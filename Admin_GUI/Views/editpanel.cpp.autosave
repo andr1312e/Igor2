@@ -1,0 +1,315 @@
+#include "editpanel.h"
+#include <QDebug>
+
+
+SettingsPanel::SettingsPanel(DatabaseService *repository, QWidget *parent)
+    : QWidget(parent)
+    , m_accountRepository(repository)
+{
+    initServices();
+    initUI();
+    insertWidgetsIntoLayout();
+    createConnections();
+}
+
+SettingsPanel::~SettingsPanel()
+{
+    delete m_kioskLockUnLockService;
+    delete m_integrityService;
+
+    delete m_actionLayout;
+    delete m_kioskLayout;
+    delete m_editFields;
+    delete m_mainLayout;
+
+    delete m_userNameLabel;
+    delete m_userNameValue;
+    delete m_userIdLabel;
+    delete m_userIdValue;
+    delete m_isInDBExistLabel;
+    delete m_FCSLabel;
+    delete m_FCSValue;
+    delete m_rankLabel;
+    delete m_rankValue;
+    delete m_roleLabel;
+    delete m_roleValue;
+
+    delete m_fileIntegrityLevelLabel;
+    delete m_fileIntegrityLevelValue;
+    delete m_userIntegrityLevelLabel;
+    delete m_userIntegrityLevelValue;
+    delete m_canUserEditFile;
+
+    delete m_editFieldsLabel;
+    delete m_FCSLineEdit;
+    delete m_rankEditLabel;
+    delete m_rankComboBox;
+    delete m_roleEditLabel;
+    delete m_roleComboBox;
+
+    delete m_save;
+    delete m_delete;
+
+    delete m_kioskModeIsEnabledLabel;
+    delete m_kioskModeIsDisabledLabel;
+    delete m_kiosModeState;
+
+    delete m_messagBox;
+
+    delete m_frame;
+}
+
+void SettingsPanel::initServices()
+{
+    Terminal *terminal=m_accountRepository->getTerminal();
+    m_integrityService=new IntegrityService(terminal);
+    m_kioskLockUnLockService=new KioskService(terminal);
+}
+
+void SettingsPanel::initUI()
+{
+   
+
+    m_frame=new QFrame();
+    m_frame->setFrameStyle(QFrame::StyledPanel|QFrame::Sunken);
+    m_frame->setLineWidth(3);
+
+    m_editFields=new QVBoxLayout();
+
+    m_editFieldsLabel=new QLabel(userEditFields.at(0));
+    m_FCSLineEdit=new QtMaterialTextField();
+    m_FCSLineEdit->setLabel("Фамилия имя отчество: ");
+    m_FCSLineEdit->setMinimumWidth(250);
+    m_rankEditLabel=new QLabel("Звание: ");
+    m_rankComboBox=new QComboBox();
+    QStringList::const_iterator it_first = Ranks.cbegin();
+    QStringList::const_iterator it_second = RanksICO.cbegin();
+    while (it_first!=Ranks.cend() || it_second!=RanksICO.cend())
+    {
+        m_rankComboBox->addItem(QIcon(*it_second), *it_first);
+        ++it_first;
+        ++it_second;
+    }
+    m_rankComboBox->setIconSize(QSize(70, 30));
+
+    m_roleEditLabel=new QLabel("Роль в системе: ");
+    m_roleComboBox=new QComboBox();
+
+
+    m_roleComboBox->addItems(Roles);
+    for (int i=0; i<Roles.length(); i++)
+    {
+        m_roleComboBox->setItemData(i, RolesToolTip.at(i), Qt::ToolTipRole);
+    }
+
+    m_actionLayout=new QHBoxLayout();
+    m_save=new QPushButton("Записать пользователя в базу");
+    m_delete=new QPushButton("Удалить пользователя из базы");
+
+    m_kioskLayout=new QHBoxLayout();
+    m_kioskLayout->setAlignment(Qt::AlignTop);
+    m_kioskModeIsEnabledLabel=new QLabel("Режим киоска включен");
+    m_kioskModeIsDisabledLabel=new QLabel("Режим киоска выключен");
+
+    m_kiosModeState=new QtMaterialToggle();
+    m_kiosModeState->setMinimumHeight(45);
+    m_kiosModeState->setOrientation(Qt::Horizontal);
+    m_kiosModeState->setDisabled(true);
+
+    m_messagBox=new QMessageBox(this);
+    m_messagBox->setText("Введите все параметры");
+}
+
+void SettingsPanel::insertWidgetsIntoLayout()
+{
+    m_mainLayout->addWidget(m_userIdLabel);
+    m_mainLayout->addWidget(m_userIdValue);
+    m_mainLayout->addWidget(m_userNameLabel);
+    m_mainLayout->addWidget(m_userNameValue);
+    m_mainLayout->addWidget(m_isInDBExistLabel);
+
+    m_mainLayout->addWidget(m_fileIntegrityLevelLabel);
+    m_mainLayout->addWidget(m_fileIntegrityLevelValue);
+    m_mainLayout->addWidget(m_userIntegrityLevelLabel);
+    m_mainLayout->addWidget(m_userIntegrityLevelValue);
+    m_mainLayout->addWidget(m_canUserEditFile);
+
+    m_mainLayout->addWidget(m_FCSLabel);
+    m_mainLayout->addWidget(m_FCSValue);
+    m_mainLayout->addWidget(m_rankLabel);
+    m_mainLayout->addWidget(m_rankValue);
+
+    m_editFields->addWidget(m_editFieldsLabel);
+    m_editFields->addWidget(m_FCSLineEdit);
+    m_editFields->addWidget(m_rankEditLabel);
+    m_editFields->addWidget(m_rankComboBox);
+    m_editFields->addWidget(m_roleLabel);
+    m_editFields->addWidget(m_roleComboBox);
+
+    m_actionLayout->addWidget(m_save);
+    m_actionLayout->addWidget(m_delete);
+
+    m_kioskLayout->addWidget(m_kioskModeIsDisabledLabel);
+    m_kioskLayout->addWidget(m_kiosModeState);
+    m_kioskLayout->addWidget(m_kioskModeIsEnabledLabel);
+
+    m_editFields->addLayout(m_actionLayout);
+    m_editFields->addLayout(m_kioskLayout);
+
+    m_frame->setLayout(m_editFields);
+    m_mainLayout->addWidget(m_frame);
+
+    setLayout(m_mainLayout);
+}
+
+void SettingsPanel::createConnections()
+{
+    connect(m_save, &QPushButton::clicked, this, &SettingsPanel::saveUser);
+    connect(m_delete, &QPushButton::clicked, this, &SettingsPanel::deleteUser);
+    connect(m_roleComboBox, &QComboBox::currentTextChanged, this, &SettingsPanel::roleChanged);
+    connect(m_kiosModeState, &QtMaterialToggle::clicked, this, &SettingsPanel::setKioskMode);
+}
+
+void SettingsPanel::setTopEditPanel(QString &userId, QString &userName)
+{
+    m_userNameValue->setText(userName);
+    m_userIdValue->setText(userId);
+    QString filePath=m_accountRepository->getFilePath();
+    QString userIngerityLevel=m_integrityService->getUserIngerityLevel(userName);
+    QString fileIngerityLevel=m_integrityService->getFileIntegrityLevel(filePath);
+
+    m_userIntegrityLevelValue->setText(userIngerityLevel);
+    m_fileIntegrityLevelValue->setText(fileIngerityLevel);
+    bool canUserEditFile=userIngerityLevel.toInt() >= fileIngerityLevel.toInt();
+    if (canUserEditFile)
+    {
+        m_canUserEditFile->setText("Данный пользователь МОЖЕТ вносить изменения в файл базы");
+    }
+    else
+    {
+        m_canUserEditFile->setText("Данный пользователь НЕ может вносить изменения в файл базы");
+    }
+
+}
+
+void SettingsPanel::setBottomEditPanel(User &user)
+{
+    if (user.hasData)
+    {
+        m_isInDBExistLabel->setText("Пользователь с ид: " + user.userId + " был успешно загружен из базы");
+        m_FCSValue->setText(user.FCS);
+        m_rankValue->setText(user.rank);
+    }
+    else
+    {
+        m_isInDBExistLabel->setText("Пользователь с ид: " + user.userId + " в базе не хранится");
+        m_FCSValue->setText("Данные отсутствуют");
+        m_rankValue->setText("Данные отсутвуют");
+    }
+
+    m_rankComboBox->setCurrentIndex(0);
+    m_FCSLineEdit->clear();
+    m_roleComboBox->setCurrentIndex(0);
+}
+
+void SettingsPanel::setLineEditsPanel(User &user)
+{
+    if (user.hasData)
+    {
+        m_editFieldsLabel->setText(userEditFields.at(1));
+        m_FCSLineEdit->setText(user.FCS);
+        m_rankComboBox->setCurrentText(user.rank);
+        m_roleComboBox->setCurrentText(user.role);
+    }
+    else
+    {
+        m_editFieldsLabel->setText(userEditFields.at(0));
+        m_FCSLineEdit->clear();
+        m_rankComboBox->setCurrentIndex(0);
+        m_roleComboBox->setCurrentIndex(0);
+    }
+}
+
+void SettingsPanel::saveUser()
+{
+    const QString FCS=m_FCSLineEdit->text();
+    const QString userID=m_userIdValue->text();
+    if (FCS=="" || userID=="")
+    {
+        m_messagBox->show();
+    }
+    else
+    {
+        const QString rank=m_rankComboBox->currentText();
+        const QString userName=m_userNameValue->text();
+        const QString role=m_roleComboBox->currentText();
+        m_accountRepository->insertUser(userID, userName, FCS, rank, role);
+        emit setDefaultRoleApps(role);
+        updateResultLabel(userID);
+    }
+}
+
+void SettingsPanel::deleteUser()
+{
+    const QString userID=m_userIdValue->text();
+    if (userID!="")
+    {
+        m_isInDBExistLabel->setText("Пользователь с ид: " + userID + " в базе не хранится");
+        m_rankComboBox->setCurrentIndex(0);
+        m_FCSLineEdit->clear();
+        m_roleComboBox->setCurrentIndex(0);
+        m_accountRepository->removeUser(userID);
+    }
+    else
+    {
+        qFatal("Идентификатор пользователя неверный");
+    }
+}
+
+void SettingsPanel::setKioskMode(bool kioskModeState)
+{
+    QString userName=m_userNameValue->text();
+    if (kioskModeState)
+    {
+        m_kioskLockUnLockService->lockUser(userName);
+    }
+    else
+    {
+        m_kioskLockUnLockService->unLockUser(userName);
+    }
+}
+
+void SettingsPanel::onLinuxUserClick(const QModelIndex &index)
+{
+    QVariant indexData=index.data(Qt::UserRole+1);
+    User user=indexData.value<User>();
+    setTopEditPanel(user.userId, user.name);
+    setBottomEditPanel(user);
+    setLineEditsPanel(user);
+
+    if (m_kioskLockUnLockService->isUserInKiosk(user.name))
+    {
+        m_kiosModeState->setChecked(true);
+    }
+    else
+    {
+        m_kiosModeState->setChecked(false);
+    }
+    m_kiosModeState->setEnabled(true);
+}
+
+void SettingsPanel::updateResultLabel(const QString &userID)
+{
+    QString operation;
+    if (m_FCSValue->text()=="Данные отсутствуют")
+    {
+        operation=" занесён";
+    }
+    else
+    {
+        operation=" изменён";
+    }
+    m_isInDBExistLabel->setText("Пользователь с ид: " + userID + operation);
+    QToast* pToast=QToast::CreateToast("Пользователь " + operation,QToast::LENGTH_LONG, this);
+    pToast->show();
+}

@@ -1,0 +1,94 @@
+#ifndef ADMIN_GUI_VIEWS_EDITPANEL_H
+#define ADMIN_GUI_VIEWS_EDITPANEL_H
+
+#include <QWidget>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QPushButton>
+#include <QFrame>
+#include <QComboBox>
+#include <QMessageBox>
+
+
+#include "Services/integrityservice.h"
+#include "Services/kioskservice.h"
+
+#include "Admin_GUI/Views/qtoast.h"
+
+#include "Admin_GUI/Widgets/qtmaterialtoggle.h"
+#include "Admin_GUI/Widgets/qtmaterialtextfield.h"
+
+class SettingsPanel : public QWidget
+{
+    Q_OBJECT
+
+public:
+
+    explicit SettingsPanel(DatabaseService *repository, QWidget *parent);
+    ~SettingsPanel();
+
+public slots:
+
+    void onLinuxUserClick(const QModelIndex &index);
+
+signals:
+
+    void setDefaultRoleApps(const QString &role);
+    void roleChanged(const QString &role);
+
+private:
+
+    void initServices();
+    void initUI();
+    void insertWidgetsIntoLayout();
+    void createConnections();
+
+private:
+
+    void setTopEditPanel(QString &userId, QString &userName);
+    void setBottomEditPanel(User &user);
+    void setLineEditsPanel(User &user);
+
+private:
+
+    KioskService *m_kioskLockUnLockService;
+    IntegrityService *m_integrityService;
+
+
+    QFrame *m_frame;
+    QVBoxLayout *m_editFields;
+    QLabel *m_editFieldsLabel;
+    QtMaterialTextField *m_FCSLineEdit;
+    QLabel *m_rankEditLabel;
+    QComboBox *m_rankComboBox;
+    QLabel *m_roleEditLabel;
+    QComboBox *m_roleComboBox;
+
+    QHBoxLayout *m_actionLayout;
+    QPushButton *m_save;
+    QPushButton *m_delete;
+
+    QHBoxLayout *m_kioskLayout;
+    QLabel *m_kioskModeIsEnabledLabel;
+    QLabel *m_kioskModeIsDisabledLabel;
+    QtMaterialToggle *m_kiosModeState;
+
+    QMessageBox *m_messagBox;
+
+
+private slots:
+
+    void saveUser();
+    void deleteUser();
+    void setKioskMode(bool kioskModeState);
+
+private:
+
+    void updateResultLabel(const QString &userID);
+    void insertUserToRepository();
+
+};
+
+#endif // ADMIN_GUI_VIEWS_EDITPANEL_H
