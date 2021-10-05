@@ -13,18 +13,18 @@ void StartupRepositoryService::checkStartupFile(const QString &folderPath, const
 
 void StartupRepositoryService::clearFile(const QString &filePath)
 {
-    m_terminal->clearFile(filePath, "StartupManagerService::writeExecToStartupFile");
+    m_terminal->clearFileSudo(filePath, "StartupManagerService::writeExecToStartupFile");
 }
 
 void StartupRepositoryService::writeExecToStartupFile(const QString &filePath, const QStringList &execPaths)
 {
     QString paths=execPaths.join('\n');
-    m_terminal->writeTextToFile(paths, filePath, "StartupManagerService::writeExecToStartupFile");
+    m_terminal->writeTextToFileSudo(paths, filePath, "StartupManagerService::writeExecToStartupFile");
 }
 
 void StartupRepositoryService::setDefaultApps(const QString &role, const QString &filePath)
 {
-    m_terminal->copyFile("/home/user/RLS_TI/"+role+".start", filePath, "StartupManagerService::setDefaultApps");
+    m_terminal->copyFileSudo("/home/user/RLS_TI/"+role+".start", filePath, "StartupManagerService::setDefaultApps");
 }
 
 QStringList StartupRepositoryService::getAllEcexFromStartupFile(const QString &filePath)

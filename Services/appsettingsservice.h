@@ -8,7 +8,7 @@
 
 #include "globalfunctions.h"
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 class AppSettingsService
 {

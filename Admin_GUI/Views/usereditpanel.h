@@ -8,7 +8,7 @@
 #include <QComboBox>
 #include <QMessageBox>
 #include <QPushButton>
-
+#include <array>
 #include "Services/databaseservice.h"
 #include "Services/kioskservice.h"
 

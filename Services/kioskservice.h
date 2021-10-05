@@ -1,7 +1,7 @@
 #ifndef SERVICES_KIOSKSERVICE_H
 #define SERVICES_KIOSKSERVICE_H
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 class KioskService
 {

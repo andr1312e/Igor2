@@ -5,7 +5,7 @@
 #include <QSignalTransition>
 #include <QPropertyAnimation>
 #include "qtmaterialtoggle_internal.h"
-#include "lib/qtmaterialstyle.h"
+#include "Styles/MaterialWidgets/qtmaterialstyle.h"
 
 
 /*!

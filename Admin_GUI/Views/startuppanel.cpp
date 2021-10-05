@@ -184,7 +184,7 @@ void StartupPanel::updateModel()
 
 void StartupPanel::writeAppListToAllUsersWithRole(QStringList &appsList)
 {
-    for (QStringList::ConstIterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
+    for (QStringList::iterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
     {
         QString startupFolder="/home/"+*it+"/RLS_TI/";
         QString startupFilePath=startupFolder+"Startup";

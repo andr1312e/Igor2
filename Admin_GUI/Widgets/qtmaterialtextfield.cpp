@@ -3,7 +3,7 @@
 #include <QtWidgets/QApplication>
 #include <QPainter>
 #include "qtmaterialtextfield_internal.h"
-#include "lib/qtmaterialstyle.h"
+#include "Styles/MaterialWidgets/qtmaterialstyle.h"
 #include <QDebug>
 
 /*!

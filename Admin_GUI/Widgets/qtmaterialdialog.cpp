@@ -8,7 +8,7 @@
 #include <QPropertyAnimation>
 #include <QPainter>
 #include "qtmaterialdialog_internal.h"
-#include "lib/qtmaterialstatetransition.h"
+#include "Styles/MaterialWidgets/qtmaterialstatetransition.h"
 
 /*!
  *  \class QtMaterialDialogPrivate

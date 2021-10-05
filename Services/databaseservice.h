@@ -9,7 +9,7 @@
 
 #include "Structs/userstruct.h"
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 class DatabaseService
 {

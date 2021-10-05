@@ -4,7 +4,7 @@
 #include <QProcess>
 #include <QStandardItemModel>
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 #include "Structs/userstruct.h"
 
 class LinuxUserService

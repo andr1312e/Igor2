@@ -7,8 +7,8 @@
 QT += core xml network widgets
 
 CONFIG += c++11
-
-TARGET = "Панель управления пользователями РЛС ТИ версия 47"
+#Панель управления пользователями РЛС ТИ версия
+TARGET = "48"
 TEMPLATE = app
 CONFIG -= console
 
@@ -25,6 +25,12 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050B00    # отключить API, у
 
 
 SOURCES += \
+    Services/Terminals/terminal.cpp \
+    Styles/InteractiveButtons/closewindowbutton.cpp \
+    Styles/InteractiveButtons/interactivebuttonbase.cpp \
+    Styles/InteractiveButtons/maximizewindowbutton.cpp \
+    Styles/InteractiveButtons/minimizewindowbutton.cpp \
+    Styles/InteractiveButtons/restorewindowbutton.cpp \
     main.cpp \
     Services/integrityservice.cpp \
     User_GUI/User_GUI.cpp \
@@ -32,14 +38,14 @@ SOURCES += \
     Admin_GUI/Model/sortmodel.cpp \
     Admin_GUI/Delegates/userdelegate.cpp \
     Admin_GUI/Views/qtoast.cpp \
-    lib/qtmaterialstyle.cpp \
-    lib/qtmaterialtheme.cpp \
-    lib/qtmaterialoverlaywidget.cpp \
-    lib/qtmaterialcheckable_internal.cpp \
-    lib/qtmaterialcheckable.cpp \
-    lib/qtmaterialripple.cpp \
-    lib/qtmaterialrippleoverlay.cpp \
-    lib/qtmaterialstatetransition.cpp \
+    Styles/MaterialWidgets/qtmaterialstyle.cpp \
+    Styles/MaterialWidgets/qtmaterialtheme.cpp \
+    Styles/MaterialWidgets/qtmaterialoverlaywidget.cpp \
+    Styles/MaterialWidgets/qtmaterialcheckable_internal.cpp \
+    Styles/MaterialWidgets/qtmaterialcheckable.cpp \
+    Styles/MaterialWidgets/qtmaterialripple.cpp \
+    Styles/MaterialWidgets/qtmaterialrippleoverlay.cpp \
+    Styles/MaterialWidgets/qtmaterialstatetransition.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp \
     Admin_GUI/Widgets/qtmaterialtoggle_internal.cpp \
@@ -47,7 +53,6 @@ SOURCES += \
     Admin_GUI/Widgets/qtmaterialdialog_internal.cpp \
     Admin_GUI/Widgets/qtmaterialdialog.cpp \
     Admin_GUI/Views/filedialogwidget.cpp \
-    Services/terminal.cpp \
     Services/fileexplorer.cpp \
     Services/kioskservice.cpp \
     Services/databaseservice.cpp \
@@ -72,14 +77,19 @@ SOURCES += \
     Server/dataHandler.cpp \
     program.cpp \
     Admin_GUI/Views/startupdialogwidget.cpp \
-    Admin_GUI/Widgets/popupdialog.cpp \
     globalfunctions.cpp \
     Services/appsettingsservice.cpp \
-    Styles/darkstyle.cpp \
-    Styles/framelesswindow.cpp \
-    Styles/windowdragger.cpp
+    Styles/Themes/darkstyle.cpp \
+    Styles/Frameless/framelesswindow.cpp \
+    Styles/Frameless/windowdragger.cpp
 
 HEADERS += \
+    Services/Terminals/terminal.h \
+    Styles/InteractiveButtons/closewindowbutton.h \
+    Styles/InteractiveButtons/interactivebuttonbase.h \
+    Styles/InteractiveButtons/maximizewindowbutton.h \
+    Styles/InteractiveButtons/minimizewindowbutton.h \
+    Styles/InteractiveButtons/restorewindowbutton.h \
     User_GUI/User_GUI.h \
     Services/integrityservice.h \
     Structs/userstruct.h \
@@ -88,18 +98,18 @@ HEADERS += \
     Admin_GUI/Model/sortmodel.h \
     Admin_GUI/Delegates/userdelegate.h \
     Admin_GUI/Views/qtoast.h \ 
-    lib/qtmaterialstyle_p.h \
-    lib/qtmaterialstyle.h \
-    lib/qtmaterialtheme_p.h \
-    lib/qtmaterialtheme.h \
-    lib/qtmaterialoverlaywidget.h \
-    lib/qtmaterialcheckable_internal.h \
-    lib/qtmaterialcheckable_p.h \
-    lib/qtmaterialripple.h \
-    lib/qtmaterialrippleoverlay.h \
-    lib/qtmaterialcheckable.h \
-    lib/qtmaterialstatetransition.h \
-    lib/qtmaterialstatetransitionevent.h \
+    Styles/MaterialWidgets/qtmaterialstyle_p.h \
+    Styles/MaterialWidgets/qtmaterialstyle.h \
+    Styles/MaterialWidgets/qtmaterialtheme_p.h \
+    Styles/MaterialWidgets/qtmaterialtheme.h \
+    Styles/MaterialWidgets/qtmaterialoverlaywidget.h \
+    Styles/MaterialWidgets/qtmaterialcheckable_internal.h \
+    Styles/MaterialWidgets/qtmaterialcheckable_p.h \
+    Styles/MaterialWidgets/qtmaterialripple.h \
+    Styles/MaterialWidgets/qtmaterialrippleoverlay.h \
+    Styles/MaterialWidgets/qtmaterialcheckable.h \
+    Styles/MaterialWidgets/qtmaterialstatetransition.h \
+    Styles/MaterialWidgets/qtmaterialstatetransitionevent.h \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
     Admin_GUI/Widgets/qtmaterialtextfield_p.h \
     Admin_GUI/Widgets/qtmaterialtextfield.h \
@@ -110,7 +120,6 @@ HEADERS += \
     Admin_GUI/Widgets/qtmaterialdialog_p.h \
     Admin_GUI/Widgets/qtmaterialdialog.h \
     Admin_GUI/Views/filedialogwidget.h \
-    Services/terminal.h \
     Services/fileexplorer.h \
     Services/kioskservice.h \
     Services/databaseservice.h \
@@ -136,12 +145,11 @@ HEADERS += \
     Server/dataHandler.h \
     program.h \
     Admin_GUI/Views/startupdialogwidget.h \
-    Admin_GUI/Widgets/popupdialog.h \
     globalfunctions.h \
     Services/appsettingsservice.h \
-    Styles/darkstyle.h \
-    Styles/framelesswindow.h \
-    Styles/windowdragger.h
+    Styles/Themes/darkstyle.h \
+    Styles/Frameless/framelesswindow.h \
+    Styles/Frameless/windowdragger.h
 
 RESOURCES += \
     resources.qrc

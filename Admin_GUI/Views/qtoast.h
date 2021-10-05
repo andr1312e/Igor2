@@ -21,10 +21,11 @@ public:
 signals:
     void signals_finished();
 protected:
-    virtual void InitUI();
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
     void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
+private:
+    void InitUI();
 private:
     QString m_strContent;
     int m_nToastInterval;

@@ -3,7 +3,7 @@
 #include <QProcess>
 #include <QString>
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 #include "Services/databaseservice.h"
 #include "Services/linuxuserservice.h"
 

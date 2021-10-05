@@ -86,7 +86,7 @@ void DatabaseService::writeToFile(QList<User> *users)
     QDomDocument documentToWrite;
     QDomElement domElement=documentToWrite.createElement("USERS");
     documentToWrite.appendChild(domElement);
-    for(QList<User>::ConstIterator it=users->begin(); it!=users->end(); ++it)
+    for(QList<User>::iterator it=users->begin(); it!=users->end(); ++it)
     {
         QDomElement userDomElement=createUserElement(documentToWrite, *it);
         domElement.appendChild(userDomElement);

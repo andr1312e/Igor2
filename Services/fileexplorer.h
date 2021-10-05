@@ -8,7 +8,7 @@
 
 #include <Structs/programstruct.h>
 
-#include <Services/terminal.h>
+#include <Services/Terminals/terminal.h>
 
 class FileExplorer
 {

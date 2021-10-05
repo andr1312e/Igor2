@@ -1,8 +1,6 @@
 #include "program.h"
 #include <QDebug>
 
-
-
 Program::Program(int &argc, char **argv)
     : QApplication(argc, argv, true)
     , m_sharedMemory(new QSharedMemory("PROCESS_CONTROLLER", this))
@@ -152,7 +150,6 @@ void Program::initAdminUI()
 void Program::createConnections()
 {
     connect(m_startupRunnableService, &StartupRunnableService::programFall, m_socketToRarm, &SocketToRarm::programFall);
-//    connect(m_framelessWindow, &FramelessWindow::minimizeWindow, [&](){    m_framelessWindow->setWindowState(Qt::WindowMinimized);} );
 }
 
 void Program::applyStyle()

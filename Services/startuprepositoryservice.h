@@ -3,7 +3,7 @@
 
 #include <QStringList>
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 class StartupRepositoryService
 {

@@ -34,13 +34,13 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
        path.quadTo(rect.topRight(), rect.topRight());
 
        if (option.state.testFlag(QStyle::State_MouseOver)) {
-           painter->setPen(QPen(QColor("#ebeced")));
-           painter->setBrush(QColor("#ebeced"));
+           painter->setPen(QPen(QColor(92, 93, 93, 255)));
+           painter->setBrush(QColor(92, 93, 93));
            painter->drawPath(path);
        }
        if (option.state.testFlag(QStyle::State_Selected)) {
-           painter->setPen(QPen(QColor("#e3e3e5")));
-           painter->setBrush(QColor("#e3e3e5"));
+           painter->setPen(QPen(QColor(227, 227, 229)));
+           painter->setBrush(QColor(227, 227, 229));
            painter->drawPath(path);
        }
        QRect iconRect = QRect(rect.left()+5, rect.top()+5, 45, 45);
@@ -48,7 +48,6 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
        QRect userNameRect = QRect(userIdRect.left(), userIdRect.bottom()+1, rect.width()-iconRect.width(), 20);
        QRect userFCSRect = QRect(userIdRect.left(), userNameRect.bottom()-1, rect.width()-iconRect.width(), 20);
 
-//       painter->drawImage(iconRect, QImage(program.m_image));
        painter->setPen(QPen(Qt::white));
        painter->setFont(QFont("Microsoft Yahei", 12));
        painter->drawText(userIdRect, "Название: " + icon.name);

@@ -40,7 +40,9 @@ bool StartupRunnableService::run(const QString &userName)
 QStringList StartupRunnableService::readUserExecFile(const QString &userName)
 {
     QString m_startupFile="/home/"+userName+"/RLS_TI/Startup";
-    QString ecexs=m_terminal->getFileTextNoSU(m_startupFile, "StartupManagerService::getAllEcexFromStartupFile");
+    m_terminal->checkAndCreateFolder("/home/"+userName+"/RLS_TI", "StartupRunnableService::readUserExecFile", false);
+    m_terminal->checkAndCreateFile("/home/"+userName+"/RLS_TI/Startup", "StartupRunnableService::readUserExecFile", false);
+    QString ecexs=m_terminal->getFileText(m_startupFile, "StartupManagerService::getAllEcexFromStartupFile", false);
     QStringList execsList=ecexs.split('\n');
     execsList.removeAll("");
     return execsList;

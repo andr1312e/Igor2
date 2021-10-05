@@ -13,6 +13,8 @@ UserEditPanel::UserEditPanel(const QString &userName, DatabaseService *repositor
 
 UserEditPanel::~UserEditPanel()
 {
+    delete m_kioskLockUnLockService;
+
     delete m_actionLayout;
     delete m_kioskLayout;
     delete m_mainLayout;
@@ -64,14 +66,14 @@ void UserEditPanel::initUI()
 
     m_mainLayout=new QVBoxLayout();
 
-    m_editFieldsLabel=new QLabel(userEditFields.at(0));
+    m_editFieldsLabel=new QLabel(userEditFields.front());
     m_FCSLineEdit=new QtMaterialTextField();
     m_FCSLineEdit->setLabel("Фамилия имя отчество: ");
     m_FCSLineEdit->setMinimumWidth(250);
     m_rankEditLabel=new QLabel("Звание: ");
     m_rankComboBox=new QComboBox();
     QStringList::const_iterator it_first = Ranks.cbegin();
-    QStringList::const_iterator it_second = RanksICO.cbegin();
+    std::array<QString, 18>::const_iterator it_second = RanksICO.cbegin();
     while (it_first!=Ranks.cend() || it_second!=RanksICO.cend())
     {
         m_rankComboBox->addItem(QIcon(*it_second), *it_first);
@@ -85,14 +87,16 @@ void UserEditPanel::initUI()
 
 
     m_roleComboBox->addItems(Roles);
-    for (int i=0; i<Roles.length(); i++)
+    quint8 index=0;
+    for (std::array<QString, 4>::const_iterator it=RolesToolTip.cbegin(); it!=RolesToolTip.cend(); ++it)
     {
-        m_roleComboBox->setItemData(i, RolesToolTip.at(i), Qt::ToolTipRole);
+        m_roleComboBox->setItemData(index, *it, Qt::ToolTipRole);
+        index++;
     }
 
     m_actionLayout=new QHBoxLayout();
-    m_addUserButton=new QPushButton("Записать пользователя в базу");
-    m_removeUserButton=new QPushButton("Удалить пользователя из базы");
+    m_addUserButton=new QPushButton(QStringLiteral("Записать пользователя в базу"));
+    m_removeUserButton=new QPushButton(QStringLiteral("Удалить пользователя из базы"));
 
     m_kioskLayout=new QHBoxLayout();
     m_kioskLayout->setAlignment(Qt::AlignTop);

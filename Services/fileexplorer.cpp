@@ -31,13 +31,13 @@ void FileExplorer::addIcon(const QString &exec, const QString &iconPath, const Q
 
 void FileExplorer::deleteIcon(const QString &iconName)
 {
-    m_terminal->deleteFile(m_path+iconName, "FileExplorer::deleteIcon");
+    m_terminal->deleteFileSudo(m_path+iconName, "FileExplorer::deleteIcon");
     updateIconListDataAndModel();
 }
 
 void FileExplorer::setDefaultIcons(const QString &role)
 {
-    m_terminal->clearFolder(m_path, "FileExplorer::deleteAllFiles");
+    m_terminal->clearFolderSudo(m_path, "FileExplorer::deleteAllFiles");
     QStringList files=m_terminal->getFileList("/home/user/RLS_TI/"+role, "FileExplorer::setDefaultIcons");
     files.removeLast();
     for (int i=files.count()-1; i>=0; i--)
@@ -49,7 +49,7 @@ void FileExplorer::setDefaultIcons(const QString &role)
     }
     for (QStringList::const_iterator it=files.cbegin(); it!=files.cend(); ++it)
     {
-        m_terminal->copyFile("/home/user/RLS_TI/"+role + "/"+ *it, m_path, "FileExplorer::setDefaultIcons");
+        m_terminal->copyFileSudo("/home/user/RLS_TI/"+role + "/"+ *it, m_path, "FileExplorer::setDefaultIcons");
     }
     updateIconListDataAndModel();
 }
@@ -57,7 +57,7 @@ void FileExplorer::setDefaultIcons(const QString &role)
 void FileExplorer::setDefaultIconsToUser(const QString &role, const QString &userName)
 {
     m_terminal->checkAndCreateFolder(m_homeName+userName+m_desktopName, "FileExplorer::setDefaultIconsToUser");
-    m_terminal->clearFolder(QString(m_homeName+userName+m_desktopName), "FileExplorer::setDefaultIconsToUser");
+    m_terminal->clearFolderSudo(QString(m_homeName+userName+m_desktopName), "FileExplorer::setDefaultIconsToUser");
     QStringList files=m_terminal->getFileList("/home/user/RLS_TI/"+role, "FileExplorer::setDefaultIcons");
     files.removeAll("");
     for (QStringList::const_iterator it=files.cbegin(); it!=files.cend(); ++it)
@@ -67,7 +67,7 @@ void FileExplorer::setDefaultIconsToUser(const QString &role, const QString &use
         {
             entity.remove(entity.count()-1, 1);
         }
-        m_terminal->copyFile("/home/user/RLS_TI/"+role + "/"+ entity, QString(m_homeName+userName+m_desktopName), "FileExplorer::setDefaultIcons");
+        m_terminal->copyFileSudo("/home/user/RLS_TI/"+role + "/"+ entity, QString(m_homeName+userName+m_desktopName), "FileExplorer::setDefaultIcons");
     }
     updateIconListDataAndModel();
 }
@@ -180,5 +180,5 @@ QString FileExplorer::createIconProperties(const QString &exec, const QString &i
 
 void FileExplorer::writeIconPropertiesToFile(const QString &iconProperties, const QString &iconName)
 {
-    m_terminal->writeTextToFile(iconProperties, m_path + iconName + m_iconType, "FileExplorer::writeIconPropertiesToFile");
+    m_terminal->writeTextToFileSudo(iconProperties, m_path + iconName + m_iconType, "FileExplorer::writeIconPropertiesToFile");
 }

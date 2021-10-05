@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QMetaMethod>
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 
 class StartupRunnableService: public QObject

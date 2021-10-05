@@ -1,5 +1,6 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
+#pragma once
 
 #include <QDebug>
 #include <QSettings>
@@ -11,7 +12,7 @@
 #include "Services/appsettingsservice.h"
 
 #include "Services/identifyservice.h"
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 #include "Services/toolbardisableservice.h"
 #include "Services/startuprunnableservice.h"
 
@@ -20,8 +21,8 @@
 #include "Admin_GUI/Views/admingui.h"
 #include "User_GUI/User_GUI.h"
 
-#include <Styles/framelesswindow.h>
-#include <Styles/darkstyle.h>
+#include <Styles/Frameless/framelesswindow.h>
+#include <Styles/Themes/darkstyle.h>
 
 class Program : public QApplication
 {

@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "Services/terminal.h"
+#include "Services/Terminals/terminal.h"
 
 class IntegrityService
 {

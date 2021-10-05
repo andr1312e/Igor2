@@ -138,7 +138,7 @@ void DesktopPanel::updateAllUsersWithCurrentRole()
 {
     if (m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
     {
-        for (QStringList::ConstIterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
+        for (QStringList::Iterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
         {
             m_rootFileService->setDefaultIconsToUser(m_pararm, *it);
         }

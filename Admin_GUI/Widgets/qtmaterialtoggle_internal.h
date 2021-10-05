@@ -2,7 +2,7 @@
 #define QTMATERIALTOGGLE_INTERNAL_H
 
 #include <QtWidgets/QWidget>
-#include "lib/qtmaterialrippleoverlay.h"
+#include "Styles/MaterialWidgets/qtmaterialrippleoverlay.h"
 
 class QtMaterialToggle;
 class QtMaterialToggleThumb;
