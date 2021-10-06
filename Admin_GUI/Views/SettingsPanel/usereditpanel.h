@@ -2,16 +2,16 @@
 #define ADMIN_GUI_VIEWS_USEREDITPANEL_H
 
 #include <QWidget>
-#include <QFrame>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <QMessageBox>
 #include <QPushButton>
-#include <array>
 #include <QLineEdit>
+#include <QResizeEvent>
 
-#include "Services/databaseservice.h"
+#include <Admin_GUI/Model/usermodel.h>
+
 #include "Services/kioskservice.h"
 
 #include "Admin_GUI/Widgets/qtmaterialtoggle.h"
@@ -22,13 +22,13 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(const QString &userName, DatabaseService *databasService, QWidget *parent);
+    UserEditPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
     ~UserEditPanel();
     void setUser(User &user);
 
 private:
 
-    void initServices(DatabaseService *databaseService);
+    void initServicesAndModel(UserModel *model, Terminal *terminal);
     void initUI();
     void applyStyle();
     void insertWidgetsIntoLayout();
@@ -43,7 +43,10 @@ signals:
 
 private:
 
-    DatabaseService *m_databaseService;
+    QFont *m_editPanelFont;
+    QFont *m_widgetsFont;
+
+    UserModel *m_model;
     KioskService *m_kioskService;
 
     QString m_userName;
@@ -70,6 +73,9 @@ private:
 
     QMessageBox *m_messagBox;
 
+    QLineEdit *m_fontEdit;
+    QLineEdit *m_buttonWidthEdit;
+
 private:
 
     void setKioskMode(bool kioskModeState);
@@ -77,10 +83,18 @@ private:
     void insertUserData(User &user);
     void showToast(QString &userName);
 
+    void resizeButton(int size);
+
 private slots:
 
     void saveUser();
     void deleteUser();
+    void setFontSize(const QString &size);
+    void ButtonSize(const QString &size);
+
+protected:
+
+    void resizeEvent(QResizeEvent *event) override;
 
 };
 

@@ -122,7 +122,6 @@ HEADERS += \
     Services/databaseservice.h \
     Services/linuxuserservice.h \
     Services/identifyservice.h \
-    Services/toolbardisableservice.h \
     Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h \

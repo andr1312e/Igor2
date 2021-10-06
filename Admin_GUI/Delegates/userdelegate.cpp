@@ -70,6 +70,6 @@ void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 QSize UserDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index)
-    qDebug()<< "option.rect.width();" << option.rect.width();
+//    qDebug()<< "option.rect.width();" << option.rect.width();
     return QSize(300, 90);
 }

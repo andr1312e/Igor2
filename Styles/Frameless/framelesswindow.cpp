@@ -51,20 +51,28 @@ void FramelessWindow::maximizeButtonClicked() {
 }
 
 void FramelessWindow::changeEvent(QEvent *event) {
-    if (event->type() == QEvent::WindowStateChange) {
-        if (windowState().testFlag(Qt::WindowNoState)) {
+    if (event->type() == QEvent::WindowStateChange)
+    {
+        if (windowState().testFlag(Qt::WindowNoState))
+        {
             m_zoomButton->setVisible(false);
             m_maximizeButton->setVisible(true);
             styleWindow(true, true);
             event->ignore();
-        } else if (windowState().testFlag(Qt::WindowMaximized)) {
-            m_zoomButton->setVisible(true);
-            m_maximizeButton->setVisible(false);
-            styleWindow(true, false);
-            event->ignore();
+        }
+        else
+        {
+            if (windowState().testFlag(Qt::WindowMaximized))
+            {
+                m_zoomButton->setVisible(true);
+                m_maximizeButton->setVisible(false);
+                styleWindow(true, false);
+                event->ignore();
+            }
         }
     }
-    event->accept();
+    else
+        event->accept();
 }
 
 void FramelessWindow::setAdminGUI(QWidget *w) {
@@ -87,9 +95,9 @@ void FramelessWindow::styleWindow(bool bActive, bool bNoState) {
         if (bNoState) {
             layout()->setMargin(15);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
-                                               "#windowTitlebar{border: 0px none palette(shadow); "
-                                               "border-top-left-radius:5px; border-top-right-radius:5px; "
-                                               "background-color:palette(shadow); height:20px;}"));
+                                                "#windowTitlebar{border: 0px none palette(shadow); "
+                                                "border-top-left-radius:5px; border-top-right-radius:5px; "
+                                                "background-color:palette(shadow); height:20px;}"));
             m_windowFrame->setStyleSheet(QStringLiteral(
                                              "#windowFrame{border:1px solid palette(highlight); border-radius:5px "
                                              "5px 5px 5px; background-color:palette(Window);}"));
@@ -103,9 +111,9 @@ void FramelessWindow::styleWindow(bool bActive, bool bNoState) {
         } else {
             layout()->setMargin(0);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
-                                               "#windowTitlebar{border: 0px none palette(shadow); "
-                                               "border-top-left-radius:0px; border-top-right-radius:0px; "
-                                               "background-color:palette(shadow); height:20px;}"));
+                                                "#windowTitlebar{border: 0px none palette(shadow); "
+                                                "border-top-left-radius:0px; border-top-right-radius:0px; "
+                                                "background-color:palette(shadow); height:20px;}"));
             m_windowFrame->setStyleSheet(QStringLiteral(
                                              "#windowFrame{border:1px solid palette(dark); border-radius:0px 0px "
                                              "0px 0px; background-color:palette(Window);}"));
@@ -118,9 +126,9 @@ void FramelessWindow::styleWindow(bool bActive, bool bNoState) {
         {
             layout()->setMargin(15);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
-                                               "#windowTitlebar{border: 0px none palette(shadow); "
-                                               "border-top-left-radius:5px; border-top-right-radius:5px; "
-                                               "background-color:palette(dark); height:20px;}"));
+                                                "#windowTitlebar{border: 0px none palette(shadow); "
+                                                "border-top-left-radius:5px; border-top-right-radius:5px; "
+                                                "background-color:palette(dark); height:20px;}"));
             m_windowFrame->setStyleSheet(QStringLiteral(
                                              "#windowFrame{border:1px solid #000000; border-radius:5px 5px 5px "
                                              "5px; background-color:palette(Window);}"));
@@ -136,9 +144,9 @@ void FramelessWindow::styleWindow(bool bActive, bool bNoState) {
         {
             layout()->setMargin(0);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
-                                               "#titlebarWidget{border: 0px none palette(shadow); "
-                                               "border-top-left-radius:0px; border-top-right-radius:0px; "
-                                               "background-color:palette(dark); height:20px;}"));
+                                                "#titlebarWidget{border: 0px none palette(shadow); "
+                                                "border-top-left-radius:0px; border-top-right-radius:0px; "
+                                                "background-color:palette(dark); height:20px;}"));
             m_windowFrame->setStyleSheet(QStringLiteral(
                                              "#windowFrame{border:1px solid palette(shadow); border-radius:0px "
                                              "0px 0px 0px; background-color:palette(Window);}"));
@@ -149,10 +157,14 @@ void FramelessWindow::styleWindow(bool bActive, bool bNoState) {
     }
 }
 
-void FramelessWindow::on_applicationStateChanged(Qt::ApplicationState state) {
-    if (state == Qt::ApplicationActive) {
+void FramelessWindow::on_applicationStateChanged(Qt::ApplicationState state)
+{
+    if (state == Qt::ApplicationActive)
+    {
         styleWindow(true, true);
-    } else {
+    }
+    else
+    {
         styleWindow(false, true);
     }
 }

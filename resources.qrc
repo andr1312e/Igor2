@@ -26,8 +26,6 @@
         <file>Styles/style.qss</file>
         <file>images/settings.ico</file>
         <file>images/settings2.ico</file>
-        <file>images/next.ico</file>
-        <file>images/hover.ico</file>
         <file>images/widgets-icons/icon_branch_closed.png</file>
         <file>images/widgets-icons/icon_branch_end.png</file>
         <file>images/widgets-icons/icon_branch_more.png</file>
@@ -55,5 +53,7 @@
         <file>images/widgets-icons/icon_window_maximize.png</file>
         <file>images/widgets-icons/icon_window_minimize.png</file>
         <file>images/widgets-icons/icon_window_restore.png</file>
+        <file>images/sun.ico</file>
+        <file>images/moon.ico</file>
     </qresource>
 </RCC>

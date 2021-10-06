@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QPushButton>
+#include <QResizeEvent>
 
 class TopBar : public QWidget
 {
@@ -23,6 +24,7 @@ public:
 signals:
 
     void hideAdditionalSettings(bool state);
+    void setTheme(bool state);
 
 private:
 
@@ -50,17 +52,26 @@ private:
 
     QPushButton *m_settingsPushButtton;
 
+    QPushButton *m_themePushButtton;
+
 private slots:
 
-    void onButtonClick(bool state);
+    void onSettingsButtonClick(bool state);
+    void onThemeButtonClick(bool state);
     void refreshDateTime();
 
 private:
 
-    void changeTextSize(bool state);
-
+    QFont *m_titleFont;
     const int m_smallFontSize=10;
-    const int m_bigFontSize=19;
+    const int m_bigFontSize=17;
+
+private:
+
+    void calculateFontSize(int width);
+protected:
+
+    void resizeEvent(QResizeEvent *event);
 };
 
 #endif // ADMIN_GUI_VIEWS_TOPBAR_H

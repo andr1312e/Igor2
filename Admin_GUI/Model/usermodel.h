@@ -16,9 +16,13 @@ public:
 
     ~UserModel();
 
+    void addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
+
+    void deleteUserFromModel(const QString &userId);
+
     QStandardItemModel* getModel(){return m_model;}
 
-    QStringList* getUserNamesByRole(const QString &role);
+    QStringList* getUsersNamesByRole(const QString &role);
 
 public slots:
 
@@ -44,7 +48,7 @@ private:
 
     void FillModelByList();
 
-    void getUserImageToList(User &user);
+    void setUserImage(User &user);
 
 };
 

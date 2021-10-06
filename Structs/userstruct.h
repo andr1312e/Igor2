@@ -15,10 +15,10 @@ struct User{
     QString m_image;
     bool hasData=false;
 
-    //    User &operator =(User &user)
-    //    {
-    //        return user;
-    //    }
+//    User& operator =(User &user)
+//    {
+//        return user;
+//    }
 };
 
 static const QStringList Roles={    "Пользователь",

@@ -2,10 +2,10 @@
 #include <QDebug>
 
 
-SettingsPanel::SettingsPanel(const QString &userName, DatabaseService *repository, QWidget *parent)
+SettingsPanel::SettingsPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent)
     : QWidget(parent)
 {
-    initUI(userName, repository);
+    initUI(userName, model, terminal);
     insertWidgetsIntoLayout();
     createConnections();
 }
@@ -18,12 +18,12 @@ SettingsPanel::~SettingsPanel()
     delete m_userEditPanel;
 }
 
-void SettingsPanel::initUI(const QString &userName, DatabaseService *repository)
+void SettingsPanel::initUI(const QString &userName, UserModel *model, Terminal *terminal)
 {
 
     m_mainLayout=new QVBoxLayout();
-    m_userInfoPanel=new UserInfoPanel(repository->getTerminal(), this);
-    m_userEditPanel=new UserEditPanel(userName, repository, this);
+    m_userInfoPanel=new UserInfoPanel(terminal, this);
+    m_userEditPanel=new UserEditPanel(userName, model, terminal, this);
 }
 
 void SettingsPanel::applyStyle()

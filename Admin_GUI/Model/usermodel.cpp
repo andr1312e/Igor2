@@ -16,6 +16,42 @@ UserModel::~UserModel()
     delete m_currentRoleUsers;
 }
 
+void UserModel::addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role)
+{
+    for(QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
+    {
+        if (it->userId==userId)
+        {
+            it->FCS=FCS;
+            it->rank=rank;
+            it->role=role;
+            it->hasData=true;
+            setUserImage(*it);
+            FillModelByList();
+            return;
+        }
+    }
+    qFatal("нет юзера");
+}
+
+void UserModel::deleteUserFromModel(const QString &userId)
+{
+    for(QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
+    {
+        if (it->userId==userId)
+        {
+            it->FCS.clear();
+            it->rank.clear();
+            it->role.clear();
+            it->hasData=false;
+            setUserImage(*it);
+            FillModelByList();
+            return;
+        }
+    }
+    qFatal("нет юзера");
+}
+
 void UserModel::dataChanged()
 {
     FillListByLinuxUserService();
@@ -23,7 +59,7 @@ void UserModel::dataChanged()
     FillModelByList();
 }
 
-QStringList* UserModel::getUserNamesByRole(const QString &role)
+QStringList* UserModel::getUsersNamesByRole(const QString &role)
 {
     m_currentRoleUsers->clear();
     for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
@@ -46,7 +82,7 @@ void UserModel::FillListByDatabaseService()
     for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
     {
         m_databaseService->readUserFromFile(*it);
-        getUserImageToList(*it);
+        setUserImage(*it);
     }
 }
 
@@ -62,7 +98,7 @@ void UserModel::FillModelByList()
     }
 }
 
-void UserModel::getUserImageToList(User &user)
+void UserModel::setUserImage(User &user)
 {
     if (user.role==Roles.at(0))
     {

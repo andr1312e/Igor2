@@ -44,10 +44,17 @@ void DatabaseService::readUserFromFile(User &currentUser)
         QDomElement user=usersList.at(i).toElement();
         if (user.attribute("userId")==currentUser.userId)
         {
-            currentUser.hasData=true;
-            currentUser.FCS=user.attribute("FCS");
-            currentUser.rank=user.attribute("rank");
-            currentUser.role=user.attribute("role" );
+            if (user.attribute("rank")=="")
+            {
+                currentUser.hasData=false;
+            }
+            else
+            {
+                currentUser.hasData=true;
+                currentUser.FCS=user.attribute("FCS");
+                currentUser.rank=user.attribute("rank");
+                currentUser.role=user.attribute("role" );
+            }
             return;
         }
     }
@@ -67,18 +74,6 @@ QString DatabaseService::getUserAttributeByLinuxUserNameToList(const QString &us
         }
     }
     return "";
-//    qFatal("Нет пользователя DatabaseService::getUserAttributeByLinuxUserName");
-}
-
-QDomElement DatabaseService::createUserElement(QDomDocument &users,const User &user)
-{
-    QDomElement userElement=users.createElement("user");
-    userElement.setAttribute("userId", user.userId);
-    userElement.setAttribute("name", user.name);
-    userElement.setAttribute("FCS", user.FCS);
-    userElement.setAttribute("rank", user.rank);
-    userElement.setAttribute("role", user.role);
-    return userElement;
 }
 
 void DatabaseService::writeToFile(QList<User> *users)
@@ -91,10 +86,26 @@ void DatabaseService::writeToFile(QList<User> *users)
         QDomElement userDomElement=createUserElement(documentToWrite, *it);
         domElement.appendChild(userDomElement);
     }
-//    qDebug()<< m_filePath;
-//    QFile file(m_filePath+"32");
-//    if(file.open(QIODevice::WriteOnly))
-//    {
-//        QTextStream(&file)<<documentToWrite.toString();
-//    }
+    qDebug()<< m_filePath;
+    QString text=documentToWrite.toString();
+    QByteArray encrypt=text.toLocal8Bit().toHex();
+    QFile file(m_filePath);
+    QTextStream stream(&file);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        stream<<encrypt;
+    }
+    stream.flush();
+    file.close();
+}
+
+QDomElement DatabaseService::createUserElement(QDomDocument &users,const User &user)
+{
+    QDomElement userElement=users.createElement("user");
+    userElement.setAttribute("userId", user.userId);
+    userElement.setAttribute("name", user.name);
+    userElement.setAttribute("FCS", user.FCS);
+    userElement.setAttribute("rank", user.rank);
+    userElement.setAttribute("role", user.role);
+    return userElement;
 }

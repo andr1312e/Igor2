@@ -24,8 +24,6 @@ public:
 
     void readUserFromFile (User &currentUser);
 
-    void writeUserToFile(User &user);
-
     QString getUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute);
 
     QString getFilePath(){ return m_filePath;}

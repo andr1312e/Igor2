@@ -11,8 +11,7 @@
 #include <QComboBox>
 #include <QMessageBox>
 
-
-
+#include "Admin_GUI/Model/usermodel.h"
 #include "Admin_GUI/Views/SettingsPanel/userinfopanel.h"
 #include "Admin_GUI/Views/SettingsPanel/usereditpanel.h"
 
@@ -26,7 +25,7 @@ class SettingsPanel : public QWidget
 
 public:
 
-    explicit SettingsPanel(const QString &userName, DatabaseService *repository, QWidget *parent);
+    explicit SettingsPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
     ~SettingsPanel();
 
     void setUser(User &user);
@@ -39,7 +38,7 @@ signals:
 
 private:
 
-    void initUI(const QString &userName, DatabaseService *repository);
+    void initUI(const QString &userName, UserModel *model, Terminal *terminal);
     void applyStyle();
     void insertWidgetsIntoLayout();
     void createConnections();

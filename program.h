@@ -13,7 +13,6 @@
 
 #include "Services/identifyservice.h"
 #include "Services/Terminals/terminal.h"
-#include "Services/toolbardisableservice.h"
 #include "Services/startuprunnableservice.h"
 
 #include "Server/dataHandler.h"

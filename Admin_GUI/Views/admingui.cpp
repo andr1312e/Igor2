@@ -37,7 +37,7 @@ void Admin_GUI::initUI()
 
     m_linuxUsersListWidget=new LinuxUsersListWidget(m_userModel, this);
 
-    m_settingsPanel=new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_databaseService, this);
+    m_settingsPanel=new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_userModel, m_databaseService->getTerminal(), this);
 
     m_additionalSettingsPanel=new AdditionalSettingsPanel(m_linuxUserService->getTerminal(), this);
 }
@@ -81,15 +81,22 @@ void Admin_GUI::initTopBar()
 void Admin_GUI::hideAdditionalSettings(bool state)
 {
     if (state)
+    {
         m_additionalSettingsPanel->hide();
+        m_linuxUsersListWidget->setMaximumWidth(width()/2);
+        m_settingsPanel->setMaximumWidth(width()/2);
+    }
     else
+    {
         m_additionalSettingsPanel->show();
-    this->showNormal();
+        m_linuxUsersListWidget->setMaximumWidth(350);
+        m_settingsPanel->setMaximumWidth(450);
+    }
 }
 
 void Admin_GUI::roleToViewChanged(const QString &role)
 {
-    QStringList *users=m_userModel->getUserNamesByRole(role);
+    QStringList *users=m_userModel->getUsersNamesByRole(role);
     m_additionalSettingsPanel->setRoleEditPanelData(role, users);
 }
 
