@@ -8,8 +8,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
-#include "Admin_GUI/Views/desktoppanel.h"
-#include "Admin_GUI/Views/startuppanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/startuppanel.h"
 
 class RoleEditPanel : public QWidget
 {

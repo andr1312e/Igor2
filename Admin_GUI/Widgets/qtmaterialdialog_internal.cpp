@@ -115,13 +115,4 @@ int QtMaterialDialogWindow::offset() const
 void QtMaterialDialogWindow::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
-
-    QPainter painter(this);
-
-    QBrush brush;
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(Qt::white);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(brush);
-    painter.drawRect(rect());
 }

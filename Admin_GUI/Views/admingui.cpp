@@ -7,9 +7,8 @@ Admin_GUI::Admin_GUI(DatabaseService *databaseService, LinuxUserService *userSer
     ,  m_databaseService(databaseService)
     ,  m_linuxUserService(userService)
 {
-    this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
     initUI();
-    applyStyle();
+    setWidgetSizes();
     insertWidgetsIntoLayout();
     createConnections();
 }
@@ -29,30 +28,24 @@ Admin_GUI::~Admin_GUI()
 
 void Admin_GUI::initUI()
 {
-
+    m_userModel=new UserModel(m_linuxUserService, m_databaseService);
 
     m_mainLayout=new QVBoxLayout();
     m_programLayout=new QHBoxLayout();
 
     initTopBar();
 
-    m_userModel=new UserModel(m_linuxUserService, m_databaseService);
-
     m_linuxUsersListWidget=new LinuxUsersListWidget(m_userModel, this);
-    m_linuxUsersListWidget->setMaximumWidth(350);
+
     m_settingsPanel=new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_databaseService, this);
-    m_settingsPanel->setMaximumWidth(450);
+
     m_additionalSettingsPanel=new AdditionalSettingsPanel(m_linuxUserService->getTerminal(), this);
 }
 
-void Admin_GUI::applyStyle()
+void Admin_GUI::setWidgetSizes()
 {
-    setStyleSheets();
-    QPalette palette;
-    palette.setColor(this->backgroundRole(), QColor(105,101,110));
-    this->setPalette(palette);
-    this->setAutoFillBackground(true);
-
+    m_linuxUsersListWidget->setMaximumWidth(350);
+    m_settingsPanel->setMaximumWidth(450);
 }
 
 void Admin_GUI::insertWidgetsIntoLayout()
@@ -75,27 +68,6 @@ void Admin_GUI::createConnections()
     connect(m_topBar, &TopBar::hideAdditionalSettings, this, &Admin_GUI::hideAdditionalSettings);
 }
 
-void Admin_GUI::setStyleSheets()
-{
-    QFile m_styleFile(":/Styles/style.qss");
-    m_styleFile.open(QFile::ReadOnly);
-    QString styleSheet=QString(m_styleFile.readAll());
-    m_styleFile.close();
-    this->setStyleSheet(styleSheet);
-}
-
-void Admin_GUI::roleToViewChanged(const QString &role)
-{
-    QStringList *users=m_userModel->getUserNamesByRole(role);
-    m_additionalSettingsPanel->setRoleEditPanelData(role, users);
-}
-
-void Admin_GUI::onLinuxUserClick(User &user)
-{
-    m_settingsPanel->setUser(user);
-    m_additionalSettingsPanel->setUserFilesEditPanelData(user.name, user.role);
-}
-
 void Admin_GUI::initTopBar()
 {
     m_topBar=new TopBar(this);
@@ -113,4 +85,16 @@ void Admin_GUI::hideAdditionalSettings(bool state)
     else
         m_additionalSettingsPanel->show();
     this->showNormal();
+}
+
+void Admin_GUI::roleToViewChanged(const QString &role)
+{
+    QStringList *users=m_userModel->getUserNamesByRole(role);
+    m_additionalSettingsPanel->setRoleEditPanelData(role, users);
+}
+
+void Admin_GUI::onLinuxUserClick(User &user)
+{
+    m_settingsPanel->setUser(user);
+    m_additionalSettingsPanel->setUserFilesEditPanelData(user.name, user.role);
 }

@@ -14,7 +14,7 @@
 
 #include "Admin_GUI/Delegates/filedelegate.h"
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
-#include "Admin_GUI/Views/filedialogwidget.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h"
 
 enum ICONS_PANEL_TYPE{
     USER_DESKTOP,

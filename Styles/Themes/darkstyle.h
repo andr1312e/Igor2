@@ -16,7 +16,6 @@ class DarkStyle : public QProxyStyle
 public:
     DarkStyle();
     ~DarkStyle();
-
     void polish(QPalette &palette) override;
     void polish(QApplication *app) override;
 
@@ -24,6 +23,7 @@ private:
     QStyle *styleBase(QStyle *style = Q_NULLPTR) const;
 
     QFile *m_qfDarkstyle;
+    bool styleApplyed=false;
 };
 
 #endif // STYLES_DARKSTYLE_H

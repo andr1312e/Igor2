@@ -1,8 +1,0 @@
-#include "LeftUserListWidget.h"
-
-UserListWidget::UserListWidget(QWidget *parent)
-    : QWidget(parent)
-    , m_allUsersListView(new QListView())
-{
-    connect(m_allUsersListView, &QListView::clicked, this, &UserListWidget::clicked);
-}

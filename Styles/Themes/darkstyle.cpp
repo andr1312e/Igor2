@@ -1,5 +1,8 @@
 #include "darkstyle.h"
 
+#include <QWidget>
+#include <QDebug>
+
 DarkStyle::DarkStyle()
     : QProxyStyle(styleBase())
     , m_qfDarkstyle(new QFile())
@@ -49,11 +52,18 @@ void DarkStyle::polish(QPalette &palette) {
                      QColor(127, 127, 127));
 }
 
-void DarkStyle::polish(QApplication *app) {
-    m_qfDarkstyle->setFileName(":/Styles/style.qss");
-    if (m_qfDarkstyle->open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QString qsStylesheet = QString(m_qfDarkstyle->readAll());
-        app->setStyleSheet(qsStylesheet);
-        m_qfDarkstyle->close();
+void DarkStyle::polish(QApplication *app)
+{
+    qDebug()<< "polish";
+    if (!styleApplyed)
+    {
+        qDebug()<< "polish";
+        m_qfDarkstyle->setFileName(":/Styles/style.qss");
+        if (m_qfDarkstyle->open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QString qsStylesheet = QString(m_qfDarkstyle->readAll());
+            app->setStyleSheet(qsStylesheet);
+            m_qfDarkstyle->close();
+        }
+        styleApplyed=true;
     }
 }

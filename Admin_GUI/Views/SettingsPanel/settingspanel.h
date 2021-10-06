@@ -13,13 +13,12 @@
 
 
 
-#include "Admin_GUI/Views/userinfopanel.h"
-#include "Admin_GUI/Views/usereditpanel.h"
+#include "Admin_GUI/Views/SettingsPanel/userinfopanel.h"
+#include "Admin_GUI/Views/SettingsPanel/usereditpanel.h"
 
 #include "Admin_GUI/Views/qtoast.h"
 
 #include "Admin_GUI/Widgets/qtmaterialtoggle.h"
-#include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
 class SettingsPanel : public QWidget
 {
@@ -36,6 +35,7 @@ signals:
 
     void setDefaultRoleApps(const QString &role);
     void roleToViewChanged(const QString &role);
+
 
 private:
 

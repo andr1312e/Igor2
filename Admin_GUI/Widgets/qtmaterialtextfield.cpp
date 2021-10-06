@@ -1,15 +1,11 @@
-#include "qtmaterialtextfield.h"
-#include "qtmaterialtextfield_p.h"
+
 #include <QtWidgets/QApplication>
 #include <QPainter>
+#include "qtmaterialtextfield.h"
+#include "qtmaterialtextfield_p.h"
 #include "qtmaterialtextfield_internal.h"
 #include "Styles/MaterialWidgets/qtmaterialstyle.h"
 #include <QDebug>
-
-/*!
- *  \class QtMaterialTextFieldPrivate
- *  \internal
- */
 
 QtMaterialTextFieldPrivate::QtMaterialTextFieldPrivate(QtMaterialTextField *q)
     : q_ptr(q)
@@ -179,12 +175,17 @@ void QtMaterialTextField::setLabelColor(const QColor &color)
 QColor QtMaterialTextField::labelColor() const
 {
     Q_D(const QtMaterialTextField);
+ return Qt::white;
+//    if (d->useThemeColors || !d->labelColor.isValid()) {
+//        return QtMaterialStyle::instance().themeColor("accent3");
+//    } else {
+//        return d->labelColor;
+//    }
+//        if (d->useThemeColors || !d->labelColor.isValid()) {
 
-    if (d->useThemeColors || !d->labelColor.isValid()) {
-        return QtMaterialStyle::instance().themeColor("accent3");
-    } else {
-        return d->labelColor;
-    }
+//        } else {
+//            return Qt::black;
+//        }
 }
 
 void QtMaterialTextField::setInkColor(const QColor &color)
@@ -200,12 +201,7 @@ void QtMaterialTextField::setInkColor(const QColor &color)
 QColor QtMaterialTextField::inkColor() const
 {
     Q_D(const QtMaterialTextField);
-
-    if (d->useThemeColors || !d->inkColor.isValid()) {
-        return QtMaterialStyle::instance().themeColor("primary1");
-    } else {
-        return d->inkColor;
-    }
+    return QtMaterialStyle::instance().themeColor("accent3");
 }
 
 void QtMaterialTextField::setInputLineColor(const QColor &color)

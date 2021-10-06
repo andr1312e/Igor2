@@ -46,42 +46,42 @@ SOURCES += \
     Styles/MaterialWidgets/qtmaterialripple.cpp \
     Styles/MaterialWidgets/qtmaterialrippleoverlay.cpp \
     Styles/MaterialWidgets/qtmaterialstatetransition.cpp \
-    Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
-    Admin_GUI/Widgets/qtmaterialtextfield.cpp \
     Admin_GUI/Widgets/qtmaterialtoggle_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtoggle.cpp \
     Admin_GUI/Widgets/qtmaterialdialog_internal.cpp \
     Admin_GUI/Widgets/qtmaterialdialog.cpp \
-    Admin_GUI/Views/filedialogwidget.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.cpp \
     Services/fileexplorer.cpp \
     Services/kioskservice.cpp \
     Services/databaseservice.cpp \
     Services/linuxuserservice.cpp \
     Services/identifyservice.cpp \
     Services/toolbardisableservice.cpp \
-    Admin_GUI/Views/desktoppanel.cpp \
-    Admin_GUI/Views/roleeditpanel.cpp \
-    Admin_GUI/Views/additionalsettingspanel.cpp \
-    Admin_GUI/Views/userfileseditpanel.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/userfileseditpanel.cpp \
     Admin_GUI/Views/topbar.cpp \
-    Admin_GUI/Views/startuppanel.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/startuppanel.cpp \
     Admin_GUI/Delegates/filedelegate.cpp \
     Admin_GUI/Views/admingui.cpp \
     Admin_GUI/Views/linuxuserslistwidget.cpp \
-    Admin_GUI/Views/userinfopanel.cpp \
-    Admin_GUI/Views/usereditpanel.cpp \
-    Admin_GUI/Views/settingspanel.cpp \
+    Admin_GUI/Views/SettingsPanel/userinfopanel.cpp \
+    Admin_GUI/Views/SettingsPanel/usereditpanel.cpp \
+    Admin_GUI/Views/SettingsPanel/settingspanel.cpp \
     Services/startuprepositoryservice.cpp \
     Services/startuprunnableservice.cpp \
     Server/messagesrepository.cpp \
     Server/dataHandler.cpp \
     program.cpp \
-    Admin_GUI/Views/startupdialogwidget.cpp \
+    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     globalfunctions.cpp \
     Services/appsettingsservice.cpp \
     Styles/Themes/darkstyle.cpp \
     Styles/Frameless/framelesswindow.cpp \
-    Styles/Frameless/windowdragger.cpp
+    Styles/Frameless/windowdragger.cpp \
+    Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
+    Admin_GUI/Widgets/qtmaterialtextfield.cpp
 
 HEADERS += \
     Services/Terminals/terminal.h \
@@ -110,46 +110,46 @@ HEADERS += \
     Styles/MaterialWidgets/qtmaterialcheckable.h \
     Styles/MaterialWidgets/qtmaterialstatetransition.h \
     Styles/MaterialWidgets/qtmaterialstatetransitionevent.h \
-    Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
-    Admin_GUI/Widgets/qtmaterialtextfield_p.h \
-    Admin_GUI/Widgets/qtmaterialtextfield.h \
     Admin_GUI/Widgets/qtmaterialtoggle_internal.h \
     Admin_GUI/Widgets/qtmaterialtoggle_p.h \
     Admin_GUI/Widgets/qtmaterialtoggle.h \
     Admin_GUI/Widgets/qtmaterialdialog_internal.h \
     Admin_GUI/Widgets/qtmaterialdialog_p.h \
     Admin_GUI/Widgets/qtmaterialdialog.h \
-    Admin_GUI/Views/filedialogwidget.h \
+    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h \
     Services/fileexplorer.h \
     Services/kioskservice.h \
     Services/databaseservice.h \
     Services/linuxuserservice.h \
     Services/identifyservice.h \
     Services/toolbardisableservice.h \
-    Admin_GUI/Views/desktoppanel.h \
-    Admin_GUI/Views/roleeditpanel.h \
-    Admin_GUI/Views/additionalsettingspanel.h \
-    Admin_GUI/Views/userfileseditpanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/userfileseditpanel.h \
     Admin_GUI/Views/topbar.h \
-    Admin_GUI/Views/startuppanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/startuppanel.h \
     Admin_GUI/Delegates/filedelegate.h \
     Admin_GUI/Views/admingui.h \
     Admin_GUI/Views/linuxuserslistwidget.h \
-    Admin_GUI/Views/userinfopanel.h \
-    Admin_GUI/Views/usereditpanel.h \
-    Admin_GUI/Views/settingspanel.h \
+    Admin_GUI/Views/SettingsPanel/userinfopanel.h \
+    Admin_GUI/Views/SettingsPanel/usereditpanel.h \
+    Admin_GUI/Views/SettingsPanel/settingspanel.h \
     Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
     Server/dataHandler.h \
     program.h \
-    Admin_GUI/Views/startupdialogwidget.h \
+    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h \
     globalfunctions.h \
     Services/appsettingsservice.h \
     Styles/Themes/darkstyle.h \
     Styles/Frameless/framelesswindow.h \
-    Styles/Frameless/windowdragger.h
+    Styles/Frameless/windowdragger.h \
+    Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
+    Admin_GUI/Widgets/qtmaterialtextfield_p.h \
+    Admin_GUI/Widgets/qtmaterialtextfield.h
 
 RESOURCES += \
     resources.qrc

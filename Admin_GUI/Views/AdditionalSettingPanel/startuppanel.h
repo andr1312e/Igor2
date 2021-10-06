@@ -14,7 +14,7 @@
 #include "Admin_GUI/Views/qtoast.h"
 
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
-#include "Admin_GUI/Views/startupdialogwidget.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h"
 
 enum STARTUP_PANEL_TYPE{
     USER_APPS,

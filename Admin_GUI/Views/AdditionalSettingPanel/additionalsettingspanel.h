@@ -14,8 +14,8 @@
 
 #include "Services/linuxuserservice.h"
 
-#include "Admin_GUI/Views/roleeditpanel.h"
-#include "Admin_GUI/Views/userfileseditpanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/userfileseditpanel.h"
 
 class AdditionalSettingsPanel : public QWidget
 {
@@ -31,6 +31,7 @@ public:
 private:
 
     void initUI(Terminal *terminal);
+    void applyStyle();
     void insertWidgetsIntoLayout();
     void createConnections();
 

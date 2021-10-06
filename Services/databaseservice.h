@@ -22,7 +22,9 @@ public:
 
     void getRLSTIAdminsUserName (QStringList &adminsUserNames);
 
-    void fillUserFromList (User &currentUser);
+    void readUserFromFile (User &currentUser);
+
+    void writeUserToFile(User &user);
 
     QString getUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute);
 

@@ -10,8 +10,8 @@
 
 #include "Admin_GUI/Views/topbar.h"
 #include "Admin_GUI/Views/linuxuserslistwidget.h"
-#include "Admin_GUI/Views/settingspanel.h"
-#include "Admin_GUI/Views/additionalsettingspanel.h"
+#include "Admin_GUI/Views/SettingsPanel/settingspanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h"
 
 
 class Admin_GUI : public QWidget
@@ -26,7 +26,7 @@ public:
 private:
 
     void initUI();
-    void applyStyle();
+    void setWidgetSizes();
     void insertWidgetsIntoLayout();
     void createConnections();
 
@@ -44,8 +44,6 @@ private:
     SettingsPanel *m_settingsPanel;
     AdditionalSettingsPanel *m_additionalSettingsPanel;
 
-private slots:
-    void setStyleSheets();
 private:
     void initTopBar();
 

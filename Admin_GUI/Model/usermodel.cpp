@@ -45,7 +45,7 @@ void UserModel::FillListByDatabaseService()
 {
     for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
     {
-        m_databaseService->fillUserFromList(*it);
+        m_databaseService->readUserFromFile(*it);
         getUserImageToList(*it);
     }
 }

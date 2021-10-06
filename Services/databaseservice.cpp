@@ -35,7 +35,7 @@ void DatabaseService::getRLSTIAdminsUserName(QStringList &adminsUserNames)
     }
 }
 
-void DatabaseService::fillUserFromList(User &currentUser)
+void DatabaseService::readUserFromFile(User &currentUser)
 {
     QDomElement users=m_accountsData.elementsByTagName("USERS").at(0).toElement();
     QDomNodeList usersList = users.elementsByTagName("user");

@@ -4,8 +4,8 @@
 #include <QWidget>
 
 
-#include "Admin_GUI/Views/desktoppanel.h"
-#include "Admin_GUI/Views/startuppanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/startuppanel.h"
 
 class UserFilesEditPanel : public QWidget
 {

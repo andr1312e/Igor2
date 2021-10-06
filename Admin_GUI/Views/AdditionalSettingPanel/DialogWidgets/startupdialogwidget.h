@@ -30,7 +30,6 @@ signals:
 private:
 
     void initUI();
-    void setStyleSteers();
     void insertWidgetsIntoLayouts();
     void createConnections();
 

@@ -146,11 +146,11 @@ void SocketToRarm::connectToRarm()
 
 void SocketToRarm::checkConnection()
 {
-    qDebug() << "Время проверить поключение";
-    if (!isRarmConnected()) {
-        reconnectToRarm();
-        qDebug() << "Переподключаемся";
-    }
+//    qDebug() << "Время проверить поключение";
+//    if (!isRarmConnected()) {
+//        reconnectToRarm();
+//        qDebug() << "Переподключаемся";
+//    }
 }
 
 void SocketToRarm::getMessage()

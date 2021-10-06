@@ -9,7 +9,6 @@ class GlobalFunctions{
 public:
     static bool stringContainsBadCharecters(const QString &fileName);
 
-//static const QStringList badCharecters в .cpp файле
 };
 
 #endif // GLOBALFUNCTIONS_H

@@ -102,6 +102,11 @@ void DesktopPanel::applyStyle()
 {
     m_addProgramButton->setObjectName("add");
     m_deleteProgramButton->setObjectName("remove");
+
+    QPalette rolePallete = m_dialogWidget->palette();
+    rolePallete.setColor(QPalette::Window, QColor(42, 42, 42));
+    m_dialogWidget->setPalette(rolePallete);
+    m_dialogWidget->setAutoFillBackground(true);
 }
 
 void DesktopPanel::initModel()

@@ -4,6 +4,7 @@ AdditionalSettingsPanel::AdditionalSettingsPanel(Terminal *terminal, QWidget *pa
     : QWidget(parent)
 {
     initUI(terminal);
+    applyStyle();
     insertWidgetsIntoLayout();
     createConnections();
 }
@@ -32,7 +33,10 @@ void AdditionalSettingsPanel::initUI(Terminal *terminal)
     m_userFilesEditPanel=new UserFilesEditPanel(terminal, this);
 
     m_roleEditPanel=new RoleEditPanel(terminal, this);
+}
 
+void AdditionalSettingsPanel::applyStyle()
+{
     QPalette userPallete = m_userFilesEditPanel->palette();
     userPallete.setColor(QPalette::Window, QColor(25, 25, 52));
     m_userFilesEditPanel->setPalette(userPallete);
@@ -41,10 +45,7 @@ void AdditionalSettingsPanel::initUI(Terminal *terminal)
 
     QPalette rolePallete = m_roleEditPanel->palette();
     rolePallete.setColor(QPalette::Window, QColor(25, 25, 25));
-    m_roleEditPanel->setObjectName("roleEdit");
     m_roleEditPanel->setPalette(rolePallete);
-
-
     m_roleEditPanel->setAutoFillBackground(true);
 }
 

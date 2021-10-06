@@ -155,6 +155,7 @@ void Program::createConnections()
 void Program::applyStyle()
 {
     m_darkStyle=new DarkStyle();
+//    m_darkStyle->applyStyle(this);
     QApplication::setStyle(m_darkStyle);
 
 }
