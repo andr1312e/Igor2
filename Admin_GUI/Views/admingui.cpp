@@ -44,7 +44,7 @@ void Admin_GUI::initUI()
 
 void Admin_GUI::setWidgetSizes()
 {
-    m_linuxUsersListWidget->setMaximumWidth(350);
+    m_linuxUsersListWidget->setMaximumWidth(336);
     m_settingsPanel->setMaximumWidth(450);
 }
 
@@ -66,6 +66,7 @@ void Admin_GUI::createConnections()
     connect(m_settingsPanel, &SettingsPanel::setDefaultRoleApps, m_additionalSettingsPanel, &AdditionalSettingsPanel::setDefaultRoleApps);
     connect(m_settingsPanel, &SettingsPanel::roleToViewChanged, this, &Admin_GUI::roleToViewChanged);
     connect(m_topBar, &TopBar::hideAdditionalSettings, this, &Admin_GUI::hideAdditionalSettings);
+    connect(m_topBar, &TopBar::setTheme, this, &Admin_GUI::setTheme);
 }
 
 void Admin_GUI::initTopBar()

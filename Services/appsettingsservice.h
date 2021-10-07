@@ -51,6 +51,14 @@ private:
 
     const QString m_pathToRoleFoldersKey="rolefolders";
 
+    const QString m_viewModeDefaultValue="full";
+
+    const QString m_themeKeyDefaultValue="dark";
+
+    const QString m_pathToExecsKeyDefaultValue="/home/user/RLS_TI/";
+
+    const QString m_pathToRoleFoldersKeyDefaultValue="/home/user/RLS_TI/";
+
 private:
 
     QString getPathUserDb();

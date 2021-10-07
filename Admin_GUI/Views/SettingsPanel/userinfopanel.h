@@ -3,6 +3,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QWidget>
 
 #include "Structs/userstruct.h"
@@ -16,6 +17,7 @@ public:
     UserInfoPanel(Terminal *terminal, QWidget *parent);
     ~UserInfoPanel();
     void setUser(User &user);
+    void setFontSize(int fontSize);
 
 private:
 
@@ -28,6 +30,8 @@ private:
     IntegrityService *m_integrityService;
 
     QString m_repositoryPath;
+
+    QFont *m_editPanelFont;
 
     QVBoxLayout *m_mainLayout;
 
@@ -72,7 +76,6 @@ public slots:
     void fillUserAdditionalInfo(const QString &FCs, const QString &rank, const QString &role);
 
     void clearAdditionalInfo();
-
 };
 
 #endif // ADMIN_GUI_VIEWS_USERINFOPANEL_H

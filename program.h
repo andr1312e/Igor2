@@ -21,7 +21,7 @@
 #include "User_GUI/User_GUI.h"
 
 #include <Styles/Frameless/framelesswindow.h>
-#include <Styles/Themes/darkstyle.h>
+#include <Styles/Themes/proxystyle.h>
 
 class Program : public QApplication
 {
@@ -76,7 +76,7 @@ private:
     FakeUI *m_fakeUI;
     FramelessWindow *m_framelessWindow;
 
-    DarkStyle *m_darkStyle;
+    ProxyStyle *m_proxyStyle;
 
 };
 #endif // PROGRAM_H

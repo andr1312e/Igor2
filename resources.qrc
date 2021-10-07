@@ -23,7 +23,6 @@
         <file>images/Звания/Генерал-майор.ico</file>
         <file>images/Звания/Генерал-полковник.ico</file>
         <file>images/ico.png</file>
-        <file>Styles/style.qss</file>
         <file>images/settings.ico</file>
         <file>images/settings2.ico</file>
         <file>images/widgets-icons/icon_branch_closed.png</file>
@@ -55,5 +54,7 @@
         <file>images/widgets-icons/icon_window_restore.png</file>
         <file>images/sun.ico</file>
         <file>images/moon.ico</file>
+        <file>Styles/Themes/styleDark.qss</file>
+        <file>Styles/Themes/styleWhite.qss</file>
     </qresource>
 </RCC>

@@ -3,6 +3,7 @@
 
 TopBar::TopBar(QWidget *parent)
     : QWidget(parent)
+    , m_oldFontSize(0)
     , m_dateTime(new QDateTime())
     , m_timer(new QTimer())
 {
@@ -15,6 +16,8 @@ TopBar::TopBar(QWidget *parent)
 
 TopBar::~TopBar()
 {
+    delete m_iconsSize;
+
     delete m_titleFont;
     delete m_timer;
     delete m_dateTime;
@@ -36,7 +39,6 @@ void TopBar::setData(QString &rank, QString &FCS, QString &role)
 
 void TopBar::initUI()
 {
-
     m_userInfoLayout=new QHBoxLayout();
     m_userInfoLayout->setSpacing(40);
     m_userInfoLayout->setContentsMargins(10, 10, 10, 10);
@@ -47,18 +49,20 @@ void TopBar::initUI()
     m_currentUserNameLabel->setFont(*m_titleFont);
     m_currentTimeLabel->setFont(*m_titleFont);
     m_currentUseRoleLabel->setFont(*m_titleFont);
+
+    m_iconsSize=new QSize(30, 30);
     m_settingsPushButtton=new QPushButton();
     m_settingsPushButtton->setCheckable(true);
     m_settingsPushButtton->setChecked(false);
     m_settingsPushButtton->setFlat(true);
     m_settingsPushButtton->setIcon(QIcon(":/images/settings2"));
-    m_settingsPushButtton->setIconSize(QSize(30, 30));
+    m_settingsPushButtton->setIconSize(*m_iconsSize);
     m_themePushButtton=new QPushButton();
     m_themePushButtton->setCheckable(true);
     m_themePushButtton->setChecked(false);
     m_themePushButtton->setFlat(true);
     m_themePushButtton->setIcon(QIcon(":/images/moon"));
-    m_themePushButtton->setIconSize(QSize(30, 30));
+    m_themePushButtton->setIconSize(*m_iconsSize);
 }
 
 void TopBar::applyStyle()
@@ -95,13 +99,12 @@ void TopBar::onSettingsButtonClick(bool state)
     if (state)
     {
         m_settingsPushButtton->setIcon(QIcon(":/images/settings2"));
-        m_settingsPushButtton->setIconSize(QSize(30, 30));
     }
     else
     {
         m_settingsPushButtton->setIcon(QIcon(":/images/settings"));
-        m_settingsPushButtton->setIconSize(QSize(30, 30));
     }
+    m_settingsPushButtton->setIconSize(*m_iconsSize);
     emit hideAdditionalSettings(state);
 }
 
@@ -110,14 +113,12 @@ void TopBar::onThemeButtonClick(bool state)
     if (state)
     {
         m_themePushButtton->setIcon(QIcon(":/images/sun"));
-        m_themePushButtton->setIconSize(QSize(30, 30));
     }
     else
     {
         m_themePushButtton->setIcon(QIcon(":/images/moon"));
-        m_themePushButtton->setIconSize(QSize(30, 30));
     }
-    //    changeTextSize(state);
+    m_themePushButtton->setIconSize(*m_iconsSize);
     emit setTheme(state);
 }
 
@@ -126,80 +127,136 @@ void TopBar::refreshDateTime()
     m_currentTimeLabel->setText(m_dateTime->currentDateTime().toString("Дата: dddd dd MMMM yyyy г.  Время: hh:mm:ss"));
 }
 
-
-
-void TopBar::calculateFontSize(int width)
+bool TopBar::isNeedToUpdateFontSize(int width)
 {
-    if (width>1870)
+    if (width>1890)
     {
-        m_titleFont->setPointSize(20);
+        if (m_oldFontSize!=20)
+        {
+            m_oldFontSize=20;
+            return true;
+        }
     }
     else
-        if (width>1760)
+        if (width>1785)
         {
-            m_titleFont->setPointSize(19);
+            if (m_oldFontSize!=19)
+            {
+                m_oldFontSize=19;
+                return true;
+            }
         }
         else
-            if (width>1720)
+            if (width>1730)
             {
-                m_titleFont->setPointSize(18);
+                if (m_oldFontSize!=18)
+                {
+                    m_oldFontSize=18;
+                    return true;
+                }
             }
             else
-                if (width>1640)
+                if (width>1716)
                 {
-                    m_titleFont->setPointSize(17);
+                    if (m_oldFontSize!=17)
+                    {
+                        m_oldFontSize=17;
+                        return true;
+                    }
                 }
                 else
-                    if (width>1530)
+                    if (width>1545)
                     {
-                        m_titleFont->setPointSize(16);
+                        if (m_oldFontSize!=16)
+                        {
+                            m_oldFontSize=16;
+                            return true;
+                        }
                     }
                     else
-                        if (width>1450)
+                        if (width>1470)
                         {
-                            m_titleFont->setPointSize(15);
+                            if (m_oldFontSize!=15)
+                            {
+                                m_oldFontSize=15;
+                                return true;
+                            }
                         }
                         else
-                            if (width>1410)
+                            if (width>1430)
                             {
-                                m_titleFont->setPointSize(14);
+                                if (m_oldFontSize!=14)
+                                {
+                                    m_oldFontSize=14;
+                                    return true;
+                                }
                             }
                             else
                                 if (width>1330)
                                 {
-                                    m_titleFont->setPointSize(13);
+                                    if (m_oldFontSize!=13)
+                                    {
+                                        m_oldFontSize=13;
+                                        return true;
+                                    }
                                 }
                                 else
-                                    if (width>1220)
+                                    if (width>1235)
                                     {
-                                        m_titleFont->setPointSize(12);
+                                        if (m_oldFontSize!=12)
+                                        {
+                                            m_oldFontSize=12;
+                                            return true;
+                                        }
                                     }
                                     else
-                                        if (width>1160)
+                                        if (width>1190)
                                         {
-                                            m_titleFont->setPointSize(11);
+                                            if (m_oldFontSize!=11)
+                                            {
+                                                m_oldFontSize=11;
+                                                return true;
+                                            }
                                         }
                                         else
                                             if (width>1080)
                                             {
-                                                m_titleFont->setPointSize(10);
+                                                if (m_oldFontSize!=10)
+                                                {
+                                                    m_oldFontSize=10;
+                                                    return true;
+                                                }
                                             }
                                             else
-                                                if (width>980)
+                                                if (width>990)
                                                 {
-                                                    m_titleFont->setPointSize(9);
+                                                    if (m_oldFontSize!=9)
+                                                    {
+                                                        m_oldFontSize=9;
+                                                        return true;
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    m_titleFont->setPointSize(8);
+                                                    if (m_oldFontSize!=8)
+                                                    {
+                                                        m_oldFontSize=8;
+                                                        return true;
+                                                    }
                                                 }
+    return false;
+}
+
+void TopBar::updateFontSize()
+{
+    m_titleFont->setPointSize(m_oldFontSize);
+    m_currentUserNameLabel->setFont(*m_titleFont);
+    m_currentTimeLabel->setFont(*m_titleFont);
+    m_currentUseRoleLabel->setFont(*m_titleFont);
 }
 
 void TopBar::resizeEvent(QResizeEvent *event)
 {
-    calculateFontSize(event->size().width());
-    m_currentUserNameLabel->setFont(*m_titleFont);
-    m_currentTimeLabel->setFont(*m_titleFont);
-    m_currentUseRoleLabel->setFont(*m_titleFont);
-
+    if (isNeedToUpdateFontSize(event->size().width()))
+        updateFontSize();
 }

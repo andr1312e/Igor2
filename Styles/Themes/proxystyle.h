@@ -9,20 +9,28 @@
 #include <QStyleFactory>
 
 
-class DarkStyle : public QProxyStyle
+class ProxyStyle : public QProxyStyle
 {
     Q_OBJECT
 
 public:
-    DarkStyle();
-    ~DarkStyle();
+    ProxyStyle();
+    void setTheme(QString &theme);
+    ~ProxyStyle();
     void polish(QPalette &palette) override;
     void polish(QApplication *app) override;
+
+public slots:
+
+    void changeTheme(bool state);
 
 private:
     QStyle *styleBase(QStyle *style = Q_NULLPTR) const;
 
-    QFile *m_qfDarkstyle;
+    QFile *m_qfCurrentStyle;
+    QString m_styleSheet;
+    QApplication *m_myApp;
+
     bool styleApplyed=false;
 };
 

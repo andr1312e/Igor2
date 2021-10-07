@@ -35,7 +35,6 @@ UserEditPanel::~UserEditPanel()
     delete m_kiosModeState;
 
     delete m_messagBox;
-
 }
 
 void UserEditPanel::setUser(User &user)
@@ -56,6 +55,33 @@ void UserEditPanel::setUser(User &user)
     }
 }
 
+void UserEditPanel::setFontSize(int fontSize)
+{
+    m_editPanelFont->setPointSize(fontSize);
+    m_editFieldsLabel->setFont(*m_editPanelFont);
+    m_FCSFieldsLabel->setFont(*m_editPanelFont);
+    m_rankEditLabel->setFont(*m_editPanelFont);
+    m_roleEditLabel->setFont(*m_editPanelFont);
+    m_FCSLineEdit->setFont(*m_editPanelFont);
+    m_kioskModeIsEnabledLabel->setFont(*m_editPanelFont);
+    m_kioskModeIsDisabledLabel->setFont(*m_editPanelFont);
+    m_saveUserDataButton->setFont(*m_editPanelFont);
+    m_FCSLineEdit->setFont(*m_editPanelFont);
+    m_removeUserButton->setFont(*m_editPanelFont);
+    m_roleComboBox->setFont(*m_editPanelFont);
+    m_rankComboBox->setFont(*m_editPanelFont);
+}
+
+void UserEditPanel::setButtonSize(int size)
+{
+    m_saveUserDataButton->setFixedHeight(size);
+    m_FCSLineEdit->setFixedHeight(size);
+    m_removeUserButton->setFixedHeight(size);
+    m_roleComboBox->setFixedHeight(size);
+    m_rankComboBox->setFixedHeight(size);
+    m_rankComboBox->setIconSize(QSize(size*1.8, size*1.8));
+}
+
 void UserEditPanel::initServicesAndModel(UserModel *model, Terminal *terminal)
 {
     m_model=model;
@@ -71,7 +97,6 @@ void UserEditPanel::initUI()
     m_FCSFieldsLabel=new QLabel("Фамилия имя отчество: ");
     m_editPanelFont=new QFont(m_FCSFieldsLabel->font());
     m_FCSLineEdit=new QLineEdit();
-    m_widgetsFont=new QFont(m_FCSLineEdit->font());
     m_rankEditLabel=new QLabel("Звание: ");
     m_rankComboBox=new QComboBox();
     QStringList::const_iterator it_first = Ranks.cbegin();
@@ -112,30 +137,6 @@ void UserEditPanel::initUI()
 
     m_messagBox=new QMessageBox(this);
     m_messagBox->setText("Введите все параметры");
-
-    m_fontEdit=new QLineEdit();
-    m_buttonWidthEdit=new QLineEdit();
-    m_fontEdit->show();
-    m_buttonWidthEdit->show();
-}
-
-void UserEditPanel::setFontSize(const QString &size)
-{
-    int intSize=size.toInt();
-    m_editPanelFont->setPointSize(intSize);
-    m_editFieldsLabel->setFont(*m_editPanelFont);
-    m_FCSFieldsLabel->setFont(*m_editPanelFont);
-    m_rankEditLabel->setFont(*m_editPanelFont);
-    m_roleEditLabel->setFont(*m_editPanelFont);
-    m_FCSLineEdit->setFont(*m_editPanelFont);
-    m_kioskModeIsEnabledLabel->setFont(*m_editPanelFont);
-    m_kioskModeIsDisabledLabel->setFont(*m_editPanelFont);
-}
-
-void UserEditPanel::ButtonSize(const QString &size)
-{
-    int intSize=size.toInt();
-    resizeButton(intSize);
 }
 
 void UserEditPanel::applyStyle()
@@ -173,9 +174,6 @@ void UserEditPanel::createConnections()
     connect(m_removeUserButton, &QPushButton::clicked, this, &UserEditPanel::deleteUser);
     connect(m_roleComboBox, &QComboBox::currentTextChanged, this, &UserEditPanel::roleToViewChanged);
     connect(m_kiosModeState, &QtMaterialToggle::clicked, this, &UserEditPanel::setKioskMode);
-
-    connect(m_fontEdit, &QLineEdit::textEdited, this, &UserEditPanel::setFontSize);
-    connect(m_buttonWidthEdit, &QLineEdit::textEdited, this, &UserEditPanel::ButtonSize);
 }
 
 void UserEditPanel::setKioskMode(bool kioskModeState)
@@ -227,22 +225,6 @@ void UserEditPanel::showToast(QString &userName)
     pToast->show();
 }
 
-void UserEditPanel::resizeButton(int size)
-{
-    m_saveUserDataButton->setFixedHeight(size);
-    m_FCSLineEdit->setFixedHeight(size);
-    m_removeUserButton->setFixedHeight(size);
-    m_roleComboBox->setFixedHeight(size);
-    m_rankComboBox->setFixedHeight(size);
-
-    m_widgetsFont->setPixelSize((size/1.5));
-    m_saveUserDataButton->setFont(*m_widgetsFont);
-    m_FCSLineEdit->setFont(*m_widgetsFont);
-    m_removeUserButton->setFont(*m_widgetsFont);
-    m_roleComboBox->setFont(*m_widgetsFont);
-    m_rankComboBox->setFont(*m_widgetsFont);
-}
-
 void UserEditPanel::saveUser()
 {
     const QString FCS=m_FCSLineEdit->text();
@@ -271,11 +253,6 @@ void UserEditPanel::deleteUser()
         m_model->deleteUserFromModel(m_userId);
         emit clearUserAdditionalInfo();
     }
-}
-
-void UserEditPanel::resizeEvent(QResizeEvent *event)
-{
-    qDebug()<< event->size();
 }
 
 

@@ -23,6 +23,10 @@ public:
     Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent=Q_NULLPTR);
     ~Admin_GUI();
 
+signals:
+
+    void setTheme(bool state);
+
 private:
 
     void initUI();

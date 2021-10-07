@@ -8,6 +8,7 @@
 #include <QListView>
 #include <QPushButton>
 #include <QComboBox>
+#include <QResizeEvent>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 
@@ -21,7 +22,7 @@ class LinuxUsersListWidget : public QWidget
     Q_OBJECT
 public:
 
-     LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
+    LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
     ~LinuxUsersListWidget();
 
 signals:
@@ -38,6 +39,10 @@ private:
     void createConnections();
 
 private:
+
+    QFont *m_font;
+
+    int m_oldFontSize;
 
     QVBoxLayout *m_mainLayout;
 
@@ -57,11 +62,19 @@ private:
 
     SortModel *m_sortModel;
 
+private:
+
+    void updateFontSize();
+
 private slots:
 
     void onLineEditChange(const QString &text);
     void onComboBoxChange(const QString &attribute);
     void getUserData(const QModelIndex &index);
+
+protected:
+
+    void resizeEvent(QResizeEvent *event) override;
 
 };
 

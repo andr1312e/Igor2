@@ -31,6 +31,7 @@ SOURCES += \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
     Styles/InteractiveButtons/minimizewindowbutton.cpp \
     Styles/InteractiveButtons/restorewindowbutton.cpp \
+    Styles/Themes/proxystyle.cpp \
     main.cpp \
     Services/integrityservice.cpp \
     User_GUI/User_GUI.cpp \
@@ -77,27 +78,20 @@ SOURCES += \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     globalfunctions.cpp \
     Services/appsettingsservice.cpp \
-    Styles/Themes/darkstyle.cpp \
     Styles/Frameless/framelesswindow.cpp \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp
 
 HEADERS += \
-    Services/Terminals/terminal.h \
+    Structs/userstruct.h \
+    Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
     Styles/InteractiveButtons/interactivebuttonbase.h \
     Styles/InteractiveButtons/maximizewindowbutton.h \
     Styles/InteractiveButtons/minimizewindowbutton.h \
     Styles/InteractiveButtons/restorewindowbutton.h \
-    User_GUI/User_GUI.h \
-    Services/integrityservice.h \
-    Structs/userstruct.h \
-    Structs/programstruct.h \
-    Admin_GUI/Model/usermodel.h \
-    Admin_GUI/Model/sortmodel.h \
-    Admin_GUI/Delegates/userdelegate.h \
-    Admin_GUI/Views/qtoast.h \ 
+    Styles/Themes/proxystyle.h \
     Styles/MaterialWidgets/qtmaterialstyle_p.h \
     Styles/MaterialWidgets/qtmaterialstyle.h \
     Styles/MaterialWidgets/qtmaterialtheme_p.h \
@@ -110,6 +104,12 @@ HEADERS += \
     Styles/MaterialWidgets/qtmaterialcheckable.h \
     Styles/MaterialWidgets/qtmaterialstatetransition.h \
     Styles/MaterialWidgets/qtmaterialstatetransitionevent.h \
+    Styles/Frameless/framelesswindow.h \
+    Styles/Frameless/windowdragger.h \
+    Admin_GUI/Model/usermodel.h \
+    Admin_GUI/Model/sortmodel.h \
+    Admin_GUI/Delegates/userdelegate.h \
+    Admin_GUI/Views/qtoast.h \ 
     Admin_GUI/Widgets/qtmaterialtoggle_internal.h \
     Admin_GUI/Widgets/qtmaterialtoggle_p.h \
     Admin_GUI/Widgets/qtmaterialtoggle.h \
@@ -117,11 +117,6 @@ HEADERS += \
     Admin_GUI/Widgets/qtmaterialdialog_p.h \
     Admin_GUI/Widgets/qtmaterialdialog.h \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h \
-    Services/fileexplorer.h \
-    Services/kioskservice.h \
-    Services/databaseservice.h \
-    Services/linuxuserservice.h \
-    Services/identifyservice.h \
     Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h \
@@ -134,21 +129,26 @@ HEADERS += \
     Admin_GUI/Views/SettingsPanel/userinfopanel.h \
     Admin_GUI/Views/SettingsPanel/usereditpanel.h \
     Admin_GUI/Views/SettingsPanel/settingspanel.h \
+    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h \
+    Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
+    Admin_GUI/Widgets/qtmaterialtextfield_p.h \
+    Admin_GUI/Widgets/qtmaterialtextfield.h \
+    Services/fileexplorer.h \
+    Services/kioskservice.h \
+    Services/databaseservice.h \
+    Services/linuxuserservice.h \
+    Services/identifyservice.h \
+    Services/Terminals/terminal.h \
+    Services/integrityservice.h \
     Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
+    Services/appsettingsservice.h \
+    User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
     Server/dataHandler.h \
-    program.h \
-    Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h \
     globalfunctions.h \
-    Services/appsettingsservice.h \
-    Styles/Themes/darkstyle.h \
-    Styles/Frameless/framelesswindow.h \
-    Styles/Frameless/windowdragger.h \
-    Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
-    Admin_GUI/Widgets/qtmaterialtextfield_p.h \
-    Admin_GUI/Widgets/qtmaterialtextfield.h
+    program.h
 
 RESOURCES += \
     resources.qrc

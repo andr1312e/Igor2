@@ -154,10 +154,10 @@ void Program::createConnections()
 
 void Program::applyStyle()
 {
-    m_darkStyle=new DarkStyle();
-//    m_darkStyle->applyStyle(this);
-    QApplication::setStyle(m_darkStyle);
-
+    m_proxyStyle=new ProxyStyle();
+    m_proxyStyle->setTheme(m_settingFileService->m_theme);
+    QApplication::setStyle(m_proxyStyle);
+    connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &ProxyStyle::changeTheme);
 }
 
 void Program::startAdminServices()

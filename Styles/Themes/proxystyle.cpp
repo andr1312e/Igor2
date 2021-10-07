@@ -1,21 +1,41 @@
-#include "darkstyle.h"
+#include "proxystyle.h"
 
 #include <QWidget>
 #include <QDebug>
 
-DarkStyle::DarkStyle()
+ProxyStyle::ProxyStyle()
     : QProxyStyle(styleBase())
-    , m_qfDarkstyle(new QFile())
+    , m_qfCurrentStyle(new QFile())
 {
 
 }
 
-DarkStyle::~DarkStyle()
+void ProxyStyle::setTheme(QString &theme)
 {
-    delete m_qfDarkstyle;
+    if (theme=="Dark")
+    {
+        m_qfCurrentStyle->setFileName(QStringLiteral(":/Styles/Themes/styleDark.qss"));
+        if (m_qfCurrentStyle->open(QIODevice::ReadOnly | QIODevice::Text)) {
+            m_styleSheet = QString(m_qfCurrentStyle->readAll());
+
+        }
+    }
+    else
+    {
+        m_qfCurrentStyle->setFileName(QStringLiteral(":/Styles/Themes/styleWhite.qss"));
+        if (m_qfCurrentStyle->open(QIODevice::ReadOnly | QIODevice::Text)) {
+            m_styleSheet = QString(m_qfCurrentStyle->readAll());
+        }
+    }
+   m_qfCurrentStyle->close();
 }
 
-QStyle *DarkStyle::styleBase(QStyle *style) const {
+ProxyStyle::~ProxyStyle()
+{
+    delete m_qfCurrentStyle;
+}
+
+QStyle *ProxyStyle::styleBase(QStyle *style) const {
     if (style==Q_NULLPTR)
     {
         return QStyleFactory::create(QStringLiteral("Fusion"));
@@ -26,7 +46,7 @@ QStyle *DarkStyle::styleBase(QStyle *style) const {
     }
 }
 
-void DarkStyle::polish(QPalette &palette) {
+void ProxyStyle::polish(QPalette &palette) {
     palette.setColor(QPalette::Window, QColor(53, 53, 53));
     palette.setColor(QPalette::WindowText, Qt::white);
     palette.setColor(QPalette::Disabled, QPalette::WindowText,
@@ -52,18 +72,26 @@ void DarkStyle::polish(QPalette &palette) {
                      QColor(127, 127, 127));
 }
 
-void DarkStyle::polish(QApplication *app)
+void ProxyStyle::polish(QApplication *app)
 {
-    qDebug()<< "polish";
+    m_myApp=app;
+    qDebug()<< "polish 1";
     if (!styleApplyed)
     {
-        qDebug()<< "polish";
-        m_qfDarkstyle->setFileName(":/Styles/style.qss");
-        if (m_qfDarkstyle->open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QString qsStylesheet = QString(m_qfDarkstyle->readAll());
-            app->setStyleSheet(qsStylesheet);
-            m_qfDarkstyle->close();
-        }
+        qDebug()<< "polish 2";
+        app->setStyleSheet(m_styleSheet);
         styleApplyed=true;
     }
+}
+
+void ProxyStyle::changeTheme(bool state)
+{
+//   if (state)
+//   {
+//        unpolish(m_myApp);
+//   }
+//   else
+//   {
+//        polish(m_myApp);
+//   }
 }

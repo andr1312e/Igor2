@@ -38,6 +38,10 @@ private:
 
 private:
 
+    QFont *m_titleFont;
+
+    int m_oldFontSize;
+
     QDateTime *m_dateTime;
 
     QTimer *m_timer;
@@ -54,6 +58,8 @@ private:
 
     QPushButton *m_themePushButtton;
 
+    QSize *m_iconsSize;
+
 private slots:
 
     void onSettingsButtonClick(bool state);
@@ -62,13 +68,9 @@ private slots:
 
 private:
 
-    QFont *m_titleFont;
-    const int m_smallFontSize=10;
-    const int m_bigFontSize=17;
+    bool isNeedToUpdateFontSize(int width);
+    void updateFontSize();
 
-private:
-
-    void calculateFontSize(int width);
 protected:
 
     void resizeEvent(QResizeEvent *event);

@@ -95,10 +95,10 @@ bool AppSettingsService::settingsFileCreated()
 
 void AppSettingsService::createDefaultParameters()
 {
-    m_setting->setValue(m_viewModeKey, "full");
-    m_setting->setValue(m_themeKey, "Black");
-    m_setting->setValue(m_pathToExecsKey, "/home/user/RLS_TI/");
-    m_setting->setValue(m_pathToRoleFolders, "/home/user/RLS_TI/");
+    m_setting->setValue(m_viewModeKey, m_viewModeDefaultValue);
+    m_setting->setValue(m_themeKey, m_themeKeyDefaultValue);
+    m_setting->setValue(m_pathToExecsKey, m_pathToExecsKeyDefaultValue);
+    m_setting->setValue(m_pathToRoleFolders, m_pathToRoleFoldersKeyDefaultValue);
 
 }
 
@@ -109,22 +109,22 @@ QString AppSettingsService::getPathUserDb()
 
 QString AppSettingsService::getViewMode()
 {
-    return m_setting->value(m_viewModeKey, "full").toString();
+    return m_setting->value(m_viewModeKey, m_viewModeDefaultValue).toString();
 }
 
 QString AppSettingsService::getThemeName()
 {
-    return m_setting->value(m_themeKey, "Black").toString();
+    return m_setting->value(m_themeKey, m_themeKeyDefaultValue).toString();
 }
 
 QString AppSettingsService::getPathToExec()
 {
-    return m_setting->value(m_pathToExecsKey, "/home/user/RLS_TI/").toString();
+    return m_setting->value(m_pathToExecsKey, m_pathToExecsKeyDefaultValue).toString();
 }
 
 QString AppSettingsService::getPathToUserRoles()
 {
-    return m_setting->value(m_pathToRoleFoldersKey, "/home/user/RLS_TI/").toString();
+    return m_setting->value(m_pathToRoleFoldersKey, m_pathToRoleFoldersKeyDefaultValue).toString();
 }
 
 bool AppSettingsService::userDBPathCorrect(const QString &userDbPath)

@@ -10,6 +10,7 @@
 #include <QFrame>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QResizeEvent>
 
 #include "Admin_GUI/Model/usermodel.h"
 #include "Admin_GUI/Views/SettingsPanel/userinfopanel.h"
@@ -35,6 +36,9 @@ signals:
     void setDefaultRoleApps(const QString &role);
     void roleToViewChanged(const QString &role);
 
+protected:
+
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
 
@@ -44,10 +48,11 @@ private:
     void createConnections();
 
 private:
-
     QVBoxLayout *m_mainLayout;
     UserInfoPanel *m_userInfoPanel;
     UserEditPanel *m_userEditPanel;
+
+    int m_oldFontSize;
 
 };
 

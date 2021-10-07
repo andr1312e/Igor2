@@ -12,6 +12,8 @@ UserInfoPanel::~UserInfoPanel()
 {
     delete m_integrityService;
 
+    delete m_editPanelFont;
+
     delete m_roleLayout;
     delete m_rankLayout;
     delete m_FCSLayout;
@@ -54,6 +56,27 @@ void UserInfoPanel::setUser(User &user)
     }
 }
 
+void UserInfoPanel::setFontSize(int fontSize)
+{
+    m_editPanelFont->setPointSize(fontSize);
+    m_userIdLabel->setFont(*m_editPanelFont);
+    m_userIdValue->setFont(*m_editPanelFont);
+    m_userNameLabel->setFont(*m_editPanelFont);
+    m_userNameValue->setFont(*m_editPanelFont);
+    m_fileIntegrityLevelLabel->setFont(*m_editPanelFont);
+    m_fileIntegrityLevelValue->setFont(*m_editPanelFont);
+    m_userIntegrityLevelLabel->setFont(*m_editPanelFont);
+    m_userIntegrityLevelValue->setFont(*m_editPanelFont);
+    m_canUserEditFile->setFont(*m_editPanelFont);
+    m_isInDBExistLabel->setFont(*m_editPanelFont);
+    m_FCSLabel->setFont(*m_editPanelFont);
+    m_FCSValue->setFont(*m_editPanelFont);
+    m_rankLabel->setFont(*m_editPanelFont);
+    m_rankValue->setFont(*m_editPanelFont);
+    m_roleLabel->setFont(*m_editPanelFont);
+    m_roleValue->setFont(*m_editPanelFont);
+}
+
 void UserInfoPanel::initServices(Terminal *terminal)
 {
     m_integrityService=new IntegrityService(terminal);
@@ -68,6 +91,8 @@ void UserInfoPanel::initUI()
     m_userIdLabel=new QLabel("Идентификатор выбранного пользователя: ");
     m_userIdLabel->setStyleSheet("font-weight: bold;");
     m_userIdValue=new QLabel("");
+
+    m_editPanelFont=new QFont(m_userIdLabel->font());
 
     m_userNameLayout=new QHBoxLayout();
     m_userNameLabel=new QLabel("Имя выбранного пользователя в системе: ");

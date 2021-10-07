@@ -25,6 +25,8 @@ public:
     UserEditPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
     ~UserEditPanel();
     void setUser(User &user);
+    void setFontSize(int fontSize);
+    void setButtonSize(int size);
 
 private:
 
@@ -44,7 +46,6 @@ signals:
 private:
 
     QFont *m_editPanelFont;
-    QFont *m_widgetsFont;
 
     UserModel *m_model;
     KioskService *m_kioskService;
@@ -73,9 +74,6 @@ private:
 
     QMessageBox *m_messagBox;
 
-    QLineEdit *m_fontEdit;
-    QLineEdit *m_buttonWidthEdit;
-
 private:
 
     void setKioskMode(bool kioskModeState);
@@ -83,19 +81,12 @@ private:
     void insertUserData(User &user);
     void showToast(QString &userName);
 
-    void resizeButton(int size);
+
 
 private slots:
 
     void saveUser();
     void deleteUser();
-    void setFontSize(const QString &size);
-    void ButtonSize(const QString &size);
-
-protected:
-
-    void resizeEvent(QResizeEvent *event) override;
-
 };
 
 #endif // ADMIN_GUI_VIEWS_USEREDITPANEL_H
