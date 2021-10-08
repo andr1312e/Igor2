@@ -29,6 +29,8 @@ private:
 
     void insertWidgetsIntoLayout();
 
+    void setBackGroundColor();
+
     void createConnections();
 
 signals:

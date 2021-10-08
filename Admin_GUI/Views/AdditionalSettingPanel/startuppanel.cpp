@@ -7,7 +7,7 @@ StartupPanel::StartupPanel(Terminal *terminal,const STARTUP_PANEL_TYPE type, QWi
     initModel();
     initServices(terminal);
     initUI();
-    applyStyle();
+    setBackGroundColor();
     insertWidgetsIntoLayout();
     createConnections();
 }
@@ -61,16 +61,16 @@ void StartupPanel::initServices(Terminal *terminal)
     m_startupRepositoryService=new StartupRepositoryService(terminal);
 }
 
-void StartupPanel::applyStyle()
+void StartupPanel::setBackGroundColor()
 {
     m_addProgramButton->setObjectName("add");
     m_deleteProgramButton->setObjectName("remove");
 
-    QPalette rolePallete = m_dialogWidget->palette();
-    rolePallete.setColor(QPalette::Window, QColor(42, 42, 42));
-    m_dialogWidget->setPalette(rolePallete);
-    m_dialogWidget->setAutoFillBackground(true);
+    setBackgroundRole(QPalette::Window);
+    setAutoFillBackground(true);
 
+    m_dialogWidget->setBackgroundRole(QPalette::Base);
+    m_dialogWidget->setAutoFillBackground(true);
 }
 
 void StartupPanel::initUI()

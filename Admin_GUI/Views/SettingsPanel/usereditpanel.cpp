@@ -159,7 +159,9 @@ void UserEditPanel::insertWidgetsIntoLayout()
     m_actionLayout->addWidget(m_removeUserButton);
 
     m_kioskLayout->addWidget(m_kioskModeIsDisabledLabel);
+    m_kioskLayout->addStretch(3);
     m_kioskLayout->addWidget(m_kiosModeState);
+    m_kioskLayout->addStretch(3);
     m_kioskLayout->addWidget(m_kioskModeIsEnabledLabel);
 
     m_mainLayout->addLayout(m_actionLayout);

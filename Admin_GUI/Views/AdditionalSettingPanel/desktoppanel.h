@@ -40,7 +40,7 @@ private:
 
     void initServices(Terminal *terminal);
     void initUI();
-    void applyStyle();
+    void setBackGroundColor();
     void initModel();
     void insertWidgetsIntoLayout();
     void createConnections();

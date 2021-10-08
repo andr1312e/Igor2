@@ -144,7 +144,6 @@ void QtMaterialDialog::showDialog()
 void QtMaterialDialog::hideDialog()
 {
     Q_D(QtMaterialDialog);
-
     d->stateMachine->postEvent(new QtMaterialStateTransitionEvent(DialogHideTransition));
     setAttribute(Qt::WA_TransparentForMouseEvents);
     d->proxyStack->setCurrentIndex(1);

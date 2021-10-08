@@ -56,6 +56,15 @@ void RoleEditPanel::insertWidgetsIntoLayout()
     setLayout(m_mainLayout);
 }
 
+void RoleEditPanel::setBackGroundColor()
+{
+//    m_roleDesktopPanel->setBackgroundRole(QPalette::Base);
+//    m_roleDesktopPanel->setAutoFillBackground(true);
+
+//    m_roleRunningApplicationPanel->setBackgroundRole(QPalette::Base);
+//    m_roleRunningApplicationPanel->setAutoFillBackground(true);
+}
+
 void RoleEditPanel::createConnections()
 {
     connect(m_roleRunningApplicationPanel, &StartupPanel::roleStartupFileChanged, [=](){emit roleStartupFileChanged(m_role);});

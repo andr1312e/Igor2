@@ -26,8 +26,8 @@ private:
     QRect *m_userNameRect;
     QRect *m_userFCSRect;
     QRect *m_userRoleRect;
-    QPen *m_grayPen;
-    QPen *m_whitePen;
+    QPen *m_textPen;
+    QPen *m_titlePen;
     QColor *m_mouseOverColor;
     QPen *m_mouseOverPen;
     QColor *m_mouseSelectedColor;

@@ -7,7 +7,7 @@ DesktopPanel::DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *p
     initServices(terminal);
     initModel();
     initUI();
-    applyStyle();
+    setBackGroundColor();
     insertWidgetsIntoLayout();
     createConnections();
 }
@@ -98,14 +98,15 @@ void DesktopPanel::initUI()
     setMinimumWidth(420);
 }
 
-void DesktopPanel::applyStyle()
+void DesktopPanel::setBackGroundColor()
 {
     m_addProgramButton->setObjectName("add");
     m_deleteProgramButton->setObjectName("remove");
 
-    QPalette rolePallete = m_dialogWidget->palette();
-    rolePallete.setColor(QPalette::Window, QColor(42, 42, 42));
-    m_dialogWidget->setPalette(rolePallete);
+    setBackgroundRole(QPalette::Window);
+    setAutoFillBackground(true);
+
+    m_dialogWidget->setBackgroundRole(QPalette::Base);
     m_dialogWidget->setAutoFillBackground(true);
 }
 

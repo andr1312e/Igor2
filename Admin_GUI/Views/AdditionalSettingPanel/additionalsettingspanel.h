@@ -31,7 +31,7 @@ public:
 private:
 
     void initUI(Terminal *terminal);
-    void applyStyle();
+    void setBackGroundColor();
     void insertWidgetsIntoLayout();
     void createConnections();
 

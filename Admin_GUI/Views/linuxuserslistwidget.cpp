@@ -121,6 +121,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
             m_oldFontSize=20;
             updateFontSize();
             m_searchTypeComboBox->setFixedHeight(44);
+            m_searchLineEdit->setFixedHeight(44);
         }
     }
     else
@@ -132,6 +133,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                 m_oldFontSize=19;
                 updateFontSize();
                 m_searchTypeComboBox->setFixedHeight(42);
+                m_searchLineEdit->setFixedHeight(42);
             }
         }
         else
@@ -143,6 +145,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                     m_oldFontSize=18;
                     updateFontSize();
                     m_searchTypeComboBox->setFixedHeight(40);
+                    m_searchLineEdit->setFixedHeight(40);
                 }
             }
             else
@@ -154,6 +157,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                         m_oldFontSize=17;
                         updateFontSize();
                         m_searchTypeComboBox->setFixedHeight(38);
+                        m_searchLineEdit->setFixedHeight(38);
                     }
                 }
                 else
@@ -165,6 +169,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                             m_oldFontSize=16;
                             updateFontSize();
                             m_searchTypeComboBox->setFixedHeight(36);
+                            m_searchLineEdit->setFixedHeight(36);
                         }
                     }
                     else
@@ -176,6 +181,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                 m_oldFontSize=15;
                                 updateFontSize();
                                 m_searchTypeComboBox->setFixedHeight(34);
+                                m_searchLineEdit->setFixedHeight(34);
                             }
                         }
                         else
@@ -187,6 +193,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                     m_oldFontSize=14;
                                     updateFontSize();
                                     m_searchTypeComboBox->setFixedHeight(33);
+                                    m_searchLineEdit->setFixedHeight(33);
                                 }
                             }
                             else
@@ -198,6 +205,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                         m_oldFontSize=13;
                                         updateFontSize();
                                         m_searchTypeComboBox->setFixedHeight(32);
+                                        m_searchLineEdit->setFixedHeight(32);
                                     }
                                 }
                                 else
@@ -209,6 +217,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                             m_oldFontSize=12;
                                             updateFontSize();
                                             m_searchTypeComboBox->setFixedHeight(31);
+                                            m_searchLineEdit->setFixedHeight(31);
                                         }
                                     }
                                     else
@@ -220,6 +229,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                                 m_oldFontSize=11;
                                                 updateFontSize();
                                                 m_searchTypeComboBox->setFixedHeight(30);
+                                                m_searchLineEdit->setFixedHeight(30);
                                             }
                                         }
                                         else
@@ -229,6 +239,7 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
                                                 m_oldFontSize=10;
                                                 updateFontSize();
                                                 m_searchTypeComboBox->setFixedHeight(29);
+                                                m_searchLineEdit->setFixedHeight(29);
                                             }
                                         }
                                     }

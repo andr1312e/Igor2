@@ -44,7 +44,7 @@ signals:
 private:
 
     void initServices(Terminal *terminal);
-    void applyStyle();
+    void setBackGroundColor();
     void initUI();
     void initModel();
     void insertWidgetsIntoLayout();

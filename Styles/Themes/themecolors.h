@@ -18,9 +18,9 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor={
     QPair<QPalette::ColorRole, QColor>(QPalette::Button, QColor(53, 53, 53)),
     QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText,Qt::white),
     QPair<QPalette::ColorRole, QColor>(QPalette::BrightText, Qt::red),
-    QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor(42, 130, 218)),
+    QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor(66, 66, 66)),
     QPair<QPalette::ColorRole, QColor>(QPalette::Highlight, QColor(42, 130, 218)),
-    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::white),
+    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::gray),
 };
 
 const std::array<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor={
@@ -32,21 +32,21 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor={
 };
 
 const std::array<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor={
-    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(225, 226, 225)),// цвет фона приложения
-    QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(245, 245, 245)),//цвет фона листвиджетов и линеедитов
-    QPair<QPalette::ColorRole, QColor>(QPalette::AlternateBase, QColor(127, 0, 0)),//цвет скролла
-    QPair<QPalette::ColorRole, QColor>(QPalette::Dark, QColor("#b33c2a")),//цвет скролла при наведении
+    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor("#ffffff")),// цвет фона приложения
+    QPair<QPalette::ColorRole, QColor>(QPalette::Base,QColor("#d6d6d6")),//цвет фона листвиджетов и линеедитов
+    QPair<QPalette::ColorRole, QColor>(QPalette::AlternateBase, QColor("#929292")),//цвет скролла
     QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, Qt::black),//цвет текста
-    QPair<QPalette::ColorRole, QColor>(QPalette::Text, Qt::green), //цвет текста в лайн дитах
-    QPair<QPalette::ColorRole, QColor>(QPalette::Shadow, QColor(127, 0, 0)),//заголовок
-    QPair<QPalette::ColorRole, QColor>(QPalette::Button, QColor(127, 0, 0)),
-    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText,QColor(225, 226, 225)),
+    QPair<QPalette::ColorRole, QColor>(QPalette::Text, Qt::black), //цвет текста в лайн дитах
+    QPair<QPalette::ColorRole, QColor>(QPalette::Shadow, QColor("#7D0000")),//заголовок
+    QPair<QPalette::ColorRole, QColor>(QPalette::Button, QColor(218, 220, 225)),
+    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText,QColor(15, 0, 5)),
     QPair<QPalette::ColorRole, QColor>(QPalette::BrightText, QColor(17, 100, 19)),
-    QPair<QPalette::ColorRole, QColor>(QPalette::Highlight, QColor(74, 0, 0)),//обводочка
-    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::black),
-    QPair<QPalette::ColorRole, QColor>(QPalette::ToolTipText, QColor(53, 127, 53)),//не используется
+    QPair<QPalette::ColorRole, QColor>(QPalette::Highlight, QColor("#ffffff")),//обводочка
+    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::black),//поле ид пользователя в листе
+    QPair<QPalette::ColorRole, QColor>(QPalette::Dark, Qt::green),//не используется
+    QPair<QPalette::ColorRole, QColor>(QPalette::ToolTipBase, QColor("#9e9e9e")),//подстветочка
     QPair<QPalette::ColorRole, QColor>(QPalette::LinkVisited, Qt::green),//не используется
-    QPair<QPalette::ColorRole, QColor>(QPalette::Link, Qt::white),//не используется
+    QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor("#ffffff")),//не используется
 };
 
 const std::array<QPair<QPalette::ColorRole, QColor>, 5> astraThemeDisabledColor={

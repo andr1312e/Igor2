@@ -38,6 +38,10 @@ private:
 
 private:
 
+    bool m_isAstraTheme;
+
+    bool m_settingsSetHidden;
+
     QFont *m_titleFont;
 
     int m_oldFontSize;
@@ -56,7 +60,7 @@ private:
 
     QPushButton *m_settingsPushButtton;
 
-    QPushButton *m_themePushButtton;
+    QPushButton *m_themePushButton;
 
     QSize *m_iconsSize;
 

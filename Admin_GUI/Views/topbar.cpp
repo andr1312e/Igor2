@@ -59,18 +59,18 @@ void TopBar::initUI()
     m_settingsPushButtton->setDefault(false);
     m_settingsPushButtton->setAutoDefault(false);
     m_settingsPushButtton->setFocusPolicy(Qt::NoFocus);
-    m_settingsPushButtton->setIcon(QIcon(":/images/settings2"));
+    m_settingsPushButtton->setIcon(QIcon(":/images/settingsBlack"));
     m_settingsPushButtton->setIconSize(*m_iconsSize);
 
-    m_themePushButtton=new QPushButton();
-    m_themePushButtton->setCheckable(true);
-    m_themePushButtton->setChecked(false);
-    m_themePushButtton->setFlat(true);
-    m_themePushButtton->setDefault(false);
-    m_themePushButtton->setAutoDefault(false);
-    m_themePushButtton->setFocusPolicy(Qt::NoFocus);
-    m_themePushButtton->setIcon(QIcon(":/images/moon"));
-    m_themePushButtton->setIconSize(*m_iconsSize);
+    m_themePushButton=new QPushButton();
+    m_themePushButton->setCheckable(true);
+    m_themePushButton->setChecked(false);
+    m_themePushButton->setFlat(true);
+    m_themePushButton->setDefault(false);
+    m_themePushButton->setAutoDefault(false);
+    m_themePushButton->setFocusPolicy(Qt::NoFocus);
+    m_themePushButton->setIcon(QIcon(":/images/moon"));
+    m_themePushButton->setIconSize(*m_iconsSize);
 }
 
 void TopBar::applyStyle()
@@ -81,11 +81,11 @@ void TopBar::applyStyle()
     pal.setColor(QPalette::Button, QColor(Qt::transparent));
     m_settingsPushButtton->setPalette(pal);
 
-    m_themePushButtton->setStyleSheet("border: 0px;");
-    m_themePushButtton->setAutoFillBackground(true);
-    QPalette Theme = m_themePushButtton->palette();
+    m_themePushButton->setStyleSheet("border: 0px;");
+    m_themePushButton->setAutoFillBackground(true);
+    QPalette Theme = m_themePushButton->palette();
     Theme.setColor(QPalette::Button, QColor(Qt::transparent));
-    m_themePushButtton->setPalette(pal);
+    m_themePushButton->setPalette(pal);
 }
 
 void TopBar::insertWidgetsIntoLayouts()
@@ -95,10 +95,10 @@ void TopBar::insertWidgetsIntoLayouts()
     m_userInfoLayout->addWidget(m_currentTimeLabel);
     m_userInfoLayout->addWidget(m_currentUseRoleLabel);
     m_userInfoLayout->addWidget(m_settingsPushButtton);
-    m_userInfoLayout->addWidget(m_themePushButtton);
+    m_userInfoLayout->addWidget(m_themePushButton);
 
     m_userInfoLayout->setAlignment(m_settingsPushButtton, Qt::AlignLeft);
-    m_userInfoLayout->setAlignment(m_themePushButtton, Qt::AlignLeft);
+    m_userInfoLayout->setAlignment(m_themePushButton, Qt::AlignLeft);
     setLayout(m_userInfoLayout);
 }
 
@@ -106,34 +106,66 @@ void TopBar::createConnections()
 {
     connect(m_timer, &QTimer::timeout, this, &TopBar::refreshDateTime);
     connect(m_settingsPushButtton, &QPushButton::clicked, this, &TopBar::onSettingsButtonClick);
-    connect(m_themePushButtton, &QPushButton::clicked, this, &TopBar::onThemeButtonClick);
+    connect(m_themePushButton, &QPushButton::clicked, this, &TopBar::onThemeButtonClick);
 }
 
 void TopBar::onSettingsButtonClick(bool state)
 {
-    if (state)
+    m_settingsSetHidden=state;
+    if (m_isAstraTheme)
     {
-        m_settingsPushButtton->setIcon(QIcon(":/images/settings2"));
+        if (m_settingsSetHidden)
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsBlack"));
+        }
+        else
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsWhite"));
+        }
     }
     else
     {
-        m_settingsPushButtton->setIcon(QIcon(":/images/settings"));
+        if (m_settingsSetHidden)
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsWhite"));
+        }
+        else
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsBlack"));
+        }
     }
     m_settingsPushButtton->setIconSize(*m_iconsSize);
-    emit hideAdditionalSettings(state);
+    emit hideAdditionalSettings(m_settingsSetHidden);
 }
 
 void TopBar::onThemeButtonClick(bool state)
 {
-    if (state)
+    m_isAstraTheme=state;
+    if (m_isAstraTheme)
     {
-        m_themePushButtton->setIcon(QIcon(":/images/sun"));
+        m_themePushButton->setIcon(QIcon(":/images/sun"));
+        if (m_settingsSetHidden)
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsBlack"));
+        }
+        else
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsWhite"));
+        }
     }
     else
     {
-        m_themePushButtton->setIcon(QIcon(":/images/moon"));
+        m_themePushButton->setIcon(QIcon(":/images/moon"));
+        if (m_settingsSetHidden)
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsWhite"));
+        }
+        else
+        {
+            m_settingsPushButtton->setIcon(QIcon(":/images/settingsBlack"));
+        }
     }
-    m_themePushButtton->setIconSize(*m_iconsSize);
+    m_themePushButton->setIconSize(*m_iconsSize);
     emit setTheme(state);
 }
 

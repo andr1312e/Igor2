@@ -6,8 +6,19 @@
 StyleChanger::StyleChanger(QApplication *app)
     : m_myApp(app)
 {
-    m_darkTheme=new Theme(":/Styles/Themes/style.qss", darkThemeColor, darkThemeDisabledColor);
-    m_astraTheme=new Theme(":/Styles/Themes/style.qss", astraThemeColor, astraThemeDisabledColor);
+    m_darkTheme=new Theme(darkThemeColor, darkThemeDisabledColor);
+    m_astraTheme=new Theme(astraThemeColor, astraThemeDisabledColor);
+    m_darkTheme->ApplyTheme(app);
+    QFile styleSheetFile(":/Styles/Themes/style.qss");
+    if (styleSheetFile.open(QIODevice::ReadOnly| QIODevice::Text))
+    {
+        m_styleSheet=QString(styleSheetFile.readAll());
+        styleSheetFile.close();
+    }
+    else
+    {
+        qFatal("styleSheet не найден");
+    }
 }
 
 StyleChanger::~StyleChanger()
@@ -26,4 +37,5 @@ void StyleChanger::changeTheme(bool state)
     {
         m_darkTheme->ApplyTheme(m_myApp);
     }
+    m_myApp->setStyleSheet(m_styleSheet);
 }

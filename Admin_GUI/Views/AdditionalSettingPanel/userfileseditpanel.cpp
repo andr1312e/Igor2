@@ -57,12 +57,6 @@ void UserFilesEditPanel::initUI(Terminal *terminal)
     m_userDesktopPanel= new DesktopPanel(terminal, ICONS_PANEL_TYPE::USER_DESKTOP ,this);
 
     m_userRunnubleApplicationPanel= new StartupPanel(terminal, STARTUP_PANEL_TYPE::USER_APPS,  this);
-
-
-//    QPalette pal = this->palette();
-//    pal.setColor(QPalette::Window, QColor(78, 75, 82));
-//    this->setPalette(pal);
-//    this->setAutoFillBackground(true);
 }
 
 void UserFilesEditPanel::insertWidgetsIntoLayout()
