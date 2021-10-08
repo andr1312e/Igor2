@@ -45,7 +45,7 @@ private:
 
     const QString m_viewModeKey="viewmode";
 
-    const QString m_themeKey="theme";
+    const QString m_themeKey="whitetheme";
 
     const QString m_pathToExecsKey="execslist";
 
@@ -53,7 +53,7 @@ private:
 
     const QString m_viewModeDefaultValue="full";
 
-    const QString m_themeKeyDefaultValue="dark";
+    const QString m_themeKeyDefaultValue="0";
 
     const QString m_pathToExecsKeyDefaultValue="/home/user/RLS_TI/";
 

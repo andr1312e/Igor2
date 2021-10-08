@@ -54,7 +54,6 @@
         <file>images/widgets-icons/icon_window_restore.png</file>
         <file>images/sun.ico</file>
         <file>images/moon.ico</file>
-        <file>Styles/Themes/styleDark.qss</file>
-        <file>Styles/Themes/styleWhite.qss</file>
+        <file>Styles/Themes/style.qss</file>
     </qresource>
 </RCC>

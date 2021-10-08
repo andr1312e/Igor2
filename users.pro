@@ -8,7 +8,7 @@ QT += core xml network widgets
 
 CONFIG += c++11
 #Панель управления пользователями РЛС ТИ версия
-TARGET = "48"
+TARGET = "49"
 TEMPLATE = app
 CONFIG -= console
 
@@ -31,7 +31,7 @@ SOURCES += \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
     Styles/InteractiveButtons/minimizewindowbutton.cpp \
     Styles/InteractiveButtons/restorewindowbutton.cpp \
-    Styles/Themes/proxystyle.cpp \
+    Styles/Themes/stylechanger.cpp \
     main.cpp \
     Services/integrityservice.cpp \
     User_GUI/User_GUI.cpp \
@@ -91,7 +91,6 @@ HEADERS += \
     Styles/InteractiveButtons/maximizewindowbutton.h \
     Styles/InteractiveButtons/minimizewindowbutton.h \
     Styles/InteractiveButtons/restorewindowbutton.h \
-    Styles/Themes/proxystyle.h \
     Styles/MaterialWidgets/qtmaterialstyle_p.h \
     Styles/MaterialWidgets/qtmaterialstyle.h \
     Styles/MaterialWidgets/qtmaterialtheme_p.h \
@@ -109,7 +108,9 @@ HEADERS += \
     Admin_GUI/Model/usermodel.h \
     Admin_GUI/Model/sortmodel.h \
     Admin_GUI/Delegates/userdelegate.h \
-    Admin_GUI/Views/qtoast.h \ 
+    Admin_GUI/Views/qtoast.h \  \
+    Styles/Themes/stylechanger.h \
+    Styles/Themes/themecolors.h \
     Admin_GUI/Widgets/qtmaterialtoggle_internal.h \
     Admin_GUI/Widgets/qtmaterialtoggle_p.h \
     Admin_GUI/Widgets/qtmaterialtoggle.h \

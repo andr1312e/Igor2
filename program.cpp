@@ -154,10 +154,10 @@ void Program::createConnections()
 
 void Program::applyStyle()
 {
-    m_proxyStyle=new ProxyStyle();
-    m_proxyStyle->setTheme(m_settingFileService->m_theme);
-    QApplication::setStyle(m_proxyStyle);
-    connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &ProxyStyle::changeTheme);
+    this->setStyle(QStringLiteral("Fusion"));
+    m_proxyStyle=new StyleChanger(this);
+    m_proxyStyle->changeTheme(m_settingFileService->m_theme.toInt());
+    connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &StyleChanger::changeTheme);
 }
 
 void Program::startAdminServices()

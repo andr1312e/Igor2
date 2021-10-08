@@ -56,7 +56,7 @@ void SettingsPanel::setUser(User &user)
 void SettingsPanel::resizeEvent(QResizeEvent *event)
 {
     int width=event->size().width();
-    if (width>930)
+    if (width>900)
     {
         if (m_oldFontSize!=20)
         {

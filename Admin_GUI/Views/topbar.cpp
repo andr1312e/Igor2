@@ -51,16 +51,24 @@ void TopBar::initUI()
     m_currentUseRoleLabel->setFont(*m_titleFont);
 
     m_iconsSize=new QSize(30, 30);
+
     m_settingsPushButtton=new QPushButton();
     m_settingsPushButtton->setCheckable(true);
     m_settingsPushButtton->setChecked(false);
     m_settingsPushButtton->setFlat(true);
+    m_settingsPushButtton->setDefault(false);
+    m_settingsPushButtton->setAutoDefault(false);
+    m_settingsPushButtton->setFocusPolicy(Qt::NoFocus);
     m_settingsPushButtton->setIcon(QIcon(":/images/settings2"));
     m_settingsPushButtton->setIconSize(*m_iconsSize);
+
     m_themePushButtton=new QPushButton();
     m_themePushButtton->setCheckable(true);
     m_themePushButtton->setChecked(false);
     m_themePushButtton->setFlat(true);
+    m_themePushButtton->setDefault(false);
+    m_themePushButtton->setAutoDefault(false);
+    m_themePushButtton->setFocusPolicy(Qt::NoFocus);
     m_themePushButtton->setIcon(QIcon(":/images/moon"));
     m_themePushButtton->setIconSize(*m_iconsSize);
 }
@@ -72,6 +80,12 @@ void TopBar::applyStyle()
     QPalette pal = m_settingsPushButtton->palette();
     pal.setColor(QPalette::Button, QColor(Qt::transparent));
     m_settingsPushButtton->setPalette(pal);
+
+    m_themePushButtton->setStyleSheet("border: 0px;");
+    m_themePushButtton->setAutoFillBackground(true);
+    QPalette Theme = m_themePushButtton->palette();
+    Theme.setColor(QPalette::Button, QColor(Qt::transparent));
+    m_themePushButtton->setPalette(pal);
 }
 
 void TopBar::insertWidgetsIntoLayouts()
@@ -84,6 +98,7 @@ void TopBar::insertWidgetsIntoLayouts()
     m_userInfoLayout->addWidget(m_themePushButtton);
 
     m_userInfoLayout->setAlignment(m_settingsPushButtton, Qt::AlignLeft);
+    m_userInfoLayout->setAlignment(m_themePushButtton, Qt::AlignLeft);
     setLayout(m_userInfoLayout);
 }
 
