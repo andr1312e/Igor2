@@ -1,5 +1,6 @@
 #include "program.h"
 #include <QDebug>
+#include "Admin_GUI/Views/Wizards/startupwizard.h"
 
 Program::Program(int &argc, char **argv)
     : QApplication(argc, argv, true)
@@ -60,26 +61,37 @@ bool Program::hasNoRunningInscance()
 
 void Program::createApp()//MAIN
 {
-    initTerminal();
-    initUserService();
-    getUserPrivileges();
-    initSettingsService();
-    if (settingsLoaded())
-    {
-        getSettings();
-        initRunnableService();
-        if(allAppsRunned())
-        {
-            initRarmSocket();
-            createConnections();
-            if (hasAdminPrivileges)
-            {
-                initAdminServices();
-                initAdminUI();
-                applyStyle();
-            }
-        }
-    }
+    m_framelessWindow=new FramelessWindow(nullptr);
+        this->setStyle(QStringLiteral("Fusion"));
+    m_proxyStyle=new StyleChanger(this);
+    m_proxyStyle->changeTheme(1);
+    connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &StyleChanger::changeTheme);
+
+    StartupWizard *wir=new StartupWizard(nullptr);
+    m_framelessWindow->setAdminGUI(wir);
+
+m_framelessWindow->show();
+
+//    initTerminal();
+//    initUserService();
+//    getUserPrivileges();
+//    initSettingsService();
+//    if (settingsLoaded())
+//    {
+//        getSettings();
+//        initRunnableService();
+//        if(allAppsRunned())
+//        {
+//            initRarmSocket();
+//            createConnections();
+//            if (hasAdminPrivileges)
+//            {
+//                initAdminServices();
+//                initAdminUI();
+//                applyStyle();
+//            }
+//        }
+//    }
 }
 
 void Program::initTerminal()

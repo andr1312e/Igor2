@@ -43,7 +43,7 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor={
     QPair<QPalette::ColorRole, QColor>(QPalette::BrightText, QColor(17, 100, 19)),
     QPair<QPalette::ColorRole, QColor>(QPalette::Highlight, QColor(255,255, 255)),//обводочка
     QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::black),//поле ид пользователя в листе
-    QPair<QPalette::ColorRole, QColor>(QPalette::Dark, Qt::green),//не используется
+    QPair<QPalette::ColorRole, QColor>(QPalette::Dark, Qt::white),//не используется
     QPair<QPalette::ColorRole, QColor>(QPalette::ToolTipBase, QColor(158, 158, 158)),//подстветочка
     QPair<QPalette::ColorRole, QColor>(QPalette::LinkVisited, Qt::green),//не используется
     QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor(255,255, 255)),//тайтл у листов

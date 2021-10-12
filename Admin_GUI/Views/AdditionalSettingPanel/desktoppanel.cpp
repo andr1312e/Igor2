@@ -106,7 +106,7 @@ void DesktopPanel::setBackGroundColor()
     setBackgroundRole(QPalette::Window);
     setAutoFillBackground(true);
 
-    m_dialogWidget->setBackgroundRole(QPalette::Base);
+    m_dialogWidget->setBackgroundRole(QPalette::AlternateBase);
     m_dialogWidget->setAutoFillBackground(true);
 }
 

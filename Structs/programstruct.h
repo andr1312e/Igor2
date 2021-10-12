@@ -2,6 +2,7 @@
 #define STRUCTS_DESKTOPENTITY_H
 
 #include <QMetaType>
+#include <QString>
 
 struct DesktopEntity{
     DesktopEntity(){}

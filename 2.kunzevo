@@ -1,0 +1,27 @@
+<!--SYNC-MODULE-SETTINGS-->
+<settings>
+<USERS>
+ <user userId="1000" rank="Рядовой" name="user" role="Оператор" FCS="Боченев"/>
+ <user userId="1001" rank="Сержант" name="user1" role="Администратор" FCS="Ермолаев В.Ю."/>
+ <user userId="1002" rank="Полковник" name="user2" role="Специалист" FCS="Микеров Игорь"/>
+</USERS>
+<firstRole roleName="Пользователь">
+    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    <runnableApp exec="/home/user/application2"></runnableApp>
+</firstRole>
+<secondRole roleName="Оператор">
+    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+    <runnableApp exec="/home/user/application"></runnableApp>
+</secondRole>
+<thirdRole roleName="Специалист">
+    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    <runnableApp exec="/home/user/application2"></runnableApp>
+</thirdRole>
+<fourthRole roleName="Администратор">
+    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    <runnableApp exec="/home/user/application2"></runnableApp>
+    <runnableApp exec="/home/user/application"></runnableApp>
+</fourthRole>
+</settings>

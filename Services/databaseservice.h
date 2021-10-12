@@ -40,9 +40,9 @@ private:
 
     QFile *m_file;
 
-    QByteArray m_array;
+    QDomDocument *m_accountsData;
 
-    QDomDocument m_accountsData;
+    QByteArray m_array;
 
 private:
 

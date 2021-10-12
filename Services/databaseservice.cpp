@@ -5,25 +5,27 @@ DatabaseService::DatabaseService(const QString &filePath, Terminal *terminal)
     : m_filePath(filePath)
     , m_terminal(terminal)
     , m_file(new QFile(m_filePath))
+    , m_accountsData(new QDomDocument())
 {
     if (m_file->open(QIODevice::ReadOnly))
     {
         m_array= m_file->readAll();
         m_file->close();
         m_array= QByteArray::fromHex(m_array);
-        m_accountsData.setContent(m_array);
+        m_accountsData->setContent(m_array);
     }
 }
 
 DatabaseService::~DatabaseService()
 {
     delete m_file;
+    delete m_accountsData;
 }
 
 
 void DatabaseService::getRLSTIAdminsUserName(QStringList &adminsUserNames)
 {
-    QDomElement users=m_accountsData.elementsByTagName("USERS").at(0).toElement();
+    QDomElement users=m_accountsData->elementsByTagName("USERS").at(0).toElement();
     QDomNodeList userList = users.elementsByTagName("user");
     for (int i=0; i<userList.count(); i++)
     {
@@ -37,7 +39,7 @@ void DatabaseService::getRLSTIAdminsUserName(QStringList &adminsUserNames)
 
 void DatabaseService::readUserFromFile(User &currentUser)
 {
-    QDomElement users=m_accountsData.elementsByTagName("USERS").at(0).toElement();
+    QDomElement users=m_accountsData->elementsByTagName("USERS").at(0).toElement();
     QDomNodeList usersList = users.elementsByTagName("user");
     for (int i=0; i<usersList.count(); i++)
     {
@@ -63,7 +65,7 @@ void DatabaseService::readUserFromFile(User &currentUser)
 
 QString DatabaseService::getUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute)
 {
-    QDomElement users=m_accountsData.elementsByTagName("USERS").at(0).toElement();
+    QDomElement users=m_accountsData->elementsByTagName("USERS").at(0).toElement();
     QDomNodeList usersList = users.elementsByTagName("user");
     for (int i=0; i<usersList.count(); i++)
     {
@@ -78,25 +80,25 @@ QString DatabaseService::getUserAttributeByLinuxUserNameToList(const QString &us
 
 void DatabaseService::writeToFile(QList<User> *users)
 {
-    QDomDocument documentToWrite;
-    QDomElement domElement=documentToWrite.createElement("USERS");
-    documentToWrite.appendChild(domElement);
+    m_accountsData->clear();
+    QDomElement domElement=m_accountsData->createElement("USERS");
+    m_accountsData->appendChild(domElement);
     for(QList<User>::iterator it=users->begin(); it!=users->end(); ++it)
     {
-        QDomElement userDomElement=createUserElement(documentToWrite, *it);
+        QDomElement userDomElement=createUserElement(*m_accountsData, *it);
         domElement.appendChild(userDomElement);
     }
-    qDebug()<< m_filePath;
-    QString text=documentToWrite.toString();
+//    qDebug()<< m_filePath;
+    QString text=m_accountsData->toString();
     QByteArray encrypt=text.toLocal8Bit().toHex();
-    QFile file(m_filePath);
-    QTextStream stream(&file);
-    if(file.open(QIODevice::WriteOnly))
+    m_file->setFileName(m_filePath);
+    QTextStream stream(m_file);
+    if(m_file->open(QIODevice::WriteOnly))
     {
         stream<<encrypt;
     }
     stream.flush();
-    file.close();
+    m_file->close();
 }
 
 QDomElement DatabaseService::createUserElement(QDomDocument &users,const User &user)

@@ -55,5 +55,6 @@
         <file>images/sun.ico</file>
         <file>images/moon.ico</file>
         <file>Styles/Themes/style.qss</file>
+        <file>images/folderBlack.ico</file>
     </qresource>
 </RCC>

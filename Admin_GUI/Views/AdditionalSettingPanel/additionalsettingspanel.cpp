@@ -37,9 +37,9 @@ void AdditionalSettingsPanel::initUI(Terminal *terminal)
 
 void AdditionalSettingsPanel::setBackGroundColor()
 {
-    m_userFilesEditPanel->setBackgroundRole(QPalette::Base);
+    m_userFilesEditPanel->setBackgroundRole(QPalette::AlternateBase);
     m_userFilesEditPanel->setAutoFillBackground(true);
-    m_roleEditPanel->setBackgroundRole(QPalette::Base);
+    m_roleEditPanel->setBackgroundRole(QPalette::AlternateBase);
     m_roleEditPanel->setAutoFillBackground(true);
 }
 

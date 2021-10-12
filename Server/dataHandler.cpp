@@ -37,6 +37,8 @@ void SocketToRarm::initAdditionalVariables()
 {
     m_pTcpSocketToRarm = new QTcpSocket(this);
     m_timeToConnectRarm = new QTimer(this);
+    m_timeToConnectRarm->start(true);
+
     m_timeToConnectRarm->setTimerType(Qt::VeryCoarseTimer);
     m_needToSend=false;
     m_dataContains=false;
@@ -146,11 +148,15 @@ void SocketToRarm::connectToRarm()
 
 void SocketToRarm::checkConnection()
 {
-//    qDebug() << "Время проверить поключение";
-//    if (!isRarmConnected()) {
-//        reconnectToRarm();
-//        qDebug() << "Переподключаемся";
+//    if (m_pTcpSocketToRarm->state()!=QAbstractSocket::ConnectedState)
+//    {
+//        m_pTcpSocketToRarm->close();
 //    }
+    qDebug() << "Время проверить поключение";
+    if (!isRarmConnected()) {
+        reconnectToRarm();
+        qDebug() << "Переподключаемся";
+    }
 }
 
 void SocketToRarm::getMessage()

@@ -8,7 +8,7 @@ QT += core xml network widgets
 
 CONFIG += c++11
 #Панель управления пользователями РЛС ТИ версия
-TARGET = "49"
+TARGET = "50"
 TEMPLATE = app
 CONFIG -= console
 
@@ -25,6 +25,8 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050B00    # отключить API, у
 
 
 SOURCES += \
+    Admin_GUI/Views/Wizards/fcspage.cpp \
+    Admin_GUI/Views/Wizards/intropage.cpp \
     Services/Terminals/terminal.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
@@ -81,9 +83,13 @@ SOURCES += \
     Styles/Frameless/framelesswindow.cpp \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
-    Admin_GUI/Widgets/qtmaterialtextfield.cpp
+    Admin_GUI/Widgets/qtmaterialtextfield.cpp \
+    Admin_GUI/Views/Wizards/startupwizard.cpp
 
 HEADERS += \
+    Admin_GUI/Views/Wizards/fcspage.h \
+    Admin_GUI/Views/Wizards/intropage.h \
+    Admin_GUI/Views/Wizards/wizardpages.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -149,7 +155,8 @@ HEADERS += \
     Server/messagesrepository.h \
     Server/dataHandler.h \
     globalfunctions.h \
-    program.h
+    program.h \
+    Admin_GUI/Views/Wizards/startupwizard.h
 
 RESOURCES += \
     resources.qrc
