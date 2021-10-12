@@ -87,5 +87,5 @@ void CloseWindowButton::initGeometry()
 
 void CloseWindowButton::initDrawing()
 {
-        m_painter->setPen(*m_pen);
+    m_painter->setPen(*m_pen);
 }

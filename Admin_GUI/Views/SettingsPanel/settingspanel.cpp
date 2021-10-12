@@ -55,8 +55,10 @@ void SettingsPanel::setUser(User &user)
 
 void SettingsPanel::resizeEvent(QResizeEvent *event)
 {
+    qDebug()<< "width" << event->size().width() << "Height" << event->size().height() <<" Settings font size " <<m_oldFontSize;
     int width=event->size().width();
-    if (width>900)
+    int height=event->size().height();
+    if (width>900 && height>720 )
     {
         if (m_oldFontSize!=20)
         {
@@ -68,7 +70,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
     }
     else
     {
-        if (width>861)
+        if (width>861&& height>700)
         {
             if (m_oldFontSize!=19)
             {
@@ -80,7 +82,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
         }
         else
         {
-            if(width>845)
+            if(width>845&& height>680 )
             {
                 if (m_oldFontSize!=18)
                 {
@@ -92,7 +94,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
             }
             else
             {
-                if(width>810)
+                if(width>810&& height>640)
                 {
                     if (m_oldFontSize!=17)
                     {
@@ -104,7 +106,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                 }
                 else
                 {
-                    if(width>726)
+                    if(width>726&& height>620)
                     {
                         if (m_oldFontSize!=16)
                         {
@@ -116,7 +118,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                     }
                     else
                     {
-                        if(width>700)
+                        if(width>700&& height>600)
                         {
                             if (m_oldFontSize!=15)
                             {
@@ -128,7 +130,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                         }
                         else
                         {
-                            if(width>666)
+                            if(width>666&& height>580)
                             {
                                 if (m_oldFontSize!=14)
                                 {
@@ -140,7 +142,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                             }
                             else
                             {
-                                if(width>600)
+                                if(width>600&& height>560)
                                 {
                                     if (m_oldFontSize!=13)
                                     {
@@ -152,7 +154,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                                 }
                                 else
                                 {
-                                    if(width>565)
+                                    if(width>565&& height>540)
                                     {
                                         if (m_oldFontSize!=12)
                                         {
@@ -164,7 +166,7 @@ void SettingsPanel::resizeEvent(QResizeEvent *event)
                                     }
                                     else
                                     {
-                                        if(width>550)
+                                        if(width>550&& height>528)
                                         {
                                             if (m_oldFontSize!=11)
                                             {

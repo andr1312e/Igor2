@@ -9,7 +9,7 @@ class SortModel: public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    SortModel(QObject *parent = nullptr);
+    SortModel(QObject *parent);
 
 public:
 

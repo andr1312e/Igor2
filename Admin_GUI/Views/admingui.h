@@ -33,6 +33,7 @@ private:
     void setWidgetSizes();
     void insertWidgetsIntoLayout();
     void createConnections();
+    void setMaximumWidgetSize();
 
 private:
 
@@ -47,6 +48,12 @@ private:
     LinuxUsersListWidget *m_linuxUsersListWidget;
     SettingsPanel *m_settingsPanel;
     AdditionalSettingsPanel *m_additionalSettingsPanel;
+
+
+
+    QScreen* m_currentScreen;
+    int m_maxWidth;
+    int m_maxHeight;
 
 private:
     void initTopBar();

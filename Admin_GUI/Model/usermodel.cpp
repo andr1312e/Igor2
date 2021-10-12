@@ -1,7 +1,8 @@
 #include "usermodel.h"
 
-UserModel::UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService)
-    : m_model(new QStandardItemModel())
+UserModel::UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent)
+    : QObject(parent)
+    , m_model(new QStandardItemModel())
     , m_databaseService(databaseService)
     , m_linuxUserService(linuxUserService)
     , m_currentRoleUsers(new QStringList())

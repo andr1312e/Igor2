@@ -28,9 +28,7 @@ private:
     QRect *m_userRoleRect;
     QPen *m_textPen;
     QPen *m_titlePen;
-    QColor *m_mouseOverColor;
     QPen *m_mouseOverPen;
-    QColor *m_mouseSelectedColor;
     QPen *m_mouseSelectedPen;
     QFont *m_font;
     QSize *m_size;

@@ -304,6 +304,7 @@ void TopBar::updateFontSize()
 
 void TopBar::resizeEvent(QResizeEvent *event)
 {
+    qDebug()<< "topBurSize"<< event->size().width() << " fontSize " << m_oldFontSize;
     if (isNeedToUpdateFontSize(event->size().width()))
         updateFontSize();
 }

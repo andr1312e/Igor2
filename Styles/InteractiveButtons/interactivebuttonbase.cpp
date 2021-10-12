@@ -1363,11 +1363,9 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
     }
 
     // ==== 绘制前景 ====
-    if (fore_enabled /*针对按钮设置*/ && show_foreground /*针对动画设置*/)
+    if (fore_enabled && show_foreground)
     {
         painter.setPen(isEnabled() ? icon_color : getOpacityColor(icon_color));
-
-        // 绘制额外内容（可能被前景覆盖）
         if (paint_addin.enable)
         {
             int l = fore_paddings.left, t = fore_paddings.top, r = width() - fore_paddings.right, b = height() - fore_paddings.bottom;
@@ -1429,17 +1427,6 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
             }
             else if (show_ani_appearing)
             {
-                /*int pro; // 将动画进度转换为回弹动画进度
-                if (show_ani_progress <= 50)
-                    pro = show_ani_progress * 2;
-                else if (show_ani_progress <= 75)
-                    pro = (show_ani_progress-50)/2 + 100;
-                else
-                    pro = 100 + (100-show_ani_progress)/2;
-
-                delta_x = rect.width() * (100-pro) / 100;
-                delta_y = rect.height() * (100-pro) / 100;*/
-
                 double pro = getNolinearProg(show_ani_progress, SpringBack50);
                 delta_x = static_cast<int>(rect.width() * (1 - pro));
                 delta_y = static_cast<int>(rect.height() * (1 - pro));
@@ -1455,30 +1442,10 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
                              rect.width() - delta_x * 2, rect.height() - delta_y * 2);
         }
 
-        /*if (this->isEnabled())
-        {
-            QColor color = icon_color;
-            color.setAlpha(color.alpha() / 2);
-            painter.setPen(color);
-        }*/
 
-        if (model == None)
+        if (model == Text)
         {
-            // 子类自己的绘制内容
-        }
-        else if (model == Text)
-        {
-            // 绘制文字教程： https://blog.csdn.net/temetnosce/article/details/78068464
             painter.setPen(isEnabled() ? text_color : getOpacityColor(text_color));
-            /*if (show_ani_appearing || show_ani_disappearing)
-            {
-                int pro = getSpringBackProgress(show_ani_progress, 50);
-                QFont font = painter.font();
-                int ps = font.pointSize();
-                ps = ps * show_ani_progress / 100;
-                font.setPointSize(ps);
-                painter.setFont(font);
-            }*/
             if (font_size > 0)
             {
                 QFont font = painter.font();
@@ -1518,18 +1485,8 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
             painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text);
         }
     }
-
-    // ==== 绘制鼠标位置 ====
-    //    painter.drawEllipse(QRect(anchor_pos.x()-5, anchor_pos.y()-5, 10, 10)); // 移动锚点
-    //    painter.drawEllipse(QRect(effect_pos.x()-2, effect_pos.y()-2, 4, 4)); // 影响位置锚点
-
-    //    return QPushButton::paintEvent(event); // 不绘制父类背景了
 }
 
-/**
- * IconText/PixmapText模式下，绘制图标
- * 可扩展到绘制图标背景色（模仿menu选中、禁用情况）等
- */
 void InteractiveButtonBase::drawIconBeforeText(QPainter &painter, QRect icon_rect)
 {
     if (model == IconText)
@@ -1538,13 +1495,7 @@ void InteractiveButtonBase::drawIconBeforeText(QPainter &painter, QRect icon_rec
         painter.drawPixmap(icon_rect, pixmap);
 }
 
-/**
- * 判断坐标是否在按钮区域内
- * 避免失去了焦点，但是依旧需要 hover 效果（非菜单和弹窗抢走焦点）
- * 为子类异形按钮区域判断提供支持
- * @param  point 当前鼠标
- * @return       是否在区域内
- */
+
 bool InteractiveButtonBase::inArea(QPoint point)
 {
     return !(point.x() < 0 || point.y() < 0 || point.x() > width() || point.y() > height());
@@ -1555,11 +1506,6 @@ bool InteractiveButtonBase::inArea(QPointF point)
     return !(point.x() < 0 || point.y() < 0 || point.x() > width() || point.y() > height());
 }
 
-/**
- * 获取按钮背景的绘制区域
- * 为子类异形按钮提供支持
- * @return [description]
- */
 QPainterPath InteractiveButtonBase::getBgPainterPath()
 {
     QPainterPath path;
@@ -1570,12 +1516,6 @@ QPainterPath InteractiveButtonBase::getBgPainterPath()
     return path;
 }
 
-/**
- * 获取水波纹绘制区域（圆形，但不规则区域）
- * 圆形水面 & 按钮区域
- * @param  water 一面水波纹动画对象
- * @return       绘制路径
- */
 QPainterPath InteractiveButtonBase::getWaterPainterPath(InteractiveButtonBase::Water water)
 {
     double prog = getNolinearProg(water.progress, FastSlower);
@@ -1595,12 +1535,6 @@ QPainterPath InteractiveButtonBase::getWaterPainterPath(InteractiveButtonBase::W
     return path;
 }
 
-/**
- * 获取统一的尺寸大小（已废弃）
- * 兼容圆形按钮出现动画，半径使用水波纹（对角线）
- * 可直接使用 protected 对象
- * @return 前景绘制区域
- */
 QRectF InteractiveButtonBase::getUnifiedGeometry()
 {
     // 将动画进度转换为回弹动画进度
@@ -1802,24 +1736,12 @@ int InteractiveButtonBase::getSpringBackProgress(int x, int max)
     return 100 + (100 - x) / 2;
 }
 
-/**
- * 获取透明的颜色
- * @param  color 颜色
- * @param  level 比例
- * @return       透明颜色
- */
 QColor InteractiveButtonBase::getOpacityColor(QColor color, double level)
 {
     color.setAlpha(static_cast<int>(color.alpha() * level));
     return color;
 }
 
-/**
- * 获取对应颜色的图标 pixmap
- * @param  p 图标
- * @param  c 颜色
- * @return   对应颜色的图标
- */
 QPixmap InteractiveButtonBase::getMaskPixmap(QPixmap p, QColor c)
 {
     QBitmap mask = p.mask();
@@ -1871,29 +1793,6 @@ QIcon::Mode InteractiveButtonBase::getIconMode()
 void InteractiveButtonBase::anchorTimeOut()
 {
     qint64 timestamp = getTimestamp();
-    // ==== 背景色 ====
-    /*if (hovering) // 在框内：加深
-    {
-        if (hover_progress < 100) // 先判断，再计算，可节约运算资源
-            hover_progress = min((timestamp - hover_timestamp) * 100 / press_bg_duration, 100);
-    }
-    else // 在框外：变浅
-    {
-        if (hover_progress > 0)
-            hover_progress = max((timestamp - leave_timestamp) * 100 / press_bg_duration, 0);
-    }
-
-    if (pressing)
-    {
-        if (press_progress < 100)
-            press_progress = min(press_start + (timestamp - press_timestamp) * 100 / press_bg_duration, 100);
-    }
-    else
-    {
-        if (press_progress > 0) // 如果按下的效果还在，变浅
-            press_progress = max((timestamp - release_timestamp) * 100 / press_bg_duration, 0);
-    }*/
-
     if (pressing) // 鼠标按下
     {
         if (press_progress < 100) // 透明渐变，且没有完成
@@ -2131,10 +2030,6 @@ void InteractiveButtonBase::anchorTimeOut()
     update();
 }
 
-/**
- * 鼠标单击事件
- * 实测按下后，在按钮区域弹起，不管移动多少距离都算是 clicked
- */
 void InteractiveButtonBase::slotClicked()
 {
     click_ani_appearing = true;
@@ -2145,10 +2040,6 @@ void InteractiveButtonBase::slotClicked()
     jitters.clear(); // 清除抖动
 }
 
-/**
- * 强行关闭状态
- * 以槽的形式，便与利用
- */
 void InteractiveButtonBase::slotCloseState()
 {
     setState(false);

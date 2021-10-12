@@ -12,7 +12,7 @@ class UserModel : public QObject
     Q_OBJECT
 public:
 
-    UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService);
+    UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent);
 
     ~UserModel();
 

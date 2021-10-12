@@ -11,10 +11,8 @@ UserDelegate::UserDelegate(QFont *font, QObject *parent)
     , m_userRoleRect(new QRect())
     , m_textPen(new QPen())
     , m_titlePen(new QPen())
-    , m_mouseOverColor(new QColor(235, 236, 238, 255))
-    , m_mouseOverPen(new QPen(*m_mouseOverColor))
-    , m_mouseSelectedColor(new QColor(235, 236, 238, 255))
-    , m_mouseSelectedPen(new QPen(*m_mouseOverColor))
+    , m_mouseOverPen(new QPen())
+    , m_mouseSelectedPen(new QPen())
     , m_font(font)
     , m_size(new QSize(300, 0))
 {
@@ -31,9 +29,7 @@ UserDelegate::~UserDelegate()
     delete m_userRoleRect;
     delete m_textPen;
     delete m_titlePen;
-    delete m_mouseOverColor;
     delete m_mouseOverPen;
-    delete m_mouseSelectedColor;
     delete m_mouseSelectedPen;
     delete m_size;
 }

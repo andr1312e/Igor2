@@ -1,6 +1,7 @@
 #include "admingui.h"
-
-#include <QFontDatabase>
+#include <QDebug>
+#include <QGuiApplication>
+#include <QScreen>
 
 Admin_GUI::Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
     :  QWidget(parent)
@@ -11,6 +12,7 @@ Admin_GUI::Admin_GUI(DatabaseService *databaseService, LinuxUserService *userSer
     setWidgetSizes();
     insertWidgetsIntoLayout();
     createConnections();
+    setMaximumWidgetSize();
 }
 
 Admin_GUI::~Admin_GUI()
@@ -28,7 +30,7 @@ Admin_GUI::~Admin_GUI()
 
 void Admin_GUI::initUI()
 {
-    m_userModel=new UserModel(m_linuxUserService, m_databaseService);
+    m_userModel=new UserModel(m_linuxUserService, m_databaseService, nullptr);
 
     m_mainLayout=new QVBoxLayout();
     m_programLayout=new QHBoxLayout();
@@ -69,6 +71,15 @@ void Admin_GUI::createConnections()
     connect(m_topBar, &TopBar::setTheme, this, &Admin_GUI::setTheme);
 }
 
+void Admin_GUI::setMaximumWidgetSize()
+{
+    m_currentScreen = QGuiApplication::screenAt(mapToGlobal({width()/2,0}));
+    m_maxWidth=m_currentScreen->availableSize().width();
+    m_maxHeight=m_currentScreen->availableSize().height()-30;
+    this->setMaximumWidth(m_maxWidth);
+    this->setMaximumHeight(m_maxHeight);
+}
+
 void Admin_GUI::initTopBar()
 {
     m_topBar=new TopBar(this);
@@ -81,17 +92,36 @@ void Admin_GUI::initTopBar()
 
 void Admin_GUI::hideAdditionalSettings(bool state)
 {
+    QScreen* pScreen = QGuiApplication::screenAt(mapToGlobal({width()/2,0}));
+    if (m_currentScreen!=pScreen)
+    {
+        setMaximumWidgetSize();
+    }
     if (state)
     {
         m_additionalSettingsPanel->hide();
         m_linuxUsersListWidget->setMaximumWidth(width()/2);
         m_settingsPanel->setMaximumWidth(width()/2);
+        this->setMinimumSize(m_linuxUsersListWidget->minimumWidth()+m_settingsPanel->minimumWidth(), 600);
     }
     else
     {
+        if(m_maxWidth>1713)
+        {
+            m_linuxUsersListWidget->setFixedWidth(350);
+            m_settingsPanel->setFixedWidth(450);
+            this->setMinimumSize(1700, 600);
+        }
+        else
+        {
+            m_linuxUsersListWidget->setFixedWidth(250);
+            m_settingsPanel->setFixedWidth(350);
+            this->setMinimumSize(500, 600);
+        }
+//        this->setFixedSize(this->size());
+        this->setMaximumSize(m_maxWidth, m_maxHeight);
         m_additionalSettingsPanel->show();
-        m_linuxUsersListWidget->setMaximumWidth(350);
-        m_settingsPanel->setMaximumWidth(450);
+
     }
 }
 

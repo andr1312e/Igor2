@@ -32,7 +32,7 @@ LinuxUsersListWidget::~LinuxUsersListWidget()
 void LinuxUsersListWidget::createProxyModel(UserModel *userModel)
 {
     m_model=userModel->getModel();
-    m_sortModel=new SortModel();
+    m_sortModel=new SortModel(nullptr);
     m_sortModel->setSourceModel(m_model);
     m_sortModel->setDynamicSortFilter(true);
 }
@@ -251,5 +251,4 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
             }
         }
     }
-
 }
