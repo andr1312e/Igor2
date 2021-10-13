@@ -1,6 +1,6 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList params, QWidget *parent)
+StartupWizard::StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList &params, QWidget *parent)
     : QWizard(parent)
     , m_backupDocument(new QDomDocument())
 {

@@ -39,7 +39,7 @@ private:
     void getUserPrivilegesAndName();
 
     void initSettingsService();
-    bool settingsLoaded();
+    bool allAppDataLoaded();
     void getSettings();
 
     void initRunnableService();

@@ -1,11 +1,13 @@
 #include "intropage.h"
 #include <QDebug>
+#include <QMessageBox>
 
 
-IntroPage::IntroPage(QWidget *parent)
+IntroPage::IntroPage(QDomDocument *backupXMLDocument, QWidget *parent)
     : QWizardPage(parent)
-    , m_document(new QDomDocument())
-    , m_file(new QFile())
+    , m_backupXMLDocument(backupXMLDocument)
+    , m_backupFile(new QFile())
+    , m_checkedList(new QStringList({ "USERS" , "FIRSTROLE" , "SECONDROLE" , "THIRDROME" , "FOURTHROLE"}))
 {
     initUI();
     setWizardTitle();
@@ -15,18 +17,18 @@ IntroPage::IntroPage(QWidget *parent)
 
 IntroPage::~IntroPage()
 {
-    delete m_document;
-    delete m_file;
+    delete m_backupFile;
+    delete m_checkedList;
 
-    delete m_settingsFileLayout;
-    delete m_settingsFileInputLayout;
+    delete m_backupFileLayout;
+    delete m_backupFileLoadLayout;
     delete m_mainLayout;
 
     delete m_topLabel;
-    delete m_settingsFileButton;
-    delete m_settingsFileLabel;
-    delete m_settingsFilePath;
-    delete m_faqTitle;
+    delete m_backupLoadButton;
+    delete m_backupLabel;
+    delete m_backupLineEdit;
+    delete m_faqLabel;
 }
 
 int IntroPage::nextId() const
@@ -37,7 +39,7 @@ int IntroPage::nextId() const
 void IntroPage::setWizardTitle()
 {
     this->setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/1.jpg"));
-    m_settingsFilePath->setStyleSheet("border: 1px solid black");
+    m_backupLineEdit->setStyleSheet("border: 1px solid black");
 }
 
 void IntroPage::initUI()
@@ -51,88 +53,96 @@ void IntroPage::initUI()
                              ));
     m_topLabel->setWordWrap(true);
 
-    m_settingsFileLayout=new QVBoxLayout();
-    m_settingsFileInputLayout=new QHBoxLayout();
-    m_settingsFileButton=new QPushButton();
-    m_settingsFileButton->setIcon(QIcon(":/images/folderBlack"));
-    m_settingsFileButton->setIconSize(QSize(30, 30));
-    m_settingsFileButton->setFlat(true);
-    m_settingsFileButton->setStyleSheet("border: 0px;");
-    m_settingsFileLabel=new QLabel("Путь к файлам настроек:");
-    m_settingsFilePath=new QLineEdit();
-    m_settingsFilePath->setText("");
-    m_faqTitle=new QLabel("<html>Краткое руководство - процесс настройки состоит из шагов:<ul><li>Внесение в базу ФИО Администратора</li><li>Заполнение ролей</li></ul> Заполнение ролей состоит из:<ul><li></li><li>Заполнение доступных программ для запуска на рабочем столе</li><li>Заполнение списка программ которые будут перезапущены</li></ul></html>");
+    m_backupFileLayout=new QVBoxLayout();
+    m_backupFileLoadLayout=new QHBoxLayout();
+    m_backupLoadButton=new QPushButton();
+    m_backupLoadButton->setIcon(QIcon(":/images/folderBlack"));
+    m_backupLoadButton->setIconSize(QSize(30, 30));
+    m_backupLoadButton->setFlat(true);
+    m_backupLoadButton->setStyleSheet("border: 0px;");
+    m_backupLabel=new QLabel("Путь к файлам настроек:");
+    m_backupLineEdit=new QLineEdit();
+    m_backupLineEdit->setText("");
+    m_faqLabel=new QLabel("<html>Краткое руководство - процесс настройки состоит из шагов:<ul><li>Внесение в базу ФИО Администратора</li><li>Заполнение ролей</li></ul> Заполнение ролей состоит из:<ul><li></li><li>Заполнение доступных программ для запуска на рабочем столе</li><li>Заполнение списка программ которые будут перезапущены</li></ul></html>");
 }
 
 void IntroPage::insertWidgetsIntoLayout()
 {
-    m_settingsFileInputLayout->addWidget(m_settingsFilePath);
-    m_settingsFileInputLayout->addWidget(m_settingsFileButton);
+    m_backupFileLoadLayout->addWidget(m_backupLineEdit);
+    m_backupFileLoadLayout->addWidget(m_backupLoadButton);
 
-    m_settingsFileLayout->addWidget(m_settingsFileLabel);
-    m_settingsFileLayout->addLayout(m_settingsFileInputLayout);
-    m_settingsFileLayout->setContentsMargins(30, 0, 0, 0);
+    m_backupFileLayout->addWidget(m_backupLabel);
+    m_backupFileLayout->addLayout(m_backupFileLoadLayout);
+    m_backupFileLayout->setContentsMargins(30, 0, 0, 0);
 
     m_mainLayout->addWidget(m_topLabel);
-    m_mainLayout->addLayout(m_settingsFileLayout);
-    m_mainLayout->addWidget(m_faqTitle);
+    m_mainLayout->addLayout(m_backupFileLayout);
+    m_mainLayout->addWidget(m_faqLabel);
 
     setLayout(m_mainLayout);
 }
 
 void IntroPage::createConnections()
 {
-    connect(m_settingsFileButton, &QPushButton::clicked, this, &IntroPage::addSettingsFile);
+    connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::addSettingsFile);
 }
 
 void IntroPage::addSettingsFile()
 {
-    QPalette palette;
-    palette.setColor(QPalette::Base,Qt::black);
-    palette.setColor(QPalette::Text,Qt::white);
-    m_settingsFilePath->setPalette(palette);
     QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.kunzevo)");
-    checkFile(loadPath);
-    m_settingsFilePath->setText(loadPath);
-
+    if(checkBackupFile(loadPath))
+    {
+        m_backupLineEdit->setText(loadPath);
+    }
+    else
+    {
+        m_backupLineEdit->clear();
+        QMessageBox::critical(this,"Файл настроек неверный","Файл настроек имеет неверную структуру",QMessageBox::Ok);
+    }
 }
 
-bool IntroPage::checkFile(QString &file)
+bool IntroPage::checkBackupFile(QString &backupPath)
 {
-    m_file->setFileName(file);
-    if (m_file->open(QIODevice::ReadOnly))
+    m_backupFile->setFileName(backupPath);
+    if (m_backupFile->open(QIODevice::ReadOnly))
     {
-        QByteArray ar=m_file->readAll();
-        m_file->close();
-        QByteArray data=ar;
-        m_document->setContent(data);
-        QDomElement settings= m_document->firstChildElement();
+        QByteArray ar=m_backupFile->readAll();
+        m_backupFile->close();
+        m_backupXMLDocument->setContent(ar);
+        QDomElement settings= m_backupXMLDocument->firstChildElement();
         if (settings.tagName()=="settings")
         {
             QDomNodeList list=settings.childNodes();
             QStringList tagList;
-            QStringList checkedList={"USERS", "firstRole", "secondRole", "thirdRole", "fourthRole"};
-
             for (int i=0; i<settings.childNodes().count(); i++)
             {
                 tagList.append(list.at(i).toElement().tagName());
             }
-            if (tagList==checkedList)
+            if (tagList==(*m_checkedList))
             {
-                int cccc=3;
+                return true;
             }
         }
-        qDebug()<< settings.childNodes().count();
-        for (int i=0; i<settings.childNodes().count(); i++)
-        {
-            qDebug()<< settings.childNodes().at(i).toElement().tagName();
-        }
-        QDomElement first=settings.childNodes().at(1).childNodes().at(0).toElement();
-        qDebug()<< first.attribute("rank");
-//        if (firstTagName!="Ku")
-        int cccc=3;
-        return true;
     }
+    setToBackupXmlDefaultStruct();
     return false;
+}
+
+void IntroPage::setToBackupXmlDefaultStruct()
+{
+    m_backupXMLDocument->clear();
+    QDomElement mainElem=m_backupXMLDocument->createElement("settings");
+    m_backupXMLDocument->appendChild(mainElem);
+    QDomElement settings=m_backupXMLDocument->firstChildElement();
+    QDomElement USERS=m_backupXMLDocument->createElement("USERS");
+    QDomElement FIRSTROLE=m_backupXMLDocument->createElement("FIRSTROLE");
+    QDomElement SECONDROLE=m_backupXMLDocument->createElement("SECONDROLE");
+    QDomElement THIRDROME=m_backupXMLDocument->createElement("THIRDROME");
+    QDomElement FOURTHROLE=m_backupXMLDocument->createElement("FOURTHROLE");
+    settings.appendChild(USERS);
+    settings.appendChild(FIRSTROLE);
+    settings.appendChild(SECONDROLE);
+    settings.appendChild(THIRDROME);
+    settings.appendChild(FOURTHROLE);
 }

@@ -26,7 +26,10 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050B00    # отключить API, у
 
 SOURCES += \
     Admin_GUI/Views/Wizards/fcspage.cpp \
+    Admin_GUI/Views/Wizards/framelesswizard.cpp \
     Admin_GUI/Views/Wizards/intropage.cpp \
+    Services/Settings/roleappsandstartupsettingsrepository.cpp \
+    Services/Settings/usersettingsrepository.cpp \
     Services/Terminals/terminal.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
@@ -79,7 +82,7 @@ SOURCES += \
     program.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     globalfunctions.cpp \
-    Services/appsettingsservice.cpp \
+    Services/Settings/appsettingsservice.cpp \
     Styles/Frameless/framelesswindow.cpp \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
@@ -88,8 +91,11 @@ SOURCES += \
 
 HEADERS += \
     Admin_GUI/Views/Wizards/fcspage.h \
+    Admin_GUI/Views/Wizards/framelesswizard.h \
     Admin_GUI/Views/Wizards/intropage.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
+    Services/Settings/roleappsandstartupsettingsrepository.h \
+    Services/Settings/usersettingsrepository.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -149,7 +155,7 @@ HEADERS += \
     Services/integrityservice.h \
     Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
-    Services/appsettingsservice.h \
+    Services/Settings/appsettingsservice.h \
     User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
