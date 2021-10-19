@@ -94,7 +94,9 @@ QStringList Terminal::getFileList(const QString &folderPath, QString calledFulc,
 {
     QString getFileListCommand=createGetFileListCommand(folderPath, hasRoot);
     QString files = runConsoleCommand(getFileListCommand, calledFulc);
-    return files.split('\n');
+    QStringList filesList= files.split('\n');
+    filesList.removeLast();
+    return filesList;
 }
 
 QStringList Terminal::getFolderList(const QString &folderPath, QString calledFulc, bool hasRoot)

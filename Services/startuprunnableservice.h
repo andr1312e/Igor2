@@ -2,7 +2,6 @@
 #define SERVICES_STARTUPRUNNABLESERVICE_H
 
 #include <QProcess>
-#include <QVector>
 #include <QPair>
 #include <QStringList>
 #include <QObject>
@@ -34,7 +33,7 @@ private:
 
     Terminal *m_terminal;
 
-    QVector<QProcess*> *m_runnableProcess;
+    std::vector<QProcess*> *m_runnableProcess;
 
     QStringList *m_processParams;
 

@@ -8,18 +8,25 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QDomDocument>
 
+#include <Services/Settings/wizardservice.h>
+
+#include "Services/Settings/programfilesstate.h"
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
 
 class IntroPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    IntroPage(QDomDocument *backupXMLDocument, QWidget *parent);
+    IntroPage(ProgramFilesState &state, WizardService *service, QWidget *parent);
     ~IntroPage();
     int nextId() const override;
+Q_SIGNALS:
+    void checkBackupFile(QString &backupPath);
 private:
+    ProgramFilesState m_state;
+    WizardService *m_wizardService;
+
     QVBoxLayout *m_mainLayout;
     QLabel *m_topLabel;
     QVBoxLayout *m_backupFileLayout;
@@ -29,20 +36,14 @@ private:
     QLineEdit *m_backupLineEdit;
     QLabel *m_faqLabel;
 
-private:
-    QDomDocument *m_backupXMLDocument;
-    QFile *m_backupFile;
-    QStringList *m_checkedList;
+    QString m_backupFilePath;
 private:
     void setWizardTitle();
     void initUI();
     void insertWidgetsIntoLayout();
     void createConnections();
 private Q_SLOTS:
-    void addSettingsFile();
-private:
-    bool checkBackupFile(QString &backupPath);
-    void setToBackupXmlDefaultStruct();
+    void CheckBackupFile();
 };
 
 #endif // INTROPAGE_H

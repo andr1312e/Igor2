@@ -41,7 +41,7 @@ private:
 
     const int VoiRmoWorksBitsMask=0x06;//0000 0000 0000 0000 0000 0000 0000 0110 Little Endian
 
-    QVector<quint8> *m_messagesWantedToGetFromRarm;
+    std::array<quint8, 8> *m_messagesWantedToGetFromRarm;
 
 private:
 

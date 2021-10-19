@@ -7,7 +7,7 @@
 class GlobalFunctions{
 
 public:
-    static bool stringContainsBadCharecters(const QString &fileName);
+    static bool StringContainsBadCharecters(const QString &fileName);
 
 };
 

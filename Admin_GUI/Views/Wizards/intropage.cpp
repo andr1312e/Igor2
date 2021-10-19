@@ -3,11 +3,11 @@
 #include <QMessageBox>
 
 
-IntroPage::IntroPage(QDomDocument *backupXMLDocument, QWidget *parent)
+IntroPage::IntroPage(ProgramFilesState &state, WizardService *service, QWidget *parent)
     : QWizardPage(parent)
-    , m_backupXMLDocument(backupXMLDocument)
-    , m_backupFile(new QFile())
-    , m_checkedList(new QStringList({ "USERS" , "FIRSTROLE" , "SECONDROLE" , "THIRDROME" , "FOURTHROLE"}))
+    , m_state(state)
+    , m_wizardService(service)
+
 {
     initUI();
     setWizardTitle();
@@ -17,9 +17,6 @@ IntroPage::IntroPage(QDomDocument *backupXMLDocument, QWidget *parent)
 
 IntroPage::~IntroPage()
 {
-    delete m_backupFile;
-    delete m_checkedList;
-
     delete m_backupFileLayout;
     delete m_backupFileLoadLayout;
     delete m_mainLayout;
@@ -33,7 +30,7 @@ IntroPage::~IntroPage()
 
 int IntroPage::nextId() const
 {
-    return Page_FirstRole;
+    return Page_UserData;
 }
 
 void IntroPage::setWizardTitle()
@@ -46,10 +43,30 @@ void IntroPage::initUI()
 {
     m_mainLayout=new QVBoxLayout();
 
+    QString needToUpdate;
+    switch (m_state) {
+    case NoFiles:
+    {
+        needToUpdate="Необходимо добавить: базу данных пользователей, и пути к исполняемым файлам.\n";
+        break;
+    }
+    case NoUserDb:
+    {
+        needToUpdate="Необходимо добавить базу данных пользователей.\n";
+        break;
+    }
+    case NoRoleData:
+    {
+        needToUpdate="Необходимо добавить: пути к исполняемым файлам. База пользователей имеется.\n";
+        break;
+    }
+
+    }
 
     m_topLabel = new QLabel(("Администратор, добро пожаловать в программу управления пользователями РЛС ТИ\n"
+                             +needToUpdate+
                              "Eсли у вас есть готовый файл настроек, нажмите на иконку папки справа сверху, выберите файл"
-                             ",нажмите далее. Значения файла можно будет отредактировать позже.Если файла нет, ознакомтесь с кратким руководством и нажмите далее.."
+                             ",нажмите далее. Значения файла можно будет отредактировать позже.Если файла нет, ознакомьтесь с кратким руководством и нажмите далее.."
                              ));
     m_topLabel->setWordWrap(true);
 
@@ -84,65 +101,22 @@ void IntroPage::insertWidgetsIntoLayout()
 
 void IntroPage::createConnections()
 {
-    connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::addSettingsFile);
+    connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::CheckBackupFile);
 }
 
-void IntroPage::addSettingsFile()
+void IntroPage::CheckBackupFile()
 {
     QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.kunzevo)");
-    if(checkBackupFile(loadPath))
+    m_backupFilePath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.kunzevo)");
+    if (!m_backupFilePath.isEmpty())
     {
-        m_backupLineEdit->setText(loadPath);
-    }
-    else
-    {
-        m_backupLineEdit->clear();
-        QMessageBox::critical(this,"Файл настроек неверный","Файл настроек имеет неверную структуру",QMessageBox::Ok);
-    }
-}
-
-bool IntroPage::checkBackupFile(QString &backupPath)
-{
-    m_backupFile->setFileName(backupPath);
-    if (m_backupFile->open(QIODevice::ReadOnly))
-    {
-        QByteArray ar=m_backupFile->readAll();
-        m_backupFile->close();
-        m_backupXMLDocument->setContent(ar);
-        QDomElement settings= m_backupXMLDocument->firstChildElement();
-        if (settings.tagName()=="settings")
+        if (m_wizardService->CheckAndParseBackupFile(m_backupFilePath))
         {
-            QDomNodeList list=settings.childNodes();
-            QStringList tagList;
-            for (int i=0; i<settings.childNodes().count(); i++)
-            {
-                tagList.append(list.at(i).toElement().tagName());
-            }
-            if (tagList==(*m_checkedList))
-            {
-                return true;
-            }
+             m_backupLineEdit->setText(m_backupFilePath);
+        }
+        else
+        {
+            m_backupLineEdit->clear();
         }
     }
-    setToBackupXmlDefaultStruct();
-    return false;
-}
-
-void IntroPage::setToBackupXmlDefaultStruct()
-{
-    m_backupXMLDocument->clear();
-    QDomElement mainElem=m_backupXMLDocument->createElement("settings");
-    m_backupXMLDocument->appendChild(mainElem);
-    QDomElement settings=m_backupXMLDocument->firstChildElement();
-    QDomElement USERS=m_backupXMLDocument->createElement("USERS");
-    QDomElement FIRSTROLE=m_backupXMLDocument->createElement("FIRSTROLE");
-    QDomElement SECONDROLE=m_backupXMLDocument->createElement("SECONDROLE");
-    QDomElement THIRDROME=m_backupXMLDocument->createElement("THIRDROME");
-    QDomElement FOURTHROLE=m_backupXMLDocument->createElement("FOURTHROLE");
-    settings.appendChild(USERS);
-    settings.appendChild(FIRSTROLE);
-    settings.appendChild(SECONDROLE);
-    settings.appendChild(THIRDROME);
-    settings.appendChild(FOURTHROLE);
 }

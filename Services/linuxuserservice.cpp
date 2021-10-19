@@ -1,4 +1,5 @@
 #include "Services/linuxuserservice.h"
+#include "linuxuserservice.h"
 #include <QDebug>
 
 LinuxUserService::LinuxUserService(Terminal *terminal)
@@ -24,9 +25,16 @@ void LinuxUserService::getAllUsersInSystem()
 
 const QString LinuxUserService::getCurrentUserName()
 {
-    const QString getAllCurrentUserNameCommand="whoami";
-    QString userName=m_terminal->runConsoleCommand(getAllCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
+    const QString getCurrentUserNameCommand="id -u -n";
+    QString userName=m_terminal->runConsoleCommand(getCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
     return userName;
+}
+
+const QString LinuxUserService::getCurrentUserId()
+{
+    const QString getCurrentUserIdCommand="id -u";
+    QString userId=m_terminal->runConsoleCommand(getCurrentUserIdCommand, "LinuxUserService::getCurrentUserId").remove('\n');
+    return userId;
 }
 
 bool LinuxUserService::hasCurrentUserAdminPrivileges()
@@ -73,7 +81,7 @@ void LinuxUserService::removeSystemUsersFromAllUsersList(QStringList &allUsers)
                     int userIdNumber=userId.toInt(&convertOk, 10);
                     if (convertOk)
                     {
-                        if (isUserSystem(userIdNumber))
+                        if (IsUserSystem(userIdNumber))
                         {
                             pushUserToList(userName, userId);
                             index++;
@@ -109,9 +117,9 @@ void LinuxUserService::pushUserToList(const QString &name, const QString &userId
     m_users->append(user);
 }
 
-bool LinuxUserService::isUserSystem(int &userIdNumber)
+bool LinuxUserService::IsUserSystem(int &userIdNumber)
 {
-    if (userIdNumber>999&userIdNumber<29991)
+    if (userIdNumber>999&&userIdNumber<29991)
     {
         return true;
     }

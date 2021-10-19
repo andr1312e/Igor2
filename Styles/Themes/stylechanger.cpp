@@ -4,7 +4,8 @@
 #include <QDebug>
 
 StyleChanger::StyleChanger(QApplication *app)
-    : m_myApp(app)
+    : currentThemeIsWhite(true)
+    , m_myApp(app)
 {
     m_darkTheme=new Theme(darkThemeColor, darkThemeDisabledColor);
     m_astraTheme=new Theme(astraThemeColor, astraThemeDisabledColor);

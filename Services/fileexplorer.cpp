@@ -39,7 +39,6 @@ void FileExplorer::setDefaultIcons(const QString &role)
 {
     m_terminal->clearFolderSudo(m_path, "FileExplorer::deleteAllFiles");
     QStringList files=m_terminal->getFileList("/home/user/RLS_TI/"+role, "FileExplorer::setDefaultIcons");
-    files.removeLast();
     for (int i=files.count()-1; i>=0; i--)
     {
         if (files.at(i).contains('/'))

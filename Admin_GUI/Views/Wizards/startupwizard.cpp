@@ -1,10 +1,11 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList params, QWidget *parent)
+StartupWizard::StartupWizard(ProgramFilesState &loadedDbAdnRolesState, AppFirstLoadlingSettingsService *appFirstLoadingService, QWidget *parent)
     : QWizard(parent)
-    , m_backupDocument(new QDomDocument())
+    , m_programState(loadedDbAdnRolesState)
+    , m_settingFileService(appFirstLoadingService)
 {
-    initServices(userWizardRepository, roleWizardRepostory);
+    initServices();
     initUI();
     initSizes();
     initStyles();
@@ -14,9 +15,19 @@ StartupWizard::StartupWizard(int state, QString &currentUserName, QString &curre
 
 StartupWizard::~StartupWizard()
 {
-    delete m_backupDocument;
+    delete m_wizardService;
     delete m_introPage;
     delete m_fcsPage;
+}
+
+void StartupWizard::accept()
+{
+    int ccc=3;
+}
+
+void StartupWizard::reject()
+{
+    int ccccc=3;
 }
 
 void StartupWizard::showHelp()
@@ -29,17 +40,16 @@ void StartupWizard::showHelp()
     }
 }
 
-void StartupWizard::initServices(CurrentUserWizardRepository *userWizardRepository, RoleAndStartupWizardRepository *roleWizardRepostory)
+void StartupWizard::initServices()
 {
-    m_userWizardRepository=userWizardRepository;
-    m_roleWizardRepostory=roleWizardRepostory;
+    m_wizardService=new WizardService(m_programState, m_settingFileService->getUserName(), m_settingFileService->getUserId(), m_settingFileService->getValidSettingsPaths(), m_settingFileService->getDefaultSettingsPaths(), m_settingFileService->getTerminal(), nullptr);
 }
 
 void StartupWizard::initUI()
 {
-    m_introPage =new IntroPage(m_backupDocument,this);
+    m_introPage =new IntroPage(m_programState, m_wizardService,this);
 
-    m_fcsPage=new FCSPage(m_userWizardRepository->getCurrentUserName(), m_userWizardRepository->getCurrentUserId(),m_backupDocument, this);
+    m_fcsPage=new FCSPage(m_wizardService, this);
 }
 
 void StartupWizard::initSizes()
@@ -56,6 +66,7 @@ void StartupWizard::initStyles()
 void StartupWizard::initBehaviour()
 {
     setOption(QWizard::NoBackButtonOnStartPage);
+    setOption(QWizard::HaveHelpButton);
     setPage(Page_Intro, m_introPage);
     setPage(Page_UserData, m_fcsPage);
     setStartId(Page_Intro);
@@ -64,4 +75,5 @@ void StartupWizard::initBehaviour()
 void StartupWizard::createConnections()
 {
 
+//    connect(m_wizardService, &WizardService::setFCSForm, [&](bool isOldData, QString &adminFCS, QString &adminRank){m_fcsPage->set});
 }

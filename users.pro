@@ -25,11 +25,14 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050B00    # отключить API, у
 
 
 SOURCES += \
+    Admin_GUI/Validator/stringvalidator.cpp \
     Admin_GUI/Views/Wizards/fcspage.cpp \
     Admin_GUI/Views/Wizards/framelesswizard.cpp \
     Admin_GUI/Views/Wizards/intropage.cpp \
+    Services/Settings/appfirstloadingsettingsservice.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
+    Services/Settings/wizardservice.cpp \
     Services/Terminals/terminal.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
@@ -82,7 +85,6 @@ SOURCES += \
     program.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     globalfunctions.cpp \
-    Services/Settings/appsettingsservice.cpp \
     Styles/Frameless/framelesswindow.cpp \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
@@ -90,12 +92,17 @@ SOURCES += \
     Admin_GUI/Views/Wizards/startupwizard.cpp
 
 HEADERS += \
+    Admin_GUI/Validator/stringvalidator.h \
     Admin_GUI/Views/Wizards/fcspage.h \
     Admin_GUI/Views/Wizards/framelesswizard.h \
     Admin_GUI/Views/Wizards/intropage.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
+    Services/Settings/appfirstloadingsettingsservice.h \
+    Services/Settings/defaultSettingsPath.h \
+    Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \
+    Services/Settings/wizardservice.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -155,7 +162,6 @@ HEADERS += \
     Services/integrityservice.h \
     Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
-    Services/Settings/appsettingsservice.h \
     User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \

@@ -4,7 +4,7 @@
 StartupRunnableService::StartupRunnableService(Terminal *terminal, QObject *parent)
     : QObject(parent)
     , m_terminal(terminal)
-    , m_runnableProcess(new QVector<QProcess*>)
+    , m_runnableProcess(new std::vector<QProcess*>)
     , m_processParams(new QStringList())
 {
 
@@ -12,9 +12,9 @@ StartupRunnableService::StartupRunnableService(Terminal *terminal, QObject *pare
 
 StartupRunnableService::~StartupRunnableService()
 {
-    if (!(m_runnableProcess->isEmpty()))
+    if (!(m_runnableProcess->empty()))
     {
-        for (QVector<QProcess*>::reverse_iterator iter=m_runnableProcess->rbegin(); iter!=m_runnableProcess->rend(); iter++)
+        for (std::vector<QProcess*>::reverse_iterator iter=m_runnableProcess->rbegin(); iter!=m_runnableProcess->rend(); iter++)
         {
             delete *iter;
         }
@@ -64,13 +64,13 @@ bool StartupRunnableService::isAllExecsValid(QStringList &execsList)
 void StartupRunnableService::initProcessStruct(QStringList execsList)
 {
     m_runnableProcess->resize(execsList.size());
-    if (m_runnableProcess->isEmpty())
+    if (m_runnableProcess->empty())
     {
         return;
     }
     else
     {
-        QVector<QProcess*>::iterator processIter=m_runnableProcess->begin();
+        std::vector<QProcess*>::iterator processIter=m_runnableProcess->begin();
         for (QList<QString>::ConstIterator programPath=execsList.cbegin(); programPath!=execsList.cend(); ++programPath)
         {
             (*processIter)=new QProcess();

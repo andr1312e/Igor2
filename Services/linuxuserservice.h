@@ -25,6 +25,8 @@ public:
 
     const QString getCurrentUserName();
 
+    const QString getCurrentUserId();
+
     bool hasCurrentUserAdminPrivileges();
 
 private:
@@ -35,7 +37,7 @@ private:
 
     void removeSystemUsersFromAllUsersList(QStringList &allUsers);
 
-    static bool isUserSystem(int &userIdNumber);
+    static bool IsUserSystem(int &userIdNumber);
 
 private:
 

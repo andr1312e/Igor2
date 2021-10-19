@@ -1,18 +1,24 @@
 #include "program.h"
 #include <QDebug>
-#include "Admin_GUI/Views/Wizards/startupwizard.h"
+
 
 Program::Program(int &argc, char **argv)
     : QApplication(argc, argv, true)
+    , m_loadedDbAdnRolesState(ProgramFilesState::CantRun)
+    , m_hasAdminPrivileges(false)
     , m_sharedMemory(new QSharedMemory("PROCESS_CONTROLLER", this))
-    , m_terminal(Q_NULLPTR)
-    , m_linuxUserService(Q_NULLPTR)
-    , m_dataBaseService(Q_NULLPTR)
-    , m_indentifyService(Q_NULLPTR)
-    , m_startupRunnableService(Q_NULLPTR)
-    , m_socketToRarm(Q_NULLPTR)
-    , m_AdminGui(Q_NULLPTR)
+    , m_terminal(nullptr)
+    , m_linuxUserService(nullptr)
+    , m_settingFileService(nullptr)
+    , m_startupWizard(nullptr)
+    , m_dataBaseService(nullptr)
+    , m_indentifyService(nullptr)
+    , m_startupRunnableService(nullptr)
+    , m_socketToRarm(nullptr)
+    , m_AdminGui(nullptr)
     , m_fakeUI(new FakeUI)
+    , m_framelessWindow(nullptr)
+    , m_proxyStyle(nullptr)
 {
     m_fakeUI->hide();
 }
@@ -22,10 +28,10 @@ Program::~Program()
     m_sharedMemory->detach();
     delete m_sharedMemory;
     delete m_fakeUI;
-    if (m_terminal!=Q_NULLPTR)
+    if (m_terminal!=nullptr)
     {
         delete m_settingFileService;
-        if (m_AdminGui!=Q_NULLPTR)
+        if (m_AdminGui!=nullptr)
         {
             delete m_AdminGui;
         }
@@ -63,23 +69,56 @@ void Program::createApp()//MAIN
 {
     initTerminal();
     initUserService();
-    getUserPrivilegesAndName();
+    getCurrentUserSystemData();
     initSettingsService();
-    if (settingsLoaded())
+    LoadDbAndRoles();
+    ProcessDataLoading();
+}
+
+void Program::ProcessDataLoading()
+{
+    switch (m_loadedDbAdnRolesState) {
+    case NoFiles:
+    case NoUserDb:
+    case NoRoleData:
     {
-//        getSettings();
-//        initRunnableService();
-//        if(allAppsRunned())
-//        {
-//            initRarmSocket();
-//            createConnections();
-//            if (m_hasAdminPrivileges)
-//            {
-//                initAdminServices();
-//                initAdminUI();
-//                initStyle();
-//            }
-//        }
+        StartSettingsWizard();
+        break;
+    }
+    case Fine:
+    {
+        ContinueLoading();
+        break;
+    }
+    case CantRun:
+    {
+        QMessageBox::critical(nullptr,"Приложение не может запуститься", "Файл настроек  имеет неверную структуру, обратитесь к Администратору для решения проблемы",QMessageBox::Ok);
+        break;
+    }
+    }
+}
+
+void Program::StartSettingsWizard()
+{
+    m_startupWizard=new StartupWizard(m_loadedDbAdnRolesState, m_settingFileService, nullptr);
+    connect(m_startupWizard, &StartupWizard::finish, this, &Program::ContinueLoading);
+    m_startupWizard->show();
+}
+
+void Program::ContinueLoading()
+{
+    getSettings();
+    initRunnableService();
+    if(allAppsRunned())
+    {
+        initRarmSocket();
+        createConnections();
+        if (m_hasAdminPrivileges)
+        {
+            initAdminServices();
+            initAdminUI();
+            initStyle();
+        }
     }
 }
 
@@ -93,7 +132,7 @@ void Program::initUserService()
     m_linuxUserService=new LinuxUserService(m_terminal);
 }
 
-void Program::getUserPrivilegesAndName()
+void Program::getCurrentUserSystemData()
 {
     m_hasAdminPrivileges=m_linuxUserService->hasCurrentUserAdminPrivileges();
     m_currentUserName=m_linuxUserService->getCurrentUserName();
@@ -101,12 +140,12 @@ void Program::getUserPrivilegesAndName()
 
 void Program::initSettingsService()
 {
-    m_settingFileService=new AppSettingsService(m_currentUserName, m_hasAdminPrivileges, m_fakeUI, m_terminal);
+    m_settingFileService=new AppFirstLoadlingSettingsService(m_currentUserName,m_currentUserId, m_hasAdminPrivileges, m_fakeUI, m_terminal);
 }
 
-bool Program::settingsLoaded()
+void Program::LoadDbAndRoles()
 {
-    return m_settingFileService->isAllSettingsLoaded();
+    m_loadedDbAdnRolesState= m_settingFileService->isAllDataLoaded();
 }
 
 void Program::getSettings()

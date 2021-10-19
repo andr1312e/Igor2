@@ -1,20 +1,47 @@
 #ifndef WIZARDSERVICE_H
 #define WIZARDSERVICE_H
 #include <QStringList>
+#include <QDomDocument>
+#include <QDebug>
 
 #include "Services/Terminals/terminal.h"
 #include "Structs/programstruct.h"
+#include "Structs/userstruct.h"
 
-class RoleAndStartupWizardRepository
+class RolesAndStartupsWizardRepository
 {
 public:
-    RoleAndStartupWizardRepository(QString &currentUserName, Terminal *terminal);
-    ~RoleAndStartupWizardRepository();
+    RolesAndStartupsWizardRepository(Terminal *terminal);
 
-    void getRoleData(int roleNum, QList<DesktopEntity> *m_RoleDesktops, QStringList *m_startups);
+    ~RolesAndStartupsWizardRepository();
+
+    bool hasData();
+
+    void RetunRoleDesktopsAndStartups(int roleNum, QList<DesktopEntity> &roleDesktops, QStringList &startups);
+
+    void SetRoleDesktopsAndStartupsFromFile(QString &pathToDesktopsFolder, QString &pathToStartupsFolder);
+
+    void SetRoleDesktopsAndStartupsFromBackup(int roleNum, QDomElement &backupNode);
+
 private:
+
+    void SetRoleDesktopsFromFile(QString &pathToDesktopsFolder);
+
+    void SetRoleStartupsFromFile(QString &pathToStartupsFolder);
+
+    void SetRoleDesktopFromXml(int roleNum, QDomElement &desktops);
+
+    void SetRoleStartupsFromXml(int roleNum, QDomElement &startups);
+
+    void AppendRoleStartups(int roleNum, QString startup);
+
+    void AppendEnittyToRoleDesktops(int roleNum, DesktopEntity &desktopEntity);
+
+private:
+
+    bool m_hasData;
+
     Terminal *m_terminal;
-    QString m_currentUserName;
 
     QStringList *m_firstRoleStartup;
     QStringList *m_secondRoleStartup;

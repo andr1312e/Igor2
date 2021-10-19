@@ -1,39 +1,45 @@
 #ifndef USERSETTINGSREPOSITORY_H
 #define USERSETTINGSREPOSITORY_H
+#include <QString>
+#include <QFile>
 #include <QDomDocument>
-
-#include "Services/Terminals/terminal.h"
+#include <QStringLiteral>
 
 class CurrentUserWizardRepository
 {
+
 public:
-    CurrentUserWizardRepository(QString &currentUserId, QString &currentUserName, Terminal *terminal);
+
+    explicit CurrentUserWizardRepository(QString &curerntUserName);
 
     ~CurrentUserWizardRepository();
 
-    QString getCurrentUserId();
+    const QString& getCurrentUserName() const;
 
-    QString getCurrentUserName();
+    bool hasData() const;
 
-    void setUserData(QDomDocument *doc);
+    QString& GetCurrentUserFCS();
 
-    void setUserFCS(const QString &FCS);
+    QString& GetCurrentUserRank();
 
-     void setUserRank(const QString &rank);
+    int GetUsersCount() const;
+
+    void setFCSAndRolesFromDb(QString &pathToUserDb);
+
+    void getFCSAndRolesFromXml(QDomElement &usersNode);
 
 private:
 
-    Terminal *m_terminal;
+    const QString m_curerntUserName;
 
-    QString m_currentUserId;
+    bool m_hasData;
 
-    QString m_currentUserName;
+    int m_usersCount;
 
-    QString m_currentUserFCS;
+    QString m_userFCS;
 
-    QString m_currentUserRank;
+    QString m_userRank;
 
-    QDomDocument *m_usersRepository;
 };
 
 #endif // USERSETTINGSREPOSITORY_H

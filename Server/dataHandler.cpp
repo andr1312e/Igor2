@@ -42,7 +42,7 @@ void SocketToRarm::initAdditionalVariables()
     m_timeToConnectRarm->setTimerType(Qt::VeryCoarseTimer);
     m_needToSend=false;
     m_dataContains=false;
-    m_messagesWantedToGetFromRarm=new QVector<quint8>{
+    m_messagesWantedToGetFromRarm=new std::array<quint8, 8>{
             RMO_VOI_TRACK_SETTING_MESSAGE,//1 Сообщение о проритетности трассы
             VOI_RMO_TRACK_DELETE_MESSAGE,//106 Сообщение об удалении трассы от вторички
             RMO_VOI_TARGET_POSITION_MESSAGE, //3 Сообщение с параметрами ЦУ
@@ -133,11 +133,11 @@ void SocketToRarm::connectToRarm()
     dataStream.setVersion(QDataStream::Qt_5_3);
     dataStream.setByteOrder(QDataStream::LittleEndian);
     dataStream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-    qint16 sizeOfMessage=qint16((m_messagesWantedToGetFromRarm->count()+2)*sizeof(quint8));//messagesCount+MessageId+myId
+    qint16 sizeOfMessage=qint16((m_messagesWantedToGetFromRarm->size()+2)*sizeof(quint8));//messagesCount+MessageId+myId
     dataStream << sizeOfMessage;//размер
     dataStream << quint8(255);//ид сообщения
     dataStream << quint8(PROCESS_CONTROLLER);// мой ид
-    for (QVector<quint8>::ConstIterator it=m_messagesWantedToGetFromRarm->cbegin(); it!=m_messagesWantedToGetFromRarm->cend(); ++it)
+    for (std::array<quint8, 8>::const_iterator it=m_messagesWantedToGetFromRarm->cbegin(); it!=m_messagesWantedToGetFromRarm->cend(); ++it)
     {
         dataStream << *it;
     }

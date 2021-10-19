@@ -9,7 +9,7 @@ class IntegrityService
 {
 public:
 
-    IntegrityService(Terminal *terminal);
+    explicit IntegrityService(Terminal *terminal);
 
     ~IntegrityService();
 

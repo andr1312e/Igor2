@@ -9,6 +9,10 @@
 #include "Admin_GUI/Views/Wizards/intropage.h"
 #include "Admin_GUI/Views/Wizards/fcspage.h"
 
+#include "Services/Settings/appfirstloadingsettingsservice.h"
+#include "Services/Settings/wizardservice.h"
+
+#include "Services/Settings/programfilesstate.h"
 #include "Services/Settings/usersettingsrepository.h"
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 
@@ -16,26 +20,30 @@ class StartupWizard : public QWizard
 {
     Q_OBJECT
 public:
-    StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList params, QWidget *parent);
+    StartupWizard(ProgramFilesState &loadedDbAdnRolesState, AppFirstLoadlingSettingsService *appFirstLoadingService, QWidget *parent);
     ~StartupWizard();
+    void accept() override;
+    void reject() override;
+Q_SIGNALS:
+    void finish();
 private Q_SLOTS:
     void showHelp();
 private:
+    ProgramFilesState m_programState;
+    AppFirstLoadlingSettingsService *m_settingFileService;
+    WizardService *m_wizardService;
 
-    QDomDocument *m_backupDocument;
-
-    CurrentUserWizardRepository *m_userWizardRepository;
-    RoleAndStartupWizardRepository *m_roleWizardRepostory;
     IntroPage *m_introPage;
     FCSPage *m_fcsPage;
 
 private:
-    void initServices(CurrentUserWizardRepository *userWizardRepository, RoleAndStartupWizardRepository *roleWizardRepostory);
+    void initServices();
     void initUI();
     void initSizes();
     void initStyles();
     void initBehaviour();
     void createConnections();
+
 };
 
 #endif // STARTUPWIZARD_H

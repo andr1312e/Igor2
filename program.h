@@ -1,15 +1,14 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
-#pragma once
 
 #include <QDebug>
 #include <QSettings>
-#include <QApplication>
 #include <QMessageBox>
+#include <QApplication>
 #include <QInputDialog>
 #include <QSharedMemory>
 
-#include "Services/Settings/appsettingsservice.h"
+#include "Services/Settings/appfirstloadingsettingsservice.h"
 
 #include "Services/identifyservice.h"
 #include "Services/Terminals/terminal.h"
@@ -18,10 +17,12 @@
 #include "Server/dataHandler.h"
 
 #include "Admin_GUI/Views/admingui.h"
+#include "Admin_GUI/Views/Wizards/startupwizard.h"
+
 #include "User_GUI/User_GUI.h"
 
-#include <Styles/Frameless/framelesswindow.h>
-#include <Styles/Themes/stylechanger.h>
+#include "Styles/Frameless/framelesswindow.h"
+#include "Styles/Themes/stylechanger.h"
 
 class Program : public QApplication
 {
@@ -36,10 +37,19 @@ private:
 
     void initTerminal();
     void initUserService();
-    void getUserPrivilegesAndName();
+    void getCurrentUserSystemData();
 
     void initSettingsService();
-    bool settingsLoaded();
+    void LoadDbAndRoles();
+
+    void ProcessDataLoading();
+    void StartSettingsWizard();
+private Q_SLOTS:
+
+    void ContinueLoading();
+
+public:
+
     void getSettings();
 
     void initRunnableService();
@@ -58,7 +68,10 @@ private:
 
 private:
 
+    ProgramFilesState m_loadedDbAdnRolesState;
+
     bool m_hasAdminPrivileges;
+    QString m_currentUserId;
     QString m_currentUserName;
 
     QSharedMemory *m_sharedMemory;
@@ -67,7 +80,9 @@ private:
 
     Terminal *m_terminal;
     LinuxUserService *m_linuxUserService;
-    AppSettingsService *m_settingFileService;
+    AppFirstLoadlingSettingsService *m_settingFileService;
+
+    StartupWizard *m_startupWizard;
 
     DatabaseService *m_dataBaseService;
     IdentifyService *m_indentifyService;

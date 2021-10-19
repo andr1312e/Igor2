@@ -138,7 +138,7 @@ void FileDialogWidget::addIconToUserDesktop()
         }
         else
         {
-            if(GlobalFunctions::stringContainsBadCharecters(m_iconName->text()))
+            if(GlobalFunctions::StringContainsBadCharecters(m_iconName->text()))
             {
                 m_messagBox->setText("Текст в поле \"Название на рабочем столе\" не может содержать символы \ / ` : & * ? \" \' < > | () : ;");
                 m_messagBox->exec();
