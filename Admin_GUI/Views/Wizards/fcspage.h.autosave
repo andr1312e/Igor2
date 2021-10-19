@@ -20,6 +20,7 @@ public:
     void initializePage() override;
 private:
     CurrentUserWizardRepository *m_userWizardRepository;
+    QString m_currentUserName;
     QDomDocument *m_backup;
 
     QString m_FCSValue;

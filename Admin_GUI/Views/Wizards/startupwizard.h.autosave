@@ -16,7 +16,7 @@ class StartupWizard : public QWizard
 {
     Q_OBJECT
 public:
-    StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList params, QWidget *parent);
+    StartupWizard(int state, QString &currentUserName, QString &currentUserId, QStringList &params, QWidget *parent);
     ~StartupWizard();
 private Q_SLOTS:
     void showHelp();

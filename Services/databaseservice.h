@@ -16,7 +16,9 @@ class DatabaseService
 
 public:
 
-    DatabaseService(const QString &filePath, Terminal *terminal);
+    DatabaseService(Terminal *terminal);
+
+    void loadFromFile(const QString &userDbPath);
 
     ~DatabaseService();
 
@@ -26,7 +28,7 @@ public:
 
     QString getUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute);
 
-    QString getFilePath(){ return m_filePath;}
+    QString getFilePath(){ return m_userDbPath;}
 
     Terminal* getTerminal() {return m_terminal;}
 
@@ -34,7 +36,7 @@ public:
 
 private:
 
-    QString m_filePath;
+    QString m_userDbPath;
 
     Terminal *m_terminal;
 

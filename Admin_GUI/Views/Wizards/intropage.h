@@ -16,22 +16,23 @@ class IntroPage : public QWizardPage
 {
     Q_OBJECT
 public:
-    IntroPage(QWidget *parent);
+    IntroPage(QDomDocument *backupXMLDocument, QWidget *parent);
     ~IntroPage();
     int nextId() const override;
 private:
     QVBoxLayout *m_mainLayout;
     QLabel *m_topLabel;
-    QVBoxLayout *m_settingsFileLayout;
-    QHBoxLayout *m_settingsFileInputLayout;
-    QPushButton *m_settingsFileButton;
-    QLabel *m_settingsFileLabel;
-    QLineEdit *m_settingsFilePath;
-    QLabel *m_faqTitle;
+    QVBoxLayout *m_backupFileLayout;
+    QHBoxLayout *m_backupFileLoadLayout;
+    QPushButton *m_backupLoadButton;
+    QLabel *m_backupLabel;
+    QLineEdit *m_backupLineEdit;
+    QLabel *m_faqLabel;
 
 private:
-    QDomDocument *m_document;
-    QFile *m_file;
+    QDomDocument *m_backupXMLDocument;
+    QFile *m_backupFile;
+    QStringList *m_checkedList;
 private:
     void setWizardTitle();
     void initUI();
@@ -40,7 +41,8 @@ private:
 private Q_SLOTS:
     void addSettingsFile();
 private:
-    bool checkFile(QString &file);
+    bool checkBackupFile(QString &backupPath);
+    void setToBackupXmlDefaultStruct();
 };
 
 #endif // INTROPAGE_H

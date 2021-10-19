@@ -1,12 +1,18 @@
 #include "databaseservice.h"
 #include <QDebug>
 
-DatabaseService::DatabaseService(const QString &filePath, Terminal *terminal)
-    : m_filePath(filePath)
-    , m_terminal(terminal)
-    , m_file(new QFile(m_filePath))
+DatabaseService::DatabaseService(Terminal *terminal)
+    : m_terminal(terminal)
+    , m_file(new QFile())
     , m_accountsData(new QDomDocument())
 {
+
+}
+
+void DatabaseService::loadFromFile(const QString &userDbPath)
+{
+    m_userDbPath=userDbPath;
+    m_file->setFileName(userDbPath);
     if (m_file->open(QIODevice::ReadOnly))
     {
         m_array= m_file->readAll();
@@ -88,10 +94,10 @@ void DatabaseService::writeToFile(QList<User> *users)
         QDomElement userDomElement=createUserElement(*m_accountsData, *it);
         domElement.appendChild(userDomElement);
     }
-//    qDebug()<< m_filePath;
+    //    qDebug()<< m_filePath;
     QString text=m_accountsData->toString();
     QByteArray encrypt=text.toLocal8Bit().toHex();
-    m_file->setFileName(m_filePath);
+    m_file->setFileName(m_userDbPath);
     QTextStream stream(m_file);
     if(m_file->open(QIODevice::WriteOnly))
     {

@@ -31,6 +31,9 @@ int FCSPage::nextId() const
 {
     QString fcs=m_FCSlineEdit->text();
     QString rank=m_RankComboBox->currentText();
+    m_userWizardRepository->setUserRank(rank);
+    m_userWizardRepository->setUserFCS(fcs);
+    
     Q_EMIT sendUpdatedDataToParentWizard(fcs, rank);
     return 0;
 }

@@ -65,21 +65,21 @@ void Program::createApp()//MAIN
     initUserService();
     getUserPrivilegesAndName();
     initSettingsService();
-    if (settingsLoaded())
+    if (allAppDataLoaded())
     {
-//        getSettings();
-//        initRunnableService();
-//        if(allAppsRunned())
-//        {
-//            initRarmSocket();
-//            createConnections();
-//            if (m_hasAdminPrivileges)
-//            {
-//                initAdminServices();
-//                initAdminUI();
-//                initStyle();
-//            }
-//        }
+        getSettings();
+        initRunnableService();
+        if(allAppsRunned())
+        {
+            initRarmSocket();
+            createConnections();
+            if (m_hasAdminPrivileges)
+            {
+                initAdminServices();
+                initAdminUI();
+                initStyle();
+            }
+        }
     }
 }
 
@@ -104,9 +104,9 @@ void Program::initSettingsService()
     m_settingFileService=new AppSettingsService(m_currentUserName, m_hasAdminPrivileges, m_fakeUI, m_terminal);
 }
 
-bool Program::settingsLoaded()
+bool Program::allAppDataLoaded()
 {
-    return m_settingFileService->isAllSettingsLoaded();
+    return m_settingFileService->isAllDataLoaded();
 }
 
 void Program::getSettings()
