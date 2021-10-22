@@ -4,31 +4,36 @@
 #
 #-------------------------------------------------
 
-QT += core xml network widgets
+QT += core xml network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
-CONFIG += c++11
-#Панель управления пользователями РЛС ТИ версия
-TARGET = "50"
-TEMPLATE = app
-CONFIG -= console
-
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050B00    # отключить API, устаревший в 5.11 или более ранних версиях
-
+TARGET      = "Панель управления пользователями РЛС ТИ версия 52"
+TEMPLATE    = app
+DESTDIR     = $$PWD/../bin
+RESOURCES += \
+    resources.qrc
+CONFIG += c++latest strict_c strict_c++ precompile_header stl_off utf8_source
+CONFIG -= cmdline qml_debug
+ no_include_pwd
+DEFINES +=                 \
+  QT_DISABLE_DEPRECATED_BEFORE=0x050B00 \# отключить API, устаревший в 5.11 или более ранних версиях
+  QT_USE_FAST_CONCATENATION\
+  QT_DEPRECATED_WARNINGS   \
+  QT_USE_FAST_OPERATOR_PLUS\
+  DQT_NO_URL_CAST_FROM_STRING\
+  QT_NO_CAST_TO_ASCII      \
+  QT_NO_CAST_FROM_BYTEARRAY
 
 SOURCES += \
     Admin_GUI/Validator/stringvalidator.cpp \
-    Admin_GUI/Views/Wizards/fcspage.cpp \
+    Admin_GUI/Views/Wizards/conclusionwizardpage.cpp \
     Admin_GUI/Views/Wizards/framelesswizard.cpp \
     Admin_GUI/Views/Wizards/intropage.cpp \
+    Admin_GUI/Views/Wizards/roleappswizardpage.cpp \
+    Admin_GUI/Views/Wizards/roleappswizardwidget.cpp \
+    Admin_GUI/Views/Wizards/userwizardpage.cpp \
+    Admin_GUI/Views/Wizards/userwizardwidget.cpp \
     Services/Settings/appfirstloadingsettingsservice.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
@@ -93,9 +98,13 @@ SOURCES += \
 
 HEADERS += \
     Admin_GUI/Validator/stringvalidator.h \
-    Admin_GUI/Views/Wizards/fcspage.h \
-    Admin_GUI/Views/Wizards/framelesswizard.h \
+    Admin_GUI/Views/Wizards/actions.h \
+    Admin_GUI/Views/Wizards/conclusionwizardpage.h \
     Admin_GUI/Views/Wizards/intropage.h \
+    Admin_GUI/Views/Wizards/roleappswizardpage.h \
+    Admin_GUI/Views/Wizards/roleappswizardwidget.h \
+    Admin_GUI/Views/Wizards/userwizardpage.h \
+    Admin_GUI/Views/Wizards/userwizardwidget.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
     Services/Settings/appfirstloadingsettingsservice.h \
     Services/Settings/defaultSettingsPath.h \
@@ -170,6 +179,17 @@ HEADERS += \
     program.h \
     Admin_GUI/Views/Wizards/startupwizard.h
 
-RESOURCES += \
-    resources.qrc
+*-g++* {
+  QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt
 
+  QMAKE_CXXFLAGS_DEBUG *= -fsanitize=address,undefined
+  QMAKE_LFLAGS_DEBUG *= -fsanitize=address,undefined
+
+  QMAKE_CFLAGS_RELEASE *= -Ofast -DNDEBUG NS_BLOCK_ASSERTIONS
+  QMAKE_CXXFLAGS_RELEASE *= -Ofast -DNDEBUG -fno-stack-protector -fno-plt
+
+  QMAKE_LFLAGS *= -fno-stack-protector -fuse-ld=gold
+}
+
+DISTFILES += \
+    astyle.astylerc

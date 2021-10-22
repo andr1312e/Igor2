@@ -4,10 +4,11 @@
 #include <QString>
 #include <QStringList>
 
-class GlobalFunctions{
+class GlobalFunctions
+{
 
 public:
-    static bool StringContainsBadCharecters(const QString &fileName);
+  static bool StringContainsBadCharecters(const QString &fileName);
 
 };
 

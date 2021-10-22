@@ -11,47 +11,49 @@
 class RolesAndStartupsWizardRepository
 {
 public:
-    RolesAndStartupsWizardRepository(Terminal *terminal);
+   RolesAndStartupsWizardRepository(Terminal *terminal);
 
-    ~RolesAndStartupsWizardRepository();
+   ~RolesAndStartupsWizardRepository();
 
-    bool hasData();
+   bool hasData();
 
-    void RetunRoleDesktopsAndStartups(int roleNum, QList<DesktopEntity> &roleDesktops, QStringList &startups);
+   void RetunRoleDesktopsAndStartups(int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups);
 
-    void SetRoleDesktopsAndStartupsFromFile(QString &pathToDesktopsFolder, QString &pathToStartupsFolder);
+   void SetRoleDesktopsAndStartupsFromFile(QString &pathToDesktopsFolder, QString &pathToStartupsFolder);
 
-    void SetRoleDesktopsAndStartupsFromBackup(int roleNum, QDomElement &backupNode);
+   void SetRoleDesktopsAndStartupsFromBackup(int roleIndex, QDomElement &backupNode);
 
-private:
-
-    void SetRoleDesktopsFromFile(QString &pathToDesktopsFolder);
-
-    void SetRoleStartupsFromFile(QString &pathToStartupsFolder);
-
-    void SetRoleDesktopFromXml(int roleNum, QDomElement &desktops);
-
-    void SetRoleStartupsFromXml(int roleNum, QDomElement &startups);
-
-    void AppendRoleStartups(int roleNum, QString startup);
-
-    void AppendEnittyToRoleDesktops(int roleNum, DesktopEntity &desktopEntity);
+   int GetRoleDesktopsAppCount(int roleIndex);
 
 private:
 
-    bool m_hasData;
+   void SetRoleDesktopsFromFile(QString &pathToDesktopsFolder);
 
-    Terminal *m_terminal;
+   void SetRoleStartupsFromFile(QString &pathToStartupsFolder);
 
-    QStringList *m_firstRoleStartup;
-    QStringList *m_secondRoleStartup;
-    QStringList *m_thirdRoleStartup;
-    QStringList *m_fourthRoleStartup;
+   void SetRoleDesktopFromXml(int roleIndex, QDomElement &desktops);
 
-    QList<DesktopEntity> *m_firstRoleDesktopsIcons;
-    QList<DesktopEntity> *m_secondRoleDesktopsIcons;
-    QList<DesktopEntity> *m_thirdRoleDesktopsIcons;
-    QList<DesktopEntity> *m_fourthRoleDesktopsIcons;
+   void SetRoleStartupsFromXml(int roleIndex, QDomElement &startups);
+
+   void AppendRoleStartups(int roleIndex, QString startup);
+
+   void AppendEnittyToRoleDesktops(int roleNum, DesktopEntity &desktopEntity);
+
+private:
+
+   bool m_hasData;
+
+   Terminal *m_terminal;
+
+   QStringList m_firstRoleStartup;
+   QStringList m_secondRoleStartup;
+   QStringList m_thirdRoleStartup;
+   QStringList m_fourthRoleStartup;
+
+   QList<DesktopEntity> *m_firstRoleDesktopsIcons;
+   QList<DesktopEntity> *m_secondRoleDesktopsIcons;
+   QList<DesktopEntity> *m_thirdRoleDesktopsIcons;
+   QList<DesktopEntity> *m_fourthRoleDesktopsIcons;
 };
 
 #endif // WIZARDSERVICE_H

@@ -4,41 +4,50 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QStringLiteral>
+#include <QVector>
 
-class CurrentUserWizardRepository
+#include "Structs/userstruct.h"
+
+#include "Services/Terminals/terminal.h"
+
+class UsersDataWizardRepository
 {
 
 public:
 
-    explicit CurrentUserWizardRepository(QString &curerntUserName);
+   explicit UsersDataWizardRepository(QString &curerntUserName);
 
-    ~CurrentUserWizardRepository();
+   ~UsersDataWizardRepository();
 
-    const QString& getCurrentUserName() const;
+   const QString &GetCurrentUserName() const;
 
-    bool hasData() const;
+   bool HasData() const;
 
-    QString& GetCurrentUserFCS();
+   QString &GetCurrentUserFCS();
 
-    QString& GetCurrentUserRank();
+   QString &GetCurrentUserRank();
 
-    int GetUsersCount() const;
+   QVector<User> &GetUsersList();
 
-    void setFCSAndRolesFromDb(QString &pathToUserDb);
+   int GetUserCount();
 
-    void getFCSAndRolesFromXml(QDomElement &usersNode);
+   void SetFCSAndRolesFromDb(QString &pathToUserDb);
+
+   void GetFCSAndRolesFromXml(QDomElement &usersNode);
+
+   void WriteToFile(Terminal *terminal, QString &pathToWritingDb);
 
 private:
 
-    const QString m_curerntUserName;
+   const QString m_curerntUserName;
 
-    bool m_hasData;
+   bool m_hasData;
 
-    int m_usersCount;
+   QString m_userFCS;
 
-    QString m_userFCS;
+   QString m_userRank;
 
-    QString m_userRank;
+   QVector<User> m_usersList;
 
 };
 
