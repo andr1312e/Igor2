@@ -10,7 +10,7 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 
-#include "globalfunctions.h"
+#include "functionswithstrings.h"
 #include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
 class FileDialogWidget:public QWidget

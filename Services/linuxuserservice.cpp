@@ -18,7 +18,7 @@ LinuxUserService::~LinuxUserService()
 void LinuxUserService::getAllUsersInSystem()
 {
     //All users -> remove System Users -> PushUserToList
-    QString allUsers=m_terminal->getFileText("/etc/passwd", "LinuxUserService::GetUsers");
+    QString allUsers=m_terminal->GetFileText("/etc/passwd", "LinuxUserService::GetUsers");
     QStringList usersList=allUsers.split('\n');
     removeSystemUsersFromAllUsersList(usersList);
 }
@@ -26,14 +26,14 @@ void LinuxUserService::getAllUsersInSystem()
 const QString LinuxUserService::getCurrentUserName()
 {
     const QString getCurrentUserNameCommand="id -u -n";
-    QString userName=m_terminal->runConsoleCommand(getCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
+    QString userName=m_terminal->RunConsoleCommand(getCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
     return userName;
 }
 
 const QString LinuxUserService::getCurrentUserId()
 {
     const QString getCurrentUserIdCommand="id -u";
-    QString userId=m_terminal->runConsoleCommand(getCurrentUserIdCommand, "LinuxUserService::getCurrentUserId").remove('\n');
+    QString userId=m_terminal->RunConsoleCommand(getCurrentUserIdCommand, "LinuxUserService::getCurrentUserId").remove('\n');
     return userId;
 }
 
@@ -53,7 +53,7 @@ bool LinuxUserService::hasCurrentUserAdminPrivileges()
 QStringList LinuxUserService::getUserGroups(const QString &userName)
 {
     const QString getAllCurrentUserGroupCommand="id -Gn "+userName;
-    QString userGroups=m_terminal->runConsoleCommand(getAllCurrentUserGroupCommand, "LinuxUserService::getUserGroups");
+    QString userGroups=m_terminal->RunConsoleCommand(getAllCurrentUserGroupCommand, "LinuxUserService::getUserGroups");
     userGroups.remove('\n');
     QStringList list=userGroups.split(' ');
     return list;

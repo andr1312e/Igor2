@@ -107,7 +107,7 @@ void IntroPage::createConnections()
 void IntroPage::CheckBackupFile()
 {
    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-   m_backupFilePath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.kunzevo)");
+   m_backupFilePath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.sync)");
 
    if (!m_backupFilePath.isEmpty()) {
       if (m_wizardService->CheckAndParseBackupFile(m_backupFilePath)) {

@@ -22,8 +22,7 @@ DEFINES +=                 \
   QT_DEPRECATED_WARNINGS   \
   QT_USE_FAST_OPERATOR_PLUS\
   DQT_NO_URL_CAST_FROM_STRING\
-  QT_NO_CAST_TO_ASCII      \
-  QT_NO_CAST_FROM_BYTEARRAY
+
 
 SOURCES += \
     Admin_GUI/Validator/stringvalidator.cpp \
@@ -45,6 +44,7 @@ SOURCES += \
     Styles/InteractiveButtons/minimizewindowbutton.cpp \
     Styles/InteractiveButtons/restorewindowbutton.cpp \
     Styles/Themes/stylechanger.cpp \
+    functionswithstrings.cpp \
     main.cpp \
     Services/integrityservice.cpp \
     User_GUI/User_GUI.cpp \
@@ -89,7 +89,6 @@ SOURCES += \
     Server/dataHandler.cpp \
     program.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
-    globalfunctions.cpp \
     Styles/Frameless/framelesswindow.cpp \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
@@ -107,7 +106,6 @@ HEADERS += \
     Admin_GUI/Views/Wizards/userwizardwidget.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
     Services/Settings/appfirstloadingsettingsservice.h \
-    Services/Settings/defaultSettingsPath.h \
     Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \
@@ -175,7 +173,7 @@ HEADERS += \
     Server/DataMessage.h \
     Server/messagesrepository.h \
     Server/dataHandler.h \
-    globalfunctions.h \
+    functionswithstrings.h \
     program.h \
     Admin_GUI/Views/Wizards/startupwizard.h
 

@@ -2,7 +2,7 @@
 #define STRINGVALIDATOR_H
 #include <QValidator>
 
-#include "globalfunctions.h"
+#include "functionswithstrings.h"
 
 class StringValidator: public QValidator
 {

@@ -13,7 +13,7 @@ StringValidator::~StringValidator()
 
 QValidator::State StringValidator::validate(QString &input, int &pos) const
 {
-    if (GlobalFunctions::StringContainsBadCharecters(input))
+    if (FunctionsWithStrings::StringContainsBadCharecters(input))
     {
         return QValidator::Invalid;
     }

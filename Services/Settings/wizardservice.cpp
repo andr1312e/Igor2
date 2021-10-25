@@ -1,16 +1,17 @@
 #include "wizardservice.h"
 
-WizardService::WizardService(ProgramFilesState state, QString &currentUserName, QString currentUserId, QStringList validSettingsPaths, QStringList defaultValues, Terminal *terminal, QObject *parent)
+WizardService::WizardService(ProgramFilesState state, const QString &currentUserName, const QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultSettingsValues, Terminal *terminal, QObject *parent)
    : QObject(parent)
-   , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(currentUserName))
-   , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(currentUserName))
+   , m_validSettingsPaths(validSettingsPaths)
+   , m_defaultSettingsValues(defaultSettingsValues)
+   , m_terminal(terminal)
+   , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, terminal))
+   , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, terminal))
    , m_oldDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
    , m_backupDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
-   , m_backupXmlNodesList(
-{ "USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"
-})
 {
-   SetOldRepositoriesData(state, currentUserName, validSettingsPaths, terminal);
+   m_backupCorrectTagsList = QStringList{"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
+   SetOldRepositoriesData(state, validSettingsPaths, terminal);
 }
 
 WizardService::~WizardService()
@@ -21,7 +22,7 @@ WizardService::~WizardService()
    delete m_backupDataRolesAndStartupsWizardRepository;
 }
 
-void WizardService::SetOldRepositoriesData(ProgramFilesState state, QString &currentUserName, QStringList &validSettingsPaths, Terminal *terminal)
+void WizardService::SetOldRepositoriesData(ProgramFilesState state, QStringList &validSettingsPaths, Terminal *terminal)
 {
    switch (state) {
       case CantRun:
@@ -45,7 +46,7 @@ void WizardService::SetOldRepositoriesData(ProgramFilesState state, QString &cur
 
 void WizardService::TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths)
 {
-   m_oldDataCurrentUserWizardRepositry->SetFCSAndRolesFromDb(validSettingsPaths.first());
+   m_oldDataCurrentUserWizardRepositry->SetFCSAndRolesFromFile(validSettingsPaths.first());
 }
 
 void WizardService::TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPaths)
@@ -55,14 +56,10 @@ void WizardService::TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPa
 
 bool WizardService::CheckAndParseBackupFile(QString &backupPath)
 {
-   QFile m_backupFile;
-   m_backupFile.setFileName(backupPath);
+   QByteArray arr = m_terminal->GetFileText(backupPath, "WizardService::CheckAndParseBackupFile", true).toUtf8();
+   QDomDocument m_backupXMLDocument;
 
-   if (m_backupFile.open(QIODevice::ReadOnly)) {
-      QByteArray ar = m_backupFile.readAll();
-      m_backupFile.close();
-      QDomDocument m_backupXMLDocument;
-      m_backupXMLDocument.setContent(ar);
+   if (m_backupXMLDocument.setContent(arr)) {
       QDomElement settings = m_backupXMLDocument.firstChildElement();
 
       if (settings.tagName() == "settings") {
@@ -73,19 +70,19 @@ bool WizardService::CheckAndParseBackupFile(QString &backupPath)
             tagList.append(list.at(i).toElement().tagName());
          }
 
-         if (tagList == m_backupXmlNodesList) {
+         if (tagList == m_backupCorrectTagsList) {
             ParseBackupFile(m_backupXMLDocument);
             return true;
          }
       }
-
-      return false;
    }
+
+   return false;
 }
 
 bool WizardService::HasBackup()
 {
-   return m_backupDataUserWizardRepositry->HasData() || m_backupDataRolesAndStartupsWizardRepository->hasData();
+   return m_backupDataUserWizardRepositry->HasData() || m_backupDataRolesAndStartupsWizardRepository->HasData();
 }
 
 bool WizardService::HasOldData()
@@ -109,23 +106,28 @@ void WizardService::ParseBackupFile(QDomDocument &backupXMLDocument)
 void WizardService::ApplySettingsWithUserRepository()
 {
    if (m_actionWithUserRepository == userWizardPageComboBoxBackupAndOldDataActions.at(0)) {
-      //m_backupDataUserWizardRepositry->WriteToFile(nullptr, )//basic sett
+      m_backupDataUserWizardRepositry->WriteUserRepositoryToFile(m_defaultSettingsValues.at(0), true);
    } else {
       if (m_actionWithUserRepository == userWizardPageComboBoxBackupAndOldDataActions.at(1)) {
-         //m_backupDataUserWizardRepositry->WriteToFile(nullptr, ) basic
+         m_backupDataUserWizardRepositry->WriteUserRepositoryToFile(m_defaultSettingsValues.at(0), false);
       } else {
-         //m_backupDataUserWizardRepositry->WriteToFile(nullptr, ) current
+         m_oldDataCurrentUserWizardRepositry->WriteUserRepositoryToFile(m_validSettingsPaths.at(0), false);
       }
    }
 }
 
 void WizardService::ApplySettingsWithRolesRepository()
 {
-   for (int i = 0; i < m_actionWithRolesRepository.count(); i++) {
-
+   for (int i = 0; i < 4; i++) {
+      if (m_actionWithRolesRepository.at(0) == m_rolesWizardPageComboBoxBackupAndOldDataActions.at(0)) {
+         RolesAndStartupsWizardRepository *rep = m_backupDataRolesAndStartupsWizardRepository;
+      } else {
+         if (m_actionWithRolesRepository.at(0) == m_rolesWizardPageComboBoxBackupAndOldDataActions.at(1)) {
+            m_backupDataRolesAndStartupsWizardRepository->SaveRoleDesktops(m_defaultSettingsValues.at(1), i);
+            m_backupDataRolesAndStartupsWizardRepository->SaveRoleStartups(m_defaultSettingsValues.at(2), i);
+         }
+      }
    }
-
-
 }
 
 void WizardService::GetDataFromUserRepository(bool isOldData, QString &FCS, QString &rank, QVector<User> &userList)
@@ -164,7 +166,7 @@ void WizardService::GetDataFromDesktopRepository(int roleIndex, bool isOldData, 
       currentRepository = m_backupDataRolesAndStartupsWizardRepository;
    }
 
-   if (currentRepository->hasData()) {
+   if (currentRepository->HasData()) {
       currentRepository->RetunRoleDesktopsAndStartups(roleIndex, roleDesktops, roleExecs);
    }
 }
@@ -201,4 +203,5 @@ const QString &WizardService::GetActionWithRoleRepository(int roleIndex)
 void WizardService::ApplySettings()
 {
    ApplySettingsWithUserRepository();
+   ApplySettingsWithRolesRepository();
 }

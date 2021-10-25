@@ -13,14 +13,14 @@ IntegrityService::~IntegrityService()
 QString IntegrityService::getUserIngerityLevel(QString &userName)
 {
     const QString getUserInterityLevelCommand="sudo pdpl-user "+ userName;
-    QString astraUserInfo=m_terminal->runConsoleCommand(getUserInterityLevelCommand, "IntegrityService::getUserIngerityLevel");
+    QString astraUserInfo=m_terminal->RunConsoleCommand(getUserInterityLevelCommand, "IntegrityService::getUserIngerityLevel");
     return getUserIngerityLevelFromString(astraUserInfo);
 }
 
 QString IntegrityService::getFileIntegrityLevel(QString &filePath)
 {
     const QString getFileIntegrityLevelCommand="sudo pdp-ls -Md "+filePath;
-    QString astraFileInfo=m_terminal->runConsoleCommand(getFileIntegrityLevelCommand, "IntegrityService::getFileIntegrityLevel");
+    QString astraFileInfo=m_terminal->RunConsoleCommand(getFileIntegrityLevelCommand, "IntegrityService::getFileIntegrityLevel");
     return getFileIntegrityLevelFromString(astraFileInfo);
 }
 

@@ -12,13 +12,13 @@ FileExplorer::~FileExplorer()
    delete m_model;
 }
 
-void FileExplorer::setPath(QString &path)
+void FileExplorer::SetPath(QString &path)
 {
    m_path = path;
    updateIconListDataAndModel();
 }
 
-void FileExplorer::addIcon(const QString &exec, const QString &iconPath,
+void FileExplorer::AddIcon(const QString &exec, const QString &iconPath,
                            const QString &iconName)
 {
    QString fileName(iconName);
@@ -29,16 +29,16 @@ void FileExplorer::addIcon(const QString &exec, const QString &iconPath,
    updateIconListDataAndModel();
 }
 
-void FileExplorer::deleteIcon(const QString &iconName)
+void FileExplorer::DeleteIcon(const QString &iconName)
 {
-   m_terminal->deleteFileSudo(m_path + iconName, "FileExplorer::deleteIcon");
+   m_terminal->DeleteFileSudo(m_path + iconName, "FileExplorer::deleteIcon");
    updateIconListDataAndModel();
 }
 
-void FileExplorer::setDefaultIcons(const QString &role)
+void FileExplorer::SetDefaultIcons(const QString &role)
 {
-   m_terminal->clearFolderSudo(m_path, "FileExplorer::deleteAllFiles");
-   QStringList files = m_terminal->getFileList("/home/user/RLS_TI/" + role,
+   m_terminal->ClearFolderSudo(m_path, "FileExplorer::deleteAllFiles");
+   QStringList files = m_terminal->GetFileList("/home/user/RLS_TI/" + role,
                        "FileExplorer::setDefaultIcons");
 
    for (int i = files.count() - 1; i >= 0; i--) {
@@ -49,21 +49,23 @@ void FileExplorer::setDefaultIcons(const QString &role)
 
    for (QStringList::const_iterator it = files.cbegin(); it != files.cend();
          ++it) {
-      m_terminal->copyFileSudo("/home/user/RLS_TI/" + role + "/" + *it, m_path,
+      m_terminal->CopyFileSudo("/home/user/RLS_TI/" + role + "/" + *it, m_path,
                                "FileExplorer::setDefaultIcons");
    }
 
    updateIconListDataAndModel();
 }
 
-void FileExplorer::setDefaultIconsToUser(const QString &role,
+void FileExplorer::SetDefaultIconsToUser(const QString &role,
       const QString &userName)
 {
-   m_terminal->checkAndCreateFolder(m_homeName + userName + m_desktopName,
-                                    "FileExplorer::setDefaultIconsToUser");
-   m_terminal->clearFolderSudo(QString(m_homeName + userName + m_desktopName),
-                               "FileExplorer::setDefaultIconsToUser");
-   QStringList files = m_terminal->getFileList("/home/user/RLS_TI/" + role,
+   QString userDesktopPath = m_homeName + userName + m_desktopName;
+
+   if (m_terminal->IsDirNotExists(userDesktopPath, "FileExplorer::setDefaultIconsToUser")) {
+      m_terminal->ClearFolderSudo(userDesktopPath, "FileExplorer::setDefaultIconsToUser");
+   }
+
+   QStringList files = m_terminal->GetFileList("/home/user/RLS_TI/" + role,
                        "FileExplorer::setDefaultIcons");
    files.removeAll("");
 
@@ -75,12 +77,22 @@ void FileExplorer::setDefaultIconsToUser(const QString &role,
          entity.remove(entity.count() - 1, 1);
       }
 
-      m_terminal->copyFileSudo("/home/user/RLS_TI/" + role + "/" + entity,
+      m_terminal->CopyFileSudo("/home/user/RLS_TI/" + role + "/" + entity,
                                QString(m_homeName + userName + m_desktopName),
                                "FileExplorer::setDefaultIcons");
    }
 
    updateIconListDataAndModel();
+}
+
+QStandardItemModel *FileExplorer::GetModel()
+{
+   return m_model;
+}
+
+Terminal *FileExplorer::GetTerminal()
+{
+   return m_terminal;
 }
 
 void FileExplorer::updateIconListDataAndModel()
@@ -105,7 +117,7 @@ void FileExplorer::updateIconsList()
       }
 
       if (isIcon(entity)) {
-         QString entityInfo = m_terminal->getFileText(
+         QString entityInfo = m_terminal->GetFileText(
                                  m_path + entity, "FileExplorer::updateIconsList");
          appendIconInfoToList(entity, entityInfo);
       } else {
@@ -129,9 +141,9 @@ void FileExplorer::updateModel()
 
 QStringList FileExplorer::getAllDesktopEntities()
 {
-   m_terminal->checkAndCreateFolder(m_path,
-                                    "FileExplorer::getAllDesktopEntities");
-   QStringList allEntites = m_terminal->getFileList(
+   m_terminal->IsDirNotExists(m_path,
+                              "FileExplorer::getAllDesktopEntities");
+   QStringList allEntites = m_terminal->GetFileList(
                                m_path, "FilesAndIconManager::getAllDesktopEntities-1");
    allEntites.removeAll("");
    return allEntites;
@@ -185,8 +197,13 @@ bool FileExplorer::isIcon(const QString &entityName) const
 
 void FileExplorer::createIconFile(const QString &iconName)
 {
-   m_terminal->checkAndCreateFile(m_path + iconName + ".desktop",
-                                  "FilesAndIconManager::createIconFile");
+   QString pathToDesktopIcon = m_path + iconName + ".desktop";
+
+   if (m_terminal->IsFileNotExists(pathToDesktopIcon, "FilesAndIconManager::createIconFile")) {
+      m_terminal->CreateFile(pathToDesktopIcon, "FilesAndIconManager::createIconFile", true);
+   } else {
+      m_terminal->ClearFileSudo(pathToDesktopIcon, "FilesAndIconManager::createIconFile");
+   }
 }
 
 QString FileExplorer::createIconProperties(const QString &exec,
@@ -202,7 +219,7 @@ QString FileExplorer::createIconProperties(const QString &exec,
 void FileExplorer::writeIconPropertiesToFile(const QString &iconProperties,
       const QString &iconName)
 {
-   m_terminal->writeTextToFileSudo(iconProperties,
+   m_terminal->WriteTextToFileSudo(iconProperties.toLatin1(),
                                    m_path + iconName + m_iconType,
                                    "FileExplorer::writeIconPropertiesToFile");
 }

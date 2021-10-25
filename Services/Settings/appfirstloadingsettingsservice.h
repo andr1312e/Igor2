@@ -6,7 +6,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "globalfunctions.h"
+#include "functionswithstrings.h"
 #include "Structs/userstruct.h"
 #include "Services/Settings/programfilesstate.h"
 
@@ -14,139 +14,163 @@
 
 class AppFirstLoadlingSettingsService : public QObject
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    AppFirstLoadlingSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal);
+   AppFirstLoadlingSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal);
 
-    ~AppFirstLoadlingSettingsService();
+   ~AppFirstLoadlingSettingsService();
 
-    ProgramFilesState isAllDataLoaded();
+   ProgramFilesState isAllDataLoaded();
 
-    QString getUserDBPathValue() { return m_userDBPath; }
+   QString &getUserDBPathValue()
+   {
+      return m_userDBPath;
+   }
 
-    QString getViewModeValue() { return m_viewMode; }
+   QString &getViewModeValue()
+   {
+      return m_viewMode;
+   }
 
-    bool getThemeValue() { return m_theme; }
+   bool getThemeValue()
+   {
+      return m_theme;
+   }
 
-    QString getFolderPathToExecsValue() { return m_folderPathToExecs; }
+   QString &getFolderPathToExecsValue()
+   {
+      return m_folderPathToExecs;
+   }
 
-    QString getFolderPathToRoleFoldersValue() { return m_folderPathToRoleFolders; }
+   QString &getFolderPathToRoleFoldersValue()
+   {
+      return m_folderPathToRoleFolders;
+   }
 
 public:
 
-    QString& getUserName() { return m_currentUserName; }
+   const QString &getUserName()
+   {
+      return m_currentUserName;
+   }
 
-    QString getUserId() { return m_currentUserId; }
+   const QString &getUserId()
+   {
+      return m_currentUserId;
+   }
 
-    Terminal* getTerminal() { return m_terminal; }
+   Terminal *getTerminal()
+   {
+      return m_terminal;
+   }
 
-    QStringList getValidSettingsPaths(){ return m_validSettingsPaths; }
+   QStringList &getValidSettingsPaths()
+   {
+      return m_validSettingsPaths;
+   }
 
-    QStringList getDefaultSettingsPaths(){ return m_defaultSettingsPaths; }
+   const QStringList &getDefaultSettingsPaths()
+   {
+      return m_defaultSettingsPaths;
+   }
 
 Q_SIGNALS:
 
-    void allDataLoaded();
+   void allDataLoaded();
 
 private:
 
-    QString m_userDBPath;
+   QString m_userDBPath;
 
-    QString m_viewMode;
+   QString m_viewMode;
 
-    bool m_theme;
+   bool m_theme;
 
-    QString m_folderPathToExecs;
+   QString m_folderPathToExecs;
 
-    QString m_folderPathToRoleFolders;
-
-private:
-
-    QString m_currentUserId;
-
-    QString m_currentUserName;
-
-    bool m_hasAdminPrivileges;
-
-    QWidget *m_fakeWidget;
-
-    Terminal *m_terminal;
+   QString m_folderPathToRoleFolders;
 
 private:
 
-    QSettings *m_setting;
+   const QString m_currentUserId;
 
-    QString m_settingsFileName;
+   const QString m_currentUserName;
 
-    QString m_pathToSettingsFile;
+   const bool m_hasAdminPrivileges;
 
-private:
+   QWidget *m_fakeWidget;
 
-    const QString m_pathUserDBKey="userdb";
-
-    const QString m_viewModeKey="viewmode";
-
-    const QString m_themeKey="whitetheme";
-
-    const QString m_pathToExecsKey="execslist";
-
-    const QString m_pathToRoleFoldersKey="rolefolders";
+   Terminal *m_terminal;
 
 private:
 
-    QString m_userDBPathDefaultValue;
+   QString m_pathToSettingsFile;
 
-    const QString m_viewModeDefaultValue="full";
-
-    const bool m_themeKeyDefaultValue=true;
-
-    QString m_pathToExecsDefaultValue;
-
-    QString m_pathToRoleFoldersDefaultValue;
+   QSettings *m_setting;
 
 private:
 
-    QStringList m_validSettingsPaths;
+   const QString m_pathUserDBKey = "userdb";
 
-    QStringList m_defaultSettingsPaths;
+   const QString m_viewModeKey = "viewmode";
 
-private:
+   const QString m_themeKey = "whitetheme";
 
-    void SetCurrentUserNameToDefaultPaths();
+   const QString m_pathToExecsKey = "execslist";
 
-    QString GetPathUserDbFromSettings();
-
-    QString GetViewModeFromSettings();
-
-    bool GetThemeNameFromSettings();
-
-    QString GetPathToExecFromSettings();
-
-    QString GetPathToUserRolesFromSettings();
+   const QString m_pathToRoleFoldersKey = "rolefolders";
 
 private:
 
-    void OpenSettingsFile();
+   QString m_userDBPathDefaultValue;
 
-    void СreateSettingsFile();
+   const QString m_viewModeDefaultValue = "full";
 
-    void GetValuesFromSettingsFile();
+   const bool m_themeKeyDefaultValue = true;
 
-    ProgramFilesState CheckIsPathsInSettingsFileCorrect();
+   QString m_pathToExecsDefaultValue;
 
-    bool FilePathIsCorrect(const QString &filePath);
+   QString m_pathToRoleFoldersDefaultValue;
 
-    bool FodlerPathIsExists(const QString &folderPath);
+private:
 
-    void InitWizardServiceAndStartIt(ProgramFilesState state);
+   QStringList m_validSettingsPaths;
 
-    void SetSettingsValueToDefault();
+   const QStringList m_defaultSettingsPaths;
+
+private:
+
+   QString GetPathUserDbFromSettings();
+
+   QString GetViewModeFromSettings();
+
+   bool GetThemeNameFromSettings();
+
+   QString GetPathToExecFromSettings();
+
+   QString GetPathToUserRolesFromSettings();
+
+private:
+
+   void OpenSettingsFile();
+
+   void СreateSettingsFile();
+
+   void GetValuesFromSettingsFile();
+
+   ProgramFilesState CheckIsPathsInSettingsFileCorrect();
+
+   bool FilePathIsCorrect(const QString &filePath);
+
+   bool FodlerPathIsExists(const QString &folderPath);
+
+   void SetSettingsValueToDefault();
 
 private Q_SLOTS:
 
-    void wizardFinished(int result);
+   void wizardFinished(int result);
 
 };
 

@@ -15,7 +15,7 @@ class UsersDataWizardRepository
 
 public:
 
-   explicit UsersDataWizardRepository(QString &curerntUserName);
+   explicit UsersDataWizardRepository(const QString &curerntUserName, const  QString &curerntUserId, Terminal *terminal);
 
    ~UsersDataWizardRepository();
 
@@ -27,19 +27,41 @@ public:
 
    QString &GetCurrentUserRank();
 
-   QVector<User> &GetUsersList();
+   QVector<User> GetUsersList();
 
    int GetUserCount();
 
-   void SetFCSAndRolesFromDb(QString &pathToUserDb);
+   void SetFCSAndRolesFromFile(QString &pathToUserDb);
 
    void GetFCSAndRolesFromXml(QDomElement &usersNode);
 
-   void WriteToFile(Terminal *terminal, QString &pathToWritingDb);
+   void WriteUserRepositoryToFile(const QString &pathToWriteDb, bool adminOnly);
+
+private:
+
+   bool FindAndUpdateAdminData();
+
+   void AppendAdminToList();
+
+   void CreateMainTag();
+
+   void WriteAllUsersToDomDocument();
+
+   void WriteAdminToDomDocument();
+
+   void AppendUserToDomDocument(QDomDocument &document, const User &user);
+
+   void EncryptAndWriteToFile(const QString &pathToWriteDb);
 
 private:
 
    const QString m_curerntUserName;
+
+   const QString m_curerntUserId;
+
+   Terminal *m_terminal;
+
+private:
 
    bool m_hasData;
 
@@ -48,6 +70,8 @@ private:
    QString m_userRank;
 
    QVector<User> m_usersList;
+
+   QDomDocument *m_accountsData;
 
 };
 

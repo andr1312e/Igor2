@@ -16,19 +16,19 @@ void KioskService::lockUser(QString &userName)
 {
     setPrivacyLevelZero(userName);
     const QString activateKioskMode ="sudo fly-kiosk -a lock -u "+userName;
-    m_terminal->runConsoleCommand(activateKioskMode, "KioskLockUnLockService::LockUser");
+    m_terminal->RunConsoleCommand(activateKioskMode, "KioskLockUnLockService::LockUser");
 }
 
 void KioskService::unLockUser(QString &userName)
 {
     const QString deactivateKioskMode="sudo fly-kiosk -a unlock -u "+userName;
-    m_terminal->runConsoleCommand(deactivateKioskMode, "KioskLockUnLockService::UnLockUser");
+    m_terminal->RunConsoleCommand(deactivateKioskMode, "KioskLockUnLockService::UnLockUser");
 }
 
 bool KioskService::isUserInKiosk(QString &userName)
 {
     const QString checkKioskMode="sudo fly-kiosk -s -u "+userName;
-    QString userState=m_terminal->runConsoleCommand(checkKioskMode, "KioskLockUnLockService::isUserInKiosk");
+    QString userState=m_terminal->RunConsoleCommand(checkKioskMode, "KioskLockUnLockService::isUserInKiosk");
     if (userState.contains("not locked"))
         return false;
     else
@@ -38,5 +38,5 @@ bool KioskService::isUserInKiosk(QString &userName)
 void KioskService::setPrivacyLevelZero(QString &userName)
 {
     const QString setPrivacyLevelToZero="sudo pdpl-user -l 0:0 "+userName;
-    m_terminal->runConsoleCommand(setPrivacyLevelToZero, "KioskLockUnLockService::setPrivacyLevelZero");
+    m_terminal->RunConsoleCommand(setPrivacyLevelToZero, "KioskLockUnLockService::setPrivacyLevelZero");
 }

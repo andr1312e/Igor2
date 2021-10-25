@@ -1,90 +1,97 @@
 #include "startuprunnableservice.h"
 #include <QDebug>
+#include <QFile>
 
 StartupRunnableService::StartupRunnableService(Terminal *terminal, QObject *parent)
-    : QObject(parent)
-    , m_terminal(terminal)
-    , m_runnableProcess(new std::vector<QProcess*>)
-    , m_processParams(new QStringList())
+   : QObject(parent)
+   , m_terminal(terminal)
+   , m_runnableProcess(new QVector<QProcess*>)
+   , m_processParams(new QStringList())
 {
 
 }
 
 StartupRunnableService::~StartupRunnableService()
 {
-    if (!(m_runnableProcess->empty()))
-    {
-        for (std::vector<QProcess*>::reverse_iterator iter=m_runnableProcess->rbegin(); iter!=m_runnableProcess->rend(); iter++)
-        {
-            delete *iter;
-        }
-    }
-    delete m_runnableProcess;
-    delete m_processParams;
+   if (!(m_runnableProcess->empty())) {
+      for (QVector<QProcess *>::reverse_iterator iter = m_runnableProcess->rbegin(); iter != m_runnableProcess->rend(); iter++) {
+         delete *iter;
+      }
+   }
+
+   delete m_runnableProcess;
+   delete m_processParams;
 }
 
 bool StartupRunnableService::run(const QString &userName)
 {
-    QStringList execs=readUserExecFile(userName);
-    if(isAllExecsValid(execs))
-    {
-        initProcessStruct(execs);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+   QStringList execs = readUserExecFile(userName);
+
+   if (isAllExecsValid(execs)) {
+      initProcessStruct(execs);
+      return true;
+   } else {
+      return false;
+   }
 }
 
 QStringList StartupRunnableService::readUserExecFile(const QString &userName)
 {
-    QString m_startupFile="/home/"+userName+"/RLS_TI/Startup";
-    m_terminal->checkAndCreateFolder("/home/"+userName+"/RLS_TI", "StartupRunnableService::readUserExecFile", false);
-    m_terminal->checkAndCreateFile("/home/"+userName+"/RLS_TI/Startup", "StartupRunnableService::readUserExecFile", false);
-    QString ecexs=m_terminal->getFileText(m_startupFile, "StartupManagerService::getAllEcexFromStartupFile", false);
-    QStringList execsList=ecexs.split('\n');
-    execsList.removeAll("");
-    return execsList;
+   QString m_startupFolder = "/home/" + userName + "/RLS_TI/";
+   QString m_startupFile = "/home/" + userName + "/RLS_TI/Startup";
+   QStringList execsList;
+
+   if (m_terminal->IsDirNotExists(m_startupFolder, "StartupRunnableService::readUserExecFile", false)) {
+      m_terminal->CreateFolder(m_startupFolder, "StartupRunnableService::readUserExecFile", false);
+   }
+
+   if (m_terminal->IsFileNotExists(m_startupFile, "StartupRunnableService::readUserExecFile", false)) {
+      m_terminal->CreateFile(m_startupFile, "StartupRunnableService::readUserExecFile", false);
+   } else {
+      QString ecexs = m_terminal->GetFileText(m_startupFile, "StartupManagerService::getAllEcexFromStartupFile", false);
+      execsList = ecexs.split('\n');
+      execsList.removeAll("");
+   }
+
+   return execsList;
 }
 
 bool StartupRunnableService::isAllExecsValid(QStringList &execsList)
 {
-    for (QStringList::const_iterator it=execsList.cbegin(); it!=execsList.cend(); ++it)
-    {
-        if (!QFile::exists(*it))
-        {
-            emit noExecApplication(*it);
-            return false;
-        }
-    }
-    return true;
+   for (QStringList::const_iterator it = execsList.cbegin(); it != execsList.cend(); ++it) {
+      if (!QFile::exists(*it)) {
+         emit noExecApplication(*it);
+         return false;
+      }
+   }
+
+   return true;
 }
 
 void StartupRunnableService::initProcessStruct(QStringList execsList)
 {
-    m_runnableProcess->resize(execsList.size());
-    if (m_runnableProcess->empty())
-    {
-        return;
-    }
-    else
-    {
-        std::vector<QProcess*>::iterator processIter=m_runnableProcess->begin();
-        for (QList<QString>::ConstIterator programPath=execsList.cbegin(); programPath!=execsList.cend(); ++programPath)
-        {
-            (*processIter)=new QProcess();
-            (*processIter)->setObjectName(*programPath);
-            connect(*processIter , QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableService::restartProcess);
-            if(!((*processIter)->state() == QProcess::Running))
-                (*processIter)->start(*programPath, QStringList());
-        }
-    }
+   m_runnableProcess->resize(execsList.size());
+
+   if (m_runnableProcess->empty()) {
+      return;
+   } else {
+      QVector<QProcess *>::iterator processIter = m_runnableProcess->begin();
+
+      for (QList<QString>::ConstIterator programPath = execsList.cbegin(); programPath != execsList.cend(); ++programPath) {
+         (*processIter) = new QProcess();
+         (*processIter)->setObjectName(*programPath);
+         connect(*processIter, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableService::restartProcess);
+
+         if (!((*processIter)->state() == QProcess::Running)) {
+            (*processIter)->start(*programPath, QStringList());
+         }
+      }
+   }
 }
 
 void StartupRunnableService::restartProcess()
 {
-    QProcess* process=static_cast<QProcess*>(sender());
-    process->start();
-    emit programFall();
+   QProcess *process = static_cast<QProcess *>(sender());
+   process->start();
+   emit programFall();
 }

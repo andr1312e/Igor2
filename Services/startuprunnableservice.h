@@ -13,41 +13,41 @@
 class StartupRunnableService: public QObject
 {
 
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    StartupRunnableService(Terminal *terminal, QObject *parent);
+   StartupRunnableService(Terminal *terminal, QObject *parent);
 
-    ~StartupRunnableService();
+   ~StartupRunnableService();
 
-    bool run(const QString &userName);
+   bool run(const QString &userName);
 
 signals:
 
-    void noExecApplication(const QString &execPath);
+   void noExecApplication(const QString &execPath);
 
-    void programFall();
-
-private:
-
-    Terminal *m_terminal;
-
-    std::vector<QProcess*> *m_runnableProcess;
-
-    QStringList *m_processParams;
+   void programFall();
 
 private:
 
-    QStringList readUserExecFile(const QString &userName);
+   Terminal *m_terminal;
 
-    bool isAllExecsValid(QStringList &execsList);
+   QVector<QProcess *> *m_runnableProcess;
 
-    void initProcessStruct(QStringList execsList);
+   QStringList *m_processParams;
+
+private:
+
+   QStringList readUserExecFile(const QString &userName);
+
+   bool isAllExecsValid(QStringList &execsList);
+
+   void initProcessStruct(QStringList execsList);
 
 private slots:
 
-    void restartProcess();
+   void restartProcess();
 
 };
 

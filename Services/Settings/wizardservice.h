@@ -16,7 +16,8 @@ class WizardService : public QObject
 {
    Q_OBJECT
 public:
-   explicit WizardService(ProgramFilesState state, QString &currentUserName, QString currentUserId, QStringList validSettingsPaths, QStringList defaultValues, Terminal *terminal, QObject *parent);
+
+   explicit WizardService(ProgramFilesState state, const  QString &currentUserName, const  QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultValues, Terminal *terminal, QObject *parent);
 
    ~WizardService();
 
@@ -48,6 +49,14 @@ public:
 
 private:
 
+   QStringList m_validSettingsPaths;
+
+   const QStringList m_defaultSettingsValues;
+
+   Terminal *m_terminal;
+
+private:
+
    QString m_actionWithUserRepository;
 
    QStringList m_actionWithRolesRepository = {"", "", "", ""};
@@ -62,7 +71,7 @@ private:
 
 private:
 
-   QStringList m_backupXmlNodesList;
+   QStringList m_backupCorrectTagsList;
 
 Q_SIGNALS:
 
@@ -74,7 +83,7 @@ Q_SIGNALS:
 
 private:
 
-   void SetOldRepositoriesData(ProgramFilesState state, QString &currentUserName, QStringList &validSettingsPaths,  Terminal *terminal);
+   void SetOldRepositoriesData(ProgramFilesState state, QStringList &validSettingsPaths,  Terminal *terminal);
 
    void TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths);
 

@@ -47,7 +47,7 @@ void DesktopPanel::setParam(const QString &param, QStringList *users)
     m_pararm=param;
     m_usersList=users;
     m_dialogWidget->setTitleText(titleText);
-    m_rootFileService->setPath(rootFolder);
+    m_rootFileService->SetPath(rootFolder);
     m_addProgramButton->setEnabled(true);
     m_deleteProgramButton->setDisabled(true);
 }
@@ -56,7 +56,7 @@ void DesktopPanel::setDefaultRoleApps(const QString &role)
 {
     if (m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
     {
-        m_rootFileService->setDefaultIcons(role);
+        m_rootFileService->SetDefaultIcons(role);
     }
     else
     {
@@ -112,7 +112,7 @@ void DesktopPanel::setBackGroundColor()
 
 void DesktopPanel::initModel()
 {
-    m_model=m_rootFileService->getModel();
+    m_model=m_rootFileService->GetModel();
 }
 
 void DesktopPanel::insertWidgetsIntoLayout()
@@ -146,20 +146,20 @@ void DesktopPanel::updateAllUsersWithCurrentRole()
     {
         for (QStringList::Iterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
         {
-            m_rootFileService->setDefaultIconsToUser(m_pararm, *it);
+            m_rootFileService->SetDefaultIconsToUser(m_pararm, *it);
         }
     }
 }
 
 void DesktopPanel::addProgram(const QString &exec, const QString &iconPath, const QString &iconName)
 {
-    m_rootFileService->addIcon(exec, iconPath, iconName);
+    m_rootFileService->AddIcon(exec, iconPath, iconName);
     updateAllUsersWithCurrentRole();
 }
 
 void DesktopPanel::deleteProgram()
 {
-    m_rootFileService->deleteIcon(m_selectedItemName);
+    m_rootFileService->DeleteIcon(m_selectedItemName);
     m_deleteProgramButton->setDisabled(true);
     updateAllUsersWithCurrentRole();
 }

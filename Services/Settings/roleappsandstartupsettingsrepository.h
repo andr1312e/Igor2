@@ -15,7 +15,7 @@ public:
 
    ~RolesAndStartupsWizardRepository();
 
-   bool hasData();
+   bool HasData();
 
    void RetunRoleDesktopsAndStartups(int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups);
 
@@ -24,6 +24,10 @@ public:
    void SetRoleDesktopsAndStartupsFromBackup(int roleIndex, QDomElement &backupNode);
 
    int GetRoleDesktopsAppCount(int roleIndex);
+
+   void SaveRoleDesktops(const QString &pathToDesktopsFolder, int roleIndex);
+
+   void SaveRoleStartups(const QString &pathToStarupsFolder, int roleIndex);
 
 private:
 
@@ -41,6 +45,14 @@ private:
 
 private:
 
+   QList<DesktopEntity> &GetDesktopsByIndex(int roleIndex);
+
+   QStringList &GetStatupsByIndex(int roleIndex);
+
+   QString CreateIconProperties(const QString &exec, const QString &imagePath, const QString &iconName);
+
+private:
+
    bool m_hasData;
 
    Terminal *m_terminal;
@@ -50,10 +62,10 @@ private:
    QStringList m_thirdRoleStartup;
    QStringList m_fourthRoleStartup;
 
-   QList<DesktopEntity> *m_firstRoleDesktopsIcons;
-   QList<DesktopEntity> *m_secondRoleDesktopsIcons;
-   QList<DesktopEntity> *m_thirdRoleDesktopsIcons;
-   QList<DesktopEntity> *m_fourthRoleDesktopsIcons;
+   QList<DesktopEntity> m_firstRoleDesktopsIcons;
+   QList<DesktopEntity> m_secondRoleDesktopsIcons;
+   QList<DesktopEntity> m_thirdRoleDesktopsIcons;
+   QList<DesktopEntity> m_fourthRoleDesktopsIcons;
 };
 
 #endif // WIZARDSERVICE_H

@@ -10,66 +10,66 @@
 
 #include <Services/Terminals/terminal.h>
 
-class FileExplorer {
+class FileExplorer
+{
 public:
-  FileExplorer(Terminal *terminal);
+   FileExplorer(Terminal *terminal);
 
-  ~FileExplorer();
+   ~FileExplorer();
 
-  void setPath(QString &path);
+   void SetPath(QString &path);
 
-  void addIcon(const QString &exec, const QString &iconPath,
-               const QString &iconName);
+   void AddIcon(const QString &exec, const QString &iconPath, const QString &iconName);
 
-  void deleteIcon(const QString &iconName);
+   void DeleteIcon(const QString &iconName);
 
-  void setDefaultIcons(const QString &role);
+   void SetDefaultIcons(const QString &role);
 
-  void setDefaultIconsToUser(const QString &role, const QString &userName);
+   void SetDefaultIconsToUser(const QString &role, const QString &userName);
 
-  QStandardItemModel *getModel() { return m_model; }
+   QStandardItemModel *GetModel();
 
-  Terminal *getTerminal() { return m_terminal; }
-
-private:
-  void updateIconListDataAndModel();
-
-  void updateIconsList();
-
-  void updateModel();
+   Terminal *GetTerminal();
 
 private:
-  Terminal *m_terminal;
+   void updateIconListDataAndModel();
 
-  QString m_path;
+   void updateIconsList();
 
-  QList<DesktopEntity> *m_filesList;
-
-  QStandardItemModel *m_model;
-
-  const QString m_desktopName = "/Desktop/";
-
-  const QString m_homeName = "/home/";
-
-  const QString m_iconType = ".desktop";
+   void updateModel();
 
 private:
-  QStringList getAllDesktopEntities();
+   Terminal *m_terminal;
 
-  void appendIconInfoToList(const QString &programName,
-                            const QString &iconInfo);
+   QString m_path;
 
-  void appendFileInfoToList(const QString &fileName);
+   QList<DesktopEntity> *m_filesList;
 
-  bool isIcon(const QString &entityName) const;
+   QStandardItemModel *m_model;
 
-  void createIconFile(const QString &iconName);
+   const QString m_desktopName = "/Desktop/";
 
-  QString createIconProperties(const QString &exec, const QString &imagePath,
-                               const QString &iconName);
+   const QString m_homeName = "/home/";
 
-  void writeIconPropertiesToFile(const QString &iconProperties,
-                                 const QString &iconName);
+   const QString m_iconType = ".desktop";
+
+private:
+   QStringList getAllDesktopEntities();
+
+   void appendIconInfoToList(const QString &programName,
+                             const QString &iconInfo);
+
+   void appendFileInfoToList(const QString &fileName);
+
+   bool isIcon(const QString &entityName) const;
+
+   void createIconFile(const QString &iconName);
+
+   QString createIconProperties(const QString &exec, const QString &imagePath,
+                                const QString &iconName);
+
+   void writeIconPropertiesToFile(const QString &iconProperties,
+                                  const QString &iconName);
 };
 
 #endif // SERVICES_FILEEXPLORER_H
