@@ -67,7 +67,7 @@ bool UserWizardPage::isComplete() const
 {
    //    qDebug()<<"fff";
    return true;
-   //    return !m_backupFCSLineEdit->text().remove(' ').isEmpty();
+   //       return !m_backupFCSLineEdit->text().remove(' ').isEmpty();
 }
 
 void UserWizardPage::initUI()

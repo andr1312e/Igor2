@@ -1,5 +1,5 @@
-#ifndef CONCLUSIONWIZARDPAGE_H
-#define CONCLUSIONWIZARDPAGE_H
+#ifndef ADMIN_GUI_VIEWS_WIZARD_CONCLUSIONWIZARDPAGE_H
+#define ADMIN_GUI_VIEWS_WIZARD_CONCLUSIONWIZARDPAGE_H
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -61,12 +61,11 @@ private:
    QLabel *m_fourthRoleCommentValue;
 
 private:
-   void initUI();
-   void insertWidgetsIntoLayout();
-   void createConnections();
+   void CreateUI();
+   void InsertWidgetsIntoLayout();
 private:
-   void setUserLabel(QString &actionWithUserRepository);
-   void setRolesLabel(int &roleIndex, const QString &actionWithRoleReposiory);
+   void SetUserActionValueLabel(QString &actionWithUserRepository);
+   void SetRolesActionValueLabel(int &roleIndex, const QString &actionWithRoleReposiory);
 };
 
-#endif // CONCLUSIONWIZARDPAGE_H
+#endif // ADMIN_GUI_VIEWS_WIZARD_CONCLUSIONWIZARDPAGE_H

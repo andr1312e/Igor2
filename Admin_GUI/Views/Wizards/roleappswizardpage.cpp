@@ -1,13 +1,13 @@
 #include "roleappswizardpage.h"
 
-RoleAppsWizardPage::RoleAppsWizardPage(const QString &role, int currentRoleIndex, WizardService *service, QWidget *parent)
+RoleAppsWizardPage::RoleAppsWizardPage(const QString &role, const int currentRoleIndex, WizardService *service, QWidget *parent)
    : QWizardPage(parent)
    , m_currentRoleIndex(currentRoleIndex)
    , m_wizardService(service)
 {
-   initUI(role);
-   insertWidgetsIntoLayout();
-   createConnections();
+   CreateUI(role);
+   InsertWidgetsIntoLayout();
+   CreateConnections();
 }
 
 RoleAppsWizardPage::~RoleAppsWizardPage()
@@ -28,19 +28,19 @@ int RoleAppsWizardPage::nextId() const
 
 void RoleAppsWizardPage::initializePage()
 {
-   QStringList execs;
-   QList<DesktopEntity> desktops;
+   QStringList currentStartups;
+   QList<DesktopEntity> currentDesktops;
 
    if (m_wizardService->HasBackup()) {
-      m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, false, desktops, execs);
+      m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, false, currentDesktops, currentStartups);
       m_backupWidget->setVisible(true);
-      m_backupWidget->setWizardWidgetFileds(desktops, execs);
+      m_backupWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
 
       if (m_wizardService->HasOldData()) {
 
-         m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, true, desktops, execs);
+         m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, true, currentDesktops, currentStartups);
          m_oldWidget->setVisible(true);
-         m_oldWidget->setWizardWidgetFileds(desktops, execs);
+         m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
          m_actionComboBox->addItems(m_rolesWizardPageComboBoxBackupAndOldDataActions);
 
       } else {
@@ -54,32 +54,32 @@ void RoleAppsWizardPage::initializePage()
       m_backupWidget->setVisible(false);
 
       if (m_wizardService->HasOldData()) {
-         m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, false, desktops, execs);
-         m_oldWidget->setWizardWidgetFileds(desktops, execs);
+         m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, false, currentDesktops, currentStartups);
+         m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
          m_actionComboBox->addItems(m_rolesWizardPageComboBoxOldDataActions);
          m_actionComboBox->setCurrentIndex(1);
       } else {
-         m_oldWidget->setWizardWidgetFileds(desktops, execs);
+         m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
          m_actionComboBox->addItems(m_rolesWizardPageComboBoxNoDataActions);
       }
    }
 }
 
-QString RoleAppsWizardPage::getUserChoise()
+QString RoleAppsWizardPage::GetUserChoise()
 {
    return m_actionComboBox->currentText();
 }
 
-void RoleAppsWizardPage::initUI(const QString &role)
+void RoleAppsWizardPage::CreateUI(const QString &role)
 {
    m_mainLayout = new QVBoxLayout();
    m_titleLabel = new QLabel("Ярлыки и программы на рабочем столе для роли: " + role);
-   m_oldWidget = new RoleAppsWizardWidget(" уже имеющихся", nullptr);
-   m_backupWidget = new RoleAppsWizardWidget(" файла восстановления", nullptr);
+   m_oldWidget = new RoleAppsWizardSubWidget(" уже имеющихся", nullptr);
+   m_backupWidget = new RoleAppsWizardSubWidget(" файла восстановления", nullptr);
    m_actionComboBox = new QComboBox();
 }
 
-void RoleAppsWizardPage::insertWidgetsIntoLayout()
+void RoleAppsWizardPage::InsertWidgetsIntoLayout()
 {
    m_mainLayout->addWidget(m_titleLabel);
    m_mainLayout->addWidget(m_oldWidget);
@@ -88,7 +88,7 @@ void RoleAppsWizardPage::insertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void RoleAppsWizardPage::createConnections()
+void RoleAppsWizardPage::CreateConnections()
 {
    connect(m_actionComboBox, &QComboBox::currentTextChanged, [&](const QString & actionWithRoleRepository) {
       m_wizardService->SetActionWithRoleRepository(m_currentRoleIndex, actionWithRoleRepository);

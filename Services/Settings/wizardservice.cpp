@@ -1,6 +1,6 @@
 #include "wizardservice.h"
 
-WizardService::WizardService(ProgramFilesState state, const QString &currentUserName, const QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultSettingsValues, Terminal *terminal, QObject *parent)
+WizardService::WizardService(ProgramState state, const QString &currentUserName, const QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultSettingsValues, Terminal *terminal, QObject *parent)
    : QObject(parent)
    , m_validSettingsPaths(validSettingsPaths)
    , m_defaultSettingsValues(defaultSettingsValues)
@@ -10,7 +10,6 @@ WizardService::WizardService(ProgramFilesState state, const QString &currentUser
    , m_oldDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
    , m_backupDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
 {
-   m_backupCorrectTagsList = QStringList{"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
    SetOldRepositoriesData(state, validSettingsPaths, terminal);
 }
 
@@ -22,7 +21,7 @@ WizardService::~WizardService()
    delete m_backupDataRolesAndStartupsWizardRepository;
 }
 
-void WizardService::SetOldRepositoriesData(ProgramFilesState state, QStringList &validSettingsPaths, Terminal *terminal)
+void WizardService::SetOldRepositoriesData(ProgramState state, QStringList &validSettingsPaths, Terminal *terminal)
 {
    switch (state) {
       case CantRun:
@@ -54,7 +53,7 @@ void WizardService::TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPa
    m_oldDataRolesAndStartupsWizardRepository->SetRoleDesktopsAndStartupsFromFile(validSettingsPaths.front(), validSettingsPaths.last());
 }
 
-bool WizardService::CheckAndParseBackupFile(QString &backupPath)
+bool WizardService::CheckAndParseBackupFile(const QString &backupPath)
 {
    QByteArray arr = m_terminal->GetFileText(backupPath, "WizardService::CheckAndParseBackupFile", true).toUtf8();
    QDomDocument m_backupXMLDocument;
@@ -80,14 +79,14 @@ bool WizardService::CheckAndParseBackupFile(QString &backupPath)
    return false;
 }
 
-bool WizardService::HasBackup()
+bool WizardService::HasBackup() const
 {
    return m_backupDataUserWizardRepositry->HasData() || m_backupDataRolesAndStartupsWizardRepository->HasData();
 }
 
-bool WizardService::HasOldData()
+bool WizardService::HasOldData() const
 {
-   return m_oldDataCurrentUserWizardRepositry->HasData();;
+   return m_oldDataCurrentUserWizardRepositry->HasData() || m_oldDataRolesAndStartupsWizardRepository->HasData();
 }
 
 void WizardService::ParseBackupFile(QDomDocument &backupXMLDocument)
@@ -130,7 +129,7 @@ void WizardService::ApplySettingsWithRolesRepository()
    }
 }
 
-void WizardService::GetDataFromUserRepository(bool isOldData, QString &FCS, QString &rank, QVector<User> &userList)
+void WizardService::GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QVector<User> &userList)
 {
    UsersDataWizardRepository *currentRepository;
 
@@ -147,7 +146,7 @@ void WizardService::GetDataFromUserRepository(bool isOldData, QString &FCS, QStr
    }
 }
 
-int WizardService::GetUserCountFromUserRepository(bool isOldData)
+int WizardService::GetUserCountFromUserRepository(const bool isOldData) const
 {
    if (isOldData) {
       return m_oldDataCurrentUserWizardRepositry->GetUserCount();
@@ -156,7 +155,7 @@ int WizardService::GetUserCountFromUserRepository(bool isOldData)
    }
 }
 
-void WizardService::GetDataFromDesktopRepository(int roleIndex, bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs)
+void WizardService::GetDataFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs)
 {
    RolesAndStartupsWizardRepository *currentRepository;
 
@@ -171,7 +170,7 @@ void WizardService::GetDataFromDesktopRepository(int roleIndex, bool isOldData, 
    }
 }
 
-int WizardService::GetUserCountFromDesktopRepository(int roleIndex, bool isOldData)
+int WizardService::GetUserCountFromDesktopRepository(const int roleIndex, const bool isOldData)
 {
    if (isOldData) {
       return m_oldDataRolesAndStartupsWizardRepository->GetRoleDesktopsAppCount(roleIndex);
@@ -190,17 +189,17 @@ QString &WizardService::GetActionWithUserRepository()
    return m_actionWithUserRepository;
 }
 
-void WizardService::SetActionWithRoleRepository(int roleIndex, const QString &actionWithRoleRepository)
+void WizardService::SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository)
 {
    m_actionWithRolesRepository[roleIndex] = actionWithRoleRepository;
 }
 
-const QString &WizardService::GetActionWithRoleRepository(int roleIndex)
+const QString &WizardService::GetActionWithRoleRepository(const int roleIndex)
 {
    return m_actionWithRolesRepository.at(roleIndex);
 }
 
-void WizardService::ApplySettings()
+void WizardService::ApplyWizard()
 {
    ApplySettingsWithUserRepository();
    ApplySettingsWithRolesRepository();

@@ -5,8 +5,8 @@ UsersDataWizardRepository::UsersDataWizardRepository(const QString &curerntUserN
    , m_curerntUserId(curerntUserId)
    , m_terminal(terminal)
    , m_hasData(false)
-   , m_userFCS(QStringLiteral(""))
-   , m_userRank(QStringLiteral(""))
+   , m_userFCS("")
+   , m_userRank("")
    , m_accountsData(new QDomDocument())
 {
 
@@ -32,12 +32,12 @@ QString &UsersDataWizardRepository::GetCurrentUserRank()
    return m_userRank;
 }
 
-QVector<User> UsersDataWizardRepository::GetUsersList()
+QVector<User> &UsersDataWizardRepository::GetUsersList()
 {
    return m_usersList;
 }
 
-int UsersDataWizardRepository::GetUserCount()
+int UsersDataWizardRepository::GetUserCount() const
 {
    return m_usersList.count();
 }

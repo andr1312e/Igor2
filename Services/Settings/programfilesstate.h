@@ -1,12 +1,12 @@
-#ifndef PROGRAMFILESSTATE_H
-#define PROGRAMFILESSTATE_H
+#ifndef SERVICES_SETTINGS_PROGRAMFILESSTATE_H
+#define SERVICES_SETTINGS_PROGRAMFILESSTATE_H
 
-enum ProgramFilesState{
-    NoFiles=0,
-    NoUserDb=1,
-    NoRoleData=2,
-    Fine=3,
-    CantRun=4,
+enum ProgramState {
+   NoFiles = 0,
+   NoUserDb = 1,
+   NoRoleData = 2,
+   Fine = 3,
+   CantRun = 4,
 };
 
-#endif // PROGRAMFILESSTATE_H
+#endif // SERVICES_SETTINGS_PROGRAMFILESSTATE_H

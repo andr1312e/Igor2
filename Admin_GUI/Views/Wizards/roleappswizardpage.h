@@ -1,5 +1,5 @@
-#ifndef ROLEPAGE_H
-#define ROLEPAGE_H
+#ifndef ADMIN_GUI_VIEWS_WIZARD_ROLEPAGE_H
+#define ADMIN_GUI_VIEWS_WIZARD_ROLEPAGE_H
 
 #include <QObject>
 #include <QWizardPage>
@@ -12,35 +12,33 @@
 #include "Services/Settings/wizardservice.h"
 
 #include "Admin_GUI/Views/Wizards/actions.h"
-#include "Admin_GUI/Views/Wizards/roleappswizardwidget.h"
+#include "Admin_GUI/Views/Wizards/roleappswizardsubwidget.h"
 
 class RoleAppsWizardPage : public QWizardPage
 {
 public:
-   RoleAppsWizardPage(const QString &role, int currentRoleIndex, WizardService *service, QWidget *parent);
+   RoleAppsWizardPage(const QString &role, const int currentRoleIndex, WizardService *service, QWidget *parent);
    ~RoleAppsWizardPage();
    int nextId() const override;
    void initializePage() override;
-   QString getUserChoise();
+   QString GetUserChoise();
 
 private:
 
-   int m_currentRoleIndex;
+   const int m_currentRoleIndex;
    WizardService *m_wizardService;
 
    QVBoxLayout *m_mainLayout;
    QLabel *m_titleLabel;
-   RoleAppsWizardWidget *m_backupWidget;
-   RoleAppsWizardWidget *m_oldWidget;
+   RoleAppsWizardSubWidget *m_backupWidget;
+   RoleAppsWizardSubWidget *m_oldWidget;
 
    QComboBox *m_actionComboBox;
 
 private:
-   void initUI(const QString &role);
-   void insertWidgetsIntoLayout();
-   void createConnections();
-private:
-
+   void CreateUI(const QString &role);
+   void InsertWidgetsIntoLayout();
+   void CreateConnections();
 };
 
-#endif // ROLEPAGE_H
+#endif // ADMIN_GUI_VIEWS_WIZARD_ROLEPAGE_H

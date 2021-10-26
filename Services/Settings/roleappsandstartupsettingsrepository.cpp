@@ -1,5 +1,4 @@
 #include "roleappsandstartupsettingsrepository.h"
-#include <QDir>
 
 RolesAndStartupsWizardRepository::RolesAndStartupsWizardRepository(Terminal *terminal)
    : m_terminal(terminal)
@@ -17,7 +16,7 @@ bool RolesAndStartupsWizardRepository::HasData()
    return m_hasData;
 }
 
-void RolesAndStartupsWizardRepository::RetunRoleDesktopsAndStartups(int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups)
+void RolesAndStartupsWizardRepository::RetunRoleDesktopsAndStartups(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups)
 {
    switch (roleIndex) {
       case 0: {
@@ -56,17 +55,15 @@ void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromFile(QStrin
    SetRoleStartupsFromFile(pathToStartupsFolder);
 }
 
-void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(int roleIndex, QDomElement &backupNode)
+void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(const int roleIndex, QDomElement &backupNode)
 {
    QDomElement desktops = backupNode.firstChildElement();
-   qDebug() << desktops.tagName();
    QDomElement startups = backupNode.lastChildElement();
-   qDebug() << startups.tagName();
    SetRoleDesktopFromXml(roleIndex, desktops);
    SetRoleStartupsFromXml(roleIndex, startups);
 }
 
-int RolesAndStartupsWizardRepository::GetRoleDesktopsAppCount(int roleIndex)
+int RolesAndStartupsWizardRepository::GetRoleDesktopsAppCount(const int roleIndex)
 {
    switch (roleIndex) {
       case 0: {
@@ -91,7 +88,7 @@ int RolesAndStartupsWizardRepository::GetRoleDesktopsAppCount(int roleIndex)
    }
 }
 
-void RolesAndStartupsWizardRepository::SaveRoleDesktops(const QString &pathToDesktopsFolder, int roleIndex)
+void RolesAndStartupsWizardRepository::SaveRoleDesktops(const QString &pathToDesktopsFolder, const int roleIndex)
 {
    if (m_terminal->IsDirNotExists(pathToDesktopsFolder, "RolesAndStartupsWizardRepository::SaveRolesAndStartups", true)) {
       m_terminal->CheckAndCreatePathToElement(pathToDesktopsFolder, "RolesAndStartupsWizardRepository::SaveRolesAndStartups", true);
@@ -120,7 +117,7 @@ void RolesAndStartupsWizardRepository::SaveRoleDesktops(const QString &pathToDes
    }
 }
 
-void RolesAndStartupsWizardRepository::SaveRoleStartups(const QString &pathToStarupsFolder, int roleIndex)
+void RolesAndStartupsWizardRepository::SaveRoleStartups(const QString &pathToStarupsFolder, const int roleIndex)
 {
    if (m_terminal->IsDirNotExists(pathToStarupsFolder, "RolesAndStartupsWizardRepository::SaveRolesAndStartups", true)) {
       m_terminal->CheckAndCreatePathToElement(pathToStarupsFolder, "RolesAndStartupsWizardRepository::SaveRolesAndStartups", true);
@@ -147,57 +144,65 @@ void RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile(QString &pathToDe
 
    for (int i = 0; i < Roles.count(); i++) {
       QString currentStartupFileFullPath = pathToDesktops + Roles.at(i) + "/";
-      QDir dir(currentStartupFileFullPath);
 
-      if (dir.exists()) {
-         QStringList list = m_terminal->GetFileList(currentStartupFileFullPath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+      if (m_terminal->IsDirNotExists(currentStartupFileFullPath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true)) {
+         m_terminal->CheckAndCreatePathToElement(currentStartupFileFullPath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+         m_terminal->CreateFolder(currentStartupFileFullPath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+      }
 
-         for (QStringList::iterator it = list.begin(); it != list.end(); ++it) {
-            DesktopEntity desktopEntity;
-            QString entityInfo = m_terminal->GetFileText(currentStartupFileFullPath + *it, "FileExplorer::updateIconsList");
-            QStringList entityInfoList = entityInfo.split('\n');
-            entityInfoList.removeLast();
+      QStringList list = m_terminal->GetFileList(currentStartupFileFullPath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
 
-            for (QList<QString>::const_iterator iconInfoLine = entityInfoList.cbegin(); iconInfoLine != entityInfoList.cend(); ++iconInfoLine) {
-               QString parametr = *iconInfoLine;
+      for (QStringList::iterator it = list.begin(); it != list.end(); ++it) {
+         DesktopEntity desktopEntity;
+         QString entityInfo = m_terminal->GetFileText(currentStartupFileFullPath + *it, "FileExplorer::updateIconsList");
+         QStringList entityInfoList = entityInfo.split('\n');
+         entityInfoList.removeLast();
 
-               if (parametr.startsWith("Exec")) {
+         for (QList<QString>::const_iterator iconInfoLine = entityInfoList.cbegin(); iconInfoLine != entityInfoList.cend(); ++iconInfoLine) {
+            QString parametr = *iconInfoLine;
+
+            if (parametr.startsWith("Exec")) {
+               int index = parametr.indexOf("=");
+               desktopEntity.exec = parametr.mid(index + 1);
+            } else {
+               if (parametr.startsWith("Icon")) {
                   int index = parametr.indexOf("=");
-                  desktopEntity.exec = parametr.mid(index + 1);
-               } else {
-                  if (parametr.startsWith("Icon")) {
-                     int index = parametr.indexOf("=");
-                     desktopEntity.icon = parametr.mid(index + 1);
-                  }
+                  desktopEntity.icon = parametr.mid(index + 1);
                }
             }
-
-            AppendEnittyToRoleDesktops(i, desktopEntity);
          }
+
+         AppendEnittyToRoleDesktops(i, desktopEntity);
       }
+
    }
 }
 
 void RolesAndStartupsWizardRepository::SetRoleStartupsFromFile(QString &pathToStartupsFolder)
 {
-   QFile file;
-   QString currentStartupFileFullPath;
+
+   if (m_terminal->IsDirNotExists(pathToStartupsFolder, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true)) {
+      m_terminal->CheckAndCreatePathToElement(pathToStartupsFolder, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+      m_terminal->CreateFolder(pathToStartupsFolder, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+   }
+
+   QString currentStartupFilePath;
 
    for (int i = 0; i < Roles.count(); i++) {
-      currentStartupFileFullPath = pathToStartupsFolder + Roles.at(i) + ".start";
-      file.setFileName(currentStartupFileFullPath);
+      currentStartupFilePath = pathToStartupsFolder + Roles.at(i) + ".start";
 
-      if (file.open(QIODevice::ReadOnly)) {
-         while (!file.atEnd()) {
-            AppendRoleStartups(i, file.readLine());
-         }
-
-         file.close();
+      if (m_terminal->IsFileExists(currentStartupFilePath, "RolesAndStartupsWizardRepository::SetRoleStartupsFromFile", true)) {
+         m_terminal->CreateFile(currentStartupFilePath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+      } else {
+         QString startupsPaths = m_terminal->GetFileText(currentStartupFilePath, "RolesAndStartupsWizardRepository::SetRoleDesktopsFromFile", true);
+         QStringList startupsList = startupsPaths.split('\n');
+         startupsList.removeLast();
+         AppendRoleStartups(i, startupsList);
       }
    }
 }
 
-void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(int roleIndex, QDomElement &desktops)
+void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(const int roleIndex, QDomElement &desktops)
 {
    if (desktops.tagName() == "desktops") {
       QDomNodeList desktopsList = desktops.childNodes();
@@ -221,8 +226,10 @@ void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(int roleIndex, QDom
    }
 }
 
-void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(int roleIndex, QDomElement &startups)
+void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(const int roleIndex, QDomElement &startups)
 {
+   QStringList startupList;
+
    if (startups.tagName() == "startups") {
       QDomNodeList startupsList = startups.childNodes();
 
@@ -232,15 +239,16 @@ void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(int roleIndex, QDo
          if (startup.tagName() != "startupApp") {
             break;
          } else {
-            AppendRoleStartups(roleIndex, startup.attribute("exec"));
+            startupList.append(startup.attribute("exec"));
          }
       }
 
+      AppendRoleStartups(roleIndex, startupList);
       m_hasData = true;
    }
 }
 
-void RolesAndStartupsWizardRepository::AppendEnittyToRoleDesktops(int roleIndex, DesktopEntity &desktopEntity)
+void RolesAndStartupsWizardRepository::AppendEnittyToRoleDesktops(const int roleIndex, DesktopEntity &desktopEntity)
 {
    switch (roleIndex) {
       case 0: {
@@ -269,7 +277,7 @@ void RolesAndStartupsWizardRepository::AppendEnittyToRoleDesktops(int roleIndex,
    }
 }
 
-QList<DesktopEntity> &RolesAndStartupsWizardRepository::GetDesktopsByIndex(int roleIndex)
+QList<DesktopEntity> &RolesAndStartupsWizardRepository::GetDesktopsByIndex(const int roleIndex)
 {
    switch (roleIndex) {
       case 0: {
@@ -298,7 +306,7 @@ QList<DesktopEntity> &RolesAndStartupsWizardRepository::GetDesktopsByIndex(int r
    }
 }
 
-QStringList &RolesAndStartupsWizardRepository::GetStatupsByIndex(int roleIndex)
+QStringList &RolesAndStartupsWizardRepository::GetStatupsByIndex(const int roleIndex)
 {
    switch (roleIndex) {
       case 0: {
@@ -327,9 +335,7 @@ QStringList &RolesAndStartupsWizardRepository::GetStatupsByIndex(int roleIndex)
    }
 }
 
-QString RolesAndStartupsWizardRepository::CreateIconProperties(const QString &exec,
-      const QString &imagePath,
-      const QString &iconName)
+QString RolesAndStartupsWizardRepository::CreateIconProperties(const QString &exec, const QString &imagePath, const QString &iconName)
 {
    QString iconText = "[Desktop Entry]\nType=Application\nExec='" + exec + "'\n";
    iconText += "Name= " + iconName + " \nName[ru]= " + iconName +
@@ -337,26 +343,26 @@ QString RolesAndStartupsWizardRepository::CreateIconProperties(const QString &ex
    return iconText;
 }
 
-void RolesAndStartupsWizardRepository::AppendRoleStartups(int roleIndex, QString startup)
+void RolesAndStartupsWizardRepository::AppendRoleStartups(const int roleIndex, QStringList &startupList)
 {
    switch (roleIndex) {
       case 0: {
-         m_firstRoleStartup.append(startup);
+         m_firstRoleStartup = startupList;
          break;
       }
 
       case 1: {
-         m_secondRoleStartup.append(startup);
+         m_secondRoleStartup = startupList;
          break;
       }
 
       case 2: {
-         m_thirdRoleStartup.append(startup);
+         m_thirdRoleStartup = startupList;
          break;
       }
 
       case 3: {
-         m_fourthRoleStartup.append(startup);
+         m_fourthRoleStartup = startupList;
          break;
       }
 

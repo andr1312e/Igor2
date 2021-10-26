@@ -1,5 +1,5 @@
-#ifndef INTROPAGE_H
-#define INTROPAGE_H
+#ifndef ADMIN_GUI_VIEWS_WIZARD_INTROPAGE_H
+#define ADMIN_GUI_VIEWS_WIZARD_INTROPAGE_H
 #include <QLabel>
 #include <QWizardPage>
 #include <QPushButton>
@@ -9,20 +9,20 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 
-#include <Services/Settings/wizardservice.h>
-
+#include "Services/Settings/wizardservice.h"
 #include "Services/Settings/programfilesstate.h"
+
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
 
 class IntroPage : public QWizardPage
 {
    Q_OBJECT
 public:
-   IntroPage(ProgramFilesState &state, WizardService *service, QWidget *parent);
+   IntroPage(const ProgramState &state, WizardService *service, QWidget *parent);
    ~IntroPage();
    int nextId() const override;
 private:
-   ProgramFilesState m_state;
+   const ProgramState m_state;
    WizardService *m_wizardService;
 
    QVBoxLayout *m_mainLayout;
@@ -36,12 +36,12 @@ private:
 
    QString m_backupFilePath;
 private:
-   void setWizardTitle();
-   void initUI();
-   void insertWidgetsIntoLayout();
-   void createConnections();
+   void SetWizardTitle();
+   void CreateUI();
+   void InsertWidgetsIntoLayout();
+   void CreateConnections();
 private Q_SLOTS:
    void CheckBackupFile();
 };
 
-#endif // INTROPAGE_H
+#endif // ADMIN_GUI_VIEWS_WIZARD_INTROPAGE_H

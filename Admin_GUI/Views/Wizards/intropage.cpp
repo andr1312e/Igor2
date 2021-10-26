@@ -3,16 +3,16 @@
 #include <QMessageBox>
 
 
-IntroPage::IntroPage(ProgramFilesState &state, WizardService *service, QWidget *parent)
+IntroPage::IntroPage(const ProgramState &state, WizardService *service, QWidget *parent)
    : QWizardPage(parent)
    , m_state(state)
    , m_wizardService(service)
 
 {
-   initUI();
-   setWizardTitle();
-   insertWidgetsIntoLayout();
-   createConnections();
+   CreateUI();
+   SetWizardTitle();
+   InsertWidgetsIntoLayout();
+   CreateConnections();
 }
 
 IntroPage::~IntroPage()
@@ -33,13 +33,13 @@ int IntroPage::nextId() const
    return Page_UserData;
 }
 
-void IntroPage::setWizardTitle()
+void IntroPage::SetWizardTitle()
 {
    this->setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/1.jpg"));
    m_backupLineEdit->setStyleSheet("border: 1px solid black");
 }
 
-void IntroPage::initUI()
+void IntroPage::CreateUI()
 {
    m_mainLayout = new QVBoxLayout();
 
@@ -59,6 +59,10 @@ void IntroPage::initUI()
       case NoRoleData: {
          needToUpdate = "Необходимо добавить: пути к исполняемым файлам. База пользователей имеется.\n";
          break;
+      }
+
+      default: {
+         qFatal("Нереализованное поведение");
       }
 
    }
@@ -83,7 +87,7 @@ void IntroPage::initUI()
    m_faqLabel = new QLabel("<html>Краткое руководство - процесс настройки состоит из шагов:<ul><li>Внесение в базу ФИО Администратора</li><li>Заполнение ролей</li></ul> Заполнение ролей состоит из шагов:<ul><li></li><li>Заполнение доступных программ для запуска на рабочем столе</li><li>Заполнение списка программ которые будут перезапущены</li></ul></html>");
 }
 
-void IntroPage::insertWidgetsIntoLayout()
+void IntroPage::InsertWidgetsIntoLayout()
 {
    m_backupFileLoadLayout->addWidget(m_backupLineEdit);
    m_backupFileLoadLayout->addWidget(m_backupLoadButton);
@@ -99,7 +103,7 @@ void IntroPage::insertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void IntroPage::createConnections()
+void IntroPage::CreateConnections()
 {
    connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::CheckBackupFile);
 }

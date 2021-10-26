@@ -1,5 +1,5 @@
-#ifndef SERVICES_SETTINGSFILESERVICE_H
-#define SERVICES_SETTINGSFILESERVICE_H
+#ifndef SERVICES_SETTINGS_FIRSTSTARTSETTINGSSERVICE_H
+#define SERVICES_SETTINGS_FIRSTSTARTSETTINGSSERVICE_H
 #include <QDir>
 #include <QFile>
 #include <QSettings>
@@ -12,73 +12,73 @@
 
 #include "Services/Terminals/terminal.h"
 
-class AppFirstLoadlingSettingsService : public QObject
+class FirstStartSettingsService : public QObject
 {
    Q_OBJECT
 
 public:
 
-   AppFirstLoadlingSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal);
+   explicit FirstStartSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal);
 
-   ~AppFirstLoadlingSettingsService();
+   ~FirstStartSettingsService();
 
-   ProgramFilesState isAllDataLoaded();
+   ProgramState IsAllDataLoaded();
 
-   QString &getUserDBPathValue()
+   QString &GetUserDBPathValue()
    {
       return m_userDBPath;
    }
 
-   QString &getViewModeValue()
+   QString &GetViewModeValue()
    {
       return m_viewMode;
    }
 
-   bool getThemeValue()
+   bool GetThemeValue()
    {
       return m_theme;
    }
 
-   QString &getFolderPathToExecsValue()
+   QString &GetFolderPathToExecsValue()
    {
       return m_folderPathToExecs;
    }
 
-   QString &getFolderPathToRoleFoldersValue()
+   QString &GetFolderPathToRoleFoldersValue()
    {
       return m_folderPathToRoleFolders;
    }
 
 public:
 
-   const QString &getUserName()
+   const QString &GetUserName()
    {
       return m_currentUserName;
    }
 
-   const QString &getUserId()
+   const QString &GetUserId()
    {
       return m_currentUserId;
    }
 
-   Terminal *getTerminal()
+   Terminal *GetTerminal()
    {
       return m_terminal;
    }
 
-   QStringList &getValidSettingsPaths()
+   QStringList &GetValidSettingsPaths()
    {
       return m_validSettingsPaths;
    }
 
-   const QStringList &getDefaultSettingsPaths()
+   const QStringList &GetDefaultSettingsPaths()
    {
       return m_defaultSettingsPaths;
    }
 
 Q_SIGNALS:
 
-   void allDataLoaded();
+   void AllDataLoaded();
 
 private:
 
@@ -160,7 +160,7 @@ private:
 
    void GetValuesFromSettingsFile();
 
-   ProgramFilesState CheckIsPathsInSettingsFileCorrect();
+   ProgramState CheckIsPathsInSettingsFileCorrect();
 
    bool FilePathIsCorrect(const QString &filePath);
 
@@ -174,4 +174,4 @@ private Q_SLOTS:
 
 };
 
-#endif // SERVICES_SETTINGSFILESERVICE_H
+#endif //SERVICES_SETTINGS_FIRSTSTARTSETTINGSSERVICE_H

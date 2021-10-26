@@ -1,23 +1,23 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(ProgramFilesState &loadedDbAdnRolesState, AppFirstLoadlingSettingsService *appFirstLoadingService, QWidget *parent)
+StartupWizard::StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *appFirstLoadingService, QWidget *parent)
    : QWizard(parent)
    , m_programState(loadedDbAdnRolesState)
-   , m_settingFileService(appFirstLoadingService)
+   , m_firstStartSettingService(appFirstLoadingService)
 {
-   initServices();
-   initUI();
-   initSizes();
-   initStyles();
-   initBehaviour();
-   createConnections();
+   CreateServices();
+   CreateUI();
+   InitSizes();
+   InitStyles();
+   InitBehaviour();
+   CreateConnections();
 }
 
 StartupWizard::~StartupWizard()
 {
    delete m_wizardService;
    delete m_introPage;
-   delete m_fcsPage;
+   delete m_userWizardPage;
 
    for (int i = 0; i < Roles.size(); ++i) {
       delete m_rolesPages.at(i);
@@ -28,57 +28,128 @@ StartupWizard::~StartupWizard()
 
 void StartupWizard::accept()
 {
-   m_wizardService->ApplySettings();
+   m_wizardService->ApplyWizard();
+   Q_EMIT finish();
+   QWizard::accept();
 }
 
 void StartupWizard::reject()
 {
-   int ccccc = 3;
+   QWizard::reject();
+   qFatal("Дописать StartupWizard::reject");
 }
 
 void StartupWizard::showHelp()
 {
    QString message;
+   bool hasBackUp = m_wizardService->HasBackup();
+   bool hasOldData = m_wizardService->HasOldData();
 
    switch (currentId()) {
       case Page_Intro:
-         message = "Выберите файл восстановления, нажав на кнопку папки справа. Если файл корректный он отобразится в поле файла. Если файла нет прочитайте руководство и нажмите далее";
+         message = "При запуске приложения, если необходимые данные не были обнаружены, инициируется процесс автоматического восстановления.\n"
+                   "Несмотря на то, что приведенные ниже шаги могут показаться сложными на первом этапе, просто выполните их по порядку, и мы попробуем помочь вам.\n"
+                   "Если у вас есть готовый файл восстановления, выберите его, нажав на кнопку папки справа. Если файл корректный он отобразится в поле файла, иначе изменений не произойдет. \n"
+                   "Если файла нет прочитайте краткое руководство и нажмите Далее...";
          break;
 
       case Page_UserData:
-         message = "Поле ввода данных администратора. Поле пользователей редактируется в программе позже...";
+         if (hasBackUp) {
+            if (hasOldData) {
+               message = "Поле ввода данных администратора.\n"
+                         "Ваша программа обнаружила уже имеющиеся данные, так же вы предоставили файл восстановления, "
+                         "все эти файлы были загружены.\n"
+                         "Необходимо выбрать только один источник, выбрать необходимый вы можете в самом"
+                         "нижнем поле программы.\n"
+                         "Вы можете изменить ФИО, или воиское звание, в соответсвующих полях\n"
+                         "Поля пользователей разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            } else {
+               message = "Поле ввода данных администратора.\n "
+                         "Вы предоставили программе предоставили файл восстановления, данный файл был успешно заружен.\n"
+                         "Вы можете не использовать базу из файла восстановления, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
+                         "При необходимости измените ФИО, или воиское звание.\n"
+                         "Поля пользователей разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            }
+         } else {
+            if (hasOldData) {
+               message = "Поле ввода данных администратора.\n "
+                         "Ваша программа обнаружила уже имеющиеся данные, они были загружены, файл восстановления не выбран, "
+                         "при необходимости вы можете изменить ФИО, или воиское звание.\n"
+                         "Так же вы можете не использовать имеющуюся базу, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
+                         "Поля пользователей разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            } else {
+               message = "Поле ввода данных администратора.\n "
+                         "К сожалению, у вас нет ни данных, ни файла восстановления, поэтому "
+                         "введите пожалуйста ФИО, и выберите воиское звание снизу.\n"
+                         "Поля пользователей разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            }
+         }
+
          break;
 
       case Page_FirstRole:
-         message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли %s", Roles.at(0).toLatin1().constData();
-         break;
-
       case Page_SecondRole:
-         message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли %s", Roles.at(1).toLatin1().constData();
-         break;
-
       case Page_ThirdRole:
-         message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли %s", Roles.at(2).toLatin1().constData();
+      case Page_FourthRole:
+         if (hasBackUp) {
+            if (hasOldData) {
+               message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() - 2) +
+                         "\nВаша программа обнаружила уже имеющиеся данные, так же вы предоставили файл восстановления, "
+                         "все эти файлы были загружены.\n"
+                         "Необходимо выбрать только один источник, выбрать необходимый вы можете в самом"
+                         "нижнем поле программы.\n"
+                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            } else {
+               message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() - 2) +
+                         "\nВы предоставили программе предоставили файл восстановления, данный файл был успешно заружен.\n"
+                         "Вы можете не использовать базу из файла восстановления, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
+                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            }
+         } else {
+            if (hasOldData) {
+               message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() - 2) +
+                         "\nВаша программа обнаружила уже имеющиеся данные, они были загружены, файл восстановления не выбран, "
+                         "Так же вы можете не использовать имеющуюся базу, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
+                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            } else {
+               message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() + 2) +
+                         "\nК сожалению, у вас нет ни данных, ни файла восстановления, поэтому "
+                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                         "Затем, нажмите кнопку Далее...";
+            }
+         }
+
          break;
 
-      case Page_FourthRole:
-         message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли %s", Roles.at(3).toLatin1().constData();
+      case Page_Conclusion:
+         message = "Заключительный этап настройки.\n"
+                   "Проверьте правильность настроек, и импорт данных из источников.\n"
+                   "Если все правильно, нажмите кнопку Завершить..\n."
+                   "Иначе нажмите кнопку Назад, и измените необходимые параметры...\n";
+
          break;
    }
 
    QMessageBox::information(this, "Окно справки", message);
 }
 
-void StartupWizard::initServices()
+void StartupWizard::CreateServices()
 {
-   m_wizardService = new WizardService(m_programState, m_settingFileService->getUserName(), m_settingFileService->getUserId(), m_settingFileService->getValidSettingsPaths(), m_settingFileService->getDefaultSettingsPaths(), m_settingFileService->getTerminal(), nullptr);
+   m_wizardService = new WizardService(m_programState, m_firstStartSettingService->GetUserName(), m_firstStartSettingService->GetUserId(), m_firstStartSettingService->GetValidSettingsPaths(), m_firstStartSettingService->GetDefaultSettingsPaths(), m_firstStartSettingService->GetTerminal(), nullptr);
 }
 
-void StartupWizard::initUI()
+void StartupWizard::CreateUI()
 {
    m_introPage = new IntroPage(m_programState, m_wizardService, this);
 
-   m_fcsPage = new UserWizardPage(m_wizardService, this);
+   m_userWizardPage = new UserWizardPage(m_wizardService, this);
    m_rolesPages.resize(Roles.size());
 
    for (int i = 0; i < Roles.size(); i++) {
@@ -88,22 +159,22 @@ void StartupWizard::initUI()
    m_conclusionPage = new ConclusionWizardPage(m_wizardService, this);
 }
 
-void StartupWizard::initSizes()
+void StartupWizard::InitSizes()
 {
    setMinimumSize(900, 700);
 }
 
-void StartupWizard::initStyles()
+void StartupWizard::InitStyles()
 {
    setWizardStyle(QWizard::ModernStyle);
    this->setAutoFillBackground(true);
 }
 
-void StartupWizard::initBehaviour()
+void StartupWizard::InitBehaviour()
 {
 
    setPage(Page_Intro, m_introPage);
-   setPage(Page_UserData, m_fcsPage);
+   setPage(Page_UserData, m_userWizardPage);
 
    for (int i = 0; i < m_rolesPages.size(); i++) {
       setPage(i + 2, m_rolesPages.at(i));
@@ -115,7 +186,7 @@ void StartupWizard::initBehaviour()
    setOption(QWizard::HaveHelpButton);
 }
 
-void StartupWizard::createConnections()
+void StartupWizard::CreateConnections()
 {
    connect(this, &QWizard::helpRequested, this, &StartupWizard::showHelp);
 }

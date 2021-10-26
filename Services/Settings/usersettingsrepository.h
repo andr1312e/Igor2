@@ -1,10 +1,10 @@
-#ifndef USERSETTINGSREPOSITORY_H
-#define USERSETTINGSREPOSITORY_H
-#include <QString>
+#ifndef SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H
+#define SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H
+
 #include <QFile>
-#include <QDomDocument>
-#include <QStringLiteral>
 #include <QVector>
+#include <QString>
+#include <QDomDocument>
 
 #include "Structs/userstruct.h"
 
@@ -27,9 +27,9 @@ public:
 
    QString &GetCurrentUserRank();
 
-   QVector<User> GetUsersList();
+   QVector<User> &GetUsersList();
 
-   int GetUserCount();
+   int GetUserCount() const;
 
    void SetFCSAndRolesFromFile(QString &pathToUserDb);
 
@@ -75,4 +75,4 @@ private:
 
 };
 
-#endif // USERSETTINGSREPOSITORY_H
+#endif // SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H

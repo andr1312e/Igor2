@@ -1,8 +1,7 @@
-#ifndef WIZARDSERVICE_H
-#define WIZARDSERVICE_H
+#ifndef SERVICES_SETTINGS_ROLESANDSTARTUPSWIZARDREPOSITORY_H
+#define SERVICES_SETTINGS_ROLESANDSTARTUPSWIZARDREPOSITORY_H
 #include <QStringList>
 #include <QDomDocument>
-#include <QDebug>
 
 #include "Services/Terminals/terminal.h"
 #include "Structs/programstruct.h"
@@ -11,23 +10,23 @@
 class RolesAndStartupsWizardRepository
 {
 public:
-   RolesAndStartupsWizardRepository(Terminal *terminal);
+   explicit RolesAndStartupsWizardRepository(Terminal *terminal);
 
    ~RolesAndStartupsWizardRepository();
 
    bool HasData();
 
-   void RetunRoleDesktopsAndStartups(int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups);
+   void RetunRoleDesktopsAndStartups(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups);
 
    void SetRoleDesktopsAndStartupsFromFile(QString &pathToDesktopsFolder, QString &pathToStartupsFolder);
 
-   void SetRoleDesktopsAndStartupsFromBackup(int roleIndex, QDomElement &backupNode);
+   void SetRoleDesktopsAndStartupsFromBackup(const int roleIndex, QDomElement &backupNode);
 
-   int GetRoleDesktopsAppCount(int roleIndex);
+   int GetRoleDesktopsAppCount(const int roleIndex);
 
-   void SaveRoleDesktops(const QString &pathToDesktopsFolder, int roleIndex);
+   void SaveRoleDesktops(const QString &pathToDesktopsFolder, const int roleIndex);
 
-   void SaveRoleStartups(const QString &pathToStarupsFolder, int roleIndex);
+   void SaveRoleStartups(const QString &pathToStarupsFolder, const int roleIndex);
 
 private:
 
@@ -35,19 +34,19 @@ private:
 
    void SetRoleStartupsFromFile(QString &pathToStartupsFolder);
 
-   void SetRoleDesktopFromXml(int roleIndex, QDomElement &desktops);
+   void SetRoleDesktopFromXml(const int roleIndex, QDomElement &desktops);
 
-   void SetRoleStartupsFromXml(int roleIndex, QDomElement &startups);
+   void SetRoleStartupsFromXml(const int roleIndex, QDomElement &startups);
 
-   void AppendRoleStartups(int roleIndex, QString startup);
+   void AppendRoleStartups(const int roleIndex, QStringList &startupList);
 
-   void AppendEnittyToRoleDesktops(int roleNum, DesktopEntity &desktopEntity);
+   void AppendEnittyToRoleDesktops(const int roleIndex, DesktopEntity &desktopEntity);
 
 private:
 
-   QList<DesktopEntity> &GetDesktopsByIndex(int roleIndex);
+   QList<DesktopEntity> &GetDesktopsByIndex(const int roleIndex);
 
-   QStringList &GetStatupsByIndex(int roleIndex);
+   QStringList &GetStatupsByIndex(const int roleIndex);
 
    QString CreateIconProperties(const QString &exec, const QString &imagePath, const QString &iconName);
 
@@ -68,4 +67,4 @@ private:
    QList<DesktopEntity> m_fourthRoleDesktopsIcons;
 };
 
-#endif // WIZARDSERVICE_H
+#endif // SERVICES_SETTINGS_ROLESANDSTARTUPSWIZARDREPOSITORY_H

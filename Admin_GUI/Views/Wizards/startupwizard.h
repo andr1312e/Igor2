@@ -1,5 +1,5 @@
-#ifndef STARTUPWIZARD_H
-#define STARTUPWIZARD_H
+#ifndef ADMIN_GUI_VIEWS_WIZARD_STARTUPWIZARD_H
+#define ADMIN_GUI_VIEWS_WIZARD_STARTUPWIZARD_H
 
 #include <QWizard>
 #include <QLabel>
@@ -8,8 +8,10 @@
 #include "Services/Settings/wizardservice.h"
 #include "Services/Settings/programfilesstate.h"
 #include "Services/Settings/usersettingsrepository.h"
-#include "Services/Settings/appfirstloadingsettingsservice.h"
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
+
+#include "Services/Settings/firststartsettingsservice.h"
+
 
 #include "Admin_GUI/Views/Wizards/intropage.h"
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
@@ -21,7 +23,7 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(ProgramFilesState &loadedDbAdnRolesState, AppFirstLoadlingSettingsService *appFirstLoadingService, QWidget *parent);
+   StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *appFirstLoadingService, QWidget *parent);
    ~StartupWizard();
    void accept() override;
    void reject() override;
@@ -30,23 +32,23 @@ Q_SIGNALS:
 private Q_SLOTS:
    void showHelp();
 private:
-   ProgramFilesState m_programState;
-   AppFirstLoadlingSettingsService *m_settingFileService;
+   ProgramState m_programState;
+   FirstStartSettingsService *m_firstStartSettingService;
    WizardService *m_wizardService;
 
    IntroPage *m_introPage;
-   UserWizardPage *m_fcsPage;
+   UserWizardPage *m_userWizardPage;
    QVector<RoleAppsWizardPage *> m_rolesPages;
    ConclusionWizardPage *m_conclusionPage;
 
 private:
-   void initServices();
-   void initUI();
-   void initSizes();
-   void initStyles();
-   void initBehaviour();
-   void createConnections();
+   void CreateServices();
+   void CreateUI();
+   void InitSizes();
+   void InitStyles();
+   void InitBehaviour();
+   void CreateConnections();
 
 };
 
-#endif // STARTUPWIZARD_H
+#endif // ADMIN_GUI_VIEWS_WIZARD_STARTUPWIZARD_H

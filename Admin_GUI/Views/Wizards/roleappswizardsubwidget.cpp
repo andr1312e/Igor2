@@ -1,14 +1,13 @@
-#include "roleappswizardwidget.h"
+#include "roleappswizardsubwidget.h"
 
-RoleAppsWizardWidget::RoleAppsWizardWidget(QString title, QWidget *parent)
+RoleAppsWizardSubWidget::RoleAppsWizardSubWidget(const QString title, QWidget *parent)
    : QWidget(parent)
 {
-   initUI(title);
-   insertWidgetsIntoLayout();
-   createConnections();
+   CreateUI(title);
+   InsertWidgetsIntoLayout();
 }
 
-RoleAppsWizardWidget::~RoleAppsWizardWidget()
+RoleAppsWizardSubWidget::~RoleAppsWizardSubWidget()
 {
    delete m_mainLayout;
 
@@ -19,7 +18,7 @@ RoleAppsWizardWidget::~RoleAppsWizardWidget()
    delete m_desktopsTable;
 }
 
-void RoleAppsWizardWidget::setWizardWidgetFileds(QList<DesktopEntity> &desktops, QStringList &ecexs)
+void RoleAppsWizardSubWidget::SetWizardWidgetFileds(QList<DesktopEntity> &desktops, QStringList &ecexs)
 {
    m_execsList->clear();
    m_execsList->addItems(ecexs);
@@ -27,7 +26,6 @@ void RoleAppsWizardWidget::setWizardWidgetFileds(QList<DesktopEntity> &desktops,
    m_desktopsTable->setRowCount(desktops.count());
    m_desktopsTable->setColumnCount(3);
    m_desktopsTable->setHorizontalHeaderLabels(m_headerLabels);
-   //   m_desktopsTable->horizontalHeader()->
    m_desktopsTable->setColumnWidth(1, 280);
    m_desktopsTable->horizontalHeader()->setStretchLastSection(true);
 
@@ -38,7 +36,7 @@ void RoleAppsWizardWidget::setWizardWidgetFileds(QList<DesktopEntity> &desktops,
    }
 }
 
-void RoleAppsWizardWidget::initUI(QString &title)
+void RoleAppsWizardSubWidget::CreateUI(const QString &title)
 {
    m_mainLayout = new QVBoxLayout();
    m_topLabel = new QLabel("Данные полученны из: " + title);
@@ -49,7 +47,7 @@ void RoleAppsWizardWidget::initUI(QString &title)
    m_desktopsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
-void RoleAppsWizardWidget::insertWidgetsIntoLayout()
+void RoleAppsWizardSubWidget::InsertWidgetsIntoLayout()
 {
    m_mainLayout->addWidget(m_topLabel);
    m_mainLayout->addWidget(m_execsLabel);
@@ -57,9 +55,4 @@ void RoleAppsWizardWidget::insertWidgetsIntoLayout()
    m_mainLayout->addWidget(m_desktopsLabel);
    m_mainLayout->addWidget(m_desktopsTable);
    setLayout(m_mainLayout);
-}
-
-void RoleAppsWizardWidget::createConnections()
-{
-
 }

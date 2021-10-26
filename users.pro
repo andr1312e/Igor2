@@ -30,10 +30,10 @@ SOURCES += \
     Admin_GUI/Views/Wizards/framelesswizard.cpp \
     Admin_GUI/Views/Wizards/intropage.cpp \
     Admin_GUI/Views/Wizards/roleappswizardpage.cpp \
-    Admin_GUI/Views/Wizards/roleappswizardwidget.cpp \
+    Admin_GUI/Views/Wizards/roleappswizardsubwidget.cpp \
     Admin_GUI/Views/Wizards/userwizardpage.cpp \
     Admin_GUI/Views/Wizards/userwizardwidget.cpp \
-    Services/Settings/appfirstloadingsettingsservice.cpp \
+    Services/Settings/firststartsettingsservice.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
     Services/Settings/wizardservice.cpp \
@@ -101,11 +101,11 @@ HEADERS += \
     Admin_GUI/Views/Wizards/conclusionwizardpage.h \
     Admin_GUI/Views/Wizards/intropage.h \
     Admin_GUI/Views/Wizards/roleappswizardpage.h \
-    Admin_GUI/Views/Wizards/roleappswizardwidget.h \
+    Admin_GUI/Views/Wizards/roleappswizardsubwidget.h \
     Admin_GUI/Views/Wizards/userwizardpage.h \
     Admin_GUI/Views/Wizards/userwizardwidget.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
-    Services/Settings/appfirstloadingsettingsservice.h \
+    Services/Settings/firststartsettingsservice.h \
     Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \

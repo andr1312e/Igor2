@@ -4,9 +4,8 @@ ConclusionWizardPage::ConclusionWizardPage(WizardService *service, QWidget *pare
    : QWizardPage(parent)
    , m_wizardService(service)
 {
-   initUI();
-   insertWidgetsIntoLayout();
-   createConnections();
+   CreateUI();
+   InsertWidgetsIntoLayout();
 }
 
 ConclusionWizardPage::~ConclusionWizardPage()
@@ -52,23 +51,23 @@ int ConclusionWizardPage::nextId() const
 void ConclusionWizardPage::initializePage()
 {
    QString actionWithUserRepository = m_wizardService->GetActionWithUserRepository();
-   setUserLabel(actionWithUserRepository);
+   SetUserActionValueLabel(actionWithUserRepository);
 
 
    QString actionWithRoleRepository ;
 
    for (int i = 0; i < Roles.count(); ++i) {
       actionWithRoleRepository = m_wizardService->GetActionWithRoleRepository(i);
-      setRolesLabel(i, actionWithRoleRepository);
+      SetRolesActionValueLabel(i, actionWithRoleRepository);
    }
 }
 
-void ConclusionWizardPage::initUI()
+void ConclusionWizardPage::CreateUI()
 {
    m_mainLayout = new QVBoxLayout();
    m_titleLabel = new QLabel("Итоговые настройки\n"
                              "Настройки пока НЕ применены, проверьте корректность ввода данных.\n"
-                             "Если все настройки выставлены правильно, нажмите готово. Иначе, нажмите назад и выполните настройку еще раз...");
+                             "Если все настройки выставлены правильно, нажмите кнопку Завершить. Иначе, нажмите Назад и выполните настройку еще раз...");
    m_backupLayout = new QHBoxLayout();
    m_backupLabel = new QLabel("Файл восстановления: ");
    m_backupValue = new QLabel();
@@ -106,7 +105,7 @@ void ConclusionWizardPage::initUI()
    m_fourthRoleCommentValue = new QLabel();
 }
 
-void ConclusionWizardPage::insertWidgetsIntoLayout()
+void ConclusionWizardPage::InsertWidgetsIntoLayout()
 {
    m_backupLayout->addWidget(m_backupLabel);
    m_backupLayout->addWidget(m_backupValue);
@@ -148,12 +147,7 @@ void ConclusionWizardPage::insertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void ConclusionWizardPage::createConnections()
-{
-
-}
-
-void ConclusionWizardPage::setUserLabel(QString &actionWithUserRepository)
+void ConclusionWizardPage::SetUserActionValueLabel(QString &actionWithUserRepository)
 {
    m_usersActionValue->setText(actionWithUserRepository);
 
@@ -164,19 +158,19 @@ void ConclusionWizardPage::setUserLabel(QString &actionWithUserRepository)
          if (m_wizardService->HasBackup()) {
             m_usersCommentValue->setText(QString::number(m_wizardService->GetUserCountFromUserRepository(false)));
          } else {
-            qFatal("Не реализованное поедение файл восстановления есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");
+            qFatal("Не реализованное поведение: файл восстановления есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");
          }
       } else {
          if (m_wizardService->HasOldData()) {
             m_usersCommentValue->setText(QString::number(m_wizardService->GetUserCountFromUserRepository(true)));
          } else {
-            qFatal("Не реализованное поедение старые данные есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");
+            qFatal("Не реализованное поведение: старые данные есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");
          }
       }
    }
 }
 
-void ConclusionWizardPage::setRolesLabel(int &roleIndex, const QString &actionWithRoleReposiory)
+void ConclusionWizardPage::SetRolesActionValueLabel(int &roleIndex, const QString &actionWithRoleReposiory)
 {
    switch (roleIndex) {
       case 0:

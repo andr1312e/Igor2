@@ -1,5 +1,5 @@
-#ifndef FCSPAGE_H
-#define FCSPAGE_H
+#ifndef ADMIN_GUI_VIEWS_USERWIZARDPAGE_H
+#define ADMIN_GUI_VIEWS_USERWIZARDPAGE_H
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWizardPage>
@@ -52,10 +52,6 @@ private:
    void createConnections();
 Q_SIGNALS:
    void sendUpdatedDataToParentWizard(const QString &FCS, const QString &rank) const;
-
-   // QWidget interface
-public:
-   //    QSize sizeHint() const override;
 };
 
-#endif // FCSPAGE_H
+#endif // ADMIN_GUI_VIEWS_USERWIZARDPAGE_H

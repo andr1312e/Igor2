@@ -12,11 +12,6 @@
     </desktops>
     <startups>
         <startupApp exec="/home/user/application2"></startupApp>
-        <startupApp exec="/home/user/application3"></startupApp>
-        <startupApp exec="/home/user/application4"></startupApp>
-        <startupApp exec="/home/user/application5"></startupApp>
-        <startupApp exec="/home/user/application6"></startupApp>
-        <startupApp exec="/home/user/application7"></startupApp>
     </startups>
 </FIRSTROLE>
 <SECONDROLE roleName="Оператор">

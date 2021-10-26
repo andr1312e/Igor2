@@ -1,6 +1,6 @@
-#include "appfirstloadingsettingsservice.h"
+#include "firststartsettingsservice.h"
 
-AppFirstLoadlingSettingsService::AppFirstLoadlingSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal)
+FirstStartSettingsService::FirstStartSettingsService(QString &currentUserName, QString &currentUserId, bool hasAdminPrivileges, QWidget *fakeWidget, Terminal *terminal)
    : m_currentUserId(currentUserId)
    , m_currentUserName(currentUserName)
    , m_hasAdminPrivileges(hasAdminPrivileges)
@@ -14,20 +14,20 @@ AppFirstLoadlingSettingsService::AppFirstLoadlingSettingsService(QString &curren
 
 }
 
-AppFirstLoadlingSettingsService::~AppFirstLoadlingSettingsService()
+FirstStartSettingsService::~FirstStartSettingsService()
 {
    delete m_setting;
 }
 
-ProgramFilesState AppFirstLoadlingSettingsService::isAllDataLoaded()//main function
+ProgramState FirstStartSettingsService::IsAllDataLoaded()//main function
 {
    if (m_terminal->IsFileNotExists(m_pathToSettingsFile, "AppFirstLoadlingSettingsService::isAllDataLoaded", m_hasAdminPrivileges)) {
       if (m_hasAdminPrivileges) {
          СreateSettingsFile();
          OpenSettingsFile();
-         return ProgramFilesState::NoFiles;
+         return ProgramState::NoFiles;
       } else {
-         return ProgramFilesState::CantRun;
+         return ProgramState::CantRun;
       }
    } else {
       OpenSettingsFile();
@@ -36,44 +36,44 @@ ProgramFilesState AppFirstLoadlingSettingsService::isAllDataLoaded()//main funct
    }
 }
 
-QString AppFirstLoadlingSettingsService::GetPathUserDbFromSettings()
+QString FirstStartSettingsService::GetPathUserDbFromSettings()
 {
    return m_setting->value(m_pathUserDBKey, "").toString();
 }
 
-QString AppFirstLoadlingSettingsService::GetViewModeFromSettings()
+QString FirstStartSettingsService::GetViewModeFromSettings()
 {
    return m_setting->value(m_viewModeKey, m_viewModeDefaultValue).toString();
 }
 
-bool AppFirstLoadlingSettingsService::GetThemeNameFromSettings()
+bool FirstStartSettingsService::GetThemeNameFromSettings()
 {
    return m_setting->value(m_themeKey, m_themeKeyDefaultValue).toBool();
 }
 
-QString AppFirstLoadlingSettingsService::GetPathToExecFromSettings()
+QString FirstStartSettingsService::GetPathToExecFromSettings()
 {
    return m_setting->value(m_pathToExecsKey, "").toString();
 }
 
-QString AppFirstLoadlingSettingsService::GetPathToUserRolesFromSettings()
+QString FirstStartSettingsService::GetPathToUserRolesFromSettings()
 {
    return m_setting->value(m_pathToRoleFoldersKey, "").toString();
 }
 
-void AppFirstLoadlingSettingsService::OpenSettingsFile()
+void FirstStartSettingsService::OpenSettingsFile()
 {
    m_setting = new QSettings(m_pathToSettingsFile, QSettings::IniFormat);
 }
 
-void AppFirstLoadlingSettingsService::СreateSettingsFile()
+void FirstStartSettingsService::СreateSettingsFile()
 {
    if (m_terminal->IsFileNotExists(m_pathToSettingsFile, "AppFirstLoadlingSettingsService::СreateSettingsFile", m_hasAdminPrivileges)) {
       m_terminal->CreateFile(m_pathToSettingsFile, "AppFirstLoadlingSettingsService::СreateSettingsFile", m_hasAdminPrivileges);
    }
 }
 
-void AppFirstLoadlingSettingsService::GetValuesFromSettingsFile()
+void FirstStartSettingsService::GetValuesFromSettingsFile()
 {
    m_userDBPath = GetPathUserDbFromSettings();
    m_viewMode = GetViewModeFromSettings();
@@ -82,37 +82,37 @@ void AppFirstLoadlingSettingsService::GetValuesFromSettingsFile()
    m_folderPathToRoleFolders = GetPathToUserRolesFromSettings();
 }
 
-ProgramFilesState AppFirstLoadlingSettingsService::CheckIsPathsInSettingsFileCorrect()
+ProgramState FirstStartSettingsService::CheckIsPathsInSettingsFileCorrect()
 {
    if (FodlerPathIsExists(m_folderPathToExecs) || FodlerPathIsExists(m_folderPathToRoleFolders)) {
       if (FilePathIsCorrect(m_userDBPath)) {
-         return ProgramFilesState::Fine;
+         return ProgramState::Fine;
       } else {
          if (m_hasAdminPrivileges) {
             m_validSettingsPaths.append(m_folderPathToRoleFolders);
             m_validSettingsPaths.append(m_folderPathToExecs);
-            return ProgramFilesState::NoUserDb;
+            return ProgramState::NoUserDb;
          } else {
-            return ProgramFilesState::CantRun;
+            return ProgramState::CantRun;
          }
       }
    } else {
       if (m_hasAdminPrivileges) {
          if (FilePathIsCorrect(m_userDBPath)) {
             m_validSettingsPaths.append(m_userDBPath);
-            return ProgramFilesState::NoRoleData;
+            return ProgramState::NoRoleData;
          } else {
-            return ProgramFilesState::NoFiles;
+            return ProgramState::NoFiles;
          }
       } else {
-         return ProgramFilesState::CantRun;
+         return ProgramState::CantRun;
       }
    }
 
 }
 
 
-bool AppFirstLoadlingSettingsService::FilePathIsCorrect(const QString &filePath)
+bool FirstStartSettingsService::FilePathIsCorrect(const QString &filePath)
 {
    if (filePath == "" || m_terminal->IsFileNotExists(filePath, "AppFirstLoadlingSettingsService::FilePathIsCorrect", m_hasAdminPrivileges)) {
       return false;
@@ -121,7 +121,7 @@ bool AppFirstLoadlingSettingsService::FilePathIsCorrect(const QString &filePath)
    return true;
 }
 
-bool AppFirstLoadlingSettingsService::FodlerPathIsExists(const QString &folderPath)
+bool FirstStartSettingsService::FodlerPathIsExists(const QString &folderPath)
 {
    if (folderPath == "" || m_terminal->IsDirNotExists(folderPath, "AppFirstLoadlingSettingsService::FodlerPathIsExists", m_hasAdminPrivileges)) {
       return false;
@@ -130,14 +130,14 @@ bool AppFirstLoadlingSettingsService::FodlerPathIsExists(const QString &folderPa
    return true;
 }
 
-void AppFirstLoadlingSettingsService::wizardFinished(int result)
+void FirstStartSettingsService::wizardFinished(int result)
 {
    Q_UNUSED(result);
    SetSettingsValueToDefault();
-   Q_EMIT allDataLoaded();
+   Q_EMIT AllDataLoaded();
 }
 
-void AppFirstLoadlingSettingsService::SetSettingsValueToDefault()
+void FirstStartSettingsService::SetSettingsValueToDefault()
 {
    m_setting->setValue(m_viewModeKey, m_viewModeDefaultValue);
    m_setting->setValue(m_themeKey, m_themeKeyDefaultValue);

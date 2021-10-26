@@ -1,5 +1,5 @@
-#ifndef FCSWIDGET_H
-#define FCSWIDGET_H
+#ifndef ADMIN_GUI_VIEWS_USERWIZARDWIDGET_H
+#define ADMIN_GUI_VIEWS_USERWIZARDWIDGET_H
 
 #include <QComboBox>
 #include <QLabel>
@@ -46,4 +46,4 @@ private:
    void createConnections();
 };
 
-#endif // FCSWIDGET_H
+#endif // ADMIN_GUI_VIEWS_USERWIZARDWIDGET_H
