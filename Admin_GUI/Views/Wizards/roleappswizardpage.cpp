@@ -30,6 +30,7 @@ void RoleAppsWizardPage::initializePage()
 {
    QStringList currentStartups;
    QList<DesktopEntity> currentDesktops;
+   m_actionComboBox->clear();
 
    if (m_wizardService->HasBackup()) {
       m_wizardService->GetDataFromDesktopRepository(m_currentRoleIndex, false, currentDesktops, currentStartups);

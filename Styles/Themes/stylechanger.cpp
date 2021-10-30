@@ -4,39 +4,35 @@
 #include <QDebug>
 
 StyleChanger::StyleChanger(QApplication *app)
-    : currentThemeIsWhite(true)
-    , m_myApp(app)
+   : currentThemeIsWhite(true)
+   , m_myApp(app)
 {
-    m_darkTheme=new Theme(darkThemeColor, darkThemeDisabledColor);
-    m_astraTheme=new Theme(astraThemeColor, astraThemeDisabledColor);
-    m_darkTheme->ApplyTheme(app);
-    QFile styleSheetFile(":/Styles/Themes/style.qss");
-    if (styleSheetFile.open(QIODevice::ReadOnly| QIODevice::Text))
-    {
-        m_styleSheet=QString(styleSheetFile.readAll());
-        styleSheetFile.close();
-    }
-    else
-    {
-        qFatal("styleSheet не найден");
-    }
+   m_darkTheme = new Theme(darkThemeColor, darkThemeDisabledColor);
+   m_whiteTheme = new Theme(astraThemeColor, astraThemeDisabledColor);
+   m_darkTheme->ApplyTheme(app);
+   QFile styleSheetFile(":/Styles/Themes/style.qss");
+
+   if (styleSheetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      m_styleSheet = QString(styleSheetFile.readAll());
+      styleSheetFile.close();
+   } else {
+      qFatal("Каскадная таблица стилей не найден");
+   }
 }
 
 StyleChanger::~StyleChanger()
 {
-    delete m_darkTheme;
-    delete m_astraTheme;
+   delete m_darkTheme;
+   delete m_whiteTheme;
 }
 
-void StyleChanger::changeTheme(bool state)
+void StyleChanger::hangeTheme(bool setDarkTheme)
 {
-    if (state)
-    {
-        m_astraTheme->ApplyTheme(m_myApp);
-    }
-    else
-    {
-        m_darkTheme->ApplyTheme(m_myApp);
-    }
-    m_myApp->setStyleSheet(m_styleSheet);
+   if (setDarkTheme) {
+      m_darkTheme->ApplyTheme(m_myApp);
+   } else {
+      m_whiteTheme->ApplyTheme(m_myApp);
+   }
+
+   m_myApp->setStyleSheet(m_styleSheet);
 }

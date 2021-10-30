@@ -26,8 +26,12 @@ UserWizardWidget::~UserWizardWidget()
    delete m_accountsData;
 }
 
-void UserWizardWidget::setWizardWidgetFileds(QString &title, QString &FCS, QString &rank, QVector<User> &users)
+void UserWizardWidget::setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QVector<User> &users)
 {
+   m_accountsData->setStyleSheet("background-color: red");
+   m_accountsData->setAutoFillBackground(true);
+
+
    m_topLabel->setText(title);
    m_fcsLineEdit->setText(FCS);
    m_rankComboBox->setCurrentText(rank);
@@ -80,6 +84,8 @@ void UserWizardWidget::initUI()
    m_numOfUsersValue = new QLabel();
 
    m_accountsData = new QTableWidget();
+
+
    m_accountsData->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
@@ -99,9 +105,7 @@ void UserWizardWidget::insertWidgetsIntoLayout()
    m_mainLayout->addLayout(m_userRankLayout);
    m_mainLayout->addLayout(m_numOfUsersLayout);
    m_mainLayout->addWidget(m_accountsData);
-   //    setMinimumSize(500, 500);
    setLayout(m_mainLayout);
-   //        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
 void UserWizardWidget::createConnections()

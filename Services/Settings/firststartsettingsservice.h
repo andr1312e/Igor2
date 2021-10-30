@@ -24,57 +24,27 @@ public:
 
    ProgramState IsAllDataLoaded();
 
-   QString &GetUserDBPathValue()
-   {
-      return m_userDBPath;
-   }
+   QString &GetUserDBPathValue();
 
-   QString &GetViewModeValue()
-   {
-      return m_viewMode;
-   }
+   QString &GetViewModeValue();
 
-   bool GetThemeValue()
-   {
-      return m_theme;
-   }
+   bool GetThemeValue() const;
 
-   QString &GetFolderPathToExecsValue()
-   {
-      return m_folderPathToExecs;
-   }
+   QString &GetFolderPathToExecsValue();
 
-   QString &GetFolderPathToRoleFoldersValue()
-   {
-      return m_folderPathToRoleFolders;
-   }
+   QString &GetFolderPathToRoleFoldersValue();
 
 public:
 
-   const QString &GetUserName()
-   {
-      return m_currentUserName;
-   }
+   const QString &GetUserName() const;
 
-   const QString &GetUserId()
-   {
-      return m_currentUserId;
-   }
+   const QString &GetUserId() const;
 
-   Terminal *GetTerminal()
-   {
-      return m_terminal;
-   }
+   Terminal *GetTerminal() const;
 
-   QStringList &GetValidSettingsPaths()
-   {
-      return m_validSettingsPaths;
-   }
+   QStringList &GetValidSettingsPaths();
 
-   const QStringList &GetDefaultSettingsPaths()
-   {
-      return m_defaultSettingsPaths;
-   }
+   const QStringList &GetDefaultSettingsPaths() const;
 
 Q_SIGNALS:
 
@@ -116,7 +86,7 @@ private:
 
    const QString m_viewModeKey = "viewmode";
 
-   const QString m_themeKey = "whitetheme";
+   const QString m_themeKey = "blacked";
 
    const QString m_pathToExecsKey = "execslist";
 

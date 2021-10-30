@@ -19,7 +19,7 @@ class UserWizardWidget : public QWidget
 public:
    explicit UserWizardWidget(const QStringList &headerLabels, QWidget *parent);
    ~UserWizardWidget();
-   void setWizardWidgetFileds(QString &title, QString &FCS, QString &rank, QVector<User> &users);
+   void setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QVector<User> &users);
    QString getUserChoise();
 private:
    const QStringList &m_headerLabels;

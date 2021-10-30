@@ -1,9 +1,9 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *appFirstLoadingService, QWidget *parent)
+StartupWizard::StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *firstStartSettingService, QWidget *parent)
    : QWizard(parent)
    , m_programState(loadedDbAdnRolesState)
-   , m_firstStartSettingService(appFirstLoadingService)
+   , m_firstStartSettingService(firstStartSettingService)
 {
    CreateServices();
    CreateUI();
@@ -24,22 +24,23 @@ StartupWizard::~StartupWizard()
    }
 
    delete m_conclusionPage;
+   delete m_themePushButton;
 }
 
 void StartupWizard::accept()
 {
    m_wizardService->ApplyWizard();
-   Q_EMIT finish();
+   Q_EMIT WizardFinished();
    QWizard::accept();
 }
 
 void StartupWizard::reject()
 {
    QWizard::reject();
-   qFatal("Дописать StartupWizard::reject");
+   Q_EMIT WizardRejected();
 }
 
-void StartupWizard::showHelp()
+void StartupWizard::OnHelpButtonClick()
 {
    QString message;
    bool hasBackUp = m_wizardService->HasBackup();
@@ -140,6 +141,18 @@ void StartupWizard::showHelp()
    QMessageBox::information(this, "Окно справки", message);
 }
 
+void StartupWizard::OnThemeButtonClick(bool checked)
+{
+   if (checked) {
+      m_themePushButton->setIcon(QIcon(":/images/sun"));
+   } else {
+      m_themePushButton->setIcon(QIcon(":/images/moon"));
+   }
+
+   m_themePushButton->setIconSize(QSize(30, 30));
+   Q_EMIT ChangeTheme(checked);
+}
+
 void StartupWizard::CreateServices()
 {
    m_wizardService = new WizardService(m_programState, m_firstStartSettingService->GetUserName(), m_firstStartSettingService->GetUserId(), m_firstStartSettingService->GetValidSettingsPaths(), m_firstStartSettingService->GetDefaultSettingsPaths(), m_firstStartSettingService->GetTerminal(), nullptr);
@@ -147,9 +160,19 @@ void StartupWizard::CreateServices()
 
 void StartupWizard::CreateUI()
 {
-   m_introPage = new IntroPage(m_programState, m_wizardService, this);
+   m_themePushButton = new QPushButton();
+   m_themePushButton->setCheckable(true);
+   m_themePushButton->setChecked(m_firstStartSettingService->GetThemeValue());
+   m_themePushButton->setFlat(true);
+   m_themePushButton->setDefault(false);
+   m_themePushButton->setAutoDefault(false);
+   m_themePushButton->setFocusPolicy(Qt::NoFocus);
+   m_themePushButton->setIcon(QIcon(":/images/sun"));
+   m_themePushButton->setIconSize(QSize(30, 30));
 
-   m_userWizardPage = new UserWizardPage(m_wizardService, this);
+   m_introPage = new IntroPage(m_programState, m_wizardService, m_themePushButton, this);
+
+   m_userWizardPage = new UserWizardPage(m_wizardService, m_themePushButton, this);
    m_rolesPages.resize(Roles.size());
 
    for (int i = 0; i < Roles.size(); i++) {
@@ -157,6 +180,7 @@ void StartupWizard::CreateUI()
    }
 
    m_conclusionPage = new ConclusionWizardPage(m_wizardService, this);
+
 }
 
 void StartupWizard::InitSizes()
@@ -188,5 +212,6 @@ void StartupWizard::InitBehaviour()
 
 void StartupWizard::CreateConnections()
 {
-   connect(this, &QWizard::helpRequested, this, &StartupWizard::showHelp);
+   connect(this, &QWizard::helpRequested, this, &StartupWizard::OnHelpButtonClick);
+   connect(m_themePushButton, &QPushButton::clicked, this, &StartupWizard::OnThemeButtonClick);
 }

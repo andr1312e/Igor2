@@ -13,19 +13,19 @@
 #include "Services/Settings/programfilesstate.h"
 
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
+#include "Admin_GUI/Views/Wizards/mywizardpage.h"
 
-class IntroPage : public QWizardPage
+class IntroPage : public MyWizardPage
 {
    Q_OBJECT
 public:
-   IntroPage(const ProgramState &state, WizardService *service, QWidget *parent);
+   explicit IntroPage(const ProgramState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent);
    ~IntroPage();
    int nextId() const override;
 private:
    const ProgramState m_state;
    WizardService *m_wizardService;
 
-   QVBoxLayout *m_mainLayout;
    QLabel *m_topLabel;
    QVBoxLayout *m_backupFileLayout;
    QHBoxLayout *m_backupFileLoadLayout;
@@ -38,7 +38,7 @@ private:
 private:
    void SetWizardTitle();
    void CreateUI();
-   void InsertWidgetsIntoLayout();
+   void InsertWidgetsIntoLayout(QPushButton *themePushButton);
    void CreateConnections();
 private Q_SLOTS:
    void CheckBackupFile();

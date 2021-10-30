@@ -11,73 +11,75 @@
 
 class TopBar : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    explicit TopBar(QWidget *parent);
+   explicit TopBar(QWidget *parent);
 
-    ~TopBar();
+   ~TopBar();
 
-    void setData(QString &rank, QString &FCS, QString &role);
+   void SetData(QString &rank, QString &FCS, QString &role);
 
-signals:
+Q_SIGNALS:
 
-    void hideAdditionalSettings(bool state);
-    void setTheme(bool state);
-
-private:
-
-    void initUI();
-
-    void applyStyle();
-
-    void insertWidgetsIntoLayouts();
-
-    void createConnections();
+   void HideAdditionalSettings(bool state);
+   void ChangeTheme(bool state);
 
 private:
 
-    bool m_isAstraTheme;
+   void CreateUI();
 
-    bool m_settingsSetHidden;
+   void ApplyStyle();
 
-    QFont *m_titleFont;
+   void InsertWidgetsIntoLayouts();
 
-    int m_oldFontSize;
-
-    QDateTime *m_dateTime;
-
-    QTimer *m_timer;
-
-    QHBoxLayout *m_userInfoLayout;
-
-    QLabel *m_currentUserNameLabel;
-
-    QLabel *m_currentTimeLabel;
-
-    QLabel *m_currentUseRoleLabel;
-
-    QPushButton *m_settingsPushButtton;
-
-    QPushButton *m_themePushButton;
-
-    QSize *m_iconsSize;
-
-private slots:
-
-    void onSettingsButtonClick(bool state);
-    void onThemeButtonClick(bool state);
-    void refreshDateTime();
+   void CreateConnections();
 
 private:
 
-    bool isNeedToUpdateFontSize(int width);
-    void updateFontSize();
+   bool m_isWhiteTheme;
+
+   bool m_settingsSetHidden;
+
+   QFont *m_titleFont;
+
+   const int m_iconSize;
+
+   int m_oldFontSize;
+
+   QDateTime *m_dateTime;
+
+   QTimer *m_timer;
+
+   QHBoxLayout *m_userInfoLayout;
+
+   QLabel *m_currentUserNameLabel;
+
+   QLabel *m_currentTimeLabel;
+
+   QLabel *m_currentUseRoleLabel;
+
+   QPushButton *m_settingsPushButtton;
+
+   QPushButton *m_themePushButton;
+
+   QSize *m_iconsSize;
+
+private Q_SLOTS:
+
+   void OnSettingsButtonClick(bool state);
+   void OnThemeButtonClick(bool state);
+   void RefreshDateTime();
+
+private:
+
+   bool IsNeedToUpdateFontSize(int width);
+   void UpdateFontSize();
 
 protected:
 
-    void resizeEvent(QResizeEvent *event);
+   void resizeEvent(QResizeEvent *event);
 };
 
 #endif // ADMIN_GUI_VIEWS_TOPBAR_H

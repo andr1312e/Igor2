@@ -10,6 +10,7 @@
 class RolesAndStartupsWizardRepository
 {
 public:
+
    explicit RolesAndStartupsWizardRepository(Terminal *terminal);
 
    ~RolesAndStartupsWizardRepository();

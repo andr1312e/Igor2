@@ -8,7 +8,7 @@ QT += core xml network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
 
-TARGET      = "Панель управления пользователями РЛС ТИ версия 52"
+TARGET      = "53"
 TEMPLATE    = app
 DESTDIR     = $$PWD/../bin
 RESOURCES += \
@@ -27,8 +27,8 @@ DEFINES +=                 \
 SOURCES += \
     Admin_GUI/Validator/stringvalidator.cpp \
     Admin_GUI/Views/Wizards/conclusionwizardpage.cpp \
-    Admin_GUI/Views/Wizards/framelesswizard.cpp \
     Admin_GUI/Views/Wizards/intropage.cpp \
+    Admin_GUI/Views/Wizards/mywizardpage.cpp \
     Admin_GUI/Views/Wizards/roleappswizardpage.cpp \
     Admin_GUI/Views/Wizards/roleappswizardsubwidget.cpp \
     Admin_GUI/Views/Wizards/userwizardpage.cpp \
@@ -44,6 +44,7 @@ SOURCES += \
     Styles/InteractiveButtons/minimizewindowbutton.cpp \
     Styles/InteractiveButtons/restorewindowbutton.cpp \
     Styles/Themes/stylechanger.cpp \
+    Styles/Themes/theme.cpp \
     functionswithstrings.cpp \
     main.cpp \
     Services/integrityservice.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     Admin_GUI/Views/Wizards/actions.h \
     Admin_GUI/Views/Wizards/conclusionwizardpage.h \
     Admin_GUI/Views/Wizards/intropage.h \
+    Admin_GUI/Views/Wizards/mywizardpage.h \
     Admin_GUI/Views/Wizards/roleappswizardpage.h \
     Admin_GUI/Views/Wizards/roleappswizardsubwidget.h \
     Admin_GUI/Views/Wizards/userwizardpage.h \
@@ -136,6 +138,7 @@ HEADERS += \
     Admin_GUI/Delegates/userdelegate.h \
     Admin_GUI/Views/qtoast.h \  \
     Styles/Themes/stylechanger.h \
+    Styles/Themes/theme.h \
     Styles/Themes/themecolors.h \
     Admin_GUI/Widgets/qtmaterialtoggle_internal.h \
     Admin_GUI/Widgets/qtmaterialtoggle_p.h \

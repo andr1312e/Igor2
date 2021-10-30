@@ -30,19 +30,21 @@ class Program : public QApplication
 public:
    explicit Program(int &argc, char **argv);
    virtual ~Program();
-   bool hasNoRunningInscance();
-   void createApp();
+   bool HasNoRunningInscance();
+   void CreateApp();
 
 private:
 
-   void initTerminal();
-   void initUserService();
-   void getCurrentUserSystemData();
+   void InitTerminal();
+   void InitUserService();
+   void GetCurrentUserNameIdAndAdminPriviliges();
 
-   void initSettingsService();
-   void LoadDbAndRoles();
+   void InitSettingsService();
+   void GetProgramState();
 
    void ProcessDataLoading();
+   void InitStyle();
+   void InitFramelessWindow();
    void StartSettingsWizard();
 private Q_SLOTS:
 
@@ -50,21 +52,21 @@ private Q_SLOTS:
 
 public:
 
-   void getSettings();
+   void GetSettings();
 
-   void initRunnableService();
-   bool allAppsRunned();
+   void InitRunnableService();
+   bool AllAppsRunned();
 
-   void initAdminServices();
-   void initRarmSocket();
+   void InitAdminServices();
+   void InitRarmSocket();
 
-   void initAdminUI();
+   void InitAdminUI();
 
-   void startAdminServices();
+   void StartAdminServices();
 
-   void createConnections();
+   void CreateConnections();
 
-   void initStyle();
+
 
 private:
 

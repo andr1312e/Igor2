@@ -36,6 +36,56 @@ ProgramState FirstStartSettingsService::IsAllDataLoaded()//main function
    }
 }
 
+QString &FirstStartSettingsService::GetUserDBPathValue()
+{
+   return m_userDBPath;
+}
+
+QString &FirstStartSettingsService::GetViewModeValue()
+{
+   return m_viewMode;
+}
+
+bool FirstStartSettingsService::GetThemeValue() const
+{
+   return m_theme;
+}
+
+QString &FirstStartSettingsService::GetFolderPathToExecsValue()
+{
+   return m_folderPathToExecs;
+}
+
+QString &FirstStartSettingsService::GetFolderPathToRoleFoldersValue()
+{
+   return m_folderPathToRoleFolders;
+}
+
+const QString &FirstStartSettingsService::GetUserId() const
+{
+   return m_currentUserId;
+}
+
+Terminal *FirstStartSettingsService::GetTerminal() const
+{
+   return m_terminal;
+}
+
+QStringList &FirstStartSettingsService::GetValidSettingsPaths()
+{
+   return m_validSettingsPaths;
+}
+
+const QStringList &FirstStartSettingsService::GetDefaultSettingsPaths() const
+{
+   return m_defaultSettingsPaths;
+}
+
+const QString &FirstStartSettingsService::GetUserName() const
+{
+   return m_currentUserName;
+}
+
 QString FirstStartSettingsService::GetPathUserDbFromSettings()
 {
    return m_setting->value(m_pathUserDBKey, "").toString();

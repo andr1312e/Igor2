@@ -1,19 +1,17 @@
 #include "userwizardpage.h"
 
-UserWizardPage::UserWizardPage(WizardService *service, QWidget *parent)
-   : QWizardPage(parent)
+UserWizardPage::UserWizardPage(WizardService *service, QPushButton *themePushButton, QWidget *parent)
+   : MyWizardPage(parent)
    , m_wizardService(service)
    , m_oldDataUsageValue(false)
 {
-   initUI();
-   insertWidgetsIntoLayout();
-   createConnections();
+   CreateUI();
+   InsertWidgetsIntoLayout(themePushButton);
+   CreateConnections();
 }
 
 UserWizardPage::~UserWizardPage()
 {
-   delete m_mainLayout;
-
    delete m_topLabel;
    delete m_oldFCSWidget;
    delete m_backupFCSWidget;
@@ -29,6 +27,7 @@ void UserWizardPage::initializePage()
 {
    QString adminFCS, adminRank;
    QVector<User> users;
+   m_actionComboBox->clear();
 
    if (m_wizardService->HasBackup()) {
       m_backupFCSWidget->setVisible(true);
@@ -70,33 +69,28 @@ bool UserWizardPage::isComplete() const
    //       return !m_backupFCSLineEdit->text().remove(' ').isEmpty();
 }
 
-void UserWizardPage::initUI()
+void UserWizardPage::CreateUI()
 {
-   m_mainLayout = new QVBoxLayout();
    m_topLabel = new QLabel("Данные администратора");
    m_oldFCSWidget = new UserWizardWidget(m_tableHeader, this);
    m_backupFCSWidget = new UserWizardWidget(m_tableHeader, this);
    m_actionComboBox = new QComboBox();
 }
 
-void UserWizardPage::insertWidgetsIntoLayout()
+void UserWizardPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
 {
-   m_mainLayout->addWidget(m_topLabel);
+   MainLayout()->addWidget(themePushButton, 0, Qt::AlignRight);
+   MainLayout()->addWidget(m_topLabel);
 
-   m_mainLayout->addWidget(m_oldFCSWidget);
-   m_mainLayout->addWidget(m_backupFCSWidget);
-   m_mainLayout->addWidget(m_actionComboBox);
-   //    m_mainLayout->setSizeConstraint(QLayout::SetMaximumSize);
-
-   setLayout(m_mainLayout);
+   MainLayout()->addWidget(m_oldFCSWidget);
+   MainLayout()->addWidget(m_backupFCSWidget);
+   MainLayout()->addWidget(m_actionComboBox);
 
 }
 
-void UserWizardPage::createConnections()
+void UserWizardPage::CreateConnections()
 {
-   connect(m_actionComboBox, &QComboBox::currentTextChanged, [&](const QString & text) {
-      m_wizardService->SetActionWithUserRepository(text);
-   });
+   connect(m_actionComboBox, &QComboBox::currentTextChanged, m_wizardService, &WizardService::SetActionWithUserRepository);
 }
 
 //QSize FCSPage::sizeHint() const

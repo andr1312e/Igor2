@@ -1,8 +1,6 @@
 #ifndef SERVICES_SETTINGS_WIZARDSERVICE_H
 #define SERVICES_SETTINGS_WIZARDSERVICE_H
 
-#include <QObject>
-
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 #include "Services/Settings/usersettingsrepository.h"
 #include "Services/Settings/programfilesstate.h"
@@ -35,8 +33,6 @@ public:
 
    int GetUserCountFromDesktopRepository(const int roleIndex, const bool isOldData);
 
-   void SetActionWithUserRepository(const QString &actionWithUserRepository);
-
    QString &GetActionWithUserRepository();
 
    void SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository);
@@ -44,6 +40,10 @@ public:
    const QString &GetActionWithRoleRepository(const int roleIndex);
 
    void ApplyWizard();
+
+public Q_SLOTS:
+
+   void SetActionWithUserRepository(const QString &actionWithUserRepository);
 
 private:
 

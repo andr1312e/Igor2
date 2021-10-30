@@ -3,15 +3,15 @@
 #include <QMessageBox>
 
 
-IntroPage::IntroPage(const ProgramState &state, WizardService *service, QWidget *parent)
-   : QWizardPage(parent)
+IntroPage::IntroPage(const ProgramState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent)
+   : MyWizardPage(parent)
    , m_state(state)
    , m_wizardService(service)
 
 {
    CreateUI();
    SetWizardTitle();
-   InsertWidgetsIntoLayout();
+   InsertWidgetsIntoLayout(themePushButton);
    CreateConnections();
 }
 
@@ -19,7 +19,6 @@ IntroPage::~IntroPage()
 {
    delete m_backupFileLayout;
    delete m_backupFileLoadLayout;
-   delete m_mainLayout;
 
    delete m_topLabel;
    delete m_backupLoadButton;
@@ -41,8 +40,6 @@ void IntroPage::SetWizardTitle()
 
 void IntroPage::CreateUI()
 {
-   m_mainLayout = new QVBoxLayout();
-
    QString needToUpdate;
 
    switch (m_state) {
@@ -85,9 +82,12 @@ void IntroPage::CreateUI()
    m_backupLineEdit = new QLineEdit();
    m_backupLineEdit->setText("");
    m_faqLabel = new QLabel("<html>Краткое руководство - процесс настройки состоит из шагов:<ul><li>Внесение в базу ФИО Администратора</li><li>Заполнение ролей</li></ul> Заполнение ролей состоит из шагов:<ul><li></li><li>Заполнение доступных программ для запуска на рабочем столе</li><li>Заполнение списка программ которые будут перезапущены</li></ul></html>");
+
+   m_backupLineEdit->setFrame(false);
+
 }
 
-void IntroPage::InsertWidgetsIntoLayout()
+void IntroPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
 {
    m_backupFileLoadLayout->addWidget(m_backupLineEdit);
    m_backupFileLoadLayout->addWidget(m_backupLoadButton);
@@ -96,11 +96,11 @@ void IntroPage::InsertWidgetsIntoLayout()
    m_backupFileLayout->addLayout(m_backupFileLoadLayout);
    m_backupFileLayout->setContentsMargins(30, 0, 0, 0);
 
-   m_mainLayout->addWidget(m_topLabel);
-   m_mainLayout->addLayout(m_backupFileLayout);
-   m_mainLayout->addWidget(m_faqLabel);
+   MainLayout()->addWidget(themePushButton, 0, Qt::AlignRight);
+   MainLayout()->addWidget(m_topLabel);
+   MainLayout()->addLayout(m_backupFileLayout);
+   MainLayout()->addWidget(m_faqLabel);
 
-   setLayout(m_mainLayout);
 }
 
 void IntroPage::CreateConnections()
@@ -110,6 +110,14 @@ void IntroPage::CreateConnections()
 
 void IntroPage::CheckBackupFile()
 {
+
+   QPalette bgpal;
+   bgpal.setColor(QPalette::Base, Qt::red);
+   bgpal.setColor(QPalette::Text, Qt::green);
+   m_backupLineEdit->setPalette(bgpal);
+   //     m_backupLineEdit->setFrame(false);
+   //   m_backupLineEdit->setStyleSheet("background-color: red");
+   //   m_backupLineEdit->setFrame(false);
    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
    m_backupFilePath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.sync)");
 

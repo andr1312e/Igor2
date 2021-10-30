@@ -12,7 +12,6 @@
 
 #include "Services/Settings/firststartsettingsservice.h"
 
-
 #include "Admin_GUI/Views/Wizards/intropage.h"
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
 #include "Admin_GUI/Views/Wizards/userwizardpage.h"
@@ -23,19 +22,24 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *appFirstLoadingService, QWidget *parent);
+   StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *firstStartSettingService, QWidget *parent);
    ~StartupWizard();
    void accept() override;
    void reject() override;
 Q_SIGNALS:
-   void finish();
+   void WizardFinished();
+   void WizardRejected();
+   void ChangeTheme(bool state);
 private Q_SLOTS:
-   void showHelp();
+   void OnHelpButtonClick();
+   void OnThemeButtonClick(bool checked);
 private:
    ProgramState m_programState;
    FirstStartSettingsService *m_firstStartSettingService;
+
    WizardService *m_wizardService;
 
+   QPushButton *m_themePushButton;
    IntroPage *m_introPage;
    UserWizardPage *m_userWizardPage;
    QVector<RoleAppsWizardPage *> m_rolesPages;

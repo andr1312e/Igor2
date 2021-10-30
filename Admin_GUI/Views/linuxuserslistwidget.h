@@ -19,62 +19,62 @@
 
 class LinuxUsersListWidget : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
 
-    LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
-    ~LinuxUsersListWidget();
+   LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
+   ~LinuxUsersListWidget();
 
-signals:
+Q_SIGNALS:
 
-    void onUserClick(User &user);
-    void search(const QString &text, const QString &attribute);
-
-private:
-
-    void createProxyModel(UserModel *userModel);
-    void initUI();
-    void insertWidgetsIntoLayout();
-    void setModelToView();
-    void createConnections();
+   void OnUserClick(User &user);
+   void Search(const QString &text, const QString &attribute);
 
 private:
 
-    QFont *m_font;
-
-    int m_oldFontSize;
-
-    QVBoxLayout *m_mainLayout;
-
-    QLabel *m_linuxUsersLabel;
-
-    QHBoxLayout *m_searchLayout;
-
-    QLineEdit *m_searchLineEdit;
-
-    QComboBox *m_searchTypeComboBox;
-
-    QListView *m_allUsersListView;
-
-    UserDelegate *m_userDelegate;
-
-    QStandardItemModel *m_model;
-
-    SortModel *m_sortModel;
+   void CreateProxyModel(UserModel *userModel);
+   void CreateUI();
+   void InsertWidgetsIntoLayout();
+   void SetModelToListView();
+   void CreateConnections();
 
 private:
 
-    void updateFontSize();
+   QFont *m_font;
 
-private slots:
+   int m_oldFontSize;
 
-    void onLineEditChange(const QString &text);
-    void onComboBoxChange(const QString &attribute);
-    void getUserData(const QModelIndex &index);
+   QVBoxLayout *m_mainLayout;
+
+   QLabel *m_linuxUsersLabel;
+
+   QHBoxLayout *m_searchLayout;
+
+   QLineEdit *m_searchLineEdit;
+
+   QComboBox *m_searchTypeComboBox;
+
+   QListView *m_allUsersListView;
+
+   UserDelegate *m_userDelegate;
+
+   QStandardItemModel *m_model;
+
+   SortModel *m_sortModel;
+
+private:
+
+   void UpdateFontSize();
+
+private Q_SLOTS:
+
+   void OnLineEditChange(const QString &text);
+   void OnComboBoxChange(const QString &attribute);
+   void GetUserData(const QModelIndex &index);
 
 protected:
 
-    void resizeEvent(QResizeEvent *event) override;
+   void resizeEvent(QResizeEvent *event) override;
 
 };
 

@@ -45,7 +45,7 @@ Program::~Program()
    }
 }
 
-bool Program::hasNoRunningInscance()
+bool Program::HasNoRunningInscance()
 {
    if (m_sharedMemory->attach(QSharedMemory::ReadOnly)) {
       m_sharedMemory->detach();
@@ -60,13 +60,13 @@ bool Program::hasNoRunningInscance()
    }
 }
 
-void Program::createApp()//MAIN
+void Program::CreateApp()//MAIN
 {
-   initTerminal();
-   initUserService();
-   getCurrentUserSystemData();
-   initSettingsService();
-   LoadDbAndRoles();
+   InitTerminal();
+   InitUserService();
+   GetCurrentUserNameIdAndAdminPriviliges();
+   InitSettingsService();
+   GetProgramState();
    ProcessDataLoading();
 }
 
@@ -76,6 +76,8 @@ void Program::ProcessDataLoading()
       case NoFiles:
       case NoUserDb:
       case NoRoleData: {
+         InitStyle();
+         InitFramelessWindow();
          StartSettingsWizard();
          break;
       }
@@ -87,84 +89,103 @@ void Program::ProcessDataLoading()
 
       case CantRun: {
          QMessageBox::critical(nullptr, "Приложение не может запуститься", "Файл настроек  имеет неверную структуру, обратитесь к Администратору для решения проблемы", QMessageBox::Ok);
-         break;
+         this->exit(0);
       }
    }
+}
+
+void Program::InitStyle()
+{
+   this->setStyle(QStringLiteral("Fusion"));
+   m_proxyStyle = new StyleChanger(this);
+   m_proxyStyle->hangeTheme(m_settingFileService->GetThemeValue());
+}
+
+void Program::InitFramelessWindow()
+{
+   m_framelessWindow = new FramelessWindow(nullptr);
+   m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
+   m_framelessWindow->SetWindowTitle("Мастер первоначальной настройки");
+
 }
 
 void Program::StartSettingsWizard()
 {
    m_startupWizard = new StartupWizard(m_loadedDbAdnRolesState, m_settingFileService, nullptr);
-   connect(m_startupWizard, &StartupWizard::finish, this, &Program::ContinueLoading);
-   m_startupWizard->show();
+   connect(m_startupWizard, &StartupWizard::ChangeTheme, m_proxyStyle, &StyleChanger::hangeTheme);
+   connect(m_startupWizard, &StartupWizard::WizardFinished, this, &Program::ContinueLoading);
+   connect(m_startupWizard, &StartupWizard::WizardRejected, [&]() {
+      this->exit();
+   });
+   m_framelessWindow->SetMainWidget(m_startupWizard);
+   m_framelessWindow->show();
 }
 
 void Program::ContinueLoading()
 {
-   getSettings();
-   initRunnableService();
+   GetSettings();
+   InitRunnableService();
 
-   if (allAppsRunned()) {
-      initRarmSocket();
-      createConnections();
+   if (AllAppsRunned()) {
+      InitRarmSocket();
+      CreateConnections();
 
       if (m_hasAdminPrivileges) {
-         initAdminServices();
-         initAdminUI();
-         initStyle();
+         InitAdminServices();
+         InitAdminUI();
       }
    }
 }
 
-void Program::initTerminal()
+void Program::InitTerminal()
 {
    m_terminal = new Terminal();
 }
 
-void Program::initUserService()
+void Program::InitUserService()
 {
    m_linuxUserService = new LinuxUserService(m_terminal);
 }
 
-void Program::getCurrentUserSystemData()
+void Program::GetCurrentUserNameIdAndAdminPriviliges()
 {
    m_hasAdminPrivileges = m_linuxUserService->hasCurrentUserAdminPrivileges();
    m_currentUserName = m_linuxUserService->getCurrentUserName();
    m_currentUserId = m_linuxUserService->getCurrentUserId();
 }
 
-void Program::initSettingsService()
+void Program::InitSettingsService()
 {
    m_settingFileService = new FirstStartSettingsService(m_currentUserName, m_currentUserId, m_hasAdminPrivileges, m_fakeUI, m_terminal);
 }
 
-void Program::LoadDbAndRoles()
+void Program::GetProgramState()
 {
    m_loadedDbAdnRolesState = m_settingFileService->IsAllDataLoaded();
 }
 
-void Program::getSettings()
+void Program::GetSettings()
 {
    m_userDBPath = m_settingFileService->GetUserDBPathValue();
 }
 
-void Program::initRunnableService()
+void Program::InitRunnableService()
 {
    m_startupRunnableService = new StartupRunnableService(m_terminal, this);
 }
 
-bool Program::allAppsRunned()
+bool Program::AllAppsRunned()
 {
    return true;
    //    return m_startupRunnableService->run(m_linuxUserService->getCurrentUserName());
 }
 
-void Program::initRarmSocket()
+void Program::InitRarmSocket()
 {
    m_socketToRarm = new SocketToRarm("127.0.0.1:4242", this);
 }
 
-void Program::initAdminServices()
+void Program::InitAdminServices()
 {
    m_dataBaseService = new DatabaseService(m_terminal);
    m_dataBaseService->loadFromFile(m_userDBPath);
@@ -172,32 +193,26 @@ void Program::initAdminServices()
    m_linuxUserService->getAllUsersInSystem();
 }
 
-void Program::initAdminUI()
+void Program::InitAdminUI()
 {
    if (m_indentifyService->canGetAccess()) {
-      m_framelessWindow = new FramelessWindow(Q_NULLPTR);
+
       m_AdminGui = new Admin_GUI(m_dataBaseService, m_linuxUserService);
-      m_framelessWindow->setWindowIcon(QIcon(":/images/ico.png"));
-      m_framelessWindow->setWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
-      m_framelessWindow->setAdminGUI(m_AdminGui);
-      m_framelessWindow->show();
+      connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &StyleChanger::hangeTheme);
+      m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
+      m_framelessWindow->SetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
+      m_framelessWindow->SetMainWidget(m_AdminGui);
    }
 }
 
-void Program::createConnections()
+void Program::CreateConnections()
 {
    connect(m_startupRunnableService, &StartupRunnableService::programFall, m_socketToRarm, &SocketToRarm::programFall);
 }
 
-void Program::initStyle()
-{
-   this->setStyle(QStringLiteral("Fusion"));
-   m_proxyStyle = new StyleChanger(this);
-   m_proxyStyle->changeTheme(m_settingFileService->GetThemeValue());
-   connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &StyleChanger::changeTheme);
-}
 
-void Program::startAdminServices()
+
+void Program::StartAdminServices()
 {
    m_linuxUserService->getAllUsersInSystem();
 }
