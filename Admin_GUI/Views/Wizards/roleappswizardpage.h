@@ -19,8 +19,8 @@ class RoleAppsWizardPage : public QWizardPage
 public:
    RoleAppsWizardPage(const QString &role, const int currentRoleIndex, WizardService *service, QWidget *parent);
    ~RoleAppsWizardPage();
-   int nextId() const override;
-   void initializePage() override;
+   int nextId() const Q_DECL_OVERRIDE;
+   void initializePage() Q_DECL_OVERRIDE;
    QString GetUserChoise();
 
 private:
@@ -38,7 +38,7 @@ private:
 private:
    void CreateUI(const QString &role);
    void InsertWidgetsIntoLayout();
-   void CreateConnections();
+   void ConnectObjects();
 };
 
 #endif // ADMIN_GUI_VIEWS_WIZARD_ROLEPAGE_H

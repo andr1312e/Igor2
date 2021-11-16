@@ -1,5 +1,5 @@
-#ifndef ADMIN_GUI_VIEWS_EXECDIALOGWIDGET_H
-#define ADMIN_GUI_VIEWS_EXECDIALOGWIDGET_H
+#ifndef ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_EXECDIALOGWIDGET_H
+#define ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_EXECDIALOGWIDGET_H
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -15,56 +15,52 @@
 
 class StartupDialogWidget : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
-    explicit StartupDialogWidget(QWidget *parent);
-    ~StartupDialogWidget();
-    void setTitleLabel(QString &userName);
+   explicit StartupDialogWidget(QWidget *parent);
+   ~StartupDialogWidget();
+   void setTitleLabel(QString &userName);
 
-signals:
+private:
+   void CreateUI();
+   void InsertWidgetsIntoLayouts();
+   void ConnectObjects();
 
-    void hideDialog();
-    void addExecPathToFile(const QString &exec);
+Q_SIGNALS:
+   void ToHideDialog();
+   void ToAddExecPathToFile(const QString &exec);
+
+
+private Q_SLOTS:
+   void OnHideAndClearDialog();
+   void OnAddEcexPath();
+   void OnCheckExec();
+
+private:
+   void CearAllTextFiels();
+
 
 private:
 
-    void initUI();
-    void insertWidgetsIntoLayouts();
-    void createConnections();
+   QVBoxLayout *m_mainLayout;
 
-private:
+   QLabel *m_titleLabel;
 
-    void clearAllTextFiels();
+   QHBoxLayout *m_execPathLayout;
 
-private slots:
+   QtMaterialTextField *m_exec;
 
-    void hideAndClearDialog();
-    void addEcexPath();
-    void checkExec();
-
-private:
-
-    QVBoxLayout *m_mainLayout;
+   QPushButton *m_execButton;
 
 
-    QLabel *m_titleLabel;
+   QHBoxLayout *m_bottomButtonsLayout;
 
+   QPushButton *m_saveDialogButton;
 
-    QHBoxLayout *m_execPathLayout;
+   QPushButton *m_closeDialogButton;
 
-    QtMaterialTextField *m_exec;
-
-    QPushButton *m_execButton;
-
-
-    QHBoxLayout *m_bottomButtonsLayout;
-
-    QPushButton *m_saveDialogButton;
-
-    QPushButton *m_closeDialogButton;
-
-    QMessageBox *m_errorMessagBox;
+   QMessageBox *m_errorMessagBox;
 };
 
-#endif // ADMIN_GUI_VIEWS_EXECDIALOGWIDGET_H
+#endif // ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_EXECDIALOGWIDGET_H

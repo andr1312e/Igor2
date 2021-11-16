@@ -4,12 +4,12 @@ StartupPanel::StartupPanel(Terminal *terminal,const STARTUP_PANEL_TYPE type, QWi
     : QWidget(parent)
     , m_type(type)
 {
-    initModel();
-    initServices(terminal);
-    initUI();
-    setBackGroundColor();
-    insertWidgetsIntoLayout();
-    createConnections();
+    CreateModel();
+    CreateServices(terminal);
+    CreateUI();
+    SetBackGroundColor();
+    InsertWidgetsIntoLayout();
+    ConnectObjects();
 }
 
 StartupPanel::~StartupPanel()
@@ -42,26 +42,26 @@ void StartupPanel::setParam(const QString &param, QStringList *users)
     {
 
         m_startupFolder="/home/user/RLS_TI/";
-        m_startupFilePath=m_startupFolder+param+".start";
+        m_startupFilePath=m_startupFolder+param+".startup";
     }
     m_usersList=users;
-    m_startupRepositoryService->checkStartupFile(m_startupFolder, m_startupFilePath);
+    m_startupRepositoryService->checkStartupFile(m_startupFilePath);
     m_addProgramButton->setEnabled(true);
-    updateModel();
+    UpdateModel();
 }
 
-void StartupPanel::setDefaultRoleApps(const QString &role)
+void StartupPanel::OnSetDefaultRoleApps(const QString &role)
 {
     m_startupRepositoryService->setDefaultApps(role, m_startupFilePath);
-    updateModel();
+    UpdateModel();
 }
 
-void StartupPanel::initServices(Terminal *terminal)
+void StartupPanel::CreateServices(Terminal *terminal)
 {
     m_startupRepositoryService=new StartupRepositoryService(terminal);
 }
 
-void StartupPanel::setBackGroundColor()
+void StartupPanel::SetBackGroundColor()
 {
     m_addProgramButton->setObjectName("add");
     m_deleteProgramButton->setObjectName("remove");
@@ -73,7 +73,7 @@ void StartupPanel::setBackGroundColor()
     m_dialogWidget->setAutoFillBackground(true);
 }
 
-void StartupPanel::initUI()
+void StartupPanel::CreateUI()
 {
 
     m_mainLayout=new QVBoxLayout();
@@ -89,7 +89,7 @@ void StartupPanel::initUI()
     m_deleteProgramButton=new QPushButton("Удалить выбранную программу");
     m_deleteProgramButton->setEnabled(false);
 
-    m_dialog=new QtMaterialDialog();
+    m_dialog=new QtMaterialDialog(this);
 
     m_dialog->setParent(this);
 
@@ -101,12 +101,12 @@ void StartupPanel::initUI()
 
 }
 
-void StartupPanel::initModel()
+void StartupPanel::CreateModel()
 {
     m_appsList=new QStringListModel();
 }
 
-void StartupPanel::insertWidgetsIntoLayout()
+void StartupPanel::InsertWidgetsIntoLayout()
 {
     m_mainLayout->addWidget(m_titleLabel);
     m_mainLayout->addWidget(m_allProgramsListView);
@@ -124,16 +124,16 @@ void StartupPanel::insertWidgetsIntoLayout()
 
 }
 
-void StartupPanel::createConnections()
+void StartupPanel::ConnectObjects()
 {
-    connect(m_allProgramsListView, &QListView::clicked, this, &StartupPanel::onProgramSelect);
-    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::showDialog);
-    connect(m_deleteProgramButton, &QPushButton::clicked, this, &StartupPanel::deleteProgram);
-    connect(m_dialogWidget, &StartupDialogWidget::hideDialog, m_dialog, &QtMaterialDialog::hideDialog);
-    connect(m_dialogWidget, &StartupDialogWidget::addExecPathToFile, this, &StartupPanel::addProgram);
+    connect(m_allProgramsListView, &QListView::clicked, this, &StartupPanel::OnProgramSelect);
+    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::OnShowDialog);
+    connect(m_deleteProgramButton, &QPushButton::clicked, this, &StartupPanel::OnDeleteProgram);
+    connect(m_dialogWidget, &StartupDialogWidget::ToHideDialog, m_dialog, &QtMaterialDialog::OnHideDialog);
+    connect(m_dialogWidget, &StartupDialogWidget::ToAddExecPathToFile, this, &StartupPanel::OnAddProgram);
 }
 
-void StartupPanel::deleteProgram()
+void StartupPanel::OnDeleteProgram()
 {
     if (m_selectedItemIndex>-1 && m_selectedItemIndex<m_appsList->rowCount())
     {
@@ -142,14 +142,14 @@ void StartupPanel::deleteProgram()
         QStringList appsList=m_appsList->stringList();
         m_startupRepositoryService->clearFile(m_startupFilePath);
         m_startupRepositoryService->writeExecToStartupFile(m_startupFilePath, appsList);
-        updateAllUsersWithCurrentRole(appsList);
+        UpdateAllUsersWithCurrentRole(appsList);
         m_selectedItemIndex=-1;
         QToast* pToast=QToast::CreateToast("Программа удалена",QToast::LENGTH_LONG, this);
         pToast->show();
     }
 }
 
-void StartupPanel::addProgram(const QString &exec)
+void StartupPanel::OnAddProgram(const QString &exec)
 {
     QStringList appsList=m_appsList->stringList();
     if (!appsList.contains(exec))
@@ -157,7 +157,7 @@ void StartupPanel::addProgram(const QString &exec)
         appsList.append(exec);
         m_startupRepositoryService->writeExecToStartupFile(m_startupFilePath, appsList);
         m_appsList->setStringList(appsList);
-        updateAllUsersWithCurrentRole(appsList);
+        UpdateAllUsersWithCurrentRole(appsList);
         QToast* pToast=QToast::CreateToast("Программа " + exec + " добавлена",QToast::LENGTH_LONG, this);
         pToast->show();
     }
@@ -168,33 +168,32 @@ void StartupPanel::addProgram(const QString &exec)
     }
 }
 
-void StartupPanel::onProgramSelect(const QModelIndex &index)
+void StartupPanel::OnProgramSelect(const QModelIndex &index)
 {
     m_selectedItemIndex=index.row();
     m_deleteProgramButton->setEnabled(true);
 }
 
-void StartupPanel::updateAllUsersWithCurrentRole(QStringList &appsList)
+void StartupPanel::UpdateAllUsersWithCurrentRole(QStringList &appsList)
 {
     if (m_type==STARTUP_PANEL_TYPE::ROLE_APPS)
     {
-        writeAppListToAllUsersWithRole(appsList);
+        WriteAppListToAllUsersWithRole(appsList);
     }
 }
 
-void StartupPanel::updateModel()
+void StartupPanel::UpdateModel()
 {
     QStringList list=m_startupRepositoryService->getAllEcexFromStartupFile(m_startupFilePath);
     m_appsList->setStringList(list);
 }
 
-void StartupPanel::writeAppListToAllUsersWithRole(QStringList &appsList)
+void StartupPanel::WriteAppListToAllUsersWithRole(QStringList &appsList)
 {
     for (QStringList::iterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
     {
-        QString startupFolder="/home/"+*it+"/RLS_TI/";
-        QString startupFilePath=startupFolder+"Startup";
-        m_startupRepositoryService->checkStartupFile(startupFolder, startupFilePath);
+        QString startupFilePath="/home/"+*it+"/RLS_TI/Startup";
+        m_startupRepositoryService->checkStartupFile(startupFilePath);
         m_startupRepositoryService->clearFile(startupFilePath);
         m_startupRepositoryService->writeExecToStartupFile(startupFilePath, appsList);
     }

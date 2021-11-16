@@ -13,47 +13,47 @@
 
 class RoleEditPanel : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    RoleEditPanel(Terminal *terminal, QWidget *parent);
+   RoleEditPanel(Terminal *terminal, QWidget *parent);
 
-    ~RoleEditPanel();
+   ~RoleEditPanel();
 
-    void setRoleToViewWithUsers(const QString &role, QStringList *users);
-
-private:
-
-    void initUI(Terminal *terminal);
-
-    void insertWidgetsIntoLayout();
-
-    void setBackGroundColor();
-
-    void createConnections();
-
-signals:
-
-    void roleStartupFileChanged(const QString &role);
+   void setRoleToViewWithUsers(const QString &role, QStringList *users);
 
 private:
 
-    QString m_role;
+   void CreateUI(Terminal *terminal);
 
-    QVBoxLayout *m_mainLayout;
+   void InsertWidgetsIntoLayout();
 
-    QHBoxLayout *m_topLayout;
+   void SetBackGroundColor();
 
-    QLabel *m_titleLabel;
+   void ConnectObjects();
 
-    QLabel *m_descriptionLabel;
+Q_SIGNALS:
 
-    QLabel *m_currentRole;
+   void ToRoleStartupFileChanging(const QString &role);
 
-    DesktopPanel *m_roleDesktopPanel;
+private:
 
-    StartupPanel *m_roleRunningApplicationPanel;
+   QString m_role;
+
+   QVBoxLayout *m_mainLayout;
+
+   QHBoxLayout *m_topLayout;
+
+   QLabel *m_titleLabel;
+
+   QLabel *m_descriptionLabel;
+
+   QLabel *m_currentRole;
+
+   DesktopPanel *m_roleDesktopPanel;
+
+   StartupPanel *m_roleRunningApplicationPanel;
 };
 
 #endif // ADMIN_GUI_VIEWS_ROLEINFOPANEL_H

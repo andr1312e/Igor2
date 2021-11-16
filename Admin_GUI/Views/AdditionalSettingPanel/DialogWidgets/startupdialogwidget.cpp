@@ -3,9 +3,9 @@
 StartupDialogWidget::StartupDialogWidget(QWidget *parent)
     : QWidget(parent)
 {
-    initUI();
-    insertWidgetsIntoLayouts();
-    createConnections();
+    CreateUI();
+    InsertWidgetsIntoLayouts();
+    ConnectObjects();
 }
 
 StartupDialogWidget::~StartupDialogWidget()
@@ -27,7 +27,7 @@ void StartupDialogWidget::setTitleLabel(QString &userName)
     m_titleLabel->setText("Добавить контроль над закрытием программы для пользователя: " + userName);
 }
 
-void StartupDialogWidget::initUI()
+void StartupDialogWidget::CreateUI()
 {
     m_mainLayout= new QVBoxLayout;
 
@@ -51,7 +51,7 @@ void StartupDialogWidget::initUI()
     m_errorMessagBox->setWindowTitle("Внимание!");
 }
 
-void StartupDialogWidget::insertWidgetsIntoLayouts()
+void StartupDialogWidget::InsertWidgetsIntoLayouts()
 {
     m_mainLayout->addWidget(m_titleLabel);
 
@@ -69,33 +69,33 @@ void StartupDialogWidget::insertWidgetsIntoLayouts()
     setLayout(m_mainLayout);
 }
 
-void StartupDialogWidget::createConnections()
+void StartupDialogWidget::ConnectObjects()
 {
-    connect(m_closeDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::hideAndClearDialog);
-    connect(m_execButton, &QPushButton::clicked, this, &StartupDialogWidget::addEcexPath);
-    connect(m_saveDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::checkExec);
+    connect(m_closeDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnHideAndClearDialog);
+    connect(m_execButton, &QPushButton::clicked, this, &StartupDialogWidget::OnAddEcexPath);
+    connect(m_saveDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnCheckExec);
 
 }
 
-void StartupDialogWidget::clearAllTextFiels()
+void StartupDialogWidget::CearAllTextFiels()
 {
     m_exec->clear();
 }
 
-void StartupDialogWidget::hideAndClearDialog()
+void StartupDialogWidget::OnHideAndClearDialog()
 {
-    clearAllTextFiels();
-    emit hideDialog();
+    CearAllTextFiels();
+    emit ToHideDialog();
 }
 
-void StartupDialogWidget::addEcexPath()
+void StartupDialogWidget::OnAddEcexPath()
 {
     QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
     m_exec->setText(loadPath);
 }
 
-void StartupDialogWidget::checkExec()
+void StartupDialogWidget::OnCheckExec()
 {
     if (m_exec->text()=="")
     {
@@ -106,8 +106,8 @@ void StartupDialogWidget::checkExec()
     {
         if (QFile::exists(m_exec->text()))
         {
-            emit addExecPathToFile(m_exec->text());
-            hideAndClearDialog();
+            emit ToAddExecPathToFile(m_exec->text());
+            OnHideAndClearDialog();
         }
         else
         {

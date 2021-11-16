@@ -3,9 +3,9 @@
 RoleEditPanel::RoleEditPanel(Terminal *terminal, QWidget *parent)
     : QWidget(parent)
 {
-    initUI(terminal);
-    insertWidgetsIntoLayout();
-    createConnections();
+    CreateUI(terminal);
+    InsertWidgetsIntoLayout();
+    ConnectObjects();
 }
 
 RoleEditPanel::~RoleEditPanel()
@@ -24,12 +24,12 @@ void RoleEditPanel::setRoleToViewWithUsers(const QString &role, QStringList *use
 {
     m_role=role;
     m_currentRole->setText("Выбранная роль: "+ m_role);
-    m_roleDesktopPanel->setParam(role, users);
+    m_roleDesktopPanel->SetParam(role, users);
     m_roleRunningApplicationPanel->setParam(role, users);
 }
 
 
-void RoleEditPanel::initUI(Terminal *terminal)
+void RoleEditPanel::CreateUI(Terminal *terminal)
 {
     m_mainLayout=new QVBoxLayout();
     m_topLayout=new QHBoxLayout();
@@ -44,7 +44,7 @@ void RoleEditPanel::initUI(Terminal *terminal)
     m_roleRunningApplicationPanel=new StartupPanel(terminal, STARTUP_PANEL_TYPE::ROLE_APPS, this);
 }
 
-void RoleEditPanel::insertWidgetsIntoLayout()
+void RoleEditPanel::InsertWidgetsIntoLayout()
 {
     m_topLayout->addWidget(m_titleLabel);
     m_topLayout->addStretch(4);
@@ -56,7 +56,7 @@ void RoleEditPanel::insertWidgetsIntoLayout()
     setLayout(m_mainLayout);
 }
 
-void RoleEditPanel::setBackGroundColor()
+void RoleEditPanel::SetBackGroundColor()
 {
 //    m_roleDesktopPanel->setBackgroundRole(QPalette::Base);
 //    m_roleDesktopPanel->setAutoFillBackground(true);
@@ -65,7 +65,7 @@ void RoleEditPanel::setBackGroundColor()
 //    m_roleRunningApplicationPanel->setAutoFillBackground(true);
 }
 
-void RoleEditPanel::createConnections()
+void RoleEditPanel::ConnectObjects()
 {
-    connect(m_roleRunningApplicationPanel, &StartupPanel::roleStartupFileChanged, [=](){emit roleStartupFileChanged(m_role);});
+    connect(m_roleRunningApplicationPanel, &StartupPanel::ToRoleStartupFileChanging, [=](){emit ToRoleStartupFileChanging(m_role);});
 }

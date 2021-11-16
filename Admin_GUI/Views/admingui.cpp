@@ -8,11 +8,11 @@ Admin_GUI::Admin_GUI(DatabaseService *databaseService, LinuxUserService *userSer
    ,  m_databaseService(databaseService)
    ,  m_linuxUserService(userService)
 {
-   initUI();
-   setWidgetSizes();
-   insertWidgetsIntoLayout();
-   createConnections();
-   setMaximumWidgetSize();
+   CreateUI();
+   SetWidgetSizes();
+   InsertWidgetsIntoLayout();
+   ConnectObjects();
+   SetMaximumWidgetSize();
 }
 
 Admin_GUI::~Admin_GUI()
@@ -28,7 +28,7 @@ Admin_GUI::~Admin_GUI()
    delete m_additionalSettingsPanel;
 }
 
-void Admin_GUI::initUI()
+void Admin_GUI::CreateUI()
 {
    m_userModel = new UserModel(m_linuxUserService, m_databaseService, nullptr);
 
@@ -39,18 +39,18 @@ void Admin_GUI::initUI()
 
    m_linuxUsersListWidget = new LinuxUsersListWidget(m_userModel, this);
 
-   m_settingsPanel = new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_userModel, m_databaseService->getTerminal(), this);
+   m_settingsPanel = new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_userModel, m_databaseService->GetTerminal(), this);
 
    m_additionalSettingsPanel = new AdditionalSettingsPanel(m_linuxUserService->getTerminal(), this);
 }
 
-void Admin_GUI::setWidgetSizes()
+void Admin_GUI::SetWidgetSizes()
 {
    m_linuxUsersListWidget->setMaximumWidth(336);
    m_settingsPanel->setMaximumWidth(450);
 }
 
-void Admin_GUI::insertWidgetsIntoLayout()
+void Admin_GUI::InsertWidgetsIntoLayout()
 {
    m_mainLayout->addWidget(m_topBar);
 
@@ -62,16 +62,16 @@ void Admin_GUI::insertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void Admin_GUI::createConnections()
+void Admin_GUI::ConnectObjects()
 {
    connect(m_linuxUsersListWidget, &LinuxUsersListWidget::OnUserClick, this, &Admin_GUI::onLinuxUserClick);
-   connect(m_settingsPanel, &SettingsPanel::setDefaultRoleApps, m_additionalSettingsPanel, &AdditionalSettingsPanel::setDefaultRoleApps);
-   connect(m_settingsPanel, &SettingsPanel::roleToViewChanged, this, &Admin_GUI::roleToViewChanged);
-   connect(m_topBar, &TopBar::HideAdditionalSettings, this, &Admin_GUI::hideAdditionalSettings);
-   connect(m_topBar, &TopBar::ChangeTheme, this, &Admin_GUI::setTheme);
+   connect(m_settingsPanel, &SettingsPanel::ToSetDefaultRoleApps, m_additionalSettingsPanel, &AdditionalSettingsPanel::ToSetDefaultRoleApps);
+   connect(m_settingsPanel, &SettingsPanel::ToRoleToViewChanged, this, &Admin_GUI::roleToViewChanged);
+   connect(m_topBar, &TopBar::ToHideAdditionalSettings, this, &Admin_GUI::OnHideAdditionalSettings);
+   connect(m_topBar, &TopBar::ToChangeTheme, this, &Admin_GUI::ToChangeTheme);
 }
 
-void Admin_GUI::setMaximumWidgetSize()
+void Admin_GUI::SetMaximumWidgetSize()
 {
    m_currentScreen = QGuiApplication::screenAt(mapToGlobal({width() / 2, 0}));
    m_maxWidth = m_currentScreen->availableSize().width();
@@ -84,18 +84,18 @@ void Admin_GUI::initTopBar()
 {
    m_topBar = new TopBar(this);
    QString currentUserLinuxUserName = m_linuxUserService->getCurrentUserName();
-   QString userFCS = m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "FCS");
-   QString userRank = m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "rank");
-   QString userRole = m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "role");
+   QString userFCS = m_databaseService->GetUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "FCS");
+   QString userRank = m_databaseService->GetUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "rank");
+   QString userRole = m_databaseService->GetUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "role");
    m_topBar->SetData(userRank, userFCS, userRole);
 }
 
-void Admin_GUI::hideAdditionalSettings(bool state)
+void Admin_GUI::OnHideAdditionalSettings(bool state)
 {
    QScreen *pScreen = QGuiApplication::screenAt(mapToGlobal({width() / 2, 0}));
 
    if (m_currentScreen != pScreen) {
-      setMaximumWidgetSize();
+      SetMaximumWidgetSize();
    }
 
    if (state) {

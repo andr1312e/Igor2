@@ -46,12 +46,11 @@ private:
    void InitStyle();
    void InitFramelessWindow();
    void StartSettingsWizard();
-private Q_SLOTS:
 
-   void ContinueLoading();
+private Q_SLOTS:
+   void OnContinueLoading();
 
 public:
-
    void GetSettings();
 
    void InitRunnableService();
@@ -64,13 +63,10 @@ public:
 
    void StartAdminServices();
 
-   void CreateConnections();
-
-
+   void ConnectObjects();
 
 private:
-
-   ProgramState m_loadedDbAdnRolesState;
+   LoadingState m_loadedDbAdnRolesState;
 
    bool m_hasAdminPrivileges;
    QString m_currentUserId;
@@ -82,7 +78,7 @@ private:
 
    Terminal *m_terminal;
    LinuxUserService *m_linuxUserService;
-   FirstStartSettingsService *m_settingFileService;
+   FirstStartSettingsService *m_firstStartSettingsService;
 
    StartupWizard *m_startupWizard;
 
@@ -94,7 +90,7 @@ private:
    FakeUI *m_fakeUI;
    FramelessWindow *m_framelessWindow;
 
-   StyleChanger *m_proxyStyle;
+   StyleChanger *m_styleChanger;
 
 };
 #endif // PROGRAM_H

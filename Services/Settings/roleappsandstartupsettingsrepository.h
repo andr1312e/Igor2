@@ -21,7 +21,7 @@ public:
 
    void SetRoleDesktopsAndStartupsFromFile(QString &pathToDesktopsFolder, QString &pathToStartupsFolder);
 
-   void SetRoleDesktopsAndStartupsFromBackup(const int roleIndex, QDomElement &backupNode);
+   void SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex, QDomElement &backupNode);
 
    int GetRoleDesktopsAppCount(const int roleIndex);
 

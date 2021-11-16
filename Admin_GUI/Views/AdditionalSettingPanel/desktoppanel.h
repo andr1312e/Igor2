@@ -16,79 +16,80 @@
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h"
 
-enum ICONS_PANEL_TYPE{
-    USER_DESKTOP,
-    ROLE_DESKTOP
+enum ICONS_PANEL_TYPE {
+   USER_DESKTOP,
+   ROLE_DESKTOP
 };
 
 class DesktopPanel: public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *parent);
-    ~DesktopPanel();
+   DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *parent);
+   ~DesktopPanel();
 
-    void setParam(const QString &param, QStringList *users);//userName || role
+   void SetParam(const QString &param, QStringList *users);//userName || role
 
-public slots:
+public Q_SLOTS:
 
-    void setDefaultRoleApps(const QString &role);
+   void OnSetDefaultRoleApps(const QString &role);
 
-private:
+private Q_SLOTS:
 
-    void initServices(Terminal *terminal);
-    void initUI();
-    void setBackGroundColor();
-    void initModel();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+   void OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName);
+   void OnDeleteProgram();
+   void OnProgramSelect(const QModelIndex &index);
 
 private:
 
-    ICONS_PANEL_TYPE m_type;
-
-    FileExplorer *m_rootFileService;
-
-    QStringList *m_usersList;
-
-    QStandardItemModel *m_model;
-
-    FileDelegate *m_fileDelegate;
-
-    QString m_pararm;
-
-    QString m_selectedItemName;
-
-    QVBoxLayout *m_mainLayout;
-
-    QLabel *m_programsToRun;
-
-    QListView *m_allProgramsListView;
-
-    QHBoxLayout *m_bottomLayout;
-
-    QPushButton *m_addProgramButton;
-
-    QPushButton *m_deleteProgramButton;
-
-
-    QtMaterialDialog *m_dialog;
-
-    QVBoxLayout *m_dialogLayout;
-
-    FileDialogWidget *m_dialogWidget;
+   void CreateServices(Terminal *terminal);
+   void CreateUI();
+   void SetBackGroundColor();
+   void InitModel();
+   void InsertWidgetsIntoLayout();
+   void ConnectObjects();
 
 private:
 
-    void updateAllUsersWithCurrentRole();
+   ICONS_PANEL_TYPE m_type;
 
-private slots:
+   FileExplorer *m_rootFileService;
 
-    void addProgram(const QString &exec, const QString &iconPath, const QString &iconName);
-    void deleteProgram();
-    void onProgramSelect(const QModelIndex &index);
+   QStringList *m_usersList;
+
+   QStandardItemModel *m_model;
+
+   FileDelegate *m_fileDelegate;
+
+   QString m_pararm;
+
+   QString m_selectedItemName;
+
+   QVBoxLayout *m_mainLayout;
+
+   QLabel *m_programsToRun;
+
+   QListView *m_allProgramsListView;
+
+   QHBoxLayout *m_bottomLayout;
+
+   QPushButton *m_addProgramButton;
+
+   QPushButton *m_deleteProgramButton;
+
+
+   QtMaterialDialog *m_dialog;
+
+   QVBoxLayout *m_dialogLayout;
+
+   FileDialogWidget *m_dialogWidget;
+
+private:
+
+   void updateAllUsersWithCurrentRole();
+
 
 };
 

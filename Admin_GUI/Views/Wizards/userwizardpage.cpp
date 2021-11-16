@@ -90,7 +90,7 @@ void UserWizardPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
 
 void UserWizardPage::CreateConnections()
 {
-   connect(m_actionComboBox, &QComboBox::currentTextChanged, m_wizardService, &WizardService::SetActionWithUserRepository);
+   connect(m_actionComboBox, &QComboBox::currentTextChanged, m_wizardService, &WizardService::OnSetActionWithUserRepository);
 }
 
 //QSize FCSPage::sizeHint() const

@@ -16,52 +16,52 @@
 
 class Admin_GUI : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent=Q_NULLPTR);
-    ~Admin_GUI();
+   Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent = Q_NULLPTR);
+   ~Admin_GUI();
 
-signals:
+Q_SIGNALS:
 
-    void setTheme(bool state);
-
-private:
-
-    void initUI();
-    void setWidgetSizes();
-    void insertWidgetsIntoLayout();
-    void createConnections();
-    void setMaximumWidgetSize();
+   void ToChangeTheme(bool isDarkTheme);
 
 private:
 
-    DatabaseService *m_databaseService;
-    LinuxUserService *m_linuxUserService;
-    UserModel *m_userModel;
-
-    QVBoxLayout *m_mainLayout;
-    TopBar *m_topBar;
-
-    QHBoxLayout *m_programLayout;
-    LinuxUsersListWidget *m_linuxUsersListWidget;
-    SettingsPanel *m_settingsPanel;
-    AdditionalSettingsPanel *m_additionalSettingsPanel;
-
-
-
-    QScreen* m_currentScreen;
-    int m_maxWidth;
-    int m_maxHeight;
+   void CreateUI();
+   void SetWidgetSizes();
+   void InsertWidgetsIntoLayout();
+   void ConnectObjects();
+   void SetMaximumWidgetSize();
 
 private:
-    void initTopBar();
 
-private slots:
-    void hideAdditionalSettings(bool state);
-    void roleToViewChanged(const QString &role);
-    void onLinuxUserClick(User &user);
+   DatabaseService *m_databaseService;
+   LinuxUserService *m_linuxUserService;
+   UserModel *m_userModel;
+
+   QVBoxLayout *m_mainLayout;
+   TopBar *m_topBar;
+
+   QHBoxLayout *m_programLayout;
+   LinuxUsersListWidget *m_linuxUsersListWidget;
+   SettingsPanel *m_settingsPanel;
+   AdditionalSettingsPanel *m_additionalSettingsPanel;
+
+
+
+   QScreen *m_currentScreen;
+   int m_maxWidth;
+   int m_maxHeight;
+
+private:
+   void initTopBar();
+
+private Q_SLOTS:
+   void OnHideAdditionalSettings(bool state);
+   void roleToViewChanged(const QString &role);
+   void onLinuxUserClick(User &user);
 };
 
 #endif // ADMIN_GUI_VIEWS_ADMIN_GUI_H

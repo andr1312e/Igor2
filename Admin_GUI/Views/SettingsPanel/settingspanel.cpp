@@ -43,8 +43,8 @@ void SettingsPanel::createConnections()
 {
     connect(m_userEditPanel, &UserEditPanel::clearUserAdditionalInfo, m_userInfoPanel, &UserInfoPanel::clearAdditionalInfo);
     connect(m_userEditPanel, &UserEditPanel::fillUserAdditionalInfo, m_userInfoPanel, &UserInfoPanel::fillUserAdditionalInfo);
-    connect(m_userEditPanel, &UserEditPanel::setDefaultRoleApps, this, &SettingsPanel::setDefaultRoleApps);
-    connect(m_userEditPanel, &UserEditPanel::roleToViewChanged, this, &SettingsPanel::roleToViewChanged);
+    connect(m_userEditPanel, &UserEditPanel::setDefaultRoleApps, this, &SettingsPanel::ToSetDefaultRoleApps);
+    connect(m_userEditPanel, &UserEditPanel::roleToViewChanged, this, &SettingsPanel::ToRoleToViewChanged);
 }
 
 void SettingsPanel::setUser(User &user)

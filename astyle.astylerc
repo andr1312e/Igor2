@@ -1,8 +1,3 @@
-verbose
-style=kr
-indent=spaces=3
-indent-switches
-indent-col1-comments
 break-blocks
 pad-oper
 pad-header

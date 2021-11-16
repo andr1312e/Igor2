@@ -94,18 +94,18 @@ void UsersDataWizardRepository::GetFCSAndRolesFromXml(QDomElement &usersNode)
    }
 }
 
-void UsersDataWizardRepository::WriteUserRepositoryToFile(const QString &pathToWriteDb, bool adminOnly)
+void UsersDataWizardRepository::WriteUserRepositoryToFile(const QString &pathToWriteDb, bool needToWriteOnlyAdmin)
 {
-   if (m_terminal->IsFileNotExists(pathToWriteDb, "UsersDataWizardRepository::WriteToFile", true)) {
-      m_terminal->CheckAndCreatePathToElement(pathToWriteDb, "UsersDataWizardRepository::WriteToFile", true);
-      m_terminal->CreateFile(pathToWriteDb, "UsersDataWizardRepository::WriteToFile", true);
+   if (m_terminal->IsFileNotExists(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true)) {
+      m_terminal->CheckAndCreatePathToElement(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true);
+      m_terminal->CreateFile(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true);
    } else {
-      m_terminal->ClearFileSudo(pathToWriteDb, "UsersDataWizardRepository::WriteToFile");
+      m_terminal->ClearFileSudo(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile");
    }
 
    CreateMainTag();
 
-   if (adminOnly) {
+   if (needToWriteOnlyAdmin) {
       WriteAdminToDomDocument();
    } else {
       if (!FindAndUpdateAdminData()) {
@@ -180,6 +180,6 @@ void UsersDataWizardRepository::AppendUserToDomDocument(QDomDocument &document, 
 void UsersDataWizardRepository::EncryptAndWriteToFile(const QString &pathToWriteDb)
 {
    QString text = m_accountsData->toString();
-   QByteArray encrypt = text.toLatin1().toHex();
-   m_terminal->WriteTextToFileSudo(encrypt, pathToWriteDb, "UsersDataWizardRepository::WriteToFile");
+   QByteArray encrypt = text.toUtf8().toHex();
+   m_terminal->WriteTextToFileSudo(encrypt, pathToWriteDb, "UsersDataWizardRepository::EncryptAndWriteToFile");
 }

@@ -9,46 +9,46 @@
 
 class UserModel : public QObject
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
 
-    UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent);
+   UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent);
 
-    ~UserModel();
+   ~UserModel();
 
-    void addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
+   void addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
 
-    void deleteUserFromModel(const QString &userId);
+   void deleteUserFromModel(const QString &userId);
 
-    QStandardItemModel* getModel(){return m_model;}
+   QStandardItemModel *getModel();
 
-    QStringList* getUsersNamesByRole(const QString &role);
+   QStringList *getUsersNamesByRole(const QString &role);
 
-public slots:
+public Q_SLOTS:
 
-    void dataChanged();
-
-private:
-
-    QStandardItemModel *m_model;
-
-    DatabaseService *m_databaseService;
-
-    LinuxUserService *m_linuxUserService;
-
-    QList<User> *m_users;
-
-    QStringList *m_currentRoleUsers;
+   void OnDataChanged();
 
 private:
 
-    void FillListByLinuxUserService();
+   QStandardItemModel *m_model;
 
-    void FillListByDatabaseService();
+   DatabaseService *m_databaseService;
 
-    void FillModelByList();
+   LinuxUserService *m_linuxUserService;
 
-    void setUserImage(User &user);
+   QList<User> *m_users;
+
+   QStringList *m_currentRoleUsers;
+
+private:
+
+   void FillListByLinuxUserService();
+
+   void FillListByDatabaseService();
+
+   void FillModelByList();
+
+   void setUserImage(User &user);
 
 };
 

@@ -11,7 +11,7 @@ public:
 
     StartupRepositoryService(Terminal *terminal);
 
-    void checkStartupFile(const QString &folderPath,const QString &filePath);
+    void checkStartupFile(const QString &filePath);
 
     void clearFile(const QString&filePath);
 

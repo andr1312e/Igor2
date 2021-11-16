@@ -22,37 +22,37 @@
 
 class SettingsPanel : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    explicit SettingsPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
-    ~SettingsPanel();
+   explicit SettingsPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
+   ~SettingsPanel();
 
-    void setUser(User &user);
+   void setUser(User &user);
 
-signals:
+Q_SIGNALS:
 
-    void setDefaultRoleApps(const QString &role);
-    void roleToViewChanged(const QString &role);
+   void ToSetDefaultRoleApps(const QString &role);
+   void ToRoleToViewChanged(const QString &role);
 
 protected:
 
-    void resizeEvent(QResizeEvent *event) override;
+   void resizeEvent(QResizeEvent *event) override;
 
 private:
 
-    void initUI(const QString &userName, UserModel *model, Terminal *terminal);
-    void applyStyle();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+   void initUI(const QString &userName, UserModel *model, Terminal *terminal);
+   void applyStyle();
+   void insertWidgetsIntoLayout();
+   void createConnections();
 
 private:
-    QVBoxLayout *m_mainLayout;
-    UserInfoPanel *m_userInfoPanel;
-    UserEditPanel *m_userEditPanel;
+   QVBoxLayout *m_mainLayout;
+   UserInfoPanel *m_userInfoPanel;
+   UserEditPanel *m_userEditPanel;
 
-    int m_oldFontSize;
+   int m_oldFontSize;
 
 };
 

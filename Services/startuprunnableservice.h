@@ -27,7 +27,7 @@ signals:
 
    void noExecApplication(const QString &execPath);
 
-   void programFall();
+   void ToProgramFall();
 
 private:
 
@@ -39,15 +39,15 @@ private:
 
 private:
 
-   QStringList readUserExecFile(const QString &userName);
+   QStringList ReadUserExecFile(const QString &userName);
 
-   bool isAllExecsValid(QStringList &execsList);
+   bool IsAllExecsValid(QStringList &execsList);
 
-   void initProcessStruct(QStringList execsList);
+   void InitProcessStruct(QStringList execsList);
 
-private slots:
+private Q_SLOTS:
 
-   void restartProcess();
+   void OnRestartProcess();
 
 };
 

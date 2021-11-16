@@ -7,7 +7,7 @@ RoleAppsWizardPage::RoleAppsWizardPage(const QString &role, const int currentRol
 {
    CreateUI(role);
    InsertWidgetsIntoLayout();
-   CreateConnections();
+   ConnectObjects();
 }
 
 RoleAppsWizardPage::~RoleAppsWizardPage()
@@ -89,7 +89,7 @@ void RoleAppsWizardPage::InsertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void RoleAppsWizardPage::CreateConnections()
+void RoleAppsWizardPage::ConnectObjects()
 {
    connect(m_actionComboBox, &QComboBox::currentTextChanged, [&](const QString & actionWithRoleRepository) {
       m_wizardService->SetActionWithRoleRepository(m_currentRoleIndex, actionWithRoleRepository);

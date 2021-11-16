@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 
-IntroPage::IntroPage(const ProgramState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent)
+IntroPage::IntroPage(const LoadingState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent)
    : MyWizardPage(parent)
    , m_state(state)
    , m_wizardService(service)
@@ -105,10 +105,10 @@ void IntroPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
 
 void IntroPage::CreateConnections()
 {
-   connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::CheckBackupFile);
+   connect(m_backupLoadButton, &QPushButton::clicked, this, &IntroPage::OnCheckBackupFile);
 }
 
-void IntroPage::CheckBackupFile()
+void IntroPage::OnCheckBackupFile()
 {
 
    QPalette bgpal;

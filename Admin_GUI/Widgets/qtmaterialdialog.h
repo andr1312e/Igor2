@@ -12,15 +12,15 @@ class QtMaterialDialog : public QtMaterialOverlayWidget
     Q_OBJECT
 
 public:
-    explicit QtMaterialDialog(QWidget *parent = 0);
+    explicit QtMaterialDialog(QWidget *parent);
     ~QtMaterialDialog();
 
     QLayout *windowLayout() const;
     void setWindowLayout(QLayout *layout);
 
-public slots:
-    void showDialog();
-    void hideDialog();
+public Q_SLOTS:
+    void OnShowDialog();
+    void OnHideDialog();
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

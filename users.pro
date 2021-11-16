@@ -4,13 +4,14 @@
 #
 #-------------------------------------------------
 
-QT += core xml network
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-greaterThan(QT_MAJOR_VERSION, 5): QT += core5compat
+QT += core xml network widgets
+
+VERSION = 2.0.4
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 TARGET      = "53"
 TEMPLATE    = app
-DESTDIR     = $$PWD/../bin
+DESTDIR     = $$PWD/../syncProgram
 RESOURCES += \
     resources.qrc
 CONFIG += c++latest strict_c strict_c++ precompile_header stl_off utf8_source

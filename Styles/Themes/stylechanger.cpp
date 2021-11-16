@@ -26,7 +26,7 @@ StyleChanger::~StyleChanger()
    delete m_whiteTheme;
 }
 
-void StyleChanger::hangeTheme(bool setDarkTheme)
+void StyleChanger::OnChangeTheme(bool setDarkTheme)
 {
    if (setDarkTheme) {
       m_darkTheme->ApplyTheme(m_myApp);

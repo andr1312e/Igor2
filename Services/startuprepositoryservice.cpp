@@ -5,14 +5,11 @@ StartupRepositoryService::StartupRepositoryService(Terminal *terminal)
    : m_terminal(terminal)
 {}
 
-void StartupRepositoryService::checkStartupFile(const QString &folderPath, const QString &filePath)
+void StartupRepositoryService::checkStartupFile(const QString &filePath)
 {
-   if (m_terminal->IsDirNotExists(folderPath, "StartupManagerService::checkStartupFile")) {
-
-   }
-
+   m_terminal->CheckAndCreatePathToElement(filePath, "StartupRepositoryService::checkStartupFile", true);
    if (m_terminal->IsFileNotExists(filePath, "StartupManagerService::checkStartupFile")) {
-
+        m_terminal->CreateFile(filePath, "StartupManagerService::checkStartupFile", true);
    }
 }
 
@@ -29,7 +26,7 @@ void StartupRepositoryService::writeExecToStartupFile(const QString &filePath, c
 
 void StartupRepositoryService::setDefaultApps(const QString &role, const QString &filePath)
 {
-   m_terminal->CopyFileSudo("/home/user/RLS_TI/" + role + ".start", filePath, "StartupManagerService::setDefaultApps");
+   m_terminal->CopyFileSudo("/home/user/RLS_TI/" + role + ".startup", filePath, "StartupManagerService::setDefaultApps");
 }
 
 QStringList StartupRepositoryService::getAllEcexFromStartupFile(const QString &filePath)

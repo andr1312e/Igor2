@@ -19,11 +19,23 @@ class IntroPage : public MyWizardPage
 {
    Q_OBJECT
 public:
-   explicit IntroPage(const ProgramState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent);
+   explicit IntroPage(const LoadingState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent);
    ~IntroPage();
-   int nextId() const override;
+
+private Q_SLOTS:
+   void OnCheckBackupFile();
+
+public:
+   int nextId() const Q_DECL_OVERRIDE;
+
 private:
-   const ProgramState m_state;
+   void SetWizardTitle();
+   void CreateUI();
+   void InsertWidgetsIntoLayout(QPushButton *themePushButton);
+   void CreateConnections();
+
+private:
+   const LoadingState m_state;
    WizardService *m_wizardService;
 
    QLabel *m_topLabel;
@@ -35,13 +47,7 @@ private:
    QLabel *m_faqLabel;
 
    QString m_backupFilePath;
-private:
-   void SetWizardTitle();
-   void CreateUI();
-   void InsertWidgetsIntoLayout(QPushButton *themePushButton);
-   void CreateConnections();
-private Q_SLOTS:
-   void CheckBackupFile();
+
 };
 
 #endif // ADMIN_GUI_VIEWS_WIZARD_INTROPAGE_H

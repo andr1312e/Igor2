@@ -129,7 +129,7 @@ void TopBar::OnSettingsButtonClick(bool state)
    }
 
    m_settingsPushButtton->setIconSize(*m_iconsSize);
-   Q_EMIT HideAdditionalSettings(m_settingsSetHidden);
+   Q_EMIT ToHideAdditionalSettings(m_settingsSetHidden);
 }
 
 void TopBar::OnThemeButtonClick(bool state)
@@ -155,7 +155,7 @@ void TopBar::OnThemeButtonClick(bool state)
    }
 
    m_themePushButton->setIconSize(*m_iconsSize);
-   Q_EMIT ChangeTheme(state);
+   Q_EMIT ToChangeTheme(state);
 }
 
 void TopBar::RefreshDateTime()

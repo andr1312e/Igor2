@@ -12,88 +12,94 @@
 
 class WizardService : public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
 
-   explicit WizardService(ProgramState state, const  QString &currentUserName, const  QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultValues, Terminal *terminal, QObject *parent);
+    explicit WizardService(LoadingState state, const  QString &currentUserName, const  QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultValues, Terminal *terminal, QObject *parent);
 
-   ~WizardService();
-
-   bool CheckAndParseBackupFile(const QString &backupPath);
-
-   bool HasBackup() const;
-
-   bool HasOldData() const;
-
-   void GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QVector<User> &userList);
-
-   int GetUserCountFromUserRepository(const bool isOldData) const;
-
-   void GetDataFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs);
-
-   int GetUserCountFromDesktopRepository(const int roleIndex, const bool isOldData);
-
-   QString &GetActionWithUserRepository();
-
-   void SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository);
-
-   const QString &GetActionWithRoleRepository(const int roleIndex);
-
-   void ApplyWizard();
-
-public Q_SLOTS:
-
-   void SetActionWithUserRepository(const QString &actionWithUserRepository);
-
-private:
-
-   QStringList m_validSettingsPaths;
-
-   const QStringList m_defaultSettingsValues;
-
-   Terminal *m_terminal;
-
-private:
-
-   QString m_actionWithUserRepository;
-
-   QStringList m_actionWithRolesRepository = {"", "", "", ""};
-
-   UsersDataWizardRepository *m_oldDataCurrentUserWizardRepositry;
-
-   UsersDataWizardRepository *m_backupDataUserWizardRepositry;
-
-   RolesAndStartupsWizardRepository *m_oldDataRolesAndStartupsWizardRepository;
-
-   RolesAndStartupsWizardRepository *m_backupDataRolesAndStartupsWizardRepository;
-
-private:
-
-   const QStringList m_backupCorrectTagsList = {"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
+    ~WizardService();
 
 Q_SIGNALS:
 
-   void BackupIsCorrect(bool value);
+    void ToSetFCSForm(bool isOldData, QString &adminFCS, QString &adminRank);
 
-   void SetFCSForm(bool isOldData, QString &adminFCS, QString &adminRank);
+    void ToWizardFinished();
 
-   void Finished();
+public Q_SLOTS:
+
+    void OnSetActionWithUserRepository(const QString &actionWithUserRepository);
+
+public:
+
+    bool CheckAndParseBackupFile(const QString &backupPath);
+
+    bool HasBackup() const;
+
+    bool HasOldData() const;
+
+    void GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QVector<User> &userList);
+
+    int GetUserCountFromUserRepository(const bool isOldData) const;
+
+    void GetDataFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs);
+
+    int GetUserCountFromDesktopRepository(const int roleIndex, const bool isOldData);
+
+    QString &GetActionWithUserRepository();
+
+    void SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository);
+
+    const QString &GetActionWithRoleRepository(const int roleIndex);
+
+    QStringList ApplyWizard();
+
+    QStringList &GetResultSettingsPaths();
 
 private:
 
-   void SetOldRepositoriesData(ProgramState state, QStringList &validSettingsPaths,  Terminal *terminal);
+    void SetOldRepositoriesData(LoadingState &state, QStringList &validSettingsPaths);
 
-   void TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths);
+    void TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths);
 
-   void TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPaths);
+    void TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPaths);
 
-   void ParseBackupFile(QDomDocument &backupXMLDocument);
+    void ParseBackupFile(QDomDocument &backupXMLDocument);
 
 private:
 
-   void ApplySettingsWithUserRepository();
+    const QString &ApplySettingsWithUserRepositoryAndReturnPath(const QString &actionWithUserRepository, const QStringList &validSettingsPaths, const QStringList &defautSettingsValues, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
 
-   void ApplySettingsWithRolesRepository();
+    const QStringList ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, const QStringList &validSettingsPaths, const QStringList &defautSettingsValues, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository);
+
+    const QStringList GetPathsFromRolesAndExecs(const QStringList &actionsWithRoleRepository, const QStringList &validSettinsPath, const QStringList &defaultSettingsPaths) const;
+
+private:
+
+    QStringList m_validSettingsPaths;
+
+    const QStringList m_defaultSettingsValues;
+
+    QStringList m_resultSettingsPaths;
+
+    Terminal *m_terminal;
+
+private:
+
+    QString m_actionWithUserRepository;
+
+    QStringList m_actionWithRolesRepository;
+
+    UsersDataWizardRepository *m_oldDataCurrentUserWizardRepositry;
+
+    UsersDataWizardRepository *m_backupDataUserWizardRepositry;
+
+    RolesAndStartupsWizardRepository *m_oldDataRolesAndStartupsWizardRepository;
+
+    RolesAndStartupsWizardRepository *m_backupDataRolesAndStartupsWizardRepository;
+
+private:
+
+    const QStringList m_backupCorrectTagsList = {"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
 
 };
 

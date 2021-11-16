@@ -19,33 +19,33 @@
 
 class AdditionalSettingsPanel : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    AdditionalSettingsPanel(Terminal *terminal, QWidget *parent);
-    ~AdditionalSettingsPanel();
-    void setRoleEditPanelData(const QString &role, QStringList *users);
-    void setUserFilesEditPanelData(const QString &name, const QString &role);
+   AdditionalSettingsPanel(Terminal *terminal, QWidget *parent);
+   ~AdditionalSettingsPanel();
+
+private:
+   void CreateUI(Terminal *terminal);
+   void SetBackGroundColor();
+   void InsertWidgetsIntoLayout();
+   void ConnectObjects();
+
+Q_SIGNALS:
+   void ToSetDefaultRoleApps(const QString &role);
+
+public:
+   void setRoleEditPanelData(const QString &role, QStringList *users);
+   void setUserFilesEditPanelData(const QString &name, const QString &role);
 
 private:
 
-    void initUI(Terminal *terminal);
-    void setBackGroundColor();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+   QHBoxLayout *m_mainLayout;
 
-signals:
+   UserFilesEditPanel *m_userFilesEditPanel;
 
-    void setDefaultRoleApps(const QString &role);
-
-private:
-
-    QHBoxLayout *m_mainLayout;
-
-    UserFilesEditPanel *m_userFilesEditPanel;
-
-    RoleEditPanel *m_roleEditPanel;
+   RoleEditPanel *m_roleEditPanel;
 
 };
 

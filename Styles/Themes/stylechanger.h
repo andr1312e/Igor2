@@ -18,7 +18,7 @@ public:
 
 public slots:
 
-   void hangeTheme(bool state);
+   void OnChangeTheme(bool state);
 
 private:
    bool currentThemeIsWhite;

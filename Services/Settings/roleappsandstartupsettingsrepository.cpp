@@ -55,7 +55,7 @@ void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromFile(QStrin
    SetRoleStartupsFromFile(pathToStartupsFolder);
 }
 
-void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(const int roleIndex, QDomElement &backupNode)
+void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex, QDomElement &backupNode)
 {
    QDomElement desktops = backupNode.firstChildElement();
    QDomElement startups = backupNode.lastChildElement();

@@ -22,19 +22,32 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(ProgramState &loadedDbAdnRolesState, FirstStartSettingsService *firstStartSettingService, QWidget *parent);
+   StartupWizard(LoadingState &loadedDbAdnRolesState, FirstStartSettingsService *firstStartSettingService, QWidget *parent);
    ~StartupWizard();
-   void accept() override;
-   void reject() override;
+private:
+   void CreateServices();
+   void CreateUI();
+   void InitSizes();
+   void InitStyles();
+   void InitBehaviour();
+   void ConnectObjects();
+
 Q_SIGNALS:
-   void WizardFinished();
-   void WizardRejected();
-   void ChangeTheme(bool state);
+   void ToWizardFinished();
+   void ToQuit();
+   void ToChangeTheme(bool state);
+   void ToSetDbAndIconsPaths(const QStringList &paths);
+
 private Q_SLOTS:
    void OnHelpButtonClick();
    void OnThemeButtonClick(bool checked);
+
+public:
+   void accept() Q_DECL_OVERRIDE;
+   void reject() Q_DECL_OVERRIDE;
+
 private:
-   ProgramState m_programState;
+   LoadingState m_programState;
    FirstStartSettingsService *m_firstStartSettingService;
 
    WizardService *m_wizardService;
@@ -45,13 +58,7 @@ private:
    QVector<RoleAppsWizardPage *> m_rolesPages;
    ConclusionWizardPage *m_conclusionPage;
 
-private:
-   void CreateServices();
-   void CreateUI();
-   void InitSizes();
-   void InitStyles();
-   void InitBehaviour();
-   void CreateConnections();
+   bool notDone=true;//for double click
 
 };
 

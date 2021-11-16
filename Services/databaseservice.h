@@ -16,39 +16,45 @@ class DatabaseService
 
 public:
 
-    DatabaseService(Terminal *terminal);
+   DatabaseService(Terminal *terminal);
 
-    void loadFromFile(const QString &userDbPath);
+   void LoadFromFile(const QString &userDbPath);
 
-    ~DatabaseService();
+   ~DatabaseService();
 
-    void getRLSTIAdminsUserName (QStringList &adminsUserNames);
+   void GetRLSTIAdminsUserName (QStringList &adminsUserNames);
 
-    void readUserFromFile (User &currentUser);
+   void ReadUserFromFile (User &currentUser);
 
-    QString getUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute);
+   QString GetUserAttributeByLinuxUserNameToList(const QString &userName, const QString &attribute);
 
-    QString getFilePath(){ return m_userDbPath;}
+   QString GetFilePath()
+   {
+      return m_userDbPath;
+   }
 
-    Terminal* getTerminal() {return m_terminal;}
+   Terminal *GetTerminal()
+   {
+      return m_terminal;
+   }
 
-    void writeToFile(QList<User> *users);
-
-private:
-
-    QString m_userDbPath;
-
-    Terminal *m_terminal;
-
-    QFile *m_file;
-
-    QDomDocument *m_accountsData;
-
-    QByteArray m_array;
+   void WriteToFile(QList<User> *users);
 
 private:
 
-    QDomElement createUserElement(QDomDocument &users, const User &user);
+   QString m_userDbPath;
+
+   Terminal *m_terminal;
+
+   QFile *m_file;
+
+   QDomDocument *m_accountsData;
+
+   QByteArray m_array;
+
+private:
+
+   QDomElement createUserElement(QDomDocument &users, const User &user);
 
 };
 

@@ -18,7 +18,7 @@ bool IdentifyService::canGetAccess()
 {
     if (!m_linuxUserService->hasCurrentUserAdminPrivileges())
         return false;
-    m_databaseService->getRLSTIAdminsUserName(*m_adminsUserName);
+    m_databaseService->GetRLSTIAdminsUserName(*m_adminsUserName);
     QString userName=m_linuxUserService->getCurrentUserName();
     for (QStringList::iterator it=m_adminsUserName->begin(); it!=m_adminsUserName->end(); ++it)
     {

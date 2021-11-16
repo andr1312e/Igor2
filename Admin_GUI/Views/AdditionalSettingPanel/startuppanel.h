@@ -16,87 +16,87 @@
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h"
 
-enum STARTUP_PANEL_TYPE{
-    USER_APPS,
-    ROLE_APPS,
+enum STARTUP_PANEL_TYPE {
+   USER_APPS,
+   ROLE_APPS,
 };
 
 class StartupPanel : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    StartupPanel(Terminal *terminal,const STARTUP_PANEL_TYPE type, QWidget *parent);
+   StartupPanel(Terminal *terminal, const STARTUP_PANEL_TYPE type, QWidget *parent);
 
-    ~StartupPanel();
+   ~StartupPanel();
 
-    void setParam(const QString &param, QStringList *users);
+   void setParam(const QString &param, QStringList *users);
 
-public slots:
+public Q_SLOTS:
 
-    void setDefaultRoleApps(const QString &role);
+   void OnSetDefaultRoleApps(const QString &role);
 
-signals:
+Q_SIGNALS:
 
-    void roleStartupFileChanged();
-
-private:
-
-    void initServices(Terminal *terminal);
-    void setBackGroundColor();
-    void initUI();
-    void initModel();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+   void ToRoleStartupFileChanging();
 
 private:
 
-    const STARTUP_PANEL_TYPE m_type;
-
-    QStringList *m_usersList;
-
-    StartupRepositoryService *m_startupRepositoryService;
-
-    QString m_startupFilePath;
-
-    QStringListModel *m_appsList;
-
-    int m_selectedItemIndex;
-
-    QVBoxLayout *m_mainLayout;
-
-    QLabel *m_titleLabel;
-
-    QListView *m_allProgramsListView;
-
-    QHBoxLayout *m_bottomLayout;
-
-    QPushButton *m_addProgramButton;
-
-    QPushButton *m_deleteProgramButton;
-
-    QtMaterialDialog *m_dialog;
-
-    QVBoxLayout *m_dialogLayout;
-
-    StartupDialogWidget *m_dialogWidget;
-
-private slots:
-
-    void deleteProgram();
-
-    void addProgram(const QString &exec);
-
-    void onProgramSelect(const QModelIndex &index);
+   void CreateServices(Terminal *terminal);
+   void SetBackGroundColor();
+   void CreateUI();
+   void CreateModel();
+   void InsertWidgetsIntoLayout();
+   void ConnectObjects();
 
 private:
 
-    void updateAllUsersWithCurrentRole(QStringList &appsList);
+   const STARTUP_PANEL_TYPE m_type;
 
-    void updateModel();
+   QStringList *m_usersList;
 
-    void writeAppListToAllUsersWithRole(QStringList &appsList);
+   StartupRepositoryService *m_startupRepositoryService;
+
+   QString m_startupFilePath;
+
+   QStringListModel *m_appsList;
+
+   int m_selectedItemIndex;
+
+   QVBoxLayout *m_mainLayout;
+
+   QLabel *m_titleLabel;
+
+   QListView *m_allProgramsListView;
+
+   QHBoxLayout *m_bottomLayout;
+
+   QPushButton *m_addProgramButton;
+
+   QPushButton *m_deleteProgramButton;
+
+   QtMaterialDialog *m_dialog;
+
+   QVBoxLayout *m_dialogLayout;
+
+   StartupDialogWidget *m_dialogWidget;
+
+private Q_SLOTS:
+
+   void OnDeleteProgram();
+
+   void OnAddProgram(const QString &exec);
+
+   void OnProgramSelect(const QModelIndex &index);
+
+private:
+
+   void UpdateAllUsersWithCurrentRole(QStringList &appsList);
+
+   void UpdateModel();
+
+   void WriteAppListToAllUsersWithRole(QStringList &appsList);
 
 };
 

@@ -25,17 +25,17 @@ StartupRunnableService::~StartupRunnableService()
 
 bool StartupRunnableService::run(const QString &userName)
 {
-   QStringList execs = readUserExecFile(userName);
+   QStringList execs = ReadUserExecFile(userName);
 
-   if (isAllExecsValid(execs)) {
-      initProcessStruct(execs);
+   if (IsAllExecsValid(execs)) {
+      InitProcessStruct(execs);
       return true;
    } else {
       return false;
    }
 }
 
-QStringList StartupRunnableService::readUserExecFile(const QString &userName)
+QStringList StartupRunnableService::ReadUserExecFile(const QString &userName)
 {
    QString m_startupFolder = "/home/" + userName + "/RLS_TI/";
    QString m_startupFile = "/home/" + userName + "/RLS_TI/Startup";
@@ -56,7 +56,7 @@ QStringList StartupRunnableService::readUserExecFile(const QString &userName)
    return execsList;
 }
 
-bool StartupRunnableService::isAllExecsValid(QStringList &execsList)
+bool StartupRunnableService::IsAllExecsValid(QStringList &execsList)
 {
    for (QStringList::const_iterator it = execsList.cbegin(); it != execsList.cend(); ++it) {
       if (!QFile::exists(*it)) {
@@ -68,7 +68,7 @@ bool StartupRunnableService::isAllExecsValid(QStringList &execsList)
    return true;
 }
 
-void StartupRunnableService::initProcessStruct(QStringList execsList)
+void StartupRunnableService::InitProcessStruct(QStringList execsList)
 {
    m_runnableProcess->resize(execsList.size());
 
@@ -80,7 +80,7 @@ void StartupRunnableService::initProcessStruct(QStringList execsList)
       for (QList<QString>::ConstIterator programPath = execsList.cbegin(); programPath != execsList.cend(); ++programPath) {
          (*processIter) = new QProcess();
          (*processIter)->setObjectName(*programPath);
-         connect(*processIter, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableService::restartProcess);
+         connect(*processIter, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableService::OnRestartProcess);
 
          if (!((*processIter)->state() == QProcess::Running)) {
             (*processIter)->start(*programPath, QStringList());
@@ -89,9 +89,9 @@ void StartupRunnableService::initProcessStruct(QStringList execsList)
    }
 }
 
-void StartupRunnableService::restartProcess()
+void StartupRunnableService::OnRestartProcess()
 {
    QProcess *process = static_cast<QProcess *>(sender());
    process->start();
-   emit programFall();
+   emit ToProgramFall();
 }

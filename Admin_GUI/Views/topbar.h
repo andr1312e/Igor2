@@ -23,8 +23,8 @@ public:
 
 Q_SIGNALS:
 
-   void HideAdditionalSettings(bool state);
-   void ChangeTheme(bool state);
+   void ToHideAdditionalSettings(bool state);
+   void ToChangeTheme(bool state);
 
 private:
 

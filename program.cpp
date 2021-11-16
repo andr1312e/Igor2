@@ -4,12 +4,12 @@
 
 Program::Program(int &argc, char **argv)
    : QApplication(argc, argv, true)
-   , m_loadedDbAdnRolesState(ProgramState::CantRun)
+   , m_loadedDbAdnRolesState(LoadingState::CantRun)
    , m_hasAdminPrivileges(false)
    , m_sharedMemory(new QSharedMemory("PROCESS_CONTROLLER", this))
    , m_terminal(nullptr)
    , m_linuxUserService(nullptr)
-   , m_settingFileService(nullptr)
+   , m_firstStartSettingsService(nullptr)
    , m_startupWizard(nullptr)
    , m_dataBaseService(nullptr)
    , m_indentifyService(nullptr)
@@ -18,7 +18,7 @@ Program::Program(int &argc, char **argv)
    , m_AdminGui(nullptr)
    , m_fakeUI(new FakeUI)
    , m_framelessWindow(nullptr)
-   , m_proxyStyle(nullptr)
+   , m_styleChanger(nullptr)
 {
    m_fakeUI->hide();
 }
@@ -30,7 +30,7 @@ Program::~Program()
    delete m_fakeUI;
 
    if (m_terminal != nullptr) {
-      delete m_settingFileService;
+      delete m_firstStartSettingsService;
 
       if (m_AdminGui != nullptr) {
          delete m_AdminGui;
@@ -67,23 +67,24 @@ void Program::CreateApp()//MAIN
    GetCurrentUserNameIdAndAdminPriviliges();
    InitSettingsService();
    GetProgramState();
+   InitFramelessWindow();
+   InitStyle();
    ProcessDataLoading();
 }
 
 void Program::ProcessDataLoading()
 {
+
    switch (m_loadedDbAdnRolesState) {
       case NoFiles:
       case NoUserDb:
       case NoRoleData: {
-         InitStyle();
-         InitFramelessWindow();
          StartSettingsWizard();
          break;
       }
 
       case Fine: {
-         ContinueLoading();
+         OnContinueLoading();
          break;
       }
 
@@ -97,38 +98,36 @@ void Program::ProcessDataLoading()
 void Program::InitStyle()
 {
    this->setStyle(QStringLiteral("Fusion"));
-   m_proxyStyle = new StyleChanger(this);
-   m_proxyStyle->hangeTheme(m_settingFileService->GetThemeValue());
+   m_styleChanger = new StyleChanger(this);
+   m_styleChanger->OnChangeTheme(m_firstStartSettingsService->GetThemeValue());
 }
 
 void Program::InitFramelessWindow()
 {
-   m_framelessWindow = new FramelessWindow(nullptr);
+   m_framelessWindow = new FramelessWindow(Q_NULLPTR);
    m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
    m_framelessWindow->SetWindowTitle("Мастер первоначальной настройки");
-
+   m_framelessWindow->show();
 }
 
 void Program::StartSettingsWizard()
 {
-   m_startupWizard = new StartupWizard(m_loadedDbAdnRolesState, m_settingFileService, nullptr);
-   connect(m_startupWizard, &StartupWizard::ChangeTheme, m_proxyStyle, &StyleChanger::hangeTheme);
-   connect(m_startupWizard, &StartupWizard::WizardFinished, this, &Program::ContinueLoading);
-   connect(m_startupWizard, &StartupWizard::WizardRejected, [&]() {
-      this->exit();
-   });
+   m_startupWizard = new StartupWizard(m_loadedDbAdnRolesState, m_firstStartSettingsService, Q_NULLPTR);
+   connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+   connect(m_startupWizard, &StartupWizard::ToWizardFinished, this, &Program::OnContinueLoading);
+   connect(m_startupWizard, &StartupWizard::ToQuit, this, &Program::quit);
+   connect(m_startupWizard, &StartupWizard::ToSetDbAndIconsPaths, m_firstStartSettingsService, &FirstStartSettingsService::OnSetDbAndIconsPaths);
    m_framelessWindow->SetMainWidget(m_startupWizard);
-   m_framelessWindow->show();
 }
 
-void Program::ContinueLoading()
+void Program::OnContinueLoading()
 {
    GetSettings();
    InitRunnableService();
 
    if (AllAppsRunned()) {
       InitRarmSocket();
-      CreateConnections();
+      ConnectObjects();
 
       if (m_hasAdminPrivileges) {
          InitAdminServices();
@@ -156,17 +155,17 @@ void Program::GetCurrentUserNameIdAndAdminPriviliges()
 
 void Program::InitSettingsService()
 {
-   m_settingFileService = new FirstStartSettingsService(m_currentUserName, m_currentUserId, m_hasAdminPrivileges, m_fakeUI, m_terminal);
+   m_firstStartSettingsService = new FirstStartSettingsService(m_currentUserName, m_currentUserId, m_hasAdminPrivileges, m_fakeUI, m_terminal);
 }
 
 void Program::GetProgramState()
 {
-   m_loadedDbAdnRolesState = m_settingFileService->IsAllDataLoaded();
+   m_loadedDbAdnRolesState = m_firstStartSettingsService->IsAllDataLoaded();
 }
 
 void Program::GetSettings()
 {
-   m_userDBPath = m_settingFileService->GetUserDBPathValue();
+   m_userDBPath = m_firstStartSettingsService->GetUserDBPathValue();
 }
 
 void Program::InitRunnableService()
@@ -188,7 +187,7 @@ void Program::InitRarmSocket()
 void Program::InitAdminServices()
 {
    m_dataBaseService = new DatabaseService(m_terminal);
-   m_dataBaseService->loadFromFile(m_userDBPath);
+   m_dataBaseService->LoadFromFile(m_userDBPath);
    m_indentifyService = new IdentifyService(m_terminal, m_dataBaseService, m_linuxUserService);
    m_linuxUserService->getAllUsersInSystem();
 }
@@ -198,19 +197,17 @@ void Program::InitAdminUI()
    if (m_indentifyService->canGetAccess()) {
 
       m_AdminGui = new Admin_GUI(m_dataBaseService, m_linuxUserService);
-      connect(m_AdminGui, &Admin_GUI::setTheme, m_proxyStyle, &StyleChanger::hangeTheme);
+      connect(m_AdminGui, &Admin_GUI::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
       m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
       m_framelessWindow->SetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
       m_framelessWindow->SetMainWidget(m_AdminGui);
    }
 }
 
-void Program::CreateConnections()
+void Program::ConnectObjects()
 {
-   connect(m_startupRunnableService, &StartupRunnableService::programFall, m_socketToRarm, &SocketToRarm::programFall);
+   connect(m_startupRunnableService, &StartupRunnableService::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
 }
-
-
 
 void Program::StartAdminServices()
 {

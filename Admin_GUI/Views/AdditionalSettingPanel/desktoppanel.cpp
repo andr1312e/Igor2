@@ -4,12 +4,12 @@ DesktopPanel::DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *p
     : QWidget(parent)
     , m_type(type)
 {
-    initServices(terminal);
-    initModel();
-    initUI();
-    setBackGroundColor();
-    insertWidgetsIntoLayout();
-    createConnections();
+    CreateServices(terminal);
+    InitModel();
+    CreateUI();
+    SetBackGroundColor();
+    InsertWidgetsIntoLayout();
+    ConnectObjects();
 }
 
 DesktopPanel::~DesktopPanel()
@@ -30,7 +30,7 @@ DesktopPanel::~DesktopPanel()
     delete m_dialog;
 }
 
-void DesktopPanel::setParam(const QString &param, QStringList *users)
+void DesktopPanel::SetParam(const QString &param, QStringList *users)
 {
     QString rootFolder="/home/";
     QString titleText="Добавить ярлык";
@@ -41,18 +41,18 @@ void DesktopPanel::setParam(const QString &param, QStringList *users)
     }
     else
     {
-        rootFolder=rootFolder+"user/RLS_TI/"+param+"/";
+        rootFolder=rootFolder+"user/RLS_TI/"+param;
         titleText=titleText+" на рабочий стол для пользователей с ролью: " + param;
     }
     m_pararm=param;
     m_usersList=users;
-    m_dialogWidget->setTitleText(titleText);
+    m_dialogWidget->SetTitleText(titleText);
     m_rootFileService->SetPath(rootFolder);
     m_addProgramButton->setEnabled(true);
     m_deleteProgramButton->setDisabled(true);
 }
 
-void DesktopPanel::setDefaultRoleApps(const QString &role)
+void DesktopPanel::OnSetDefaultRoleApps(const QString &role)
 {
     if (m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
     {
@@ -64,12 +64,12 @@ void DesktopPanel::setDefaultRoleApps(const QString &role)
     }
 }
 
-void DesktopPanel::initServices(Terminal *terminal)
+void DesktopPanel::CreateServices(Terminal *terminal)
 {
     m_rootFileService=new FileExplorer(terminal);
 }
 
-void DesktopPanel::initUI()
+void DesktopPanel::CreateUI()
 {
 
     m_mainLayout=new QVBoxLayout();
@@ -98,7 +98,7 @@ void DesktopPanel::initUI()
     setMinimumWidth(420);
 }
 
-void DesktopPanel::setBackGroundColor()
+void DesktopPanel::SetBackGroundColor()
 {
     m_addProgramButton->setObjectName("add");
     m_deleteProgramButton->setObjectName("remove");
@@ -110,12 +110,12 @@ void DesktopPanel::setBackGroundColor()
     m_dialogWidget->setAutoFillBackground(true);
 }
 
-void DesktopPanel::initModel()
+void DesktopPanel::InitModel()
 {
     m_model=m_rootFileService->GetModel();
 }
 
-void DesktopPanel::insertWidgetsIntoLayout()
+void DesktopPanel::InsertWidgetsIntoLayout()
 {
     m_mainLayout->addWidget(m_programsToRun);
     m_mainLayout->addWidget(m_allProgramsListView);
@@ -131,13 +131,13 @@ void DesktopPanel::insertWidgetsIntoLayout()
     setLayout(m_mainLayout);
 }
 
-void DesktopPanel::createConnections()
+void DesktopPanel::ConnectObjects()
 {
-    connect(m_allProgramsListView, &QListView::clicked, this, &DesktopPanel::onProgramSelect);
-    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::showDialog);
-    connect(m_deleteProgramButton, &QPushButton::clicked, this, &DesktopPanel::deleteProgram);
-    connect(m_dialogWidget, &FileDialogWidget::hideDialogSignal, m_dialog, &QtMaterialDialog::hideDialog);
-    connect(m_dialogWidget, &FileDialogWidget::addFileToUserDesktop, this, &DesktopPanel::addProgram);
+    connect(m_allProgramsListView, &QListView::clicked, this, &DesktopPanel::OnProgramSelect);
+    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::OnShowDialog);
+    connect(m_deleteProgramButton, &QPushButton::clicked, this, &DesktopPanel::OnDeleteProgram);
+    connect(m_dialogWidget, &FileDialogWidget::ToDialogSignalHide, m_dialog, &QtMaterialDialog::OnHideDialog);
+    connect(m_dialogWidget, &FileDialogWidget::ToAddFileToUserDesktop, this, &DesktopPanel::OnAddProgram);
 }
 
 void DesktopPanel::updateAllUsersWithCurrentRole()
@@ -151,20 +151,20 @@ void DesktopPanel::updateAllUsersWithCurrentRole()
     }
 }
 
-void DesktopPanel::addProgram(const QString &exec, const QString &iconPath, const QString &iconName)
+void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName)
 {
     m_rootFileService->AddIcon(exec, iconPath, iconName);
     updateAllUsersWithCurrentRole();
 }
 
-void DesktopPanel::deleteProgram()
+void DesktopPanel::OnDeleteProgram()
 {
     m_rootFileService->DeleteIcon(m_selectedItemName);
     m_deleteProgramButton->setDisabled(true);
     updateAllUsersWithCurrentRole();
 }
 
-void DesktopPanel::onProgramSelect(const QModelIndex &index)
+void DesktopPanel::OnProgramSelect(const QModelIndex &index)
 {
     QVariant indexData=index.data(Qt::UserRole+1);
     DesktopEntity entity=indexData.value<DesktopEntity>();
