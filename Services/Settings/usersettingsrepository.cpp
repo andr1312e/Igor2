@@ -71,7 +71,7 @@ void UsersDataWizardRepository::GetFCSAndRolesFromXml(const QDomElement &usersNo
             user.FCS = userElement.attribute("FCS");
             user.name = userElement.attribute("name");
             user.rank = userElement.attribute("rank");
-            user.role = userElement.attribute("role");
+            user.role = userElement.attribute("role").toInt();
             user.userId = userElement.attribute("userId");
 
             m_usersList.push_back(user);
@@ -82,13 +82,13 @@ void UsersDataWizardRepository::GetFCSAndRolesFromXml(const QDomElement &usersNo
 
 void UsersDataWizardRepository::WriteUserRepositoryToDB(ISqlDatabaseService *m_iSqlDatabaseService, bool needToWriteOnlyAdmin)
 {
-    if(!m_iSqlDatabaseService->CheckUserTable())
+    if(!m_iSqlDatabaseService->CheckUsersTable())
     {
         m_iSqlDatabaseService->CreateUsersTableIfNotExists();
     }
     else
     {
-        m_iSqlDatabaseService->ClearUserTable();
+        m_iSqlDatabaseService->ClearUsersTable();
     }
 
     if (needToWriteOnlyAdmin) {
@@ -143,7 +143,7 @@ void UsersDataWizardRepository::AppendAdminToCacheList()
     User user;
     user.FCS = m_currentUserFCS;
     user.rank = m_currenUserRank;
-    user.role = Roles.at(Roles.count() - 1);
+    user.role = Roles.count() - 1;
     user.userId = m_curerntUserId;
     user.name = m_curerntUserName;
     m_usersList.append(user);
@@ -164,6 +164,6 @@ void UsersDataWizardRepository::WriteAdminToDatabase(ISqlDatabaseService *m_iSql
     admin.name=m_curerntUserName;
     admin.FCS=m_currentUserFCS;
     admin.rank=m_currenUserRank;
-    admin.role=Roles.last();
+    admin.role=Roles.count()-1;
     m_iSqlDatabaseService->AppendUserIntoTable(admin);
 }

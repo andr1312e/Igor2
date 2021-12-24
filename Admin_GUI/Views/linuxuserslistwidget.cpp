@@ -123,7 +123,7 @@ void LinuxUsersListWidget::DeleteUser(const QString &userId)
     m_userModel->DeleteUser(userId);
 }
 
-void LinuxUsersListWidget::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role)
+void LinuxUsersListWidget::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role)
 {
     m_userModel->AddUserToModel(userId, FCS, rank, role);
 }

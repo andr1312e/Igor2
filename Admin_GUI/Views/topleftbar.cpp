@@ -20,10 +20,10 @@ TopLeftBar::~TopLeftBar()
     delete m_currentUseRoleLabel;
 }
 
-void TopLeftBar::SetData(QString &rank, QString &FCS, QString &role)
+void TopLeftBar::SetData(const QString &rank, const QString &FCS,const int &role)
 {
     m_currentUserNameLabel->setText("Добро пожаловать товарищ:  " + rank + " " + FCS);
-    m_currentUseRoleLabel->setText("Ваша роль:  " + role);
+    m_currentUseRoleLabel->setText("Ваша роль:  " + Roles.at(role));
 }
 
 void TopLeftBar::CreateUI()

@@ -93,9 +93,9 @@ void Program::GetCurrentUserNameIdAndAdminPriviliges()
 
 LoadingState Program::GetProgramState()
 {
-    if (m_sqlDatabaseService->CheckUserTable())
+    if (m_sqlDatabaseService->CheckUsersTable())
     {
-        if(m_sqlDatabaseService->CheckExecTables() && m_sqlDatabaseService->CheckExecTables())
+        if(m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
         {
             return LoadingState::Fine;
         }
@@ -106,7 +106,7 @@ LoadingState Program::GetProgramState()
     }
     else
     {
-        if(m_sqlDatabaseService->CheckExecTables() && m_sqlDatabaseService->CheckExecTables())
+        if(m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
         {
             return LoadingState::NoUserDb;
         }
@@ -179,22 +179,22 @@ void Program::OnContinueLoading()
         InitRarmSocket();
 
 
-//        if (m_linuxUserService->HasCurrentUserAdminPrivileges()) {
-            InitAdminServices();
-            InitAdminUI();
-            ConnectObjects();
-//        }
+        //        if (m_linuxUserService->HasCurrentUserAdminPrivileges()) {
+        InitAdminServices();
+        InitAdminUI();
+        ConnectObjects();
+        //        }
     }
 }
 
 void Program::InitRunnableService()
 {
-    m_startupRunnableService = new StartupRunnableManager(m_rlstiFolder, m_sqlDatabaseService,m_terminal, this);
+    m_startupRunnableService = new StartupRunnableManager(m_linuxUserService->GetCurrentUserName(), m_rlstiFolder, m_sqlDatabaseService,m_terminal, this);
 }
 
 bool Program::AllAppsRunned()
 {
-    return m_startupRunnableService->SetUserNameAndCheckFilesExsists(m_linuxUserService->GetCurrentUserName());
+    return m_startupRunnableService->RunStartups();
 }
 
 void Program::InitRarmSocket()
@@ -209,9 +209,9 @@ void Program::InitAdminServices()
 
 void Program::InitAdminUI()
 {
-//    if (CanGetAdminAccess())
+    //    if (CanGetAdminAccess())
     {
-        m_AdminGui = new Admin_GUI(m_sqlDatabaseService, m_linuxUserService, nullptr);
+        m_AdminGui = new Admin_GUI(m_linuxUserService->GetCurrentUserId(), m_sqlDatabaseService, m_linuxUserService, nullptr);
         m_framelessWindow->OnSetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
         m_framelessWindow->SetMainWidget(m_AdminGui);
         m_framelessWindow->show();
@@ -220,23 +220,21 @@ void Program::InitAdminUI()
 
 void Program::ConnectObjects()
 {
-    if (CanGetAdminAccess())
-    {
-        connect(m_AdminGui, &Admin_GUI::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
-        connect(m_framelessWindow, &FramelessWindow::ToSetDelegateView, m_AdminGui, &Admin_GUI::ToSetDelegateView);
-        connect(m_framelessWindow, &FramelessWindow::ToHideAdditionalSettings, m_AdminGui, &Admin_GUI::OnHideAdditionalSettings);
-    }
+    connect(m_framelessWindow, &FramelessWindow::ToSetDelegateView, m_AdminGui, &Admin_GUI::ToSetDelegateView);
+    connect(m_framelessWindow, &FramelessWindow::ToHideAdditionalSettings, m_AdminGui, &Admin_GUI::OnHideAdditionalSettings);
+    connect(m_AdminGui, &Admin_GUI::ToCurrentUserRoleChanged, m_startupRunnableService, &StartupRunnableManager::OnCurrentUserRoleChanged);
     connect(m_startupRunnableService, &StartupRunnableManager::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
     connect(m_tray, &Tray::ToCloseApp, this, &QApplication::quit);
     connect(m_tray, &Tray::ToShowApp, m_framelessWindow, &FramelessWindow::show);
     connect(m_tray, &Tray::ToHideApp, m_framelessWindow, &QWidget::hide);
+    //    connect()
 }
 
 bool Program::CanGetAdminAccess()
 {
     if (m_linuxUserService->HasCurrentUserAdminPrivileges())
     {
-        if (m_sqlDatabaseService->CheckUserTable())
+        if (m_sqlDatabaseService->CheckUsersTable())
         {
             QStringList adminsUserName=m_sqlDatabaseService->GetAdminsRoleUserName();
             QString userName=m_linuxUserService->GetCurrentUserName();

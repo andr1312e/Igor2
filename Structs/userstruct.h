@@ -11,7 +11,7 @@ struct User{
     QString name;
     QString FCS;
     QString rank;
-    QString role;
+    int role;
     QString m_image;
     bool hasData=false;
 

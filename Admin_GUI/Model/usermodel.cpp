@@ -16,7 +16,7 @@ UserModel::~UserModel()
     delete m_currentRoleUsers;
 }
 
-void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role)
+void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role)
 {
     for (User &user  : m_users)
     {
@@ -26,6 +26,7 @@ void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const 
             user.rank = rank;
             user.role = role;
             user.hasData = true;
+            m_databaseService->AppendUserIntoTable(user);
             SetImageToUser(user);
             FillModelByList();
             return;
@@ -43,8 +44,9 @@ void UserModel::DeleteUser(const QString &userId)
         {
             user.FCS.clear();
             user.rank.clear();
-            user.role.clear();
+            user.role=-1;
             user.hasData = false;
+//            m_databaseService->RemoveUserIntoTable(user);
             SetImageToUser(user);
             FillModelByList();
             return;
@@ -132,13 +134,13 @@ void UserModel::FillModelByList()
 
 void UserModel::SetImageToUser(User &user)
 {
-    if (user.role == Roles.at(0)) {
+    if (user.role == 0) {
         user.m_image = ":/images/0.jpg";
     } else {
-        if (user.role == Roles.at(1)) {
+        if (user.role == 1) {
             user.m_image = ":/images/1.jpg";
         } else {
-            if (user.role == Roles.at(2)) {
+            if (user.role == 2) {
                 user.m_image = ":/images/2.jpg";
             } else {
                 user.m_image = ":/images/3.jpg";

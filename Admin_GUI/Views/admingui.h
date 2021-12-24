@@ -23,7 +23,7 @@ class Admin_GUI : public QWidget
 
 public:
 
-    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
+    Admin_GUI(const QString &currentUserId, ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
     ~Admin_GUI();
 
 private:
@@ -36,19 +36,20 @@ private:
 Q_SIGNALS:
     void ToChangeTheme(bool isDarkTheme);
     void ToSetDelegateView(bool state);
+    void ToCurrentUserRoleChanged();
 public Q_SLOTS:
     void OnHideAdditionalSettings(bool state);
 private Q_SLOTS:
     void OnUserClick(const User &user);
     void OnDeleteUser(const QString &userId);
-    void OnSaveUser(const QString&userId, const QString &FCS, const QString &rank, const QString &oldRole, const QString &newRole);
+    void OnSaveUser(const QString&userId, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
 private:
     void InitTopBar();
 
 private:
     int m_maxWidth;
     int m_maxHeight;
-
+    const QString m_currentUserId;
 private:
     ISqlDatabaseService *m_databaseService;
     LinuxUserService *m_linuxUserService;

@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QResizeEvent>
 
+#include "Structs/userstruct.h"
+
 class TopLeftBar : public QWidget
 {
     Q_OBJECT
@@ -20,7 +22,7 @@ private:
     void InitUI();
 
 public:
-    void SetData(QString &rank, QString &FCS, QString &role);
+    void SetData(const QString &rank, const QString &FCS, const int &role);
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

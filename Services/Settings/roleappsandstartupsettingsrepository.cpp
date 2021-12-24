@@ -28,7 +28,7 @@ void RolesAndStartupsWizardRepository::GetRoleDesktopsAndStartupsFromDb(ISqlData
 {
     for (int i=0; i<Roles.count(); ++i)
     {
-        AppendRoleStartups(i, iSqlDatabaseService->GetAllRoleExecs(i));
+        AppendRoleStartups(i, iSqlDatabaseService->GetAllRoleStartups(i));
         QList<DesktopEntity> desktopEntityList=iSqlDatabaseService->GetAllRoleDesktops(i);
         for (DesktopEntity & entity: desktopEntityList)
         {
@@ -68,12 +68,12 @@ void RolesAndStartupsWizardRepository::SaveRoleDesktopsToDb(ISqlDatabaseService 
 
 void RolesAndStartupsWizardRepository::SaveRoleExecsToDb(ISqlDatabaseService *iSqlDatabaseService, const int roleIndex)
 {
-    iSqlDatabaseService->CreateExecsTableInNotExists(roleIndex);
-    iSqlDatabaseService->ClearExecsTable(roleIndex);
+    iSqlDatabaseService->CreateStartupsTableInNotExists(roleIndex);
+    iSqlDatabaseService->ClearStartupsTable(roleIndex);
     QStringList currentRoleStartups(GetStatupsByIndex(roleIndex));
     for (QString &exec :currentRoleStartups)
     {
-        iSqlDatabaseService->AppendExecIntoRole(roleIndex, exec);
+        iSqlDatabaseService->AppendStartupIntoRole(roleIndex, exec);
     }
 }
 

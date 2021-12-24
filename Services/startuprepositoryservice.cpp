@@ -14,24 +14,24 @@ StartupRepositoryPresenter::~StartupRepositoryPresenter()
 
 void StartupRepositoryPresenter::CheckStartupTable(const quint8 &roleId)
 {
-    m_sqlDatabaseService->CreateExecsTableInNotExists(roleId);
+    m_sqlDatabaseService->CreateStartupsTableInNotExists(roleId);
 }
 
 QStringList StartupRepositoryPresenter::GetAllStartups(const quint8 &roleId)
 {
-    QStringList startupsList = m_sqlDatabaseService->GetAllRoleExecs(roleId);
+    QStringList startupsList = m_sqlDatabaseService->GetAllRoleStartups(roleId);
     return startupsList;
 }
 
 void StartupRepositoryPresenter::DeleteStartup(const quint8 &roleId, const QString &startupPath)
 {
-    m_sqlDatabaseService->RemoveExecIntoRole(roleId, startupPath);
+    m_sqlDatabaseService->RemoveStartupIntoRole(roleId, startupPath);
     TryDeleteFile(startupPath);
 }
 
 void StartupRepositoryPresenter::AppendStartup(const quint8 &roleId, const QString &startupPath)
 {
-    m_sqlDatabaseService->AppendExecIntoRole(roleId, startupPath);
+    m_sqlDatabaseService->AppendStartupIntoRole(roleId, startupPath);
     TryToCopyFile(startupPath);
 }
 

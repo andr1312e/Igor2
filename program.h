@@ -33,7 +33,6 @@ public:
    void CreateApp();
 
 private:
-
    void InitTerminal();
    void InitUserService();
    void InitSqlService();
@@ -53,12 +52,9 @@ private Q_SLOTS:
 public:
    void InitRunnableService();
    bool AllAppsRunned();
-
    void InitAdminServices();
    void InitRarmSocket();
-
    void InitAdminUI();
-
    void ConnectObjects();
 
 private:

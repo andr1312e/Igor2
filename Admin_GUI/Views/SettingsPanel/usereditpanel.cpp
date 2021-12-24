@@ -120,9 +120,9 @@ void UserEditPanel::FillUI()
 
     m_roleComboBox->addItems(Roles);
     quint8 index=0;
-    for (QVarLengthArray<QString, 4>::const_iterator it=RolesToolTip.cbegin(); it!=RolesToolTip.cend(); ++it)
+    for (const QString role: RolesToolTip)
     {
-        m_roleComboBox->setItemData(index, *it, Qt::ToolTipRole);
+        m_roleComboBox->setItemData(index, role, Qt::ToolTipRole);
         index++;
     }
 
@@ -162,9 +162,9 @@ void UserEditPanel::OnSaveUser()
     else
     {
         const QString rank=m_rankComboBox->currentText();
-        const QString role=m_roleComboBox->currentText();
-        Q_EMIT ToSaveUser(m_userId, FCS, rank, m_oldRole, role);
-        m_oldRole=role;
+        const int roleIndex=m_roleComboBox->currentIndex();
+        Q_EMIT ToSaveUser(m_userId, FCS, rank, m_oldRoleIndex, roleIndex);
+        m_oldRoleIndex=roleIndex;
         ShowSaveUserToast(m_userName);
     }
 }
@@ -196,7 +196,7 @@ void UserEditPanel::SetUser(const User &user)
 {
     m_userName=user.name;
     m_userId=user.userId;
-    m_oldRole=user.role;
+    m_oldRoleIndex=user.role;
     GetUserKioskState(m_userName);
     InsertUserData(user);
     if (m_currentUserName==m_userName)
@@ -259,7 +259,7 @@ void UserEditPanel::InsertUserData(const User &user)
         m_editFieldsLabel->setText(userEditFields.at(1));
         m_FCSLineEdit->setText(user.FCS);
         m_rankComboBox->setCurrentText(user.rank);
-        m_roleComboBox->setCurrentText(user.role);
+        m_roleComboBox->setCurrentText(Roles.at(user.role));
     }
     else
     {

@@ -14,25 +14,26 @@ class StartupRunnableManager: public QObject
     Q_OBJECT
 
 public:
-    StartupRunnableManager(const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
+    StartupRunnableManager(const QString currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
     ~StartupRunnableManager();
 
 Q_SIGNALS:
-    void ToExecApplicationNotExsists(const QString &execPath);
+    void ToStartupApplicationNotExsists(const QString &execPath);
     void ToProgramFall();
 
 private Q_SLOTS:
     void OnRestartProcess();
-
+public Q_SLOTS:
+    void OnCurrentUserRoleChanged();
 public:
-    bool SetUserNameAndCheckFilesExsists(const QString &userName);
+    bool RunStartups();
 
 protected:
     virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    QProcess * CreateReRestartApp(const QString &exec);
-    QStringList ReadUserStartupFile(const QString &userName);
+    QProcess * CreateReRestartApp(const QString &startup);
+    QStringList ReadUserStartupFile();
     bool IsAllStartupValid(const QStringList &startupsList);
     void InitStartupProcessList(const QStringList &startupsList);
 
@@ -40,6 +41,7 @@ private:
     void StringsThatAreContainedAndNot(const QStringList &sourceList, const QStringList &otherList, QStringList &contained, QStringList &notContained);
 
 private:
+    const QString m_currentUserName;
     const QString m_rlsTiFolderPath;
     ISqlDatabaseService *m_sqlService;
     Terminal *m_terminal;

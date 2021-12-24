@@ -47,7 +47,7 @@ private Q_SLOTS:
 public:
    void SetDelegateView(bool state);
    void DeleteUser(const QString &userId);
-   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
+   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role);
 
 private:
    void UpdateFontSize();

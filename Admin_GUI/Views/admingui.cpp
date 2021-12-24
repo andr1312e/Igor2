@@ -1,7 +1,8 @@
 #include "admingui.h"
 
-Admin_GUI::Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
+Admin_GUI::Admin_GUI(const QString &currentUserId, ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
     :  QWidget(parent)
+    ,  m_currentUserId(currentUserId)
     ,  m_databaseService(databaseService)
     ,  m_linuxUserService(userService)
 {
@@ -83,7 +84,7 @@ void Admin_GUI::InitTopBar()
     QString currentUserLinuxUserName = m_linuxUserService->GetCurrentUserName();
     QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
     QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
-    QString userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
+    int userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
     m_leftTopBar->SetData(userRank, userFCS, userRole);
 }
 
@@ -114,9 +115,9 @@ void Admin_GUI::OnUserClick(const User &user)
 {
     m_userEditPanel->SetUser(user);
     m_userDesktopPanel->SetUser(user);
-    if(!user.role.isEmpty())
+    if(user.role!=0)
     {
-        m_roleEditPanel->OnRoleToViewChanged(Roles.indexOf(user.role));
+        m_roleEditPanel->OnRoleToViewChanged(user.role);
     }
 }
 
@@ -126,10 +127,19 @@ void Admin_GUI::OnDeleteUser(const QString &userId)
     m_userDesktopPanel->DeleteUserAllRoleIcons();
 }
 
-void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QString &rank, const QString &oldRole, const QString &newRole)
+void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QString &rank, const int &oldRole, const int &newRole)
 {
     m_usersListWidget->AddUserToModel(userId, FCS, rank, newRole);
+    m_roleEditPanel->OnRoleToViewChanged(newRole);
+    if(userId==m_currentUserId)
+    {
+        if(oldRole!=newRole)
+        {
+            Q_EMIT ToCurrentUserRoleChanged();
+        }
+        m_leftTopBar->SetData(FCS, rank, newRole);
+    }
     //удалить иконки с декскоп панели старые
     //добавить новые иконки с декскоп панели
-    m_roleEditPanel->OnRoleToViewChanged(Roles.indexOf(newRole));
+
 }

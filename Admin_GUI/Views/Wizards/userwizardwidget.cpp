@@ -96,7 +96,7 @@ void UserWizardWidget::setWizardWidgetFileds(const QString &title, QString &FCS,
          m_accountsData->setItem(r, 1, new QTableWidgetItem(users.at(r).name));
          m_accountsData->setItem(r, 2, new QTableWidgetItem(users.at(r).FCS));
          m_accountsData->setItem(r, 3, new QTableWidgetItem(users.at(r).rank));
-         m_accountsData->setItem(r, 4, new QTableWidgetItem(users.at(r).role));
+         m_accountsData->setItem(r, 4, new QTableWidgetItem(Roles.at(users.at(r).role)));
       }
    }
 }

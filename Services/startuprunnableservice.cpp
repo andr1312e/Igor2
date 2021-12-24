@@ -2,8 +2,9 @@
 #include <QDebug>
 #include <QFile>
 
-StartupRunnableManager::StartupRunnableManager(const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent)
+StartupRunnableManager::StartupRunnableManager(const QString currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent)
     : QObject(parent)
+    , m_currentUserName(currentUserName)
     , m_rlsTiFolderPath(rlstiFolderPath)
     , m_sqlService(sqlService)
     , m_terminal(terminal)
@@ -26,12 +27,24 @@ void StartupRunnableManager::OnRestartProcess()
     }
 }
 
-bool StartupRunnableManager::SetUserNameAndCheckFilesExsists(const QString &userName)
+void StartupRunnableManager::OnCurrentUserRoleChanged()
 {
-    const QStringList execs = ReadUserStartupFile(userName);
+    m_listAlreadyRunningsApps.clear();
+    for (QProcess *process:m_runnableProcess)
+    {
+        disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+        process->kill();
+    }
+    m_runnableProcess.clear();
+    RunStartups();
+}
 
-    if (IsAllStartupValid(execs)) {
-        InitStartupProcessList(execs);
+bool StartupRunnableManager::RunStartups()
+{
+    const QStringList starups = ReadUserStartupFile();
+
+    if (IsAllStartupValid(starups)) {
+        InitStartupProcessList(starups);
         return true;
     } else {
         return false;
@@ -57,23 +70,22 @@ void StartupRunnableManager::timerEvent(QTimerEvent *event)
     }
 }
 
-QProcess *StartupRunnableManager::CreateReRestartApp(const QString &exec)
+QProcess *StartupRunnableManager::CreateReRestartApp(const QString &startup)
 {
     QProcess *process=new QProcess();
-    process->setObjectName(m_rlsTiFolderPath+exec);
+    process->setObjectName(m_rlsTiFolderPath+startup);
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
-    process->start(m_rlsTiFolderPath+exec);
+    process->start(m_rlsTiFolderPath+startup);
     return process;
 }
 
-QStringList StartupRunnableManager::ReadUserStartupFile(const QString &userName)
+QStringList StartupRunnableManager::ReadUserStartupFile()
 {
     QStringList startupsList;
-    const QString userRole=m_sqlService->GetUserRole(userName);
-    if (!userRole.isEmpty())
+    const int userRole=m_sqlService->GetUserRole(m_currentUserName);
+    if (!(userRole==-1))
     {
-        const int roleId=Roles.indexOf(userRole);
-        startupsList=m_sqlService->GetAllRoleExecs(roleId);
+        startupsList=m_sqlService->GetAllRoleStartups(userRole);
     }
     return startupsList;
 }
@@ -82,7 +94,7 @@ bool StartupRunnableManager::IsAllStartupValid(const QStringList &startupsList)
 {
     for (const QString &startup:startupsList) {
         if (!QFile::exists(m_rlsTiFolderPath+startup)) {
-            Q_EMIT ToExecApplicationNotExsists(m_rlsTiFolderPath+startup);
+            Q_EMIT ToStartupApplicationNotExsists(m_rlsTiFolderPath+startup);
             return false;
         }
     }
@@ -100,9 +112,9 @@ void StartupRunnableManager::InitStartupProcessList(const QStringList &startupsL
         QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList("StartupRunnableManager::InitStartupProcessList");
         QStringList notRunnedApps;
         StringsThatAreContainedAndNot(listOfAlreadyRunningProcessName, startupsList, m_listAlreadyRunningsApps, notRunnedApps);
-        for (const QString &exec : notRunnedApps)
+        for (const QString &startup : notRunnedApps)
         {
-            m_runnableProcess.append(CreateReRestartApp(exec));
+            m_runnableProcess.append(CreateReRestartApp(startup));
         }
         if(!m_listAlreadyRunningsApps.isEmpty())
         {

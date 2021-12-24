@@ -36,7 +36,7 @@ private:
 Q_SIGNALS:
     void ToDeleteUser(const QString &userId);
     void ToRoleToViewChanged(const int &roleId);
-    void ToSaveUser(const QString&userId, const QString &FCS, const QString &rank, const QString &oldRole, const QString &newRole);
+    void ToSaveUser(const QString&userId, const QString &FCS, const QString &rank, const int &oldRoleIndex, const int &newRoleIndex);
 
 private Q_SLOTS:
     void OnSaveUser();
@@ -62,7 +62,7 @@ private:
 
     QString m_userName;
     QString m_userId;
-    QString m_oldRole;
+    int m_oldRoleIndex;
 
     QVBoxLayout *m_mainLayout;
     QLabel *m_editFieldsLabel;

@@ -17,7 +17,7 @@ public:
 
    ~UserModel();
 
-   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
+   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role);
 
    QStandardItemModel *GetModel();
 
