@@ -31,6 +31,48 @@ QString Terminal::RunConsoleCommand(const QString &command, const QString called
    return processOutput;
 }
 
+QStringList Terminal::GetAllUsersList(const QString calledFunc)
+{
+    QString getAllUsersTextCommand = CreateGetAllUsersCommand();
+    QString allUsers=RunConsoleCommand(getAllUsersTextCommand, calledFunc);
+    QStringList usersList=allUsers.split('\n');
+    usersList.removeLast();
+    return usersList;
+}
+
+bool Terminal::IsDirExists(const QString folderPath, const QString calledFunc, bool hasRoot)
+{
+    QStringList listofSubFoldersToPath = folderPath.split('/');
+
+    if (listofSubFoldersToPath.isEmpty()) {
+       qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toLatin1().constData(), folderPath.toLatin1().constData());
+    } else {
+       listofSubFoldersToPath.removeAll("");
+       QString currentPath = "/";
+
+       for (QStringList::iterator it = listofSubFoldersToPath.begin(); it != listofSubFoldersToPath.end(); ++it) {
+          if (*it == "Desktop") {
+             QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
+             QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+             if (!(files.contains((*it) + "@")) && !(folders.contains((*it) + "/"))) {
+                return false;
+             }
+          } else {
+             QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+             if (!folders.contains((*it) + "/")) {
+                return false;
+             }
+          }
+
+          currentPath = currentPath + *it + "/";
+       }
+
+       return true;
+    }
+}
+
 bool Terminal::IsDirNotExists(const QString folderPath, const QString calledFunc, bool hasRoot)
 {
    QStringList listofSubFoldersToPath = folderPath.split('/');
@@ -70,8 +112,12 @@ bool Terminal::IsFileExists(const QString filePath, const QString calledFunc, bo
    QString folderPath = filePath.left(backSlashPos);
    QString fileName = filePath.mid(backSlashPos + 1);
    QStringList files = GetFileList(folderPath, calledFunc, hasRoot);
-
-   if (files.contains(fileName)) {
+   while(files.count()==1 && files.first().endsWith('@') && !folderPath.endsWith('/'))
+   {
+      folderPath.push_back('/');
+      files = GetFileList(folderPath, calledFunc, hasRoot);
+   }
+   if (files.contains(fileName) || files.contains(fileName+"*")) {
       return true;
    } else {
       return false;
@@ -183,6 +229,28 @@ void Terminal::CopyFileSudo(const QString source, const QString &destination, co
    RunConsoleCommand(copyFileCommand, calledFunc);
 }
 
+QStringList Terminal::GetAllProcessList(const QString calledFunc)
+{
+    QString processListCommand=CreateGettAllProcessListCommand();
+    QString processes=RunConsoleCommand(processListCommand, calledFunc);
+    QStringList processList=processes.split('\n');
+    processList.removeLast();
+    for (QString &process: processList)
+    {
+        int index=process.indexOf('/');
+        if(index >0)
+        {
+            process.truncate(index);
+        }
+    }
+    return processList;
+}
+
+QString Terminal::CreateGetAllUsersCommand()
+{
+    return "awk -F: '{print $1 \":\" $3}' /etc/passwd";
+}
+
 QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasRoot)
 {
    if (hasRoot) {
@@ -255,5 +323,10 @@ QString Terminal::CreateDeleteEmptyFolderCommandSudo(const QString &folderPath)
 
 QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString &destination)
 {
-   return "sudo cp '" + source + "' '" + destination + "'";
+    return "sudo cp '" + source + "' '" + destination + "'";
+}
+
+QString Terminal::CreateGettAllProcessListCommand()
+{
+    return "ps -eo comm";
 }

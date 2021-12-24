@@ -20,11 +20,11 @@ class StartupDialogWidget : public QWidget
 public:
    explicit StartupDialogWidget(QWidget *parent);
    ~StartupDialogWidget();
-   void setTitleLabel(QString &userName);
 
 private:
    void CreateUI();
    void InsertWidgetsIntoLayouts();
+   void InitUI();
    void ConnectObjects();
 
 Q_SIGNALS:
@@ -40,27 +40,21 @@ private Q_SLOTS:
 private:
    void CearAllTextFiels();
 
-
 private:
 
    QVBoxLayout *m_mainLayout;
-
    QLabel *m_titleLabel;
-
    QHBoxLayout *m_execPathLayout;
-
-   QtMaterialTextField *m_exec;
-
+   QtMaterialTextField *m_execTextField;
    QPushButton *m_execButton;
 
-
    QHBoxLayout *m_bottomButtonsLayout;
-
    QPushButton *m_saveDialogButton;
-
    QPushButton *m_closeDialogButton;
-
    QMessageBox *m_errorMessagBox;
+
+private:
+   const QString m_desktopPath;
 };
 
 #endif // ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_EXECDIALOGWIDGET_H

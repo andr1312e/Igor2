@@ -8,16 +8,19 @@
 
 class UserDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
 public:
-
    UserDelegate(QFont *font, QObject *parent);
-
    ~UserDelegate();
 
-   void paint(QPainter *painter,
+public Q_SLOTS:
+   void OnSetDelegateView(bool state);
+
+public:
+    virtual void paint(QPainter *painter,
               const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
 
-   QSize sizeHint(const QStyleOptionViewItem &option,
+   virtual QSize sizeHint(const QStyleOptionViewItem &option,
                   const QModelIndex &index) const Q_DECL_OVERRIDE;
 private:
    QRect *m_globalRect;
@@ -32,6 +35,7 @@ private:
    QPen *m_mouseSelectedPen;
    QFont *m_font;
    QSize *m_size;
+   bool m_listItemsView;
 };
 
 #endif // ADMIN_GUI_DELEGATES_USERDELEGATE_H

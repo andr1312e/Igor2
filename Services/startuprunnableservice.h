@@ -2,53 +2,49 @@
 #define SERVICES_STARTUPRUNNABLESERVICE_H
 
 #include <QProcess>
-#include <QPair>
 #include <QStringList>
 #include <QObject>
-#include <QMetaMethod>
+#include <QTimerEvent>
 
 #include "Services/Terminals/terminal.h"
+#include "Services/isqlservice.h"
 
-
-class StartupRunnableService: public QObject
+class StartupRunnableManager: public QObject
 {
-
-   Q_OBJECT
+    Q_OBJECT
 
 public:
+    StartupRunnableManager(const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
+    ~StartupRunnableManager();
 
-   StartupRunnableService(Terminal *terminal, QObject *parent);
-
-   ~StartupRunnableService();
-
-   bool run(const QString &userName);
-
-signals:
-
-   void noExecApplication(const QString &execPath);
-
-   void ToProgramFall();
-
-private:
-
-   Terminal *m_terminal;
-
-   QVector<QProcess *> *m_runnableProcess;
-
-   QStringList *m_processParams;
-
-private:
-
-   QStringList ReadUserExecFile(const QString &userName);
-
-   bool IsAllExecsValid(QStringList &execsList);
-
-   void InitProcessStruct(QStringList execsList);
+Q_SIGNALS:
+    void ToExecApplicationNotExsists(const QString &execPath);
+    void ToProgramFall();
 
 private Q_SLOTS:
+    void OnRestartProcess();
 
-   void OnRestartProcess();
+public:
+    bool SetUserNameAndCheckFilesExsists(const QString &userName);
 
+protected:
+    virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
+
+private:
+    QProcess * CreateReRestartApp(const QString &exec);
+    QStringList ReadUserStartupFile(const QString &userName);
+    bool IsAllStartupValid(const QStringList &startupsList);
+    void InitStartupProcessList(const QStringList &startupsList);
+
+private:
+    void StringsThatAreContainedAndNot(const QStringList &sourceList, const QStringList &otherList, QStringList &contained, QStringList &notContained);
+
+private:
+    const QString m_rlsTiFolderPath;
+    ISqlDatabaseService *m_sqlService;
+    Terminal *m_terminal;
+    QList<QProcess*> m_runnableProcess;
+    QStringList m_listAlreadyRunningsApps;
 };
 
 #endif // SERVICES_STARTUPRUNNABLESERVICE_H

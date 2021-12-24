@@ -1,18 +1,17 @@
 #include "wizardservice.h"
 
-WizardService::WizardService(LoadingState state, const QString &currentUserName, const QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultSettingsValues, Terminal *terminal, QObject *parent)
+WizardService::WizardService(const QString &rlsTiFolder, LoadingState state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent)
     : QObject(parent)
-    , m_validSettingsPaths(validSettingsPaths)
-    , m_defaultSettingsValues(defaultSettingsValues)
-    , m_resultSettingsPaths(QStringList({"", "", ""}))
-    , m_terminal(terminal)
+    , m_terminal(service->GetTerminal())
+    , m_rlsTiFolder(rlsTiFolder)
     , m_actionWithRolesRepository(QStringList({"", "", "", ""}))
-    , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, terminal))
-    , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, terminal))
-    , m_oldDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
-    , m_backupDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(terminal))
+    , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(service))
+    , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(service))
+    , m_oldDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(m_terminal))
+    , m_backupDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(m_terminal))
+    , m_iSqlDatabaseService(iSqlDataBaseService)
 {
-    SetOldRepositoriesData(state, validSettingsPaths);
+    GetExsistsRepositoriesData(state);
 }
 
 WizardService::~WizardService()
@@ -23,45 +22,46 @@ WizardService::~WizardService()
     delete m_backupDataRolesAndStartupsWizardRepository;
 }
 
-void WizardService::SetOldRepositoriesData(LoadingState &state, QStringList &validSettingsPaths)
+void WizardService::GetExsistsRepositoriesData(LoadingState &state)
 {
     switch (state) {
     case CantRun:
-        qFatal("Недопустимый код");
+        Q_UNREACHABLE();
 
     case NoFiles:
         break;
 
     case NoRoleData:
-        TryToSetCurrentUserOldsFcsAndRank(validSettingsPaths);
+        GetExsistsUsersListFromDb();
         break;
 
     case NoUserDb:
-        TryToSetOldExecsAndDesktopFiles(validSettingsPaths);
+        GetExsistsExecsAndDesktopFilesFromDb();
         break;
 
     case Fine:
-        qFatal("Недопустимый код");
+        Q_UNREACHABLE();
     }
 }
 
-void WizardService::TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths)
+void WizardService::GetExsistsUsersListFromDb()
 {
-    m_oldDataCurrentUserWizardRepositry->SetFCSAndRolesFromFile(validSettingsPaths.first());
+    m_oldDataCurrentUserWizardRepositry->GetExsistsUsersListFromDb(m_iSqlDatabaseService);
 }
 
-void WizardService::TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPaths)
+void WizardService::GetExsistsExecsAndDesktopFilesFromDb()
 {
-    m_oldDataRolesAndStartupsWizardRepository->SetRoleDesktopsAndStartupsFromFile(validSettingsPaths.front(), validSettingsPaths.last());
+    m_oldDataRolesAndStartupsWizardRepository->GetRoleDesktopsAndStartupsFromDb(m_iSqlDatabaseService);
 }
 
 bool WizardService::CheckAndParseBackupFile(const QString &backupPath)
 {
-    QByteArray arr = m_terminal->GetFileText(backupPath, "WizardService::CheckAndParseBackupFile", true).toUtf8();
-    QDomDocument m_backupXMLDocument;
-
-    if (m_backupXMLDocument.setContent(arr)) {
-        QDomElement settings = m_backupXMLDocument.firstChildElement();
+    QByteArray backupByteArray = m_terminal->GetFileText(backupPath, "WizardService::CheckAndParseBackupFile", true).toUtf8();
+    QDomDocument backupXmlDocument;
+    QString errorMessage;
+    int errorLine=0, errorColumn=0;
+    if (backupXmlDocument.setContent(backupByteArray, false, &errorMessage, &errorLine, &errorColumn)) {
+        QDomElement settings = backupXmlDocument.firstChildElement();
 
         if (settings.tagName() == "settings") {
             QDomNodeList list = settings.childNodes();
@@ -72,26 +72,44 @@ bool WizardService::CheckAndParseBackupFile(const QString &backupPath)
             }
 
             if (tagList == m_backupCorrectTagsList) {
-                ParseBackupFile(m_backupXMLDocument);
+                m_backupFolder=backupPath.left(backupPath.lastIndexOf('/')+1);
+                ParseBackupFile(m_backupFolder, backupXmlDocument);
                 return true;
+            }
+            else
+            {
+                m_backupFolder.clear();
             }
         }
     }
-
+    else
+    {
+        qDebug()<< errorMessage << " at line: " << errorLine << " at column: " << errorColumn;
+    }
     return false;
 }
 
-bool WizardService::HasBackup() const
+bool WizardService::HasUserBackup() const
 {
-    return m_backupDataUserWizardRepositry->HasData() || m_backupDataRolesAndStartupsWizardRepository->HasData();
+    return m_backupDataUserWizardRepositry->HasData();
 }
 
-bool WizardService::HasOldData() const
+bool WizardService::HasProgramBackUp() const
 {
-    return m_oldDataCurrentUserWizardRepositry->HasData() || m_oldDataRolesAndStartupsWizardRepository->HasData();
+    return m_backupDataRolesAndStartupsWizardRepository->HasData();
 }
 
-void WizardService::ParseBackupFile(QDomDocument &backupXMLDocument)
+bool WizardService::HasUserOldData() const
+{
+    return m_oldDataCurrentUserWizardRepositry->HasData();
+}
+
+bool WizardService::HastProgramOldData() const
+{
+    return m_oldDataRolesAndStartupsWizardRepository->HasData();
+}
+
+void WizardService::ParseBackupFile(const QString &backupPath, QDomDocument &backupXMLDocument)
 {
     QDomElement settings = backupXMLDocument.firstChildElement();
     QDomElement users = settings.firstChildElement();
@@ -100,73 +118,64 @@ void WizardService::ParseBackupFile(QDomDocument &backupXMLDocument)
     QDomNodeList usersAndRolesXmlList = settings.childNodes();
     for (int i = 0; i < Roles.count(); i++) {
         QDomElement role = usersAndRolesXmlList.at(i+1).toElement();
-        m_backupDataRolesAndStartupsWizardRepository->SetRoleDesktopsAndStartupsFromBackup(i, role);
+        m_backupDataRolesAndStartupsWizardRepository->SetRoleDesktopsAndStartupsFromBackup(i, role, backupPath);
     }
 }
 
-const QString &WizardService::ApplySettingsWithUserRepositoryAndReturnPath(const QString &actionWithUserRepository, const QStringList &validSettingsPaths, const QStringList &defautSettingsValues, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository)
+void WizardService::ApplySettingsWithUserRepository(const QString &actionWithUserRepository, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository)
 {
     if (userWizardPageComboBoxBackupAndOldDataActions.at(0) == actionWithUserRepository) {
-        backupRepository->WriteUserRepositoryToFile(defautSettingsValues.first(), true);
-        return defautSettingsValues.first();
+        oldRepository->WriteUserRepositoryToDB(m_iSqlDatabaseService, true);
     } else {
         if (userWizardPageComboBoxBackupAndOldDataActions.at(1) == actionWithUserRepository) {
-            backupRepository->WriteUserRepositoryToFile(defautSettingsValues.first(), false);
-            return defautSettingsValues.first();
+            backupRepository->WriteUserRepositoryToDB(m_iSqlDatabaseService, false);
         } else {
-            oldRepository->WriteUserRepositoryToFile(validSettingsPaths.first(), false);
-            return validSettingsPaths.first();
+            oldRepository->WriteUserRepositoryToDB(m_iSqlDatabaseService, false);
         }
     }
 }
 
-const QStringList WizardService::ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, const QStringList &validSettingsPaths, const QStringList&defautSettingsValues, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository)
+void WizardService::ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository)
 {
-    QStringList execsAndRolesPaths(GetPathsFromRolesAndExecs(actionsWithRoleRepository, validSettingsPaths, defautSettingsValues));
+    QStringList programsNamesToCopy;
     for (int i=0; i<Roles.count(); ++i)
     {
         if (actionsWithRoleRepository.at(i) == m_rolesWizardPageComboBoxBackupAndOldDataActions.at(0)) {
-            backupRepository->SaveRoleDesktops(execsAndRolesPaths.front(), i);
-            backupRepository->SaveRoleStartups(execsAndRolesPaths.last(), i);
+            m_iSqlDatabaseService->ClearExecsTable(i);
+            m_iSqlDatabaseService->ClearDesktopTable(i);
         } else {
             if (actionsWithRoleRepository.at(i) == m_rolesWizardPageComboBoxBackupAndOldDataActions.at(1)) {
-                backupRepository->SaveRoleDesktops(execsAndRolesPaths.front(), i);
-                backupRepository->SaveRoleStartups(execsAndRolesPaths.last(), i);
-            }
-            else
-            {
-                oldRepository->SaveRoleDesktops(execsAndRolesPaths.front(), i);
-                oldRepository->SaveRoleStartups(execsAndRolesPaths.last(), i);
+                backupRepository->SaveRoleDesktopsToDb(m_iSqlDatabaseService, i);
+                backupRepository->SaveRoleExecsToDb(m_iSqlDatabaseService, i);
+                programsNamesToCopy.append(backupRepository->GetAllUniqueDesktopExecsAndStarups(i));
             }
         }
     }
-    return execsAndRolesPaths;
+    if(!programsNamesToCopy.isEmpty())
+    {
+        programsNamesToCopy.removeDuplicates();
+        CopyFilesFromRoleToFolder(m_backupFolder, programsNamesToCopy);
+    }
 }
 
-const QStringList WizardService::GetPathsFromRolesAndExecs(const QStringList &actionsWithRoleRepository, const QStringList &validSettinsPath, const QStringList &defaultSettingsPaths) const
+void WizardService::CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList programs)
 {
-    QStringList resultSettingsPaths;
-    if (m_validSettingsPaths.count()==2)
+    if (m_terminal->IsDirNotExists(m_rlsTiFolder, "WizardService::CopyFilesFromRoleToFolder", true))
     {
-        resultSettingsPaths.push_back(validSettinsPath.front());
-        resultSettingsPaths.push_back(validSettinsPath.last());
-        for (QStringList::const_iterator it=actionsWithRoleRepository.cbegin(); it!=actionsWithRoleRepository.cend(); ++it) {
-            if (*it!=m_rolesWizardPageComboBoxBackupAndOldDataActions.last())
-            {
-                resultSettingsPaths.front()=defaultSettingsPaths.at(1);
-                resultSettingsPaths.last()=defaultSettingsPaths.at(2);
-            }
+        m_terminal->CreateFolder(m_rlsTiFolder, "WizardService::CopyFilesFromRoleToFolder", true);
+    }
+    for (const QString &program : programs)
+    {
+        QString fullpath=sourceFolder+program;
+        if(m_terminal->IsFileExists(m_rlsTiFolder+program, "WizardService::CopyFilesFromRoleToFolder", true))
+        {
+            m_terminal->DeleteFileSudo(m_rlsTiFolder+program, "WizardService::CopyFilesFromRoleToFolder");
         }
+        m_terminal->CopyFileSudo(fullpath, m_rlsTiFolder, "WizardService::CopyFilesFromRoleToFolder");
     }
-    else
-    {
-        resultSettingsPaths.push_back(defaultSettingsPaths.at(1));
-        resultSettingsPaths.push_back(defaultSettingsPaths.at(2));
-    }
-    return resultSettingsPaths;
 }
 
-void WizardService::GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QVector<User> &userList)
+void WizardService::GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QList<User> &userList)
 {
     UsersDataWizardRepository *currentRepository;
 
@@ -203,7 +212,7 @@ void WizardService::GetDataFromDesktopRepository(const int roleIndex, const bool
     }
 
     if (currentRepository->HasData()) {
-        currentRepository->RetunRoleDesktopsAndStartups(roleIndex, roleDesktops, roleExecs);
+        currentRepository->GetRoleDesktopsAndStartupsFromLocalRepository(roleIndex, roleDesktops, roleExecs);
     }
 }
 
@@ -236,17 +245,8 @@ const QString &WizardService::GetActionWithRoleRepository(const int roleIndex)
     return m_actionWithRolesRepository.at(roleIndex);
 }
 
-QStringList WizardService::ApplyWizard()
+void WizardService::ApplyWizardActions()
 {
-    QString newUserDbPath=ApplySettingsWithUserRepositoryAndReturnPath(m_actionWithUserRepository, m_validSettingsPaths, m_defaultSettingsValues, m_backupDataUserWizardRepositry, m_oldDataCurrentUserWizardRepositry);
-    QStringList rolesAndExecsPaths=ApplySettingsWithRolesRepository(m_actionWithRolesRepository, m_validSettingsPaths, m_defaultSettingsValues, m_backupDataRolesAndStartupsWizardRepository, m_oldDataRolesAndStartupsWizardRepository);
-
-    QStringList allPathsToReturn(newUserDbPath);
-    allPathsToReturn.append(rolesAndExecsPaths);
-    return allPathsToReturn;
-}
-
-QStringList& WizardService::GetResultSettingsPaths()
-{
-    return m_resultSettingsPaths;
+    ApplySettingsWithUserRepository(m_actionWithUserRepository, m_backupDataUserWizardRepositry, m_oldDataCurrentUserWizardRepositry);
+    ApplySettingsWithRolesRepository(m_actionWithRolesRepository, m_backupDataRolesAndStartupsWizardRepository, m_oldDataRolesAndStartupsWizardRepository);
 }

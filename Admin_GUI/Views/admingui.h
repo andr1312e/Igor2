@@ -2,66 +2,68 @@
 #define ADMIN_GUI_VIEWS_ADMIN_GUI_H
 
 #include <QLabel>
+#include <QDebug>
+#include <QScreen>
+#include <QGuiApplication>
 
-#include "Services/databaseservice.h"
+#include "Services/isqlservice.h"
 #include "Services/linuxuserservice.h"
 
 #include "Admin_GUI/Model/usermodel.h"
 
-#include "Admin_GUI/Views/topbar.h"
+#include "Admin_GUI/Views/topleftbar.h"
 #include "Admin_GUI/Views/linuxuserslistwidget.h"
-#include "Admin_GUI/Views/SettingsPanel/settingspanel.h"
-#include "Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h"
-
+#include "Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h"
+#include "Admin_GUI/Views/SettingsPanel/usereditpanel.h"
+#include "Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h"
 
 class Admin_GUI : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
 
-   Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent = Q_NULLPTR);
-   ~Admin_GUI();
+    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
+    ~Admin_GUI();
+
+private:
+    void CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+    void InsertWidgetsIntoLayout();
+    void SetWidgetSizes();
+    void ConnectObjects();
+    void SetMaximumWidgetSize();
 
 Q_SIGNALS:
-
-   void ToChangeTheme(bool isDarkTheme);
-
-private:
-
-   void CreateUI();
-   void SetWidgetSizes();
-   void InsertWidgetsIntoLayout();
-   void ConnectObjects();
-   void SetMaximumWidgetSize();
-
-private:
-
-   DatabaseService *m_databaseService;
-   LinuxUserService *m_linuxUserService;
-   UserModel *m_userModel;
-
-   QVBoxLayout *m_mainLayout;
-   TopBar *m_topBar;
-
-   QHBoxLayout *m_programLayout;
-   LinuxUsersListWidget *m_linuxUsersListWidget;
-   SettingsPanel *m_settingsPanel;
-   AdditionalSettingsPanel *m_additionalSettingsPanel;
-
-
-
-   QScreen *m_currentScreen;
-   int m_maxWidth;
-   int m_maxHeight;
-
-private:
-   void initTopBar();
-
+    void ToChangeTheme(bool isDarkTheme);
+    void ToSetDelegateView(bool state);
+public Q_SLOTS:
+    void OnHideAdditionalSettings(bool state);
 private Q_SLOTS:
-   void OnHideAdditionalSettings(bool state);
-   void roleToViewChanged(const QString &role);
-   void onLinuxUserClick(User &user);
+    void OnUserClick(const User &user);
+    void OnDeleteUser(const QString &userId);
+    void OnSaveUser(const QString&userId, const QString &FCS, const QString &rank, const QString &oldRole, const QString &newRole);
+private:
+    void InitTopBar();
+
+private:
+    int m_maxWidth;
+    int m_maxHeight;
+
+private:
+    ISqlDatabaseService *m_databaseService;
+    LinuxUserService *m_linuxUserService;
+
+    QHBoxLayout *m_mainLayout;
+
+    QVBoxLayout *m_leftSideLayout;
+    TopLeftBar *m_leftTopBar;
+    LinuxUsersListWidget *m_usersListWidget;
+
+    QVBoxLayout *m_centerSideLayout;
+    UserEditPanel *m_userEditPanel;
+    DesktopPanel *m_userDesktopPanel;
+
+    RoleEditPanel *m_roleEditPanel;
 };
 
 #endif // ADMIN_GUI_VIEWS_ADMIN_GUI_H

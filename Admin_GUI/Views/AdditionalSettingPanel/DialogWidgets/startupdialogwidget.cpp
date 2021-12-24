@@ -2,9 +2,11 @@
 
 StartupDialogWidget::StartupDialogWidget(QWidget *parent)
     : QWidget(parent)
+    , m_desktopPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
 {
     CreateUI();
     InsertWidgetsIntoLayouts();
+    InitUI();
     ConnectObjects();
 }
 
@@ -15,16 +17,11 @@ StartupDialogWidget::~StartupDialogWidget()
     delete m_mainLayout;
 
     delete m_titleLabel;
-    delete m_exec;
+    delete m_execTextField;
     delete m_execButton;
     delete m_saveDialogButton;
     delete m_closeDialogButton;
     delete m_errorMessagBox;
-}
-
-void StartupDialogWidget::setTitleLabel(QString &userName)
-{
-    m_titleLabel->setText("Добавить контроль над закрытием программы для пользователя: " + userName);
 }
 
 void StartupDialogWidget::CreateUI()
@@ -32,30 +29,27 @@ void StartupDialogWidget::CreateUI()
     m_mainLayout= new QVBoxLayout;
 
     m_titleLabel=new QLabel();
-    m_titleLabel->setAlignment(Qt::AlignCenter);
+
 
     m_execPathLayout=new QHBoxLayout();
 
-    m_exec=new QtMaterialTextField();
-    m_exec->setLabel("Путь к исполняемому файлу: (Обязательно)");
+    m_execTextField=new QtMaterialTextField();
 
-    m_execButton=new QPushButton("Выбрать файл");
+    m_execButton=new QPushButton();
 
     m_bottomButtonsLayout=new QHBoxLayout();
-    m_saveDialogButton = new QPushButton("Применить");
-    m_saveDialogButton->setObjectName("add");
-    m_closeDialogButton = new QPushButton("Выйти без сохранения");
+    m_saveDialogButton = new QPushButton();
+
+    m_closeDialogButton = new QPushButton();
 
     m_errorMessagBox=new QMessageBox();
-    m_errorMessagBox->setIcon(QMessageBox::Critical);
-    m_errorMessagBox->setWindowTitle("Внимание!");
 }
 
 void StartupDialogWidget::InsertWidgetsIntoLayouts()
 {
     m_mainLayout->addWidget(m_titleLabel);
 
-    m_execPathLayout->addWidget(m_exec);
+    m_execPathLayout->addWidget(m_execTextField);
     m_execPathLayout->addWidget(m_execButton);
 
     m_mainLayout->addLayout(m_execPathLayout);
@@ -69,44 +63,57 @@ void StartupDialogWidget::InsertWidgetsIntoLayouts()
     setLayout(m_mainLayout);
 }
 
+void StartupDialogWidget::InitUI()
+{
+    m_titleLabel->setAlignment(Qt::AlignCenter);
+    m_execTextField->setLabel("Путь к исполняемому файлу: (Обязательно)");
+    m_execTextField->setText("Выбрать файл");
+
+    m_saveDialogButton->setText("Применить");
+    m_closeDialogButton->setText("Выйти без сохранения");
+
+    m_saveDialogButton->setObjectName("add");
+
+    m_errorMessagBox->setIcon(QMessageBox::Critical);
+    m_errorMessagBox->setWindowTitle("Внимание!");
+}
+
 void StartupDialogWidget::ConnectObjects()
 {
     connect(m_closeDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnHideAndClearDialog);
     connect(m_execButton, &QPushButton::clicked, this, &StartupDialogWidget::OnAddEcexPath);
     connect(m_saveDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnCheckExec);
-
 }
 
 void StartupDialogWidget::CearAllTextFiels()
 {
-    m_exec->clear();
+    m_execTextField->clear();
 }
 
 void StartupDialogWidget::OnHideAndClearDialog()
 {
     CearAllTextFiels();
-    emit ToHideDialog();
+    Q_EMIT ToHideDialog();
 }
 
 void StartupDialogWidget::OnAddEcexPath()
 {
-    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
-    m_exec->setText(loadPath);
+    QString loadPath = QFileDialog::getOpenFileName(this, "Выберите исполняемый файл", m_desktopPath);
+    m_execTextField->setText(loadPath);
 }
 
 void StartupDialogWidget::OnCheckExec()
 {
-    if (m_exec->text()=="")
+    if (m_execTextField->text().isEmpty())
     {
         m_errorMessagBox->setText("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно");
         m_errorMessagBox->exec();
     }
     else
     {
-        if (QFile::exists(m_exec->text()))
+        if (QFile::exists(m_execTextField->text()))
         {
-            emit ToAddExecPathToFile(m_exec->text());
+            Q_EMIT ToAddExecPathToFile(m_execTextField->text().simplified());
             OnHideAndClearDialog();
         }
         else

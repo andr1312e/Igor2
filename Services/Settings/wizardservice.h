@@ -1,6 +1,8 @@
 #ifndef SERVICES_SETTINGS_WIZARDSERVICE_H
 #define SERVICES_SETTINGS_WIZARDSERVICE_H
 
+#include "Services/isqlservice.h"
+
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 #include "Services/Settings/usersettingsrepository.h"
 #include "Services/Settings/programfilesstate.h"
@@ -15,13 +17,11 @@ class WizardService : public QObject
     Q_OBJECT
 public:
 
-    explicit WizardService(LoadingState state, const  QString &currentUserName, const  QString &currentUserId, QStringList &validSettingsPaths, const QStringList &defaultValues, Terminal *terminal, QObject *parent);
+    explicit WizardService(const QString &rlsTiFolder, LoadingState state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent);
 
     ~WizardService();
 
 Q_SIGNALS:
-
-    void ToSetFCSForm(bool isOldData, QString &adminFCS, QString &adminRank);
 
     void ToWizardFinished();
 
@@ -33,11 +33,15 @@ public:
 
     bool CheckAndParseBackupFile(const QString &backupPath);
 
-    bool HasBackup() const;
+    bool HasUserBackup() const;
 
-    bool HasOldData() const;
+    bool HasProgramBackUp() const;
 
-    void GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QVector<User> &userList);
+    bool HasUserOldData() const;
+
+    bool HastProgramOldData() const;
+
+    void GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QList<User> &userList);
 
     int GetUserCountFromUserRepository(const bool isOldData) const;
 
@@ -51,39 +55,35 @@ public:
 
     const QString &GetActionWithRoleRepository(const int roleIndex);
 
-    QStringList ApplyWizard();
-
-    QStringList &GetResultSettingsPaths();
+    void ApplyWizardActions();
 
 private:
 
-    void SetOldRepositoriesData(LoadingState &state, QStringList &validSettingsPaths);
+    void GetExsistsRepositoriesData(LoadingState &state);
 
-    void TryToSetCurrentUserOldsFcsAndRank(QStringList &validSettingsPaths);
+    void GetExsistsUsersListFromDb();
 
-    void TryToSetOldExecsAndDesktopFiles(QStringList &validSettingsPaths);
+    void GetExsistsExecsAndDesktopFilesFromDb();
 
-    void ParseBackupFile(QDomDocument &backupXMLDocument);
-
-private:
-
-    const QString &ApplySettingsWithUserRepositoryAndReturnPath(const QString &actionWithUserRepository, const QStringList &validSettingsPaths, const QStringList &defautSettingsValues, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
-
-    const QStringList ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, const QStringList &validSettingsPaths, const QStringList &defautSettingsValues, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository);
-
-    const QStringList GetPathsFromRolesAndExecs(const QStringList &actionsWithRoleRepository, const QStringList &validSettinsPath, const QStringList &defaultSettingsPaths) const;
+    void ParseBackupFile(const QString &backupPath, QDomDocument &backupXMLDocument);
 
 private:
 
-    QStringList m_validSettingsPaths;
+    void ApplySettingsWithUserRepository(const QString &actionWithUserRepository, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
 
-    const QStringList m_defaultSettingsValues;
+    void ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository);
 
-    QStringList m_resultSettingsPaths;
+    void CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList programs);
+
+private:
 
     Terminal *m_terminal;
 
 private:
+
+    const QString m_rlsTiFolder;
+
+    QString m_backupFolder;
 
     QString m_actionWithUserRepository;
 
@@ -96,6 +96,8 @@ private:
     RolesAndStartupsWizardRepository *m_oldDataRolesAndStartupsWizardRepository;
 
     RolesAndStartupsWizardRepository *m_backupDataRolesAndStartupsWizardRepository;
+
+    ISqlDatabaseService *m_iSqlDatabaseService;
 
 private:
 

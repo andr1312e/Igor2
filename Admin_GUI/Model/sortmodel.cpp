@@ -6,6 +6,11 @@ SortModel::SortModel(QObject *parent)
 
 }
 
+SortModel::~SortModel()
+{
+
+}
+
 void SortModel::UpdateSeachWordAndSeachAttribute(const QString &text, const QString &attribute)
 {
     m_searchText=text;
@@ -20,7 +25,7 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
         QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
         QVariant data=index.data(Qt::UserRole+1);
         User user=data.value<User>();
-        if (m_searchAttribute==comboBoxSearchAttributes.at(0))
+        if (comboBoxSearchAttributes.at(0)==m_searchAttribute)
         {
             if (user.FCS.contains(m_searchText))
             {
@@ -33,7 +38,7 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
         }
         else
         {
-            if (m_searchAttribute==comboBoxSearchAttributes.at(1))
+            if (comboBoxSearchAttributes.at(1)==m_searchAttribute)
             {
                 if (user.userId.contains(m_searchText))
                 {

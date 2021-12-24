@@ -4,9 +4,8 @@ UserWizardWidget::UserWizardWidget(const QStringList &headerLabels, QWidget *par
    : QWidget(parent)
    , m_headerLabels(headerLabels)
 {
-   initUI();
-   insertWidgetsIntoLayout();
-   createConnections();
+   InitUI();
+   InsertWidgetsIntoLayout();
 }
 
 UserWizardWidget::~UserWizardWidget()
@@ -26,11 +25,55 @@ UserWizardWidget::~UserWizardWidget()
    delete m_accountsData;
 }
 
-void UserWizardWidget::setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QVector<User> &users)
+void UserWizardWidget::InitUI()
+{
+   m_stringValidator = new StringValidator(nullptr);
+   m_mainLayout = new QVBoxLayout();
+   m_topLabel = new QLabel("Поле ввода данных администратора:");
+
+   m_userFCSLayout = new QHBoxLayout();
+   m_fcsLabel = new QLabel("ФИО администратора:");
+   m_fcsLineEdit = new QLineEdit();
+   m_fcsLineEdit->setValidator(m_stringValidator);
+
+   m_userRankLayout = new QHBoxLayout();
+   m_backupRankLabel = new QLabel("Звание администратора:");
+   m_rankComboBox = new QComboBox();
+   m_rankComboBox->addItems(Ranks);
+
+   m_numOfUsersLayout = new QHBoxLayout();
+   m_numOfUsersLabel = new QLabel("Колличество пользователей:");
+   m_numOfUsersValue = new QLabel();
+
+   m_accountsData = new QTableWidget();
+
+
+   m_accountsData->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+void UserWizardWidget::InsertWidgetsIntoLayout()
+{
+   m_userFCSLayout->addWidget(m_fcsLabel);
+   m_userFCSLayout->addWidget(m_fcsLineEdit);
+
+   m_userRankLayout->addWidget(m_backupRankLabel);
+   m_userRankLayout->addWidget(m_rankComboBox);
+
+   m_numOfUsersLayout->addWidget(m_numOfUsersLabel);
+   m_numOfUsersLayout->addWidget(m_numOfUsersValue);
+
+   m_mainLayout->addWidget(m_topLabel);
+   m_mainLayout->addLayout(m_userFCSLayout);
+   m_mainLayout->addLayout(m_userRankLayout);
+   m_mainLayout->addLayout(m_numOfUsersLayout);
+   m_mainLayout->addWidget(m_accountsData);
+   setLayout(m_mainLayout);
+}
+
+void UserWizardWidget::setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QList<User> &users)
 {
    m_accountsData->setStyleSheet("background-color: red");
    m_accountsData->setAutoFillBackground(true);
-
 
    m_topLabel->setText(title);
    m_fcsLineEdit->setText(FCS);
@@ -63,52 +106,4 @@ QString UserWizardWidget::getUserChoise()
    return m_rankComboBox->currentText();
 }
 
-void UserWizardWidget::initUI()
-{
-   m_stringValidator = new StringValidator(nullptr);
-   m_mainLayout = new QVBoxLayout();
-   m_topLabel = new QLabel("Поле ввода данных администратора:");
 
-   m_userFCSLayout = new QHBoxLayout();
-   m_fcsLabel = new QLabel("ФИО администратора:");
-   m_fcsLineEdit = new QLineEdit();
-   m_fcsLineEdit->setValidator(m_stringValidator);
-
-   m_userRankLayout = new QHBoxLayout();
-   m_backupRankLabel = new QLabel("Звание администратора:");
-   m_rankComboBox = new QComboBox();
-   m_rankComboBox->addItems(Ranks);
-
-   m_numOfUsersLayout = new QHBoxLayout();
-   m_numOfUsersLabel = new QLabel("Колличество пользователей:");
-   m_numOfUsersValue = new QLabel();
-
-   m_accountsData = new QTableWidget();
-
-
-   m_accountsData->setEditTriggers(QAbstractItemView::NoEditTriggers);
-}
-
-void UserWizardWidget::insertWidgetsIntoLayout()
-{
-   m_userFCSLayout->addWidget(m_fcsLabel);
-   m_userFCSLayout->addWidget(m_fcsLineEdit);
-
-   m_userRankLayout->addWidget(m_backupRankLabel);
-   m_userRankLayout->addWidget(m_rankComboBox);
-
-   m_numOfUsersLayout->addWidget(m_numOfUsersLabel);
-   m_numOfUsersLayout->addWidget(m_numOfUsersValue);
-
-   m_mainLayout->addWidget(m_topLabel);
-   m_mainLayout->addLayout(m_userFCSLayout);
-   m_mainLayout->addLayout(m_userRankLayout);
-   m_mainLayout->addLayout(m_numOfUsersLayout);
-   m_mainLayout->addWidget(m_accountsData);
-   setLayout(m_mainLayout);
-}
-
-void UserWizardWidget::createConnections()
-{
-
-}

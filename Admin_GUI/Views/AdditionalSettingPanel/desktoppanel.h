@@ -9,7 +9,7 @@
 #include <QLineEdit>
 
 #include "Structs/programstruct.h"
-
+#include "Services/isqlservice.h"
 #include "Services/fileexplorer.h"
 
 #include "Admin_GUI/Delegates/filedelegate.h"
@@ -24,38 +24,39 @@ enum ICONS_PANEL_TYPE {
 class DesktopPanel: public QWidget
 {
    Q_OBJECT
-
 public:
-
-   DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *parent);
+   DesktopPanel(ICONS_PANEL_TYPE type, Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
    ~DesktopPanel();
 
-   void SetParam(const QString &param, QStringList *users);//userName || role
+private:
+   void CreatePresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+   void CreateUI();
+   void SetBackgroundColor();
+   void SetPresenterModelToView();
+   void InsertWidgetsIntoLayout();
+   void ConnectObjects();
 
 public Q_SLOTS:
-
-   void OnSetDefaultRoleApps(const QString &role);
+   void OnSetDefaultRoleApps(const quint8 &role);
+   void OnRoleDesktopChanges(const quint8 &roleId);
 
 private Q_SLOTS:
-
    void OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName);
    void OnDeleteProgram();
    void OnProgramSelect(const QModelIndex &index);
 
-private:
-
-   void CreateServices(Terminal *terminal);
-   void CreateUI();
-   void SetBackGroundColor();
-   void InitModel();
-   void InsertWidgetsIntoLayout();
-   void ConnectObjects();
+public:
+   void SetUser(const User &user);
+   void SetRoleId(const int &roleId);//userName || role
+   void DeleteUserAllRoleIcons();
 
 private:
+
+   int m_roleId;
 
    ICONS_PANEL_TYPE m_type;
 
-   FileExplorer *m_rootFileService;
+   DesktopPanelPresenter *m_desktopPanelPresenter;
 
    QStringList *m_usersList;
 
@@ -63,34 +64,26 @@ private:
 
    FileDelegate *m_fileDelegate;
 
-   QString m_pararm;
-
+   QString m_userName;
    QString m_selectedItemName;
+
+private:
 
    QVBoxLayout *m_mainLayout;
 
    QLabel *m_programsToRun;
-
    QListView *m_allProgramsListView;
 
    QHBoxLayout *m_bottomLayout;
-
    QPushButton *m_addProgramButton;
-
    QPushButton *m_deleteProgramButton;
 
-
    QtMaterialDialog *m_dialog;
-
    QVBoxLayout *m_dialogLayout;
-
-   FileDialogWidget *m_dialogWidget;
+   DesktopUploadDialogWidget *m_dialogWidget;
 
 private:
-
-   void updateAllUsersWithCurrentRole();
-
-
+   void UpdateAllUsersWithCurrentRole();
 };
 
 #endif // ADMIN_GUI_VIEWS_DESKTOPPANEL_H

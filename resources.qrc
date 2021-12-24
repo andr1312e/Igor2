@@ -56,5 +56,10 @@
         <file>images/moon.ico</file>
         <file>Styles/Themes/style.qss</file>
         <file>images/folderBlack.ico</file>
+        <file>images/myapptray.gif</file>
+        <file>images/horizontalDelegateBlack.ico</file>
+        <file>images/horizontalDelegateWhite.ico</file>
+        <file>images/iconDelegateBlack.ico</file>
+        <file>images/iconDelegateWhite.ico</file>
     </qresource>
 </RCC>

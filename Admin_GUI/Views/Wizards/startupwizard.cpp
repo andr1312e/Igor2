@@ -1,12 +1,10 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(LoadingState &loadedDbAdnRolesState, FirstStartSettingsService *firstStartSettingService, QWidget *parent)
+StartupWizard::StartupWizard(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent)
     : QWizard(parent)
-    , m_programState(loadedDbAdnRolesState)
-    , m_firstStartSettingService(firstStartSettingService)
 {
-    CreateServices();
-    CreateUI();
+    CreateServices(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService);
+    CreateUI(loadedDbAdnRolesState);
     InitSizes();
     InitStyles();
     InitBehaviour();
@@ -28,16 +26,16 @@ StartupWizard::~StartupWizard()
 }
 
 
-void StartupWizard::CreateServices()
+void StartupWizard::CreateServices(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService)
 {
-    m_wizardService = new WizardService(m_programState, m_firstStartSettingService->GetUserName(), m_firstStartSettingService->GetUserId(), m_firstStartSettingService->GetValidSettingsPaths(), m_firstStartSettingService->GetDefaultSettingsPaths(), m_firstStartSettingService->GetTerminal(), nullptr);
+    m_wizardService = new WizardService(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService, this);
 }
 
-void StartupWizard::CreateUI()
+void StartupWizard::CreateUI(LoadingState &loadedDbAdnRolesState)
 {
     m_themePushButton = new QPushButton();
     m_themePushButton->setCheckable(true);
-    m_themePushButton->setChecked(m_firstStartSettingService->GetThemeValue());
+    m_themePushButton->setChecked(1);
     m_themePushButton->setFlat(true);
     m_themePushButton->setDefault(false);
     m_themePushButton->setAutoDefault(false);
@@ -45,7 +43,7 @@ void StartupWizard::CreateUI()
     m_themePushButton->setIcon(QIcon(":/images/sun"));
     m_themePushButton->setIconSize(QSize(30, 30));
 
-    m_introPage = new IntroPage(m_programState, m_wizardService, m_themePushButton, this);
+    m_introPage = new IntroPage(loadedDbAdnRolesState, m_wizardService, m_themePushButton, this);
 
     m_userWizardPage = new UserWizardPage(m_wizardService, m_themePushButton, this);
     m_rolesPages.resize(Roles.size());
@@ -94,8 +92,8 @@ void StartupWizard::ConnectObjects()
 void StartupWizard::OnHelpButtonClick()
 {
     QString message;
-    bool hasBackUp = m_wizardService->HasBackup();
-    bool hasOldData = m_wizardService->HasOldData();
+    bool hasBackUp = m_wizardService->HasUserBackup() || m_wizardService->HasProgramBackUp();
+    bool hasOldData = m_wizardService->HasUserOldData() || m_wizardService->HastProgramOldData();
 
     switch (currentId()) {
     case Page_Intro:
@@ -206,17 +204,11 @@ void StartupWizard::OnThemeButtonClick(bool checked)
 
 void StartupWizard::accept()
 {
-    if(notDone)
-    {
-        notDone=false;
-        Q_EMIT ToSetDbAndIconsPaths(m_wizardService->ApplyWizard());
-        Q_EMIT ToWizardFinished();
-        QWizard::accept();
-    }
+    m_wizardService->ApplyWizardActions();
+    QWizard::accept();
 }
 
 void StartupWizard::reject()
 {
     QWizard::reject();
-    Q_EMIT ToQuit();
 }

@@ -2,30 +2,33 @@
 #define SERVICES_STARTUPMANAGERSERVICE_H
 
 #include <QStringList>
-
+#include "Services/isqlservice.h"
 #include "Services/Terminals/terminal.h"
 
-class StartupRepositoryService
+class StartupRepositoryPresenter
 {
 public:
 
-    StartupRepositoryService(Terminal *terminal);
+    StartupRepositoryPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
 
-    void checkStartupFile(const QString &filePath);
+    ~StartupRepositoryPresenter();
 
-    void clearFile(const QString&filePath);
+    void CheckStartupTable(const quint8 &roleId);
 
-    void writeExecToStartupFile(const QString &filePath,const QStringList &execPaths);
+    QStringList GetAllStartups(const quint8 &roleId);
 
-    void setDefaultApps(const QString &role, const QString &filePath);
+    void DeleteStartup(const quint8 &roleId, const QString &startupPath);
 
-    QStringList getAllEcexFromStartupFile(const QString &filePath);
-
-    Terminal* getTerminal() {return m_terminal;}
+    void AppendStartup(const quint8 &roleId, const QString &startupPath);
 
 private:
+    void TryDeleteFile(const QString &startupPath);
+    void TryToCopyFile(const QString &startupPath);
 
+private:
     Terminal *m_terminal;
+    ISqlDatabaseService *m_sqlDatabaseService;
+    const QString m_destinationFolder="/usr/RLS_TI/";
 
 };
 

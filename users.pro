@@ -4,9 +4,10 @@
 #
 #-------------------------------------------------
 
-QT += core xml network widgets
+QT += core xml network widgets sql
 
-VERSION = 2.0.4
+VERSION = 2.0.5
+
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 TARGET      = "53"
@@ -34,11 +35,13 @@ SOURCES += \
     Admin_GUI/Views/Wizards/roleappswizardsubwidget.cpp \
     Admin_GUI/Views/Wizards/userwizardpage.cpp \
     Admin_GUI/Views/Wizards/userwizardwidget.cpp \
-    Services/Settings/firststartsettingsservice.cpp \
+    Admin_GUI/Views/topleftbar.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
     Services/Settings/wizardservice.cpp \
+    Services/Terminals/linuxsystemeditservice.cpp \
     Services/Terminals/terminal.cpp \
+    Services/sqldatabaseserivce.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
@@ -48,7 +51,6 @@ SOURCES += \
     Styles/Themes/theme.cpp \
     functionswithstrings.cpp \
     main.cpp \
-    Services/integrityservice.cpp \
     User_GUI/User_GUI.cpp \
     Admin_GUI/Model/usermodel.cpp \
     Admin_GUI/Model/sortmodel.cpp \
@@ -69,22 +71,15 @@ SOURCES += \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.cpp \
     Services/fileexplorer.cpp \
     Services/kioskservice.cpp \
-    Services/databaseservice.cpp \
     Services/linuxuserservice.cpp \
-    Services/identifyservice.cpp \
     Services/toolbardisableservice.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.cpp \
-    Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.cpp \
-    Admin_GUI/Views/AdditionalSettingPanel/userfileseditpanel.cpp \
-    Admin_GUI/Views/topbar.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/startuppanel.cpp \
     Admin_GUI/Delegates/filedelegate.cpp \
     Admin_GUI/Views/admingui.cpp \
     Admin_GUI/Views/linuxuserslistwidget.cpp \
-    Admin_GUI/Views/SettingsPanel/userinfopanel.cpp \
     Admin_GUI/Views/SettingsPanel/usereditpanel.cpp \
-    Admin_GUI/Views/SettingsPanel/settingspanel.cpp \
     Services/startuprepositoryservice.cpp \
     Services/startuprunnableservice.cpp \
     Server/messagesrepository.cpp \
@@ -95,7 +90,8 @@ SOURCES += \
     Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp \
-    Admin_GUI/Views/Wizards/startupwizard.cpp
+    Admin_GUI/Views/Wizards/startupwizard.cpp \
+    tray.cpp
 
 HEADERS += \
     Admin_GUI/Validator/stringvalidator.h \
@@ -108,11 +104,15 @@ HEADERS += \
     Admin_GUI/Views/Wizards/userwizardpage.h \
     Admin_GUI/Views/Wizards/userwizardwidget.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
-    Services/Settings/firststartsettingsservice.h \
+    Admin_GUI/Views/topleftbar.h \
     Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \
     Services/Settings/wizardservice.h \
+    Services/Sql/tablecolumnsnames.h \
+    Services/Terminals/linuxsystemeditservice.h \
+    Services/isqlservice.h \
+    Services/sqldatabaseserivce.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -150,27 +150,19 @@ HEADERS += \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h \
     Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.h \
-    Admin_GUI/Views/AdditionalSettingPanel/additionalsettingspanel.h \
-    Admin_GUI/Views/AdditionalSettingPanel/userfileseditpanel.h \
-    Admin_GUI/Views/topbar.h \
     Admin_GUI/Views/AdditionalSettingPanel/startuppanel.h \
     Admin_GUI/Delegates/filedelegate.h \
     Admin_GUI/Views/admingui.h \
     Admin_GUI/Views/linuxuserslistwidget.h \
-    Admin_GUI/Views/SettingsPanel/userinfopanel.h \
     Admin_GUI/Views/SettingsPanel/usereditpanel.h \
-    Admin_GUI/Views/SettingsPanel/settingspanel.h \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
     Admin_GUI/Widgets/qtmaterialtextfield_p.h \
     Admin_GUI/Widgets/qtmaterialtextfield.h \
     Services/fileexplorer.h \
     Services/kioskservice.h \
-    Services/databaseservice.h \
     Services/linuxuserservice.h \
-    Services/identifyservice.h \
     Services/Terminals/terminal.h \
-    Services/integrityservice.h \
     Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
     User_GUI/User_GUI.h \
@@ -179,7 +171,8 @@ HEADERS += \
     Server/dataHandler.h \
     functionswithstrings.h \
     program.h \
-    Admin_GUI/Views/Wizards/startupwizard.h
+    Admin_GUI/Views/Wizards/startupwizard.h \
+    tray.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt

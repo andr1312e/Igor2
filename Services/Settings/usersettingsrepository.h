@@ -1,21 +1,21 @@
 #ifndef SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H
 #define SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H
 
-#include <QFile>
-#include <QVector>
+#include <QList>
 #include <QString>
-#include <QDomDocument>
+#include <QDomElement>
 
 #include "Structs/userstruct.h"
 
-#include "Services/Terminals/terminal.h"
+#include "Services/isqlservice.h"
+#include "Services/linuxuserservice.h"
 
 class UsersDataWizardRepository
 {
 
 public:
 
-   explicit UsersDataWizardRepository(const QString &curerntUserName, const  QString &curerntUserId, Terminal *terminal);
+   explicit UsersDataWizardRepository(LinuxUserService *service);
 
    ~UsersDataWizardRepository();
 
@@ -27,52 +27,43 @@ public:
 
    QString &GetCurrentUserRank();
 
-   QVector<User> &GetUsersList();
+   QList<User> &GetUsersList();
+
+   void GetExsistsUsersListFromDb(ISqlDatabaseService *m_iSqlDatabaseService);
 
    int GetUserCount() const;
 
-   void SetFCSAndRolesFromFile(QString &pathToUserDb);
+   void GetFCSAndRolesFromXml(const QDomElement &usersNode);
 
-   void GetFCSAndRolesFromXml(QDomElement &usersNode);
-
-   void WriteUserRepositoryToFile(const QString &pathToWriteDb, bool adminOnly);
+   void WriteUserRepositoryToDB(ISqlDatabaseService *m_iSqlDatabaseService, bool adminOnly);
 
 private:
+
+   void JuxtaposeUserIdAndUserNameWithSystemsData();
 
    bool FindAndUpdateAdminData();
 
-   void AppendAdminToList();
+   void AppendAdminToCacheList();
 
-   void CreateMainTag();
+   void WriteAllUsersToDatabase(ISqlDatabaseService *m_iSqlDatabaseService);
 
-   void WriteAllUsersToDomDocument();
-
-   void WriteAdminToDomDocument();
-
-   void AppendUserToDomDocument(QDomDocument &document, const User &user);
-
-   void EncryptAndWriteToFile(const QString &pathToWriteDb);
+   void WriteAdminToDatabase(ISqlDatabaseService *m_iSqlDatabaseService);
 
 private:
+
+   LinuxUserService *m_service;
 
    const QString m_curerntUserName;
 
    const QString m_curerntUserId;
 
-   Terminal *m_terminal;
-
 private:
 
-   bool m_hasData;
+   QString m_currentUserFCS;
 
-   QString m_userFCS;
+   QString m_currenUserRank;
 
-   QString m_userRank;
-
-   QVector<User> m_usersList;
-
-   QDomDocument *m_accountsData;
-
+   QList<User> m_usersList;
 };
 
 #endif // SERVICES_SETTINGS_USERSETTINGSREPOSITORY_H

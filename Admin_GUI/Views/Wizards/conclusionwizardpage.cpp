@@ -155,13 +155,13 @@ void ConclusionWizardPage::SetUserActionValueLabel(QString &actionWithUserReposi
       m_usersCommentValue->setText("один пользователь");
    } else {
       if (actionWithUserRepository == userWizardPageComboBoxBackupAndOldDataActions.at(1)) {
-         if (m_wizardService->HasBackup()) {
+         if (m_wizardService->HasUserBackup()) {
             m_usersCommentValue->setText(QString::number(m_wizardService->GetUserCountFromUserRepository(false)));
          } else {
             qFatal("Не реализованное поведение: файл восстановления есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");
          }
       } else {
-         if (m_wizardService->HasOldData()) {
+         if (m_wizardService->HasUserOldData()) {
             m_usersCommentValue->setText(QString::number(m_wizardService->GetUserCountFromUserRepository(true)));
          } else {
             qFatal("Не реализованное поведение: старые данные есть, но колличество пользователей с него не может быть получено. ConclusionWizardPage::setUserRepositoryLabel");

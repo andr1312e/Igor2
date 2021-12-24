@@ -19,7 +19,11 @@ class UserWizardWidget : public QWidget
 public:
    explicit UserWizardWidget(const QStringList &headerLabels, QWidget *parent);
    ~UserWizardWidget();
-   void setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QVector<User> &users);
+private:
+   void InitUI();
+   void InsertWidgetsIntoLayout();
+public:
+   void setWizardWidgetFileds(const QString &title, QString &FCS, QString &rank, QList<User> &users);
    QString getUserChoise();
 private:
    const QStringList &m_headerLabels;
@@ -40,10 +44,7 @@ private:
    QLabel *m_numOfUsersValue;
 
    QTableWidget *m_accountsData;
-private:
-   void initUI();
-   void insertWidgetsIntoLayout();
-   void createConnections();
+
 };
 
 #endif // ADMIN_GUI_VIEWS_USERWIZARDWIDGET_H

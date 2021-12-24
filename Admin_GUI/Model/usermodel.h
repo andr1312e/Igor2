@@ -4,27 +4,28 @@
 
 #include "Structs/userstruct.h"
 
+#include "Services/isqlservice.h"
 #include "Services/linuxuserservice.h"
-#include "Services/databaseservice.h"
+
 
 class UserModel : public QObject
 {
    Q_OBJECT
 public:
 
-   UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent);
+   UserModel(ISqlDatabaseService *databaseService, LinuxUserService *userService, QObject *parent);
 
    ~UserModel();
 
-   void addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
+   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
 
-   void deleteUserFromModel(const QString &userId);
+   QStandardItemModel *GetModel();
 
-   QStandardItemModel *getModel();
-
-   QStringList *getUsersNamesByRole(const QString &role);
+   QStringList *GetUsersSystemNamesByRole(const QString &role);
 
 public Q_SLOTS:
+
+   void DeleteUser(const QString &userId);
 
    void OnDataChanged();
 
@@ -32,23 +33,25 @@ private:
 
    QStandardItemModel *m_model;
 
-   DatabaseService *m_databaseService;
+   ISqlDatabaseService *m_databaseService;
 
    LinuxUserService *m_linuxUserService;
 
-   QList<User> *m_users;
+   QList<User> m_users;
 
    QStringList *m_currentRoleUsers;
 
 private:
 
-   void FillListByLinuxUserService();
+   void ClearList();
 
-   void FillListByDatabaseService();
+   QList<User> FillListByUserService(const QList<QPair<QString, QString> > &namesAndIdsList) const;
+
+   QList<User> FillListByDatabaseService();
 
    void FillModelByList();
 
-   void setUserImage(User &user);
+   void SetImageToUser(User &user);
 
 };
 

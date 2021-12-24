@@ -14,56 +14,64 @@
 
 class FramelessWindow : public QWidget
 {
-
    Q_OBJECT
-
 public:
 
    explicit FramelessWindow(QWidget *parent);
    virtual ~FramelessWindow();
 
-   void SetMainWidget(QWidget *w);
-
+private:
+   void CreateUI();
+   void InitUI();
+   void SetShadowUnderTitleText();
+   void SetWindowShadow();
+   void InsertWidgetsIntoLayout();
+   void ApplyStyles();
+   void SetObjectNames();
+   void CreateConnections();
 Q_SIGNALS:
-   void minimizeWindow();
+   void ToChangeTheme(bool state);
+   void ToHideAdditionalSettings(bool state);
+   void ToSetDelegateView(bool state);
 
+public Q_SLOTS:
+   void OnSetWindowTitle(const QString &text);
+   void OnSetWindowIcon(const QIcon &icon);
+
+private Q_SLOTS:
+   void OnApplicationStateChanged(Qt::ApplicationState state);
+   void OnChangeThemeButtonClicked(bool state);
+   void OnChangeAdditionalSettingsButtonClicked(bool state);
+   void OnChangeDelegatesViewButtonClicked(bool state);
+   void OnRestoreButtonClicked();
+   void OnMaximizeButtonClicked();
+   void OnWindowDraggerDoubleClicked();
 
 private:
    bool LeftBorderHit(const QPoint &pos);
    bool RightBorderHit(const QPoint &pos);
    bool TopBorderHit(const QPoint &pos);
    bool BottomBorderHit(const QPoint &pos);
-   void StyleWindow(bool bActive, bool bNoState);
-
-public Q_SLOTS:
-
-   void SetWindowTitle(const QString &text);
-   void SetWindowIcon(const QIcon &icon);
-
-private Q_SLOTS:
-
-   void OnApplicationStateChanged(Qt::ApplicationState state);
-   void OnRestoreButtonClicked();
-   void OnMaximizeButtonClicked();
-   void WindowDraggerDoubleClicked();
-
-
+   void StyleWindow(bool bActive, bool isMaximized);
 protected:
-
-   virtual void changeEvent(QEvent *event);
-   virtual void mouseDoubleClickEvent(QMouseEvent *event);
+   virtual void changeEvent(QEvent *event) Q_DECL_OVERRIDE;
+   virtual void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
    virtual void checkBorderDragging(QMouseEvent *event);
-   virtual void mousePressEvent(QMouseEvent *event);
-   virtual void mouseReleaseEvent(QMouseEvent *event);
-   virtual bool eventFilter(QObject *obj, QEvent *event);
-
+   virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+   virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+   virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
+public:
+   void SetMainWidget(QWidget *w);
 private:
-
    WindowTitleBar *m_WindowTitleBar;
    QWidget *m_windowFrame;
    QVBoxLayout *m_mainLayout;
    QVBoxLayout *m_vertivalLayout;
    QHBoxLayout *m_topLayout;
+   QPushButton *m_changeDelegatesView;
+   QPushButton *m_changeThemePushButton;
+   QPushButton *m_changeAdditionalSettingsView;
+
    CloseWindowButton *m_closeButton;
    MaximizeWindowButton *m_maximizeButton;
    MinimizeWindowButton *m_minimizeButton;
@@ -81,15 +89,7 @@ private:
    bool m_bDragRight;
    bool m_bDragBottom;
 
-private:
 
-   void CreateUI();
-   void SetShadowUnderTitleText();
-   void SetWindowShadow();
-   void InsertWidgetsIntoLayout();
-   void ApplyStyles();
-   void SetObjectNames();
-   void CreateConnections();
 };
 
 #endif  // STYLES_FRAMELESSWINDOW_H

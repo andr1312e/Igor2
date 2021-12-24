@@ -1,215 +1,261 @@
 #include "program.h"
 #include <QDebug>
 
-
 Program::Program(int &argc, char **argv)
-   : QApplication(argc, argv, true)
-   , m_loadedDbAdnRolesState(LoadingState::CantRun)
-   , m_hasAdminPrivileges(false)
-   , m_sharedMemory(new QSharedMemory("PROCESS_CONTROLLER", this))
-   , m_terminal(nullptr)
-   , m_linuxUserService(nullptr)
-   , m_firstStartSettingsService(nullptr)
-   , m_startupWizard(nullptr)
-   , m_dataBaseService(nullptr)
-   , m_indentifyService(nullptr)
-   , m_startupRunnableService(nullptr)
-   , m_socketToRarm(nullptr)
-   , m_AdminGui(nullptr)
-   , m_fakeUI(new FakeUI)
-   , m_framelessWindow(nullptr)
-   , m_styleChanger(nullptr)
+    : QApplication(argc, argv, true)
+    , m_rlstiFolder("/usr/RLS_TI/")
+    , m_sharedMemory(new QSharedMemory("PROCESS_CONTROLLER", this))
+    , m_terminal(nullptr)
+    , m_linuxUserService(nullptr)
+    , m_startupWizard(nullptr)
+    , m_sqlDatabaseService(nullptr)
+    , m_startupRunnableService(nullptr)
+    , m_socketToRarm(nullptr)
+    , m_tray(nullptr)
+    , m_AdminGui(nullptr)
+    , m_framelessWindow(nullptr)
+    , m_styleChanger(nullptr)
 {
-   m_fakeUI->hide();
 }
 
 Program::~Program()
 {
-   m_sharedMemory->detach();
-   delete m_sharedMemory;
-   delete m_fakeUI;
+    m_sharedMemory->detach();
+    delete m_sharedMemory;
+    delete m_sqlDatabaseService;
+    if (m_terminal != nullptr) {
+        delete m_tray;
+        if (m_AdminGui != nullptr) {
+            delete m_AdminGui;
+        }
 
-   if (m_terminal != nullptr) {
-      delete m_firstStartSettingsService;
-
-      if (m_AdminGui != nullptr) {
-         delete m_AdminGui;
-      }
-
-      delete m_indentifyService;
-      delete m_dataBaseService;
-      delete m_startupRunnableService;
-      delete m_linuxUserService;
-      delete m_socketToRarm;
-      delete m_terminal;
-   }
+        delete m_startupRunnableService;
+        delete m_linuxUserService;
+        delete m_socketToRarm;
+        delete m_terminal;
+    }
 }
 
 bool Program::HasNoRunningInscance()
 {
-   if (m_sharedMemory->attach(QSharedMemory::ReadOnly)) {
-      m_sharedMemory->detach();
-      return false;
-   } else {
-      if (m_sharedMemory->create(1, QSharedMemory::ReadWrite)) {
-         return true;
-      } else {
-         qDebug() << m_sharedMemory->errorString();
-         return false;
-      }
-   }
+    if (m_sharedMemory->attach(QSharedMemory::ReadOnly)) {
+        m_sharedMemory->detach();
+        return false;
+    } else {
+        if (m_sharedMemory->create(1, QSharedMemory::ReadWrite)) {
+            return true;
+        } else {
+            qDebug() << m_sharedMemory->errorString();
+            return false;
+        }
+    }
 }
 
 void Program::CreateApp()//MAIN
 {
-   InitTerminal();
-   InitUserService();
-   GetCurrentUserNameIdAndAdminPriviliges();
-   InitSettingsService();
-   GetProgramState();
-   InitFramelessWindow();
-   InitStyle();
-   ProcessDataLoading();
-}
-
-void Program::ProcessDataLoading()
-{
-
-   switch (m_loadedDbAdnRolesState) {
-      case NoFiles:
-      case NoUserDb:
-      case NoRoleData: {
-         StartSettingsWizard();
-         break;
-      }
-
-      case Fine: {
-         OnContinueLoading();
-         break;
-      }
-
-      case CantRun: {
-         QMessageBox::critical(nullptr, "Приложение не может запуститься", "Файл настроек  имеет неверную структуру, обратитесь к Администратору для решения проблемы", QMessageBox::Ok);
-         this->exit(0);
-      }
-   }
-}
-
-void Program::InitStyle()
-{
-   this->setStyle(QStringLiteral("Fusion"));
-   m_styleChanger = new StyleChanger(this);
-   m_styleChanger->OnChangeTheme(m_firstStartSettingsService->GetThemeValue());
-}
-
-void Program::InitFramelessWindow()
-{
-   m_framelessWindow = new FramelessWindow(Q_NULLPTR);
-   m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
-   m_framelessWindow->SetWindowTitle("Мастер первоначальной настройки");
-   m_framelessWindow->show();
-}
-
-void Program::StartSettingsWizard()
-{
-   m_startupWizard = new StartupWizard(m_loadedDbAdnRolesState, m_firstStartSettingsService, Q_NULLPTR);
-   connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
-   connect(m_startupWizard, &StartupWizard::ToWizardFinished, this, &Program::OnContinueLoading);
-   connect(m_startupWizard, &StartupWizard::ToQuit, this, &Program::quit);
-   connect(m_startupWizard, &StartupWizard::ToSetDbAndIconsPaths, m_firstStartSettingsService, &FirstStartSettingsService::OnSetDbAndIconsPaths);
-   m_framelessWindow->SetMainWidget(m_startupWizard);
-}
-
-void Program::OnContinueLoading()
-{
-   GetSettings();
-   InitRunnableService();
-
-   if (AllAppsRunned()) {
-      InitRarmSocket();
-      ConnectObjects();
-
-      if (m_hasAdminPrivileges) {
-         InitAdminServices();
-         InitAdminUI();
-      }
-   }
+    InitTerminal();
+    InitUserService();
+    InitSqlService();
+    GetCurrentUserNameIdAndAdminPriviliges();
+    LoadingState state=GetProgramState();
+    InitTrayIcon();
+    InitFramelessWindow();
+    InitStyle();
+    ProcessDataLoading(state);
 }
 
 void Program::InitTerminal()
 {
-   m_terminal = new Terminal();
+    m_terminal = new Terminal();
 }
 
 void Program::InitUserService()
 {
-   m_linuxUserService = new LinuxUserService(m_terminal);
+    m_linuxUserService = new LinuxUserService(m_terminal);
+}
+
+void Program::InitSqlService()
+{
+    m_sqlDatabaseService=new SqlDatabaseSerivce(this);
+    if (!m_sqlDatabaseService->ConnectToDataBase("localhost", 5432, "postgres", "postgres", "user1234"))
+    {
+        QMessageBox::warning(nullptr, "Подключите базу данных postgres", "Подключение к бд не удалось");
+        this->exit(-1);
+    }
 }
 
 void Program::GetCurrentUserNameIdAndAdminPriviliges()
 {
-   m_hasAdminPrivileges = m_linuxUserService->hasCurrentUserAdminPrivileges();
-   m_currentUserName = m_linuxUserService->getCurrentUserName();
-   m_currentUserId = m_linuxUserService->getCurrentUserId();
+    m_currentUserName = m_linuxUserService->GetCurrentUserName();
+    m_currentUserId = m_linuxUserService->GetCurrentUserId();
+
 }
 
-void Program::InitSettingsService()
+LoadingState Program::GetProgramState()
 {
-   m_firstStartSettingsService = new FirstStartSettingsService(m_currentUserName, m_currentUserId, m_hasAdminPrivileges, m_fakeUI, m_terminal);
+    if (m_sqlDatabaseService->CheckUserTable())
+    {
+        if(m_sqlDatabaseService->CheckExecTables() && m_sqlDatabaseService->CheckExecTables())
+        {
+            return LoadingState::Fine;
+        }
+        else
+        {
+            return LoadingState::NoRoleData;
+        }
+    }
+    else
+    {
+        if(m_sqlDatabaseService->CheckExecTables() && m_sqlDatabaseService->CheckExecTables())
+        {
+            return LoadingState::NoUserDb;
+        }
+        else
+        {
+            return LoadingState::NoFiles;
+        }
+    }
+    qFatal("Invalid state");
 }
 
-void Program::GetProgramState()
+void Program::InitTrayIcon()
 {
-   m_loadedDbAdnRolesState = m_firstStartSettingsService->IsAllDataLoaded();
+    m_tray=new Tray(this);
 }
 
-void Program::GetSettings()
+void Program::InitFramelessWindow()
 {
-   m_userDBPath = m_firstStartSettingsService->GetUserDBPathValue();
+    m_framelessWindow = new FramelessWindow(Q_NULLPTR);
+    m_framelessWindow->setObjectName("FramelessWindowObject");
+    m_framelessWindow->OnSetWindowTitle("Мастер первоначальной настройки");
+    m_framelessWindow->show();
+}
+
+void Program::InitStyle()
+{
+    this->setStyle(QStringLiteral("Fusion"));
+    m_styleChanger = new StyleChanger(this);
+    m_styleChanger->OnChangeTheme(1);
+    connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+}
+
+void Program::ProcessDataLoading(LoadingState &state)
+{
+    switch (state) {
+    case NoFiles:
+    case NoUserDb:
+    case NoRoleData: {
+        StartSettingsWizard(state);
+        break;
+    }
+
+    case Fine: {
+        OnContinueLoading();
+        break;
+    }
+
+    case CantRun: {
+        QMessageBox::critical(nullptr, "Приложение не может запуститься", "Права разработчика недоступны, запустите программу от имени администратора и повторите попытку...", QMessageBox::Ok);
+        this->exit(0);
+    }
+    }
+}
+
+void Program::StartSettingsWizard(LoadingState &state)
+{
+    m_startupWizard = new StartupWizard(m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, nullptr);
+    connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+    connect(m_startupWizard, &QWizard::accepted, this, &Program::OnContinueLoading);
+    connect(m_startupWizard, &QWizard::rejected, this, &QApplication::quit);
+    m_framelessWindow->SetMainWidget(m_startupWizard);
+    m_framelessWindow->repaint();
+}
+
+void Program::OnContinueLoading()
+{
+    InitRunnableService();
+
+    if (AllAppsRunned()) {
+        InitRarmSocket();
+
+
+//        if (m_linuxUserService->HasCurrentUserAdminPrivileges()) {
+            InitAdminServices();
+            InitAdminUI();
+            ConnectObjects();
+//        }
+    }
 }
 
 void Program::InitRunnableService()
 {
-   m_startupRunnableService = new StartupRunnableService(m_terminal, this);
+    m_startupRunnableService = new StartupRunnableManager(m_rlstiFolder, m_sqlDatabaseService,m_terminal, this);
 }
 
 bool Program::AllAppsRunned()
 {
-   return true;
-   //    return m_startupRunnableService->run(m_linuxUserService->getCurrentUserName());
+    return m_startupRunnableService->SetUserNameAndCheckFilesExsists(m_linuxUserService->GetCurrentUserName());
 }
 
 void Program::InitRarmSocket()
 {
-   m_socketToRarm = new SocketToRarm("127.0.0.1:4242", this);
+    m_socketToRarm = new SocketToRarm("127.0.0.1:4242", this);
 }
 
 void Program::InitAdminServices()
 {
-   m_dataBaseService = new DatabaseService(m_terminal);
-   m_dataBaseService->LoadFromFile(m_userDBPath);
-   m_indentifyService = new IdentifyService(m_terminal, m_dataBaseService, m_linuxUserService);
-   m_linuxUserService->getAllUsersInSystem();
+    m_linuxUserService->GetAllUsersWithIdInSystem();
 }
 
 void Program::InitAdminUI()
 {
-   if (m_indentifyService->canGetAccess()) {
-
-      m_AdminGui = new Admin_GUI(m_dataBaseService, m_linuxUserService);
-      connect(m_AdminGui, &Admin_GUI::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
-      m_framelessWindow->SetWindowIcon(QIcon(":/images/ico.png"));
-      m_framelessWindow->SetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
-      m_framelessWindow->SetMainWidget(m_AdminGui);
-   }
+//    if (CanGetAdminAccess())
+    {
+        m_AdminGui = new Admin_GUI(m_sqlDatabaseService, m_linuxUserService, nullptr);
+        m_framelessWindow->OnSetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
+        m_framelessWindow->SetMainWidget(m_AdminGui);
+        m_framelessWindow->show();
+    }
 }
 
 void Program::ConnectObjects()
 {
-   connect(m_startupRunnableService, &StartupRunnableService::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
+    if (CanGetAdminAccess())
+    {
+        connect(m_AdminGui, &Admin_GUI::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+        connect(m_framelessWindow, &FramelessWindow::ToSetDelegateView, m_AdminGui, &Admin_GUI::ToSetDelegateView);
+        connect(m_framelessWindow, &FramelessWindow::ToHideAdditionalSettings, m_AdminGui, &Admin_GUI::OnHideAdditionalSettings);
+    }
+    connect(m_startupRunnableService, &StartupRunnableManager::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
+    connect(m_tray, &Tray::ToCloseApp, this, &QApplication::quit);
+    connect(m_tray, &Tray::ToShowApp, m_framelessWindow, &FramelessWindow::show);
+    connect(m_tray, &Tray::ToHideApp, m_framelessWindow, &QWidget::hide);
 }
 
-void Program::StartAdminServices()
+bool Program::CanGetAdminAccess()
 {
-   m_linuxUserService->getAllUsersInSystem();
+    if (m_linuxUserService->HasCurrentUserAdminPrivileges())
+    {
+        if (m_sqlDatabaseService->CheckUserTable())
+        {
+            QStringList adminsUserName=m_sqlDatabaseService->GetAdminsRoleUserName();
+            QString userName=m_linuxUserService->GetCurrentUserName();
+            for(QString &adminName: adminsUserName)
+            {
+                if(adminName==userName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }

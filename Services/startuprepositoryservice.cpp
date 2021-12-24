@@ -1,39 +1,61 @@
 #include "startuprepositoryservice.h"
-#include <QDebug>
 
-StartupRepositoryService::StartupRepositoryService(Terminal *terminal)
-   : m_terminal(terminal)
-{}
-
-void StartupRepositoryService::checkStartupFile(const QString &filePath)
+StartupRepositoryPresenter::StartupRepositoryPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
+    : m_terminal(terminal)
+    , m_sqlDatabaseService(sqlDatabaseService)
 {
-   m_terminal->CheckAndCreatePathToElement(filePath, "StartupRepositoryService::checkStartupFile", true);
-   if (m_terminal->IsFileNotExists(filePath, "StartupManagerService::checkStartupFile")) {
-        m_terminal->CreateFile(filePath, "StartupManagerService::checkStartupFile", true);
-   }
+
 }
 
-void StartupRepositoryService::clearFile(const QString &filePath)
+StartupRepositoryPresenter::~StartupRepositoryPresenter()
 {
-   m_terminal->ClearFileSudo(filePath, "StartupManagerService::writeExecToStartupFile");
-}
-
-void StartupRepositoryService::writeExecToStartupFile(const QString &filePath, const QStringList &execPaths)
-{
-   QString paths = execPaths.join('\n');
-   m_terminal->WriteTextToFileSudo(paths.toLatin1(), filePath, "StartupManagerService::writeExecToStartupFile");
-}
-
-void StartupRepositoryService::setDefaultApps(const QString &role, const QString &filePath)
-{
-   m_terminal->CopyFileSudo("/home/user/RLS_TI/" + role + ".startup", filePath, "StartupManagerService::setDefaultApps");
-}
-
-QStringList StartupRepositoryService::getAllEcexFromStartupFile(const QString &filePath)
-{
-   QString ecexs = m_terminal->GetFileText(filePath, "StartupManagerService::getAllEcexFromStartupFile");
-   QStringList execsList = ecexs.split('\n');
-   execsList.removeAll("");
-   return execsList;
 
 }
+
+void StartupRepositoryPresenter::CheckStartupTable(const quint8 &roleId)
+{
+    m_sqlDatabaseService->CreateExecsTableInNotExists(roleId);
+}
+
+QStringList StartupRepositoryPresenter::GetAllStartups(const quint8 &roleId)
+{
+    QStringList startupsList = m_sqlDatabaseService->GetAllRoleExecs(roleId);
+    return startupsList;
+}
+
+void StartupRepositoryPresenter::DeleteStartup(const quint8 &roleId, const QString &startupPath)
+{
+    m_sqlDatabaseService->RemoveExecIntoRole(roleId, startupPath);
+    TryDeleteFile(startupPath);
+}
+
+void StartupRepositoryPresenter::AppendStartup(const quint8 &roleId, const QString &startupPath)
+{
+    m_sqlDatabaseService->AppendExecIntoRole(roleId, startupPath);
+    TryToCopyFile(startupPath);
+}
+
+void StartupRepositoryPresenter::TryDeleteFile(const QString &startupPath)
+{
+    if(m_terminal->IsFileExists(startupPath, "StartupRepositoryPresenter::DeleteStartup", true))
+    {
+        m_terminal->DeleteFileSudo(startupPath, "StartupRepositoryPresenter::DeleteStartup");
+    }
+}
+
+void StartupRepositoryPresenter::TryToCopyFile(const QString &startupPath)
+{
+    int index=startupPath.lastIndexOf('/');
+    QString startupFileName=startupPath.mid(index);
+    if(m_terminal->IsDirNotExists(m_destinationFolder, "StartupRepositoryPresenter::AppendStartup", true))
+    {
+        m_terminal->CreateFolder(m_destinationFolder, "StartupRepositoryPresenter::AppendStartup", true);
+    }
+    if(m_terminal->IsFileExists(m_destinationFolder+startupFileName, "StartupRepositoryPresenter::AppendStartup", true))
+    {
+        m_terminal->DeleteFileSudo(m_destinationFolder+startupFileName, "StartupRepositoryPresenter::AppendStartup");
+    }
+    m_terminal->CopyFileSudo(startupPath, m_destinationFolder, "StartupRepositoryPresenter::AppendStartup");
+}
+
+

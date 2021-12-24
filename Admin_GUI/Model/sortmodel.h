@@ -11,6 +11,7 @@ class SortModel: public QSortFilterProxyModel
 public:
    SortModel(QObject *parent);
 
+    ~SortModel();
 public:
 
    void UpdateSeachWordAndSeachAttribute(const QString &text, const QString &attribute);

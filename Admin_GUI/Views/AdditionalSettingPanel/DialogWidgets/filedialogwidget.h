@@ -13,47 +13,33 @@
 #include "functionswithstrings.h"
 #include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
-class FileDialogWidget: public QWidget
+class DesktopUploadDialogWidget: public QWidget
 {
    Q_OBJECT
 public:
-
-   FileDialogWidget(QWidget *parent);
-
-   ~FileDialogWidget();
+   DesktopUploadDialogWidget(QWidget *parent);
+   ~DesktopUploadDialogWidget();
 
 private:
-
    void CreateUI();
-
    void InsertWidgetsIntoLayout();
-
    void FillUI();
-
    void ConnectObject();
 
 Q_SIGNALS:
-
    void ToDialogSignalHide();
-
    void ToAddFileToUserDesktop(const QString &exec, const QString &iconPath, const QString &iconName);
 
 private Q_SLOTS:
-
    void OnHideDialog();
-
    void OnAddingEcexutePath();
-
    void OnAddIconPath();
-
    void OnAddIconToUserDesktop();
 
 public:
-
    void SetTitleText(QString &text);
 
 private:
-
    void ClearAllTextFiels();
 
 private:

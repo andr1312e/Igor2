@@ -82,6 +82,8 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
       m_pathRect->setRect(m_programNameRect->left(), m_programNameRect->bottom() + 1, m_globalRect->width() - m_iconRect->width(), 20);
       m_typeRect->setRect(m_programNameRect->left(), m_pathRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), 20);
 
+      painter->drawImage(*m_iconRect, QImage(icon.icon));
+
       painter->setPen(*m_titlePen);
       painter->setFont(QFont("Microsoft Yahei", 12));
       painter->drawText(*m_programNameRect, "Название: " + icon.name);

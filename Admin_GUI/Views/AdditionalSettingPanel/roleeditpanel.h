@@ -17,29 +17,29 @@ class RoleEditPanel : public QWidget
 
 public:
 
-   RoleEditPanel(Terminal *terminal, QWidget *parent);
+   RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
 
    ~RoleEditPanel();
 
-   void setRoleToViewWithUsers(const QString &role, QStringList *users);
-
 private:
 
-   void CreateUI(Terminal *terminal);
+   void CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
 
    void InsertWidgetsIntoLayout();
 
-   void SetBackGroundColor();
+   void FillUI();
 
    void ConnectObjects();
 
 Q_SIGNALS:
 
-   void ToRoleStartupFileChanging(const QString &role);
+   void ToRoleDesktopChanges(const quint8 &roleId);
+
+public Q_SLOTS:
+
+   void OnRoleToViewChanged(const int &roleId);
 
 private:
-
-   QString m_role;
 
    QVBoxLayout *m_mainLayout;
 
@@ -49,7 +49,7 @@ private:
 
    QLabel *m_descriptionLabel;
 
-   QLabel *m_currentRole;
+   QLabel *m_currentRoleLabel;
 
    DesktopPanel *m_roleDesktopPanel;
 

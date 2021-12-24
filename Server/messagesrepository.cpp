@@ -51,10 +51,8 @@ void MessagesRepository::appendTargetPosition(RMOTargetPositionMessage newSettin
             it->speed[0] = newSettings.speed[0];
             it->speed[1] = newSettings.speed[1];
             it->work_mode = newSettings.work_mode;
-            it->set_mode[0] = newSettings.set_mode[0];
-            it->set_mode[1] = newSettings.set_mode[1];
-            it->freq_rays[0] = newSettings.freq_rays[0];
-            it->freq_rays[1] = newSettings.freq_rays[1];
+            it->set_mode = newSettings.set_mode;
+            it->freq_rays = newSettings.freq_rays;
             it->DSP = newSettings.DSP;
             it->out_dsp = newSettings.out_dsp;
             it->count_answer = newSettings.count_answer;

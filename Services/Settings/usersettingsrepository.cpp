@@ -1,13 +1,11 @@
 #include "usersettingsrepository.h"
 
-UsersDataWizardRepository::UsersDataWizardRepository(const QString &curerntUserName, const QString &curerntUserId, Terminal *terminal)
-   : m_curerntUserName(curerntUserName)
-   , m_curerntUserId(curerntUserId)
-   , m_terminal(terminal)
-   , m_hasData(false)
-   , m_userFCS("")
-   , m_userRank("")
-   , m_accountsData(new QDomDocument())
+UsersDataWizardRepository::UsersDataWizardRepository(LinuxUserService *service)
+    : m_service(service)
+    , m_curerntUserName(m_service->GetCurrentUserName())
+    , m_curerntUserId(m_service->GetCurrentUserName())
+    , m_currentUserFCS("")
+    , m_currenUserRank("")
 {
 
 }
@@ -19,65 +17,54 @@ UsersDataWizardRepository::~UsersDataWizardRepository()
 
 const QString &UsersDataWizardRepository::GetCurrentUserName() const
 {
-   return m_curerntUserName;
+    return m_curerntUserName;
 }
 
 QString &UsersDataWizardRepository::GetCurrentUserFCS()
 {
-   return m_userFCS;
+    return m_currentUserFCS;
 }
 
 QString &UsersDataWizardRepository::GetCurrentUserRank()
 {
-   return m_userRank;
+    return m_currenUserRank;
 }
 
-QVector<User> &UsersDataWizardRepository::GetUsersList()
+QList<User> &UsersDataWizardRepository::GetUsersList()
 {
-   return m_usersList;
+    return m_usersList;
+}
+
+void UsersDataWizardRepository::GetExsistsUsersListFromDb(ISqlDatabaseService *m_iSqlDatabaseService)
+{
+    QList<User> users=m_iSqlDatabaseService->GetAllUsers();
+    m_usersList=users;
 }
 
 int UsersDataWizardRepository::GetUserCount() const
 {
-   return m_usersList.count();
+    return m_usersList.count();
 }
 
 bool UsersDataWizardRepository::HasData() const
 {
-   return m_hasData;
+    return !m_usersList.isEmpty();
 }
 
-void UsersDataWizardRepository::SetFCSAndRolesFromFile(QString &pathToUserDb)
+void UsersDataWizardRepository::GetFCSAndRolesFromXml(const QDomElement &usersNode)
 {
-   if (m_terminal->IsFileExists(pathToUserDb, "UsersDataWizardRepository::SetFCSAndRolesFromDb", true)) {
-      QString text = m_terminal->GetFileText(pathToUserDb, "UsersDataWizardRepository::SetFCSAndRolesFromDb", true);
-      QByteArray arr;
-      arr += text;
-      QByteArray decrypted = QByteArray::fromHex(arr);
-      QDomDocument doc;
-      doc.setContent(decrypted);
-      QDomElement svg = doc.firstChildElement();
-      GetFCSAndRolesFromXml(svg);
-   }
-}
+    m_usersList.clear();
 
-void UsersDataWizardRepository::GetFCSAndRolesFromXml(QDomElement &usersNode)
-{
-   m_usersList.clear();
+    if (usersNode.tagName() == "USERS") {
+        QDomNodeList usersTags = usersNode.childNodes();
+        int usersCount = usersTags.count();
 
-   if (usersNode.tagName() == "USERS") {
-      QDomNodeList usersTags = usersNode.childNodes();
-      int usersCount = usersTags.count();
-
-      if (usersCount > 0) {
-         m_usersList.resize(usersCount);
-
-         for (int i = 0; i < usersCount; ++i) {
+        for (int i = 0; i < usersCount; ++i) {
             QDomElement userElement = usersTags.at(i).toElement();
 
             if (userElement.attribute("name") == m_curerntUserName) {
-               m_userFCS = userElement.attribute("FCS");
-               m_userRank = userElement.attribute("rank");
+                m_currentUserFCS = userElement.attribute("FCS");
+                m_currenUserRank = userElement.attribute("rank");
             }
 
             User user;
@@ -86,100 +73,97 @@ void UsersDataWizardRepository::GetFCSAndRolesFromXml(QDomElement &usersNode)
             user.rank = userElement.attribute("rank");
             user.role = userElement.attribute("role");
             user.userId = userElement.attribute("userId");
-            m_usersList[i] = user;
-         }
 
-         m_hasData = true;
-      }
-   }
+            m_usersList.push_back(user);
+        }
+        JuxtaposeUserIdAndUserNameWithSystemsData();
+    }
 }
 
-void UsersDataWizardRepository::WriteUserRepositoryToFile(const QString &pathToWriteDb, bool needToWriteOnlyAdmin)
+void UsersDataWizardRepository::WriteUserRepositoryToDB(ISqlDatabaseService *m_iSqlDatabaseService, bool needToWriteOnlyAdmin)
 {
-   if (m_terminal->IsFileNotExists(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true)) {
-      m_terminal->CheckAndCreatePathToElement(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true);
-      m_terminal->CreateFile(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile", true);
-   } else {
-      m_terminal->ClearFileSudo(pathToWriteDb, "UsersDataWizardRepository::WriteUserRepositoryToFile");
-   }
+    if(!m_iSqlDatabaseService->CheckUserTable())
+    {
+        m_iSqlDatabaseService->CreateUsersTableIfNotExists();
+    }
+    else
+    {
+        m_iSqlDatabaseService->ClearUserTable();
+    }
 
-   CreateMainTag();
+    if (needToWriteOnlyAdmin) {
+        WriteAdminToDatabase(m_iSqlDatabaseService);
+    } else {
+        if (!FindAndUpdateAdminData()) {
+            AppendAdminToCacheList();
+        }
+        WriteAllUsersToDatabase(m_iSqlDatabaseService);
+    }
+}
 
-   if (needToWriteOnlyAdmin) {
-      WriteAdminToDomDocument();
-   } else {
-      if (!FindAndUpdateAdminData()) {
-         AppendAdminToList();
-      }
+void UsersDataWizardRepository::JuxtaposeUserIdAndUserNameWithSystemsData()
+{
 
-      WriteAllUsersToDomDocument();
-   }
-
-   EncryptAndWriteToFile(pathToWriteDb);
+    QList<QPair<QString, QString> > nameIdList=m_service->GetSystemUsersNamesWithList();
+    for (int i=m_usersList.count()-1; i>=0; i--)
+    {
+        QString userName=m_usersList.at(i).name;
+        QString userId=m_usersList.at(i).userId;
+        bool findet=false;
+        for(const QPair<QString, QString> &item:nameIdList)
+        {
+            if(userName==item.first && userId==item.second)
+            {
+                findet=true;
+                break;
+            }
+        }
+        if(!findet)
+        {
+            m_usersList.removeAt(i);
+        }
+    }
 }
 
 bool UsersDataWizardRepository::FindAndUpdateAdminData()
 {
-   for (QVector<User>::iterator it = m_usersList.begin(); it != m_usersList.end(); ++it) {
-      if (it->name == m_curerntUserName) {
-         it->FCS = m_userFCS;
-         it->rank = m_userRank;
-         return true;
-      }
-   }
+    for (User &user:m_usersList) {
+        if (user.name == m_curerntUserName) {
+            user.FCS = m_currentUserFCS;
+            user.rank = m_currenUserRank;
+            return true;
+        }
+    }
 
-   return false;
+    return false;
 }
 
-void UsersDataWizardRepository::AppendAdminToList()
+void UsersDataWizardRepository::AppendAdminToCacheList()
 {
-   User user;
-   user.FCS = m_userFCS;
-   user.rank = m_userRank;
-   user.role = Roles.at(Roles.count() - 1);
-   user.userId = m_curerntUserId;
-   user.name = m_curerntUserName;
-   m_usersList.append(user);
+    User user;
+    user.FCS = m_currentUserFCS;
+    user.rank = m_currenUserRank;
+    user.role = Roles.at(Roles.count() - 1);
+    user.userId = m_curerntUserId;
+    user.name = m_curerntUserName;
+    m_usersList.append(user);
 }
 
-void UsersDataWizardRepository::CreateMainTag()
+void UsersDataWizardRepository::WriteAllUsersToDatabase(ISqlDatabaseService *m_iSqlDatabaseService)
 {
-   QDomElement mainElement = m_accountsData->createElement("USERS");
-   m_accountsData->appendChild(mainElement);
+    for (User &user : m_usersList)
+    {
+        m_iSqlDatabaseService->AppendUserIntoTable(user);
+    }
 }
 
-void UsersDataWizardRepository::WriteAllUsersToDomDocument()
+void UsersDataWizardRepository::WriteAdminToDatabase(ISqlDatabaseService *m_iSqlDatabaseService)
 {
-   for (QVector<User>::const_iterator it = m_usersList.cbegin(); it != m_usersList.cend(); ++it) {
-      AppendUserToDomDocument(*m_accountsData, *it);
-   }
-}
-
-void UsersDataWizardRepository::WriteAdminToDomDocument()
-{
-   QDomElement userElement = m_accountsData->createElement("user");
-   userElement.setAttribute("userId", m_curerntUserId);
-   userElement.setAttribute("name", m_curerntUserName);
-   userElement.setAttribute("FCS", m_userFCS);
-   userElement.setAttribute("rank", m_userRank);
-   userElement.setAttribute("role", Roles.at(Roles.count() - 1));
-   m_accountsData->firstChildElement().appendChild(userElement);
-}
-
-void UsersDataWizardRepository::AppendUserToDomDocument(QDomDocument &document, const User &user)
-{
-   QDomElement userElement = document.createElement("user");
-   userElement.setAttribute("userId", user.userId);
-   userElement.setAttribute("name", user.name);
-   userElement.setAttribute("FCS", user.FCS);
-   userElement.setAttribute("rank", user.rank);
-   userElement.setAttribute("role", user.role);
-   document.firstChildElement().appendChild(userElement);
-}
-
-void UsersDataWizardRepository::EncryptAndWriteToFile(const QString &pathToWriteDb)
-{
-   QString text = m_accountsData->toString();
-   QByteArray encrypt = text.toUtf8().toHex();
-   m_terminal->WriteTextToFileSudo(encrypt, pathToWriteDb, "UsersDataWizardRepository::EncryptAndWriteToFile");
+    User admin;
+    admin.userId=m_curerntUserId;
+    admin.name=m_curerntUserName;
+    admin.FCS=m_currentUserFCS;
+    admin.rank=m_currenUserRank;
+    admin.role=Roles.last();
+    m_iSqlDatabaseService->AppendUserIntoTable(admin);
 }

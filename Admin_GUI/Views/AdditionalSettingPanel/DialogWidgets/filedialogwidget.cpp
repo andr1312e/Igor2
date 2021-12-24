@@ -1,6 +1,6 @@
 #include "filedialogwidget.h"
 
-FileDialogWidget::FileDialogWidget(QWidget *parent)
+DesktopUploadDialogWidget::DesktopUploadDialogWidget(QWidget *parent)
    : QWidget(parent)
 {
    CreateUI();
@@ -9,7 +9,7 @@ FileDialogWidget::FileDialogWidget(QWidget *parent)
    ConnectObject();
 }
 
-FileDialogWidget::~FileDialogWidget()
+DesktopUploadDialogWidget::~DesktopUploadDialogWidget()
 {
    delete m_dialogWidgetButtonsLayout;
    delete m_iconPathLayout;
@@ -28,7 +28,7 @@ FileDialogWidget::~FileDialogWidget()
 }
 
 
-void FileDialogWidget::CreateUI()
+void DesktopUploadDialogWidget::CreateUI()
 {
    m_mainLayout = new QVBoxLayout;
 
@@ -58,7 +58,7 @@ void FileDialogWidget::CreateUI()
    m_messagBox = new QMessageBox();
 }
 
-void FileDialogWidget::InsertWidgetsIntoLayout()
+void DesktopUploadDialogWidget::InsertWidgetsIntoLayout()
 {
    m_mainLayout->addWidget(m_titleLabel);
 
@@ -82,7 +82,7 @@ void FileDialogWidget::InsertWidgetsIntoLayout()
    setLayout(m_mainLayout);
 }
 
-void FileDialogWidget::FillUI()
+void DesktopUploadDialogWidget::FillUI()
 {
    m_iconPath->setLabel("Путь к иконке: (если отдельно от приложения)");
    m_titleLabel->setAlignment(Qt::AlignCenter);
@@ -91,48 +91,48 @@ void FileDialogWidget::FillUI()
    m_messagBox->setWindowTitle("Внимание!");
 }
 
-void FileDialogWidget::ConnectObject()
+void DesktopUploadDialogWidget::ConnectObject()
 {
-   connect(m_closeDialogButton, &QPushButton::clicked, this, &FileDialogWidget::OnHideDialog);
-   connect(m_execButton, &QPushButton::clicked, this, &FileDialogWidget::OnAddingEcexutePath);
-   connect(m_iconPathButton, &QPushButton::clicked, this, &FileDialogWidget::OnAddIconPath);
-   connect(m_saveDialogButton, &QPushButton::clicked, this, &FileDialogWidget::OnAddIconToUserDesktop);
+   connect(m_closeDialogButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnHideDialog);
+   connect(m_execButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddingEcexutePath);
+   connect(m_iconPathButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddIconPath);
+   connect(m_saveDialogButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddIconToUserDesktop);
 }
 
-void FileDialogWidget::SetTitleText(QString &text)
+void DesktopUploadDialogWidget::SetTitleText(QString &text)
 {
    m_titleLabel->setText(text);
 }
 
 
-void FileDialogWidget::ClearAllTextFiels()
+void DesktopUploadDialogWidget::ClearAllTextFiels()
 {
    m_exec->clear();
    m_iconPath->clear();
    m_iconName->clear();
 }
 
-void FileDialogWidget::OnHideDialog()
+void DesktopUploadDialogWidget::OnHideDialog()
 {
    ClearAllTextFiels();
-   emit ToDialogSignalHide();
+   Q_EMIT ToDialogSignalHide();
 }
 
-void FileDialogWidget::OnAddingEcexutePath()
+void DesktopUploadDialogWidget::OnAddingEcexutePath()
 {
    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
    m_exec->setText(loadPath);
 }
 
-void FileDialogWidget::OnAddIconPath()
+void DesktopUploadDialogWidget::OnAddIconPath()
 {
    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
    m_iconPath->setText(loadPath);
 }
 
-void FileDialogWidget::OnAddIconToUserDesktop()
+void DesktopUploadDialogWidget::OnAddIconToUserDesktop()
 {
    if (m_exec->text() == "") {
       m_messagBox->setText("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно");
@@ -147,7 +147,7 @@ void FileDialogWidget::OnAddIconToUserDesktop()
             m_messagBox->exec();
          } else {
             if (QFile::exists(m_exec->text())) {
-               emit ToAddFileToUserDesktop(m_exec->text(), m_iconPath->text(), m_iconName->text());
+               Q_EMIT ToAddFileToUserDesktop(m_exec->text(), m_iconPath->text(), m_iconName->text());
                OnHideDialog();
             } else {
                m_messagBox->setText("Вы ввели путь к файлу, которого не существует, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\"");

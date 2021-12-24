@@ -15,27 +15,27 @@ public:
 
     ~LinuxUserService();
 
-    void getAllUsersInSystem();
+    void GetAllUsersWithIdInSystem();
 
-    QList<User>* getUsersList(){ return m_users;}
+    QList<QPair<QString, QString>>& GetSystemUsersNamesWithList(){ return m_users;}
 
-    Terminal* getTerminal() {return m_terminal;}
+    Terminal* GetTerminal() {return m_terminal;}
 
 public:
 
-    const QString getCurrentUserName();
+    const QString GetCurrentUserName();
 
-    const QString getCurrentUserId();
+    const QString GetCurrentUserId();
 
-    bool hasCurrentUserAdminPrivileges();
+    bool HasCurrentUserAdminPrivileges();
 
 private:
 
-    QStringList getUserGroups(const QString &userName);
+    QStringList GetUserGroups(const QString &userName);
 
-    void pushUserToList(const QString &name, const QString &userId);
+    void PushUserToNameIdList(const QString &name, const QString &userId);
 
-    void removeSystemUsersFromAllUsersList(QStringList &allUsers);
+    void RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
 
     static bool IsUserSystem(int &userIdNumber);
 
@@ -43,7 +43,7 @@ private:
 
     Terminal *m_terminal;
 
-    QList<User> *m_users;
+    QList<QPair<QString, QString>> m_users;
 
 };
 

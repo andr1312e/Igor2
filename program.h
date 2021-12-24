@@ -8,14 +8,13 @@
 #include <QInputDialog>
 #include <QSharedMemory>
 
-#include "Services/Settings/firststartsettingsservice.h"
-
-#include "Services/identifyservice.h"
+#include "Services/sqldatabaseserivce.h"
 #include "Services/Terminals/terminal.h"
 #include "Services/startuprunnableservice.h"
 
 #include "Server/dataHandler.h"
 
+#include "tray.h"
 #include "Admin_GUI/Views/admingui.h"
 #include "Admin_GUI/Views/Wizards/startupwizard.h"
 
@@ -37,22 +36,21 @@ private:
 
    void InitTerminal();
    void InitUserService();
+   void InitSqlService();
    void GetCurrentUserNameIdAndAdminPriviliges();
 
-   void InitSettingsService();
-   void GetProgramState();
+   LoadingState GetProgramState();
 
-   void ProcessDataLoading();
+   void ProcessDataLoading(LoadingState &state);
    void InitStyle();
+   void InitTrayIcon();
    void InitFramelessWindow();
-   void StartSettingsWizard();
+   void StartSettingsWizard(LoadingState &state);
 
 private Q_SLOTS:
    void OnContinueLoading();
 
 public:
-   void GetSettings();
-
    void InitRunnableService();
    bool AllAppsRunned();
 
@@ -61,14 +59,12 @@ public:
 
    void InitAdminUI();
 
-   void StartAdminServices();
-
    void ConnectObjects();
 
 private:
-   LoadingState m_loadedDbAdnRolesState;
-
-   bool m_hasAdminPrivileges;
+   bool CanGetAdminAccess();
+private:
+   const QString m_rlstiFolder;
    QString m_currentUserId;
    QString m_currentUserName;
 
@@ -78,16 +74,16 @@ private:
 
    Terminal *m_terminal;
    LinuxUserService *m_linuxUserService;
-   FirstStartSettingsService *m_firstStartSettingsService;
 
    StartupWizard *m_startupWizard;
 
-   DatabaseService *m_dataBaseService;
-   IdentifyService *m_indentifyService;
-   StartupRunnableService *m_startupRunnableService;
+   SqlDatabaseSerivce *m_sqlDatabaseService;
+   StartupRunnableManager *m_startupRunnableService;
    SocketToRarm *m_socketToRarm;
+
+   Tray *m_tray;
    Admin_GUI *m_AdminGui;
-   FakeUI *m_fakeUI;
+
    FramelessWindow *m_framelessWindow;
 
    StyleChanger *m_styleChanger;

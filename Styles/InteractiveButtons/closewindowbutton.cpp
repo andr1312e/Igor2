@@ -4,23 +4,22 @@ CloseWindowButton::CloseWindowButton(QWidget *parent)
     : InteractiveButtonBase (parent)
     , tr_radius(0)
     , m_pen(new QPen(Qt::white))
-    , m_painter(new QPainter(this))
     , m_buttonSize(new QSize(40, 40))
 {
-    initGeometry();
-    initDrawing();
+    InitGeometry();
     setUnifyGeomerey(true);
 }
 
 CloseWindowButton::~CloseWindowButton()
 {
     delete m_pen;
-    delete m_painter;
     delete m_buttonSize;
 }
 
 void CloseWindowButton::paintEvent(QPaintEvent *event)
 {
+    QPainter *m_painter=new QPainter();
+    m_painter->setPen(*m_pen);
     InteractiveButtonBase::paintEvent(event);
 
     if (!show_foreground) return ;
@@ -47,6 +46,7 @@ void CloseWindowButton::paintEvent(QPaintEvent *event)
         m_painter->drawPath(path);
     }
     m_painter->end();
+    delete m_painter;
 }
 
 void CloseWindowButton::setTopRightRadius(int r)
@@ -79,13 +79,8 @@ QSize CloseWindowButton::sizeHint() const
     return *m_buttonSize;
 }
 
-void CloseWindowButton::initGeometry()
+void CloseWindowButton::InitGeometry()
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setUnifyGeomerey(true);
-}
-
-void CloseWindowButton::initDrawing()
-{
-    m_painter->setPen(*m_pen);
 }

@@ -26,15 +26,15 @@ int UserWizardPage::nextId() const
 void UserWizardPage::initializePage()
 {
    QString adminFCS, adminRank;
-   QVector<User> users;
+   QList<User> users;
    m_actionComboBox->clear();
 
-   if (m_wizardService->HasBackup()) {
+   if (m_wizardService->HasUserBackup()) {
       m_backupFCSWidget->setVisible(true);
       m_wizardService->GetDataFromUserRepository(false, adminFCS, adminRank, users);
       m_backupFCSWidget->setWizardWidgetFileds(m_backupTitle, adminFCS, adminRank, users);
 
-      if (m_wizardService->HasOldData()) {
+      if (m_wizardService->HasUserOldData()) {
          m_oldFCSWidget->setVisible(true);
          m_wizardService->GetDataFromUserRepository(true, adminFCS, adminRank, users);
          m_oldFCSWidget->setWizardWidgetFileds(m_oldTitle, adminFCS, adminRank, users);
@@ -50,7 +50,7 @@ void UserWizardPage::initializePage()
       m_oldFCSWidget->setVisible(true);
       m_backupFCSWidget->setVisible(false);
 
-      if (m_wizardService->HasOldData()) {
+      if (m_wizardService->HasUserOldData()) {
          m_wizardService->GetDataFromUserRepository(true, adminFCS, adminRank, users);
          m_oldFCSWidget->setWizardWidgetFileds(m_oldTitle, adminFCS, adminRank, users);
          m_actionComboBox->addItems(userWizardPageComboBoxOldDataActions);
@@ -92,8 +92,3 @@ void UserWizardPage::CreateConnections()
 {
    connect(m_actionComboBox, &QComboBox::currentTextChanged, m_wizardService, &WizardService::OnSetActionWithUserRepository);
 }
-
-//QSize FCSPage::sizeHint() const
-//{
-//     return QSize(1800, 1500);
-//}

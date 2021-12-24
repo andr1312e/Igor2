@@ -22,37 +22,47 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
+    UserEditPanel(const QString &userName, Terminal *terminal, QWidget *parent);
     ~UserEditPanel();
-    void setUser(User &user);
-    void setFontSize(int fontSize);
-    void setButtonSize(int size);
 
 private:
+    void InitServicesAndModel(Terminal *terminal);
+    void CreateUI();
+    void InsertWidgetsIntoLayout();
+    void FillUI();
+    void SetObjectNames();
+    void ConnectObjects();
 
-    void initServicesAndModel(UserModel *model, Terminal *terminal);
-    void initUI();
-    void applyStyle();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+Q_SIGNALS:
+    void ToDeleteUser(const QString &userId);
+    void ToRoleToViewChanged(const int &roleId);
+    void ToSaveUser(const QString&userId, const QString &FCS, const QString &rank, const QString &oldRole, const QString &newRole);
 
-signals:
+private Q_SLOTS:
+    void OnSaveUser();
+    void OnDeleteUser();
+    void OnSetKioskMode(bool kioskModeState);
 
-    void setDefaultRoleApps(const QString &role);
-    void roleToViewChanged(const QString &role);
-    void fillUserAdditionalInfo(const QString &FCS, const QString &rank, const QString &role);
-    void clearUserAdditionalInfo();
+public:
+    void SetUser(const User &user);
+    void SetFontSize(const int fontSize);
+    void SetButtonSize(const int size);
 
 private:
+    void GetUserKioskState(const QString &userName);
+    void InsertUserData(const User &user);
+    void ShowSaveUserToast(const QString &userName);
 
-    QFont *m_editPanelFont;
+private:
+    const QString m_currentUserName;
 
-    UserModel *m_model;
+    QFont m_editPanelFont;
+
     KioskService *m_kioskService;
 
     QString m_userName;
-    QString m_currentUserName;
     QString m_userId;
+    QString m_oldRole;
 
     QVBoxLayout *m_mainLayout;
     QLabel *m_editFieldsLabel;
@@ -73,20 +83,6 @@ private:
     QtMaterialToggle *m_kiosModeState;
 
     QMessageBox *m_messagBox;
-
-private:
-
-    void setKioskMode(bool kioskModeState);
-    void checkUserKiosk(QString &userName);
-    void insertUserData(User &user);
-    void showToast(QString &userName);
-
-
-
-private slots:
-
-    void saveUser();
-    void deleteUser();
 };
 
 #endif // ADMIN_GUI_VIEWS_USEREDITPANEL_H

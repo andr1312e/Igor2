@@ -15,22 +15,20 @@ public:
     void setTopRightRadius(int r);
 
 protected:
-    void paintEvent(QPaintEvent*event);
+    virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
 
-    QPainterPath getBgPainterPath();
-    QPainterPath getWaterPainterPath(Water water);
+    virtual QPainterPath getBgPainterPath() Q_DECL_OVERRIDE;
+    virtual QPainterPath getWaterPainterPath(Water water) Q_DECL_OVERRIDE;
 
     QSize sizeHint() const override;
 
 private:
     int tr_radius;
     QPen *m_pen;
-    QPainter *m_painter;
     QSize *m_buttonSize;
 
 private:
-    void initGeometry();
-    void initDrawing();
+    void InitGeometry();
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_CLOSEWINDOWBUTTON_H

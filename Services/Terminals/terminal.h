@@ -16,6 +16,10 @@ public:
 
    QString RunConsoleCommand(const QString &command, QString calledFunc);
 
+   QStringList GetAllUsersList(const QString calledFunc);
+
+   bool IsDirExists(const QString folderPath, const QString calledFunc, bool hasRoot = true);
+
    bool IsDirNotExists(const QString folderPath, const QString calledFunc, bool hasRoot = true);
 
    bool IsFileExists(const QString filePath, const QString calledFunc, bool hasRoot = true);
@@ -44,7 +48,11 @@ public:
 
    void CopyFileSudo(const QString source, const QString &destination, const QString calledFunc);
 
+   QStringList GetAllProcessList(const QString calledFunc);
+
 private:
+
+   QString CreateGetAllUsersCommand();
 
    QString CreateCreateFolderCommand(const QString &folderPath, bool hasRoot = true);
 
@@ -67,6 +75,8 @@ private:
    QString CreateDeleteEmptyFolderCommandSudo(const QString &folderPath);
 
    QString CreateCopyFileCommandSudo(const QString &source, const QString &destination);
+
+   QString CreateGettAllProcessListCommand();
 
 private:
 

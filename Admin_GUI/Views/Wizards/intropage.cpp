@@ -115,9 +115,6 @@ void IntroPage::OnCheckBackupFile()
    bgpal.setColor(QPalette::Base, Qt::red);
    bgpal.setColor(QPalette::Text, Qt::green);
    m_backupLineEdit->setPalette(bgpal);
-   //     m_backupLineEdit->setFrame(false);
-   //   m_backupLineEdit->setStyleSheet("background-color: red");
-   //   m_backupLineEdit->setFrame(false);
    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
    m_backupFilePath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop, "Файл настроек (*.sync)");
 

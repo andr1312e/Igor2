@@ -22,59 +22,60 @@ class LinuxUsersListWidget : public QWidget
    Q_OBJECT
 public:
 
-   LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
+   LinuxUsersListWidget(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
    ~LinuxUsersListWidget();
 
-Q_SIGNALS:
-
-   void OnUserClick(User &user);
-   void Search(const QString &text, const QString &attribute);
-
 private:
-
-   void CreateProxyModel(UserModel *userModel);
+   void CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+   void CreateProxyModel();
    void CreateUI();
    void InsertWidgetsIntoLayout();
    void SetModelToListView();
    void CreateConnections();
 
-private:
+Q_SIGNALS:
 
-   QFont *m_font;
-
-   int m_oldFontSize;
-
-   QVBoxLayout *m_mainLayout;
-
-   QLabel *m_linuxUsersLabel;
-
-   QHBoxLayout *m_searchLayout;
-
-   QLineEdit *m_searchLineEdit;
-
-   QComboBox *m_searchTypeComboBox;
-
-   QListView *m_allUsersListView;
-
-   UserDelegate *m_userDelegate;
-
-   QStandardItemModel *m_model;
-
-   SortModel *m_sortModel;
-
-private:
-
-   void UpdateFontSize();
+   void ToUserClick(const User &user);
+   void ToSearch(const QString &text, const QString &attribute);
+   void ToSetDelegateView(bool state);
 
 private Q_SLOTS:
-
    void OnLineEditChange(const QString &text);
    void OnComboBoxChange(const QString &attribute);
    void GetUserData(const QModelIndex &index);
 
-protected:
+public:
+   void SetDelegateView(bool state);
+   void DeleteUser(const QString &userId);
+   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
 
-   void resizeEvent(QResizeEvent *event) override;
+private:
+   void UpdateFontSize();
+
+protected:
+   virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+
+private:
+   QFont *m_font;
+   int m_oldFontSize;
+
+private:
+
+   UserModel *m_userModel;
+   SortModel *m_sortModel;
+
+private:
+
+   QVBoxLayout *m_mainLayout;
+   QLabel *m_linuxUsersLabel;
+
+   QHBoxLayout *m_searchLayout;
+   QLineEdit *m_searchLineEdit;
+   QComboBox *m_searchTypeComboBox;
+
+   QListView *m_allUsersListView;
+   UserDelegate *m_userDelegate;
+   QStandardItemModel *m_model;
 
 };
 

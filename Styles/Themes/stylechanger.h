@@ -16,9 +16,8 @@ public:
    StyleChanger(QApplication *app);
    ~StyleChanger();
 
-public slots:
-
-   void OnChangeTheme(bool state);
+public Q_SLOTS:
+   void OnChangeTheme(bool setWhiteTheme);
 
 private:
    bool currentThemeIsWhite;

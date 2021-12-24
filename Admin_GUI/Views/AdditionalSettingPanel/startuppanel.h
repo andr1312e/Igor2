@@ -16,53 +16,50 @@
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h"
 
-enum STARTUP_PANEL_TYPE {
-   USER_APPS,
-   ROLE_APPS,
-};
+class ISqlDatabaseService;
 
 class StartupPanel : public QWidget
 {
    Q_OBJECT
 
 public:
-
-   StartupPanel(Terminal *terminal, const STARTUP_PANEL_TYPE type, QWidget *parent);
-
+   StartupPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
    ~StartupPanel();
 
-   void setParam(const QString &param, QStringList *users);
-
-public Q_SLOTS:
-
-   void OnSetDefaultRoleApps(const QString &role);
-
-Q_SIGNALS:
-
-   void ToRoleStartupFileChanging();
-
 private:
-
-   void CreateServices(Terminal *terminal);
+   void CreateServices(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
    void SetBackGroundColor();
    void CreateUI();
    void CreateModel();
    void InsertWidgetsIntoLayout();
    void ConnectObjects();
+Q_SIGNALS:
+
+   void ToRoleStartupChanges(const quint8 &roleId);
+
+private Q_SLOTS:
+   void OnDeleteProgram();
+   void OnAddProgram(const QString &startupPath);
+   void OnProgramSelect(const QModelIndex &index);
+
+public:
+   void SetRoleId(const quint8 &roleId);
+
+private:
+   void AppendStartupToModel(const QString &startupPath);
+   void GetAllStartups();
 
 private:
 
-   const STARTUP_PANEL_TYPE m_type;
+   quint8 m_roleId;
 
-   QStringList *m_usersList;
-
-   StartupRepositoryService *m_startupRepositoryService;
-
-   QString m_startupFilePath;
+   StartupRepositoryPresenter *m_startupRepositoryPresenter;
 
    QStringListModel *m_appsList;
 
    int m_selectedItemIndex;
+
+private:
 
    QVBoxLayout *m_mainLayout;
 
@@ -81,23 +78,6 @@ private:
    QVBoxLayout *m_dialogLayout;
 
    StartupDialogWidget *m_dialogWidget;
-
-private Q_SLOTS:
-
-   void OnDeleteProgram();
-
-   void OnAddProgram(const QString &exec);
-
-   void OnProgramSelect(const QModelIndex &index);
-
-private:
-
-   void UpdateAllUsersWithCurrentRole(QStringList &appsList);
-
-   void UpdateModel();
-
-   void WriteAppListToAllUsersWithRole(QStringList &appsList);
-
 };
 
 #endif // ADMIN_GUI_VIEWS_STARTUPPANEL_H
