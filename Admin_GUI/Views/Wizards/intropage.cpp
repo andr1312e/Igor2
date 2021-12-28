@@ -3,15 +3,15 @@
 #include <QMessageBox>
 
 
-IntroPage::IntroPage(const LoadingState &state, WizardService *service, QPushButton *themePushButton, QWidget *parent)
+IntroPage::IntroPage(const LoadingState &state, WizardService *service, QWidget *parent)
    : MyWizardPage(parent)
    , m_state(state)
    , m_wizardService(service)
 
 {
    CreateUI();
-   SetWizardTitle();
-   InsertWidgetsIntoLayout(themePushButton);
+   SetWizardStyles();
+   InsertWidgetsIntoLayout();
    CreateConnections();
 }
 
@@ -32,10 +32,10 @@ int IntroPage::nextId() const
    return Page_UserData;
 }
 
-void IntroPage::SetWizardTitle()
+void IntroPage::SetWizardStyles()
 {
    this->setPixmap(QWizard::WatermarkPixmap, QPixmap(":/images/1.jpg"));
-   m_backupLineEdit->setStyleSheet("border: 1px solid black");
+   m_backupLineEdit->setObjectName("wizard");
 }
 
 void IntroPage::CreateUI()
@@ -87,7 +87,7 @@ void IntroPage::CreateUI()
 
 }
 
-void IntroPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
+void IntroPage::InsertWidgetsIntoLayout()
 {
    m_backupFileLoadLayout->addWidget(m_backupLineEdit);
    m_backupFileLoadLayout->addWidget(m_backupLoadButton);
@@ -96,7 +96,6 @@ void IntroPage::InsertWidgetsIntoLayout(QPushButton *themePushButton)
    m_backupFileLayout->addLayout(m_backupFileLoadLayout);
    m_backupFileLayout->setContentsMargins(30, 0, 0, 0);
 
-   MainLayout()->addWidget(themePushButton, 0, Qt::AlignRight);
    MainLayout()->addWidget(m_topLabel);
    MainLayout()->addLayout(m_backupFileLayout);
    MainLayout()->addWidget(m_faqLabel);

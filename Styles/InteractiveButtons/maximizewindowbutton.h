@@ -7,22 +7,17 @@ class MaximizeWindowButton : public InteractiveButtonBase
 {
 public:
     MaximizeWindowButton(QWidget* parent);
-
     ~MaximizeWindowButton();
 
 protected:
-    void paintEvent(QPaintEvent*event) override;
-
-    QSize sizeHint() const override;
+    virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
+    void InitGeometry();
 
-    void initGeometry();
-
-    void initDrawing();
-
+private:
     QPen *m_pen;
-
     QPainter *m_painter;
 };
 

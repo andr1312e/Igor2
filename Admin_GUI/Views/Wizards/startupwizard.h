@@ -11,9 +11,10 @@
 #include "Services/Settings/wizardservice.h"
 #include "Services/Settings/programfilesstate.h"
 #include "Services/Settings/usersettingsrepository.h"
+#include "Services/Settings/usersprogramiconmakingservice.h"
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 
-
+#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
 #include "Admin_GUI/Views/Wizards/intropage.h"
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
 #include "Admin_GUI/Views/Wizards/userwizardpage.h"
@@ -24,11 +25,11 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
+   StartupWizard(const QString &rlsTiFolder,const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
    ~StartupWizard();
 private:
-   void CreateServices(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService);
-   void CreateUI(LoadingState &loadedDbAdnRolesState);
+   void CreateServices(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService * const linuxUserService, ISqlDatabaseService * const iSqlDataBaseService);
+   void CreateUI(const LoadingState &loadedDbAdnRolesState);
    void InitSizes();
    void InitStyles();
    void InitBehaviour();
@@ -40,16 +41,20 @@ Q_SIGNALS:
 
 private Q_SLOTS:
    void OnHelpButtonClick();
-   void OnThemeButtonClick(bool checked);
+   void OnCurrentPageChanged(int id);
+   void OnPageNumMove(int pageIdToMove);
 
 public:
-   void accept() Q_DECL_OVERRIDE;
-   void reject() Q_DECL_OVERRIDE;
+   virtual void accept() Q_DECL_OVERRIDE;
+   virtual void reject() Q_DECL_OVERRIDE;
 
 private:
+   UsersProgramIconMakingService *m_iconMakingService;
    WizardService *m_wizardService;
 
-   QPushButton *m_themePushButton;
+
+private:
+   WizardNavigtionBar *m_wizardNavigationBar;
    IntroPage *m_introPage;
    UserWizardPage *m_userWizardPage;
    QVector<RoleAppsWizardPage *> m_rolesPages;

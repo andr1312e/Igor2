@@ -118,7 +118,7 @@ void QToast::timerEvent(QTimerEvent* e)
     else if(m_nStatus==0x04)
     {
         m_nStatus=0x00;
-        emit signals_finished();
+        emit ToFininshed();
         killTimer(e->timerId());
         if(m_bAutoDelete)
         {

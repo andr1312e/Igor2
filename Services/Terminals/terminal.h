@@ -26,7 +26,7 @@ public:
 
    bool IsFileNotExists(const QString filePath, const QString calledFunc, bool hasRoot = true);
 
-   void CheckAndCreatePathToElement(const QString path, const QString calledFunc, bool hasRoot);
+   void CheckAndCreatePathToElement(const QString &path, const QString calledFunc, bool hasRoot);
 
    void CreateFolder(const QString &folderPath, const QString callerFunc, bool hasRoot = true);
 
@@ -52,37 +52,37 @@ public:
 
 private:
 
-   QString CreateGetAllUsersCommand();
+   const QString CreateGetAllUsersCommand() const;
 
-   QString CreateCreateFolderCommand(const QString &folderPath, bool hasRoot = true);
+   QString CreateCreateFolderCommand(const QString &folderPath, bool hasRoot = true) const;
 
-   QString CreateCreateFileCommand(const QString &filePath, bool hasRoot = true);
+   QString CreateCreateFileCommand(const QString &filePath, bool hasRoot = true) const;
 
-   QString CreateGetFolderListCommand(const QString &folderPath, bool hasRoot = true);
+   QString CreateGetFolderListCommand(const QString &folderPath, bool hasRoot = true) const;
 
-   QString CreateGetFileListCommand(const QString &folderPath, bool hasRoot = true);
+   QString CreateGetFileListCommand(const QString &folderPath, bool hasRoot = true) const;
 
-   QString CreateGetFileTextCommand(const QString &filePath, bool hasRoot = true);
+   QString CreateGetFileTextCommand(const QString &filePath, bool hasRoot = true) const;
 
-   QString CreateWriteTextToFileCommandSudo(const QString &filePath, const QByteArray &text);
+   QString CreateWriteTextToFileCommandSudo(const QString &filePath, const QByteArray &text) const;
 
-   QString CreateDeleteFileCommandSudo(const QString &filePath);
+   QString CreateDeleteFileCommandSudo(const QString &filePath) const;
 
-   QString CreateClearFileCommandSudo(const QString &filePath);
+   QString CreateClearFileCommandSudo(const QString &filePath) const;
 
-   QString CreateClearFolderCommandSudo(const QString &folderPath);
+   QString CreateClearFolderCommandSudo(const QString &folderPath) const;
 
-   QString CreateDeleteEmptyFolderCommandSudo(const QString &folderPath);
+   QString CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) const;
 
-   QString CreateCopyFileCommandSudo(const QString &source, const QString &destination);
+   QString CreateCopyFileCommandSudo(const QString &source, const QString &destination) const;
 
-   QString CreateGettAllProcessListCommand();
+   QString CreateGettAllProcessListCommand() const;
 
 private:
 
-   QProcess *m_process;
+   QProcess* const m_process;
 
-   QStringList *m_consoleCommand;
+   QStringList* const m_consoleCommand;
 
 };
 

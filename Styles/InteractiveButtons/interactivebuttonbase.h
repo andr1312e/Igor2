@@ -18,22 +18,8 @@
 #define PI 3.1415926
 #define GOLDEN_RATIO 0.618
 
-#define DOUBLE_PRESS_INTERVAL 300 // /* 300 */松开和按下的间隔。相等为双击
-#define SINGLE_PRESS_INTERVAL 200 // /* 150 */按下时间超过这个数就是单击。相等为单击
-
-/**
- * Copyright (c) 2019 命燃芯乂 All rights reserved.
- ×
- * 邮箱：wxy@iwxyi.com
- * QQ号：482582886
- * 时间：2020.12.28
- *
- * 说明：灵性的自定义按钮，简单又有趣
- * 源码：https://github.com/MRXY001/Interactive-Windows-Buttons
- *
- * 本代码为本人编写方便自己使用，现在无私送给大家免费使用。
- * 程序版权归作者所有，只可使用不能出售，违反者本人有权追究责任。
- */
+#define DOUBLE_PRESS_INTERVAL 300
+#define SINGLE_PRESS_INTERVAL 200
 
 class InteractiveButtonBase : public QPushButton
 {
@@ -238,25 +224,20 @@ public:
     bool getShowAni() { return show_animation; }
     bool getWaterRipple() { return water_animation; }
 
-#if QT_DEPRECATED_SINCE(5, 11)
-    QT_DEPRECATED_X("Use InteractiveButtonBase::setFixedForePos(bool fixed = true)")
-    void setFixedTextPos(bool f = true);
-#endif
-
     virtual bool inArea(QPoint point);
     virtual bool inArea(QPointF point);
 
 protected:
-    void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
-    void focusInEvent(QFocusEvent *event) override;
-    void focusOutEvent(QFocusEvent *event) override;
-    void changeEvent(QEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
+    virtual void enterEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void leaveEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    virtual void focusInEvent(QFocusEvent *event) Q_DECL_OVERRIDE;
+    virtual void focusOutEvent(QFocusEvent *event) Q_DECL_OVERRIDE;
+    virtual void changeEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
     virtual QPainterPath getBgPainterPath();
     virtual QPainterPath getWaterPainterPath(Water water);

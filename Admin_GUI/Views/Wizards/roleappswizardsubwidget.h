@@ -15,7 +15,11 @@ class RoleAppsWizardSubWidget : public QWidget
    Q_OBJECT
 public:
    RoleAppsWizardSubWidget(const QString title, QWidget *parent);
-   virtual ~RoleAppsWizardSubWidget();
+   ~RoleAppsWizardSubWidget();
+private:
+   void CreateUI(const QString &title);
+   void InsertWidgetsIntoLayout();
+public:
    void SetWizardWidgetFileds(QList<DesktopEntity> &desktops, QStringList &ecexs);
 private:
    const QStringList m_headerLabels = {"Имя ярлыка", "Путь к исполняемому файлу", "Тип"};
@@ -25,9 +29,6 @@ private:
    QListWidget *m_execsList;
    QLabel *m_desktopsLabel;
    QTableWidget *m_desktopsTable;
-private:
-   void CreateUI(const QString &title);
-   void InsertWidgetsIntoLayout();
 };
 
 #endif // ADMIN_GUI_VIEWS_WIZARD_ROLEWIDGET_H

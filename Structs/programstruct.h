@@ -5,13 +5,13 @@
 #include <QString>
 
 struct DesktopEntity{
-    DesktopEntity(){}
     QString name;
     QString type;
     QString exec;
     QString icon;
 };
 
+Q_DECLARE_TYPEINFO(DesktopEntity, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(DesktopEntity)
 
 

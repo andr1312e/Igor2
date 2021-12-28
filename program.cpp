@@ -55,6 +55,7 @@ void Program::CreateApp()//MAIN
 {
     InitTerminal();
     InitUserService();
+    GetAllUsersWithIdInSystem();
     InitSqlService();
     GetCurrentUserNameIdAndAdminPriviliges();
     LoadingState state=GetProgramState();
@@ -180,7 +181,7 @@ void Program::OnContinueLoading()
 
 
         //        if (m_linuxUserService->HasCurrentUserAdminPrivileges()) {
-        InitAdminServices();
+
         InitAdminUI();
         ConnectObjects();
         //        }
@@ -202,7 +203,7 @@ void Program::InitRarmSocket()
     m_socketToRarm = new SocketToRarm("127.0.0.1:4242", this);
 }
 
-void Program::InitAdminServices()
+void Program::GetAllUsersWithIdInSystem()
 {
     m_linuxUserService->GetAllUsersWithIdInSystem();
 }

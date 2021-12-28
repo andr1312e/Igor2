@@ -7,14 +7,14 @@
 #include <QTimerEvent>
 
 #include "Services/Terminals/terminal.h"
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 
 class StartupRunnableManager: public QObject
 {
     Q_OBJECT
 
 public:
-    StartupRunnableManager(const QString currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
+    StartupRunnableManager(const QString &currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
     ~StartupRunnableManager();
 
 Q_SIGNALS:

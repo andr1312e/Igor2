@@ -254,19 +254,19 @@ void UserEditPanel::GetUserKioskState(const QString &userName)
 
 void UserEditPanel::InsertUserData(const User &user)
 {
-    if (user.hasData)
-    {
-        m_editFieldsLabel->setText(userEditFields.at(1));
-        m_FCSLineEdit->setText(user.FCS);
-        m_rankComboBox->setCurrentText(user.rank);
-        m_roleComboBox->setCurrentText(Roles.at(user.role));
-    }
-    else
+    if (user.role==-1)
     {
         m_editFieldsLabel->setText(userEditFields.at(0));
         m_FCSLineEdit->clear();
         m_rankComboBox->setCurrentIndex(0);
         m_roleComboBox->setCurrentIndex(0);
+    }
+    else
+    {
+        m_editFieldsLabel->setText(userEditFields.at(1));
+        m_FCSLineEdit->setText(user.FCS);
+        m_rankComboBox->setCurrentText(user.rank);
+        m_roleComboBox->setCurrentText(Roles.at(user.role));
     }
 }
 

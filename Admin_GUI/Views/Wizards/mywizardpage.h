@@ -5,6 +5,7 @@
 #include <QWizardPage>
 #include <QPushButton>
 
+#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
 
 class MyWizardPage: public QWizardPage
 {
@@ -13,7 +14,7 @@ public:
    explicit MyWizardPage(QWidget *parent);
    ~MyWizardPage();
 
-   void SetWidget(QPushButton *themeChangeButton);
+   void SetWizardNavigationBar(WizardNavigtionBar *wizardNavigtionBar);
 
    QVBoxLayout *MainLayout() const;
 

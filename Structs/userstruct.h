@@ -13,7 +13,6 @@ struct User{
     QString rank;
     int role;
     QString m_image;
-    bool hasData=false;
 
 //    User& operator =(User &user)
 //    {

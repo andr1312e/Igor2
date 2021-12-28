@@ -61,5 +61,7 @@
         <file>images/horizontalDelegateWhite.ico</file>
         <file>images/iconDelegateBlack.ico</file>
         <file>images/iconDelegateWhite.ico</file>
+        <file>images/data-cleaning-blacked.ico</file>
+        <file>images/data-clearing_white.ico</file>
     </qresource>
 </RCC>

@@ -33,8 +33,8 @@ private:
    void CreateModel();
    void InsertWidgetsIntoLayout();
    void ConnectObjects();
-Q_SIGNALS:
 
+Q_SIGNALS:
    void ToRoleStartupChanges(const quint8 &roleId);
 
 private Q_SLOTS:

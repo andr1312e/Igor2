@@ -1,6 +1,6 @@
 #include "roleappsandstartupsettingsrepository.h"
 
-RolesAndStartupsWizardRepository::RolesAndStartupsWizardRepository(Terminal *terminal)
+RolesAndStartupsWizardRepository::RolesAndStartupsWizardRepository(Terminal * const terminal)
     : m_terminal(terminal)
 {
 
@@ -11,14 +11,14 @@ RolesAndStartupsWizardRepository::~RolesAndStartupsWizardRepository()
 
 }
 
-bool RolesAndStartupsWizardRepository::HasData()
+bool RolesAndStartupsWizardRepository::HasData(quint8 roleId)
 {
-    bool isNotEmptyStartups=!m_firstRoleStartup.isEmpty() || !m_secondRoleStartup.isEmpty() || !m_thirdRoleStartup.isEmpty() || !m_fourthRoleStartup.isEmpty();
-    bool isNotEmptyDesktops=!m_firstRoleDesktopsIcons.isEmpty() || !m_secondRoleDesktopsIcons.isEmpty() || !m_thirdRoleDesktopsIcons.isEmpty() || !m_fourthRoleDesktopsIcons.isEmpty();
+    bool isNotEmptyStartups = !GetStatupsByIndex(roleId).isEmpty();
+    bool isNotEmptyDesktops= !GetDesktopsByIndex(roleId).isEmpty();
     return (isNotEmptyStartups || isNotEmptyDesktops);
 }
 
-void RolesAndStartupsWizardRepository::GetRoleDesktopsAndStartupsFromLocalRepository(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups)
+void RolesAndStartupsWizardRepository::GetRoleDesktopsAndStartupsFromLocalRepository(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups) const
 {
     roleDesktops=GetDesktopsByIndex(roleIndex);
     startups=GetStatupsByIndex(roleIndex);
@@ -28,27 +28,33 @@ void RolesAndStartupsWizardRepository::GetRoleDesktopsAndStartupsFromDb(ISqlData
 {
     for (int i=0; i<Roles.count(); ++i)
     {
-        AppendRoleStartups(i, iSqlDatabaseService->GetAllRoleStartups(i));
-        QList<DesktopEntity> desktopEntityList=iSqlDatabaseService->GetAllRoleDesktops(i);
-        for (DesktopEntity & entity: desktopEntityList)
+        if(iSqlDatabaseService->CheckStartupTables((quint8)i))
         {
-            AppendEnittyToRoleDesktops(i, entity);
+            AppendRoleStartups(i, iSqlDatabaseService->GetAllRoleStartups(i));
+        }
+        if(iSqlDatabaseService->CheckDesktopTables((quint8)(i)))
+        {
+            QList<DesktopEntity> desktopEntityList=iSqlDatabaseService->GetAllRoleDesktops(i);
+            for (DesktopEntity & entity: desktopEntityList)
+            {
+                AppendEnittyToRoleDesktops(i, entity);
+            }
         }
     }
 }
 
-void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex, QDomElement &backupNode, const QString &backupFolder)
+void RolesAndStartupsWizardRepository::SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex,const QDomElement &backupNode, const QString &backupFolder)
 {
     if(backupNode.childNodes().count()==2)
     {
-        QDomElement desktops = backupNode.firstChildElement();
-        QDomElement startups = backupNode.lastChildElement();
+        const QDomElement desktops = backupNode.firstChildElement();
+        const QDomElement startups = backupNode.lastChildElement();
         SetRoleDesktopFromXml(roleIndex, desktops, backupFolder);
         SetRoleStartupsFromXml(roleIndex, startups, backupFolder);
     }
 }
 
-int RolesAndStartupsWizardRepository::GetRoleDesktopsAppCount(const int roleIndex)
+int RolesAndStartupsWizardRepository::GetRoleDesktopsAppCount(const int roleIndex) const
 {
     return GetDesktopsByIndex(roleIndex).count();
 }
@@ -70,14 +76,14 @@ void RolesAndStartupsWizardRepository::SaveRoleExecsToDb(ISqlDatabaseService *iS
 {
     iSqlDatabaseService->CreateStartupsTableInNotExists(roleIndex);
     iSqlDatabaseService->ClearStartupsTable(roleIndex);
-    QStringList currentRoleStartups(GetStatupsByIndex(roleIndex));
-    for (QString &exec :currentRoleStartups)
+    const QStringList currentRoleStartups(GetStatupsByIndex(roleIndex));
+    for (const QString &exec :currentRoleStartups)
     {
         iSqlDatabaseService->AppendStartupIntoRole(roleIndex, exec);
     }
 }
 
-QStringList RolesAndStartupsWizardRepository::GetAllUniqueDesktopExecsAndStarups(const int roleIndex)
+QStringList RolesAndStartupsWizardRepository::GetAllUniqueDesktopExecsAndStarups(const int roleIndex) const
 {
     QStringList startupsList=GetStatupsByIndex(roleIndex);
     QList<DesktopEntity> desktopsList=GetDesktopsByIndex(roleIndex);
@@ -89,7 +95,7 @@ QStringList RolesAndStartupsWizardRepository::GetAllUniqueDesktopExecsAndStarups
     return  startupsList;
 }
 
-void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(const int roleIndex, QDomElement &desktops, const QString &backupFolder)
+void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(const int roleIndex,const QDomElement &desktops, const QString &backupFolder)
 {
     if (desktops.tagName() == "desktops") {
         QDomNodeList desktopsList = desktops.childNodes();
@@ -125,7 +131,7 @@ void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(const int roleIndex
     }
 }
 
-void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(const int roleIndex, QDomElement &startups, const QString &backupFolder)
+void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(const int roleIndex,const QDomElement &startups, const QString &backupFolder)
 {
     QStringList startupList;
 
@@ -191,7 +197,7 @@ void RolesAndStartupsWizardRepository::AppendEnittyToRoleDesktops(const int role
     }
 }
 
-QList<DesktopEntity> &RolesAndStartupsWizardRepository::GetDesktopsByIndex(const int roleIndex)
+const QList<DesktopEntity> &RolesAndStartupsWizardRepository::GetDesktopsByIndex(const int roleIndex) const
 {
     switch (roleIndex) {
     case 0: {
@@ -249,7 +255,7 @@ void RolesAndStartupsWizardRepository::AppendRoleStartups(const int roleIndex, c
     }
 }
 
-QStringList &RolesAndStartupsWizardRepository::GetStatupsByIndex(const int roleIndex)
+const QStringList &RolesAndStartupsWizardRepository::GetStatupsByIndex(const int roleIndex) const
 {
     switch (roleIndex) {
     case 0: {

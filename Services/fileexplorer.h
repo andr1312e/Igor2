@@ -10,7 +10,7 @@
 #include "Structs/programstruct.h"
 
 #include "Services/Terminals/terminal.h"
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 
 class DesktopPanelPresenter
 {

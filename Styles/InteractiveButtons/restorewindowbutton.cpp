@@ -3,7 +3,6 @@
 RestoreWindowButton::RestoreWindowButton(QWidget* parent)
     : InteractiveButtonBase(parent)
     , m_pen(new QPen(Qt::white))
-    , m_painter(new QPainter(this))
     , m_buttonSize(new QSize(40, 40))
     , m_br(new QRect())
     , m_topLeft(new QPoint())
@@ -12,7 +11,6 @@ RestoreWindowButton::RestoreWindowButton(QWidget* parent)
     , m_bottomRight(new QPoint())
     , m_points(new std::array<QPoint, 5>())
 {
-    m_painter->setPen(*m_pen);
     initGeometry();
     setUnifyGeomerey(true);
 }
@@ -32,13 +30,15 @@ RestoreWindowButton::~RestoreWindowButton()
 
 void RestoreWindowButton::paintEvent(QPaintEvent* event)
 {
-
+    Q_UNUSED(event);
+    m_painter=new QPainter(this);
+    m_painter->setPen(*m_pen);
     if (!show_foreground) return ;
 
     int w = _w, h = _h;
     int dx = offset_pos.x(), dy = offset_pos.y();
     m_br->setRect(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
-    m_painter->begin(this);
+//    m_painter->begin(this);
     m_painter->drawRect(*m_br);
 
     dx /= 2; dy /= 2;
@@ -95,7 +95,7 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
         m_points->operator[](3)=*m_topRight;
         m_points->operator[](4)=QPoint(r, m_br->top());
     }
-    else // 没有重合
+    else
     {
         m_points->operator[](0)=*m_topLeft;
         m_points->operator[](1)=*m_topRight;
@@ -105,10 +105,12 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
     }
 
     QPainterPath path;
-    path.moveTo(m_points->at(0));
+    path.moveTo(m_points->front());
     for (int i = 1; i < 5; ++i)
+    {
         path.lineTo(m_points->at(i));
-    m_painter->begin(this);
+    }
+//    m_painter->begin(this);
     m_painter->drawPath(path);
     m_painter->end();
 }

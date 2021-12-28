@@ -13,7 +13,11 @@ public:
 
     virtual bool CheckStartupTables() = 0;
 
-    virtual bool ChekcDesktopTables() = 0;
+    virtual bool CheckStartupTables(quint8 roleId) = 0;
+
+    virtual bool CheckDesktopTables() = 0;
+
+    virtual bool CheckDesktopTables(quint8 roleId) = 0;
 
     //clear tables
 
@@ -31,7 +35,7 @@ public:
     virtual void CreateDesktopRolesIfNotExists(quint8 roleId) = 0;
 
     //users
-    virtual void AppendUserIntoTable(User &user) = 0;
+    virtual void AppendUserIntoTable(const User &user) = 0;
 
     virtual void RemoveUserIntoTable(quint8 roleId, User &user) = 0;
 

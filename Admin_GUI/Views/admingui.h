@@ -6,7 +6,7 @@
 #include <QScreen>
 #include <QGuiApplication>
 
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 #include "Services/linuxuserservice.h"
 
 #include "Admin_GUI/Model/usermodel.h"

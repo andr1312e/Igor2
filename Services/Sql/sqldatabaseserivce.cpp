@@ -8,26 +8,26 @@ SqlDatabaseSerivce::SqlDatabaseSerivce(QObject *parent)
 
 SqlDatabaseSerivce::~SqlDatabaseSerivce()
 {
-    db->close();
-    delete db;
+    m_db->close();
+    delete m_db;
 }
 
 bool SqlDatabaseSerivce::ConnectToDataBase(const QString &hostName, const quint16 &port, const QString &databaseName, const QString &userName, const QString &dbPassword)
 {
-    db=new QSqlDatabase(QSqlDatabase::addDatabase(postgeSqlDatabaseDriverStringKey));
-    db->setHostName(hostName);
-    db->setPort(port);
-    db->setDatabaseName(databaseName);
-    db->setUserName(userName);
-    db->setPassword(dbPassword);
-    bool isDbCreated= db->open(userName, dbPassword);
+    m_db=new QSqlDatabase(QSqlDatabase::addDatabase(postgeSqlDatabaseDriverStringKey));
+    m_db->setHostName(hostName);
+    m_db->setPort(port);
+    m_db->setDatabaseName(databaseName);
+    m_db->setUserName(userName);
+    m_db->setPassword(dbPassword);
+    bool isDbCreated= m_db->open(userName, dbPassword);
     if (isDbCreated)
     {
         return true;
     }
     else
     {
-        qDebug()<< "Error" << "Database connection error" + db->lastError().text();
+        qDebug()<< "Error" << "Database connection error" + m_db->lastError().text();
         return false;
     }
 }
@@ -41,13 +41,13 @@ void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
                    userNameCN+" VARCHAR(100) NOT NULL, "+
                    fcsCN + "    VARCHAR(100) NOT NULL, "+
                    rankCN+ "    VARCHAR(100) NOT NULL, "+
-                   roleCN+"     VARCHAR(100) NOT NULL)"))
+                   roleCN+ "    INT NOT NULL)"))
     {
         return;
     }
     else
     {
-        qDebug()<< "Error" << "Database error" + db->lastError().text();
+        qDebug()<< "Error" << "Database error" + m_db->lastError().text();
         qDebug()<< "Error" << "query error" + query.lastError().text();
         qFatal("Не удалось создать бд с исполняемыми файлами");
     }
@@ -188,10 +188,18 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
     {
         if(query.next())
         {
-            if(query.value(0).type()==QVariant::String)
+            if(query.value(0).type()==QVariant::Int)
             {
-                int role=query.value(0).toInt();
-                return role;
+                bool ok;
+                int role=query.value(0).toInt(&ok);
+                if(ok)
+                {
+                    return role;
+                }
+                else
+                {
+                    qFatal("Can't convert to int string value");
+                }
             }
             else
             {
@@ -205,13 +213,13 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
     }
     else
     {
-        qFatal("Cant delete from database exec");
+        qFatal("Can't delete from database exec");
     }
 }
 
 void SqlDatabaseSerivce::ClearTable(QString tableName)
 {
-    QSqlQuery query(*db);
+    QSqlQuery query(*m_db);
     QString request=" DELETE FROM "+tableName;
     query.prepare(request);
     if(query.exec())
@@ -275,7 +283,28 @@ bool SqlDatabaseSerivce::CheckStartupTables()
     return  result;
 }
 
-bool SqlDatabaseSerivce::ChekcDesktopTables()
+bool SqlDatabaseSerivce::CheckStartupTables(quint8 roleId)
+{
+    if(roleId>=0 && roleId<Roles.count())
+    {
+        QSqlQuery query;
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + startupTablePrefix +QString::number(roleId)+ "')");
+        if(query.exec())
+        {
+            return GetBoolFromMessage(query);
+        }
+        else
+        {
+            qFatal("Cant execute check user table query");
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool SqlDatabaseSerivce::CheckDesktopTables()
 {
     bool result=true;
     for (int i=0; i<Roles.count(); ++i)
@@ -294,27 +323,51 @@ bool SqlDatabaseSerivce::ChekcDesktopTables()
     return  result;
 }
 
-void SqlDatabaseSerivce::AppendUserIntoTable(User &user)
+bool SqlDatabaseSerivce::CheckDesktopTables(quint8 roleId)
+{
+    if(roleId>=0 && roleId<Roles.count())
+    {
+        QSqlQuery query;
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + desktopTablePrefix +QString::number(roleId)+ "')");
+        if(query.exec())
+        {
+            return GetBoolFromMessage(query);
+        }
+        else
+        {
+            qFatal("Cant execute check user table query");
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 {
     QSqlQuery query;
-    QString request="INSERT INTO " + usersTableName +
-            " ( "+ userIdCN + " , " +userNameCN +" , " + fcsCN +" , " + rankCN +" , " + roleCN + ")"+
-            " VALUES ( ?,           ?,                      ?,              ?,               ? )";
-    query.prepare(request);
-    query.bindValue(0, user.userId);
-    query.bindValue(1, user.name);
-    query.bindValue(2, user.FCS);
-    query.bindValue(3, user.rank);
-    query.bindValue(4, user.role);
-    if(query.exec())
+    QString request=
+            "DO $$ BEGIN IF EXISTS(SELECT * FROM " + usersTableName+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
+            "UPDATE " + usersTableName+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
+            "ELSE "
+            "INSERT INTO " + usersTableName+ " (" +userIdCN + ", " +userNameCN + ", "+ fcsCN + ", "+ rankCN + ", "+ roleCN + ") "+
+            "VALUES ('"+ user.userId+ "',  '"+ user.name+ "', '"+ user.FCS+ "', '"+ user.rank+ "',  "+ QString::number(user.role)+ ");  "
+                                                                                                                                   "END IF; "
+                                                                                                                                   "END $$; ";
+    if(query.exec(request))
     {
         return;
     }
     else
     {
+        qDebug()<< query.executedQuery();
+        qDebug()<< query.lastQuery();
+        qDebug()<< query.lastError().text();
         qFatal("Cant write user to database");
     }
 }
+
 
 void SqlDatabaseSerivce::RemoveUserIntoTable(quint8 roleId, User &user)
 {

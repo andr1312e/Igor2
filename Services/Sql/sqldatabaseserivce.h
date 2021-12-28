@@ -12,7 +12,7 @@
 
 #include "Services/Sql/tablecolumnsnames.h"
 
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 
 class SqlDatabaseSerivce : public QObject, public ISqlDatabaseService
 {
@@ -29,16 +29,17 @@ public:
 public:
 
     virtual bool CheckUsersTable() Q_DECL_OVERRIDE;
-    virtual bool CheckStartupTables() Q_DECL_OVERRIDE ;
-    virtual bool ChekcDesktopTables() Q_DECL_OVERRIDE;
-
+    virtual bool CheckStartupTables() Q_DECL_OVERRIDE;
+    virtual bool CheckStartupTables(quint8 roleId) Q_DECL_OVERRIDE;
+    virtual bool CheckDesktopTables() Q_DECL_OVERRIDE;
+    virtual bool CheckDesktopTables(quint8 roleId) Q_DECL_OVERRIDE;
 
 
     virtual void ClearUsersTable() Q_DECL_OVERRIDE;
     virtual void ClearStartupsTable(quint8 roleId) Q_DECL_OVERRIDE;
     virtual void ClearDesktopTable(quint8 roleId) Q_DECL_OVERRIDE;
 
-    virtual void AppendUserIntoTable(User &user) Q_DECL_OVERRIDE;
+    virtual void AppendUserIntoTable(const User &user) Q_DECL_OVERRIDE;
     virtual void RemoveUserIntoTable(quint8 roleId, User &user) Q_DECL_OVERRIDE ;
     virtual QList<User> GetAllUsers() Q_DECL_OVERRIDE;
 
@@ -67,7 +68,7 @@ private:
     void GetStringFromMessage(QString &inputString, const QSqlRecord &record, int rowPos);
 private:
     QString postgeSqlDatabaseDriverStringKey="QPSQL";
-    QSqlDatabase *db;
+    QSqlDatabase *m_db;
 
     const QString usersTableName="rlstiusers";
     const QString startupTablePrefix="rlstistartups";

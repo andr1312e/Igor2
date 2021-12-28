@@ -7,7 +7,7 @@
 
 #include "Structs/userstruct.h"
 
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 #include "Services/linuxuserservice.h"
 
 class UsersDataWizardRepository
@@ -33,11 +33,13 @@ public:
 
    int GetUserCount() const;
 
-   void GetFCSAndRolesFromXml(const QDomElement &usersNode);
+   void SetUsersFromBackup(const QDomElement &usersNode);
 
    void WriteUserRepositoryToDB(ISqlDatabaseService *m_iSqlDatabaseService, bool adminOnly);
 
 private:
+
+   int GetKorrektUserRole(const QDomElement &userDomElement);
 
    void JuxtaposeUserIdAndUserNameWithSystemsData();
 
@@ -49,9 +51,11 @@ private:
 
    void WriteAdminToDatabase(ISqlDatabaseService *m_iSqlDatabaseService);
 
+   void CheckCurrentUserFcsAndRank();
+
 private:
 
-   LinuxUserService *m_service;
+   LinuxUserService* const m_service;
 
    const QString m_curerntUserName;
 

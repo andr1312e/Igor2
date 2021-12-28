@@ -15,17 +15,19 @@ public:
    static int LENGTH_SHORT;
    enum TOAST_POS {TOP, CENTER, BOTTOM};
    static QToast *CreateToast(QString strContent, int nToastInterval, QWidget *parent);
+
    void SetTextFont(const QFont &font)
    {
       m_drawFont = font;
    }
+
    const QFont &GetTextFont()
    {
       return m_drawFont;
    }
    void SetToastPos();
 Q_SIGNALS:
-   void signals_finished();
+   void ToFininshed();
 protected:
    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
    void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;

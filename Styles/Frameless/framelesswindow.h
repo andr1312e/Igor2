@@ -29,6 +29,7 @@ private:
    void ApplyStyles();
    void SetObjectNames();
    void CreateConnections();
+
 Q_SIGNALS:
    void ToChangeTheme(bool state);
    void ToHideAdditionalSettings(bool state);
@@ -61,12 +62,12 @@ protected:
    virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
    virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 public:
-   void SetMainWidget(QWidget *w);
+   void SetMainWidget(QWidget *widget);
 private:
    WindowTitleBar *m_WindowTitleBar;
    QWidget *m_windowFrame;
    QVBoxLayout *m_mainLayout;
-   QVBoxLayout *m_vertivalLayout;
+   QVBoxLayout *m_verticalLayout;
    QHBoxLayout *m_topLayout;
    QPushButton *m_changeDelegatesView;
    QPushButton *m_changeThemePushButton;
@@ -81,13 +82,13 @@ private:
 
    QGraphicsDropShadowEffect *m_textShadow;
 
-   QRect m_StartGeometry;
+   QRect m_startGeometry;
    const quint8 CONST_DRAG_BORDER_SIZE = 15;
-   bool m_bMousePressed;
-   bool m_bDragTop;
-   bool m_bDragLeft;
-   bool m_bDragRight;
-   bool m_bDragBottom;
+   bool m_isMousePressed;
+   bool m_isDragTop;
+   bool m_isDragLeft;
+   bool m_isDragRight;
+   bool m_isDragBottom;
 
 
 };

@@ -8,7 +8,7 @@
 #include <QInputDialog>
 #include <QSharedMemory>
 
-#include "Services/sqldatabaseserivce.h"
+#include "Services/Sql/sqldatabaseserivce.h"
 #include "Services/Terminals/terminal.h"
 #include "Services/startuprunnableservice.h"
 
@@ -52,7 +52,7 @@ private Q_SLOTS:
 public:
    void InitRunnableService();
    bool AllAppsRunned();
-   void InitAdminServices();
+   void GetAllUsersWithIdInSystem();
    void InitRarmSocket();
    void InitAdminUI();
    void ConnectObjects();

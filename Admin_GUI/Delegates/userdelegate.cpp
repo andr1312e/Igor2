@@ -102,7 +102,8 @@ void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         painter->setPen(*m_textPen);
         painter->drawText(*m_userNameRect, "Имя пользователя: " + user.name);
         painter->drawText(*m_userFCSRect, "ФИО: " + user.FCS);
-        painter->drawText(*m_userRoleRect, "Роль: " + Roles.at(user.role));
+        QString role=(user.role>=0 && user.role < Roles.count()) ? Roles.at(user.role) : " ";
+        painter->drawText(*m_userRoleRect, "Роль: " + role);
         painter->restore();
 
     }

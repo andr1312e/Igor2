@@ -18,18 +18,18 @@ CloseWindowButton::~CloseWindowButton()
 
 void CloseWindowButton::paintEvent(QPaintEvent *event)
 {
-    QPainter *m_painter=new QPainter();
-    m_painter->setPen(*m_pen);
-    InteractiveButtonBase::paintEvent(event);
 
+    InteractiveButtonBase::paintEvent(event);
+    QPainter *m_painter=new QPainter(this);
+    m_painter->setPen(*m_pen);
     if (!show_foreground) return ;
 
     int w = _w, h = _h;
     int l = _l+w/3, t = _t+h/3, r = w*2/3, b = h*2/3;
     int mx = _l+w/2+offset_pos.x(), my = _t+h/2+offset_pos.y();
 
-    m_painter->begin(this);
     m_painter->setRenderHint(QPainter::Antialiasing,true);
+
     if (offset_pos.x()==0 && offset_pos.y()==0)
     {
         m_painter->drawLine(QPoint(l,t), QPoint(r,b));

@@ -8,11 +8,11 @@
 
 FramelessWindow::FramelessWindow(QWidget *parent)
     : QWidget(parent)
-    , m_bMousePressed(false)
-    , m_bDragTop(false)
-    , m_bDragLeft(false)
-    , m_bDragRight(false)
-    , m_bDragBottom(false)
+    , m_isMousePressed(false)
+    , m_isDragTop(false)
+    , m_isDragLeft(false)
+    , m_isDragRight(false)
+    , m_isDragBottom(false)
 {
 
     CreateUI();
@@ -35,7 +35,7 @@ FramelessWindow::FramelessWindow(QWidget *parent)
 
 FramelessWindow::~FramelessWindow()
 {
-    delete m_vertivalLayout;
+    delete m_verticalLayout;
     delete m_topLayout;
     delete m_mainLayout;
 
@@ -95,9 +95,9 @@ void FramelessWindow::changeEvent(QEvent *event)
     }
 }
 
-void FramelessWindow::SetMainWidget(QWidget *w)
+void FramelessWindow::SetMainWidget(QWidget *widget)
 {
-    m_vertivalLayout->addWidget(w);
+    m_verticalLayout->addWidget(widget);
 }
 
 void FramelessWindow::OnSetWindowTitle(const QString &text)
@@ -312,7 +312,7 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
 
     QPoint globalMousePos = event->globalPos();
 
-    if (m_bMousePressed) {
+    if (m_isMousePressed) {
         QScreen *screen = QGuiApplication::primaryScreen();
         QRect availGeometry = screen->availableGeometry();
         int h = availGeometry.height();
@@ -326,87 +326,87 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
         }
 
         // верх право
-        if (m_bDragTop && m_bDragRight) {
+        if (m_isDragTop && m_isDragRight) {
             int diff =
-                    globalMousePos.x() - (m_StartGeometry.x() + m_StartGeometry.width());
-            int neww = m_StartGeometry.width() + diff;
-            diff = globalMousePos.y() - m_StartGeometry.y();
-            int newy = m_StartGeometry.y() + diff;
+                    globalMousePos.x() - (m_startGeometry.x() + m_startGeometry.width());
+            int neww = m_startGeometry.width() + diff;
+            diff = globalMousePos.y() - m_startGeometry.y();
+            int newy = m_startGeometry.y() + diff;
 
             if (neww > 0 && newy > 0 && newy < h - 50) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setWidth(neww);
-                newg.setX(m_StartGeometry.x());
+                newg.setX(m_startGeometry.x());
                 newg.setY(newy);
                 setGeometry(newg);
             }
         }
         // верх лево
-        else if (m_bDragTop && m_bDragLeft) {
-            int diff = globalMousePos.y() - m_StartGeometry.y();
-            int newy = m_StartGeometry.y() + diff;
-            diff = globalMousePos.x() - m_StartGeometry.x();
-            int newx = m_StartGeometry.x() + diff;
+        else if (m_isDragTop && m_isDragLeft) {
+            int diff = globalMousePos.y() - m_startGeometry.y();
+            int newy = m_startGeometry.y() + diff;
+            diff = globalMousePos.x() - m_startGeometry.x();
+            int newx = m_startGeometry.x() + diff;
 
             if (newy > 0 && newx > 0) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setY(newy);
                 newg.setX(newx);
                 setGeometry(newg);
             }
         }
         // низ справа
-        else if (m_bDragBottom && m_bDragLeft) {
+        else if (m_isDragBottom && m_isDragLeft) {
             int diff =
-                    globalMousePos.y() - (m_StartGeometry.y() + m_StartGeometry.height());
-            int newh = m_StartGeometry.height() + diff;
-            diff = globalMousePos.x() - m_StartGeometry.x();
-            int newx = m_StartGeometry.x() + diff;
+                    globalMousePos.y() - (m_startGeometry.y() + m_startGeometry.height());
+            int newh = m_startGeometry.height() + diff;
+            diff = globalMousePos.x() - m_startGeometry.x();
+            int newx = m_startGeometry.x() + diff;
 
             if (newh > 0 && newx > 0) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setX(newx);
                 newg.setHeight(newh);
                 setGeometry(newg);
             }
-        } else if (m_bDragTop) {
-            int diff = globalMousePos.y() - m_StartGeometry.y();
-            int newy = m_StartGeometry.y() + diff;
+        } else if (m_isDragTop) {
+            int diff = globalMousePos.y() - m_startGeometry.y();
+            int newy = m_startGeometry.y() + diff;
 
             if (newy > 0 && newy < h - 50) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setY(newy);
                 setGeometry(newg);
             }
-        } else if (m_bDragLeft) {
-            int diff = globalMousePos.x() - m_StartGeometry.x();
-            int newx = m_StartGeometry.x() + diff;
+        } else if (m_isDragLeft) {
+            int diff = globalMousePos.x() - m_startGeometry.x();
+            int newx = m_startGeometry.x() + diff;
 
             if (newx > 0 && newx < w - 50) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setX(newx);
                 setGeometry(newg);
             }
-        } else if (m_bDragRight) {
+        } else if (m_isDragRight) {
             int diff =
-                    globalMousePos.x() - (m_StartGeometry.x() + m_StartGeometry.width());
-            int neww = m_StartGeometry.width() + diff;
+                    globalMousePos.x() - (m_startGeometry.x() + m_startGeometry.width());
+            int neww = m_startGeometry.width() + diff;
 
             if (neww > 0) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setWidth(neww);
-                newg.setX(m_StartGeometry.x());
+                newg.setX(m_startGeometry.x());
                 setGeometry(newg);
             }
-        } else if (m_bDragBottom) {
+        } else if (m_isDragBottom) {
             int diff =
-                    globalMousePos.y() - (m_StartGeometry.y() + m_StartGeometry.height());
-            int newh = m_StartGeometry.height() + diff;
+                    globalMousePos.y() - (m_startGeometry.y() + m_startGeometry.height());
+            int newh = m_startGeometry.height() + diff;
 
             if (newh > 0) {
-                QRect newg = m_StartGeometry;
+                QRect newg = m_startGeometry;
                 newg.setHeight(newh);
-                newg.setY(m_StartGeometry.y());
+                newg.setY(m_startGeometry.y());
                 setGeometry(newg);
             }
         }
@@ -429,10 +429,10 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
             } else if (BottomBorderHit(globalMousePos)) {
                 setCursor(Qt::SizeVerCursor);
             } else {
-                m_bDragTop = false;
-                m_bDragLeft = false;
-                m_bDragRight = false;
-                m_bDragBottom = false;
+                m_isDragTop = false;
+                m_isDragLeft = false;
+                m_isDragRight = false;
+                m_isDragBottom = false;
                 setCursor(Qt::ArrowCursor);
             }
         }
@@ -492,35 +492,35 @@ void FramelessWindow::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    m_bMousePressed = true;
-    m_StartGeometry = this->geometry();
+    m_isMousePressed = true;
+    m_startGeometry = this->geometry();
 
     QPoint globalMousePos = mapToGlobal(QPoint(event->x(), event->y()));
 
     if (LeftBorderHit(globalMousePos) && TopBorderHit(globalMousePos)) {
-        m_bDragTop = true;
-        m_bDragLeft = true;
+        m_isDragTop = true;
+        m_isDragLeft = true;
         setCursor(Qt::SizeFDiagCursor);
     } else if (RightBorderHit(globalMousePos) && TopBorderHit(globalMousePos)) {
-        m_bDragRight = true;
-        m_bDragTop = true;
+        m_isDragRight = true;
+        m_isDragTop = true;
         setCursor(Qt::SizeBDiagCursor);
     } else if (LeftBorderHit(globalMousePos) && BottomBorderHit(globalMousePos)) {
-        m_bDragLeft = true;
-        m_bDragBottom = true;
+        m_isDragLeft = true;
+        m_isDragBottom = true;
         setCursor(Qt::SizeBDiagCursor);
     } else {
         if (TopBorderHit(globalMousePos)) {
-            m_bDragTop = true;
+            m_isDragTop = true;
             setCursor(Qt::SizeVerCursor);
         } else if (LeftBorderHit(globalMousePos)) {
-            m_bDragLeft = true;
+            m_isDragLeft = true;
             setCursor(Qt::SizeHorCursor);
         } else if (RightBorderHit(globalMousePos)) {
-            m_bDragRight = true;
+            m_isDragRight = true;
             setCursor(Qt::SizeHorCursor);
         } else if (BottomBorderHit(globalMousePos)) {
-            m_bDragBottom = true;
+            m_isDragBottom = true;
             setCursor(Qt::SizeVerCursor);
         }
     }
@@ -534,13 +534,13 @@ void FramelessWindow::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
-    m_bMousePressed = false;
+    m_isMousePressed = false;
     bool bSwitchBackCursorNeeded =
-            m_bDragTop || m_bDragLeft || m_bDragRight || m_bDragBottom;
-    m_bDragTop = false;
-    m_bDragLeft = false;
-    m_bDragRight = false;
-    m_bDragBottom = false;
+            m_isDragTop || m_isDragLeft || m_isDragRight || m_isDragBottom;
+    m_isDragTop = false;
+    m_isDragLeft = false;
+    m_isDragRight = false;
+    m_isDragBottom = false;
 
     if (bSwitchBackCursorNeeded) {
         setCursor(Qt::ArrowCursor);
@@ -568,7 +568,7 @@ bool FramelessWindow::eventFilter(QObject *obj, QEvent *event)
             mousePressEvent(pMouse);
         }
     } else if (event->type() == QEvent::MouseButtonRelease) {
-        if (m_bMousePressed) {
+        if (m_isMousePressed) {
             QMouseEvent *pMouse = dynamic_cast<QMouseEvent *>(event);
 
             if (pMouse) {
@@ -587,8 +587,8 @@ void FramelessWindow::CreateUI()
 
     m_windowFrame = new QWidget();
 
-    m_vertivalLayout = new QVBoxLayout();
-    m_WindowTitleBar = new WindowTitleBar();
+    m_verticalLayout = new QVBoxLayout();
+    m_WindowTitleBar = new WindowTitleBar(this);
     m_changeDelegatesView=new QPushButton(this);
     m_changeThemePushButton=new QPushButton(this);
     m_changeAdditionalSettingsView= new QPushButton(this);
@@ -674,8 +674,8 @@ void FramelessWindow::InsertWidgetsIntoLayout()
     m_topLayout->addWidget(m_closeButton);
     m_WindowTitleBar->setLayout(m_topLayout);
 
-    m_vertivalLayout->addWidget(m_WindowTitleBar);
-    m_windowFrame->setLayout(m_vertivalLayout);
+    m_verticalLayout->addWidget(m_WindowTitleBar);
+    m_windowFrame->setLayout(m_verticalLayout);
 
     m_mainLayout->addWidget(m_windowFrame);
 
@@ -686,10 +686,10 @@ void FramelessWindow::ApplyStyles()
 {
     m_windowFrame->setAutoFillBackground(false);
 
-    m_vertivalLayout->setSpacing(0);
-    m_vertivalLayout->setContentsMargins(11, 11, 11, 11);
-    m_vertivalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    m_vertivalLayout->setContentsMargins(1, 1, 1, 1);
+    m_verticalLayout->setSpacing(0);
+    m_verticalLayout->setContentsMargins(11, 11, 11, 11);
+    m_verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+    m_verticalLayout->setContentsMargins(1, 1, 1, 1);
 
     m_mainLayout->setSpacing(0);
     m_mainLayout->setContentsMargins(11, 11, 11, 11);
@@ -718,7 +718,7 @@ void FramelessWindow::CreateConnections()
     connect(m_closeButton, &QToolButton::clicked, [&]() {
         close();
     });
-    connect(m_WindowTitleBar, &WindowTitleBar::doubleClicked, this, &FramelessWindow::OnWindowDraggerDoubleClicked);
+    connect(m_WindowTitleBar, &WindowTitleBar::ToDoubleClicked, this, &FramelessWindow::OnWindowDraggerDoubleClicked);
     connect(m_changeThemePushButton, &QPushButton::clicked, this, &FramelessWindow::OnChangeThemeButtonClicked);
     connect(m_changeAdditionalSettingsView, &QPushButton::clicked, this, &FramelessWindow::OnChangeAdditionalSettingsButtonClicked);
     connect(m_changeDelegatesView,  &QPushButton::clicked, this, &FramelessWindow::OnChangeDelegatesViewButtonClicked);

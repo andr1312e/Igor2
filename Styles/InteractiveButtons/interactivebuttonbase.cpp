@@ -1,9 +1,5 @@
 #include "interactivebuttonbase.h"
 
-/**
- * 所有内容的初始化
- * 如果要自定义，可以在这里调整所有的默认值
- */
 InteractiveButtonBase::InteractiveButtonBase(QWidget *parent)
     : QPushButton(parent), icon(nullptr), text(""), paint_addin(),
       fore_paddings(4, 4, 4, 4),
@@ -1318,13 +1314,13 @@ void InteractiveButtonBase::focusOutEvent(QFocusEvent *event)
  */
 void InteractiveButtonBase::paintEvent(QPaintEvent *event)
 {
-    if (parent_enabled) // 绘制父类（以便使用父类的QSS和各项属性）
+    if (parent_enabled)
         QPushButton::paintEvent(event);
-    if (!self_enabled) // 不绘制自己
+    if (!self_enabled)
         return;
     QPainter painter(this);
 
-    // ==== 绘制背景 ====
+
     QPainterPath path_back = getBgPainterPath();
     painter.setRenderHint(QPainter::Antialiasing, true);
 

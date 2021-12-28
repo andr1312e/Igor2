@@ -82,10 +82,13 @@ void Admin_GUI::SetMaximumWidgetSize()
 void Admin_GUI::InitTopBar()
 {
     QString currentUserLinuxUserName = m_linuxUserService->GetCurrentUserName();
-    QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
-    QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
     int userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
-    m_leftTopBar->SetData(userRank, userFCS, userRole);
+    if(userRole!=-1)
+    {
+        QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
+        QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
+        m_leftTopBar->SetData(userRank, userFCS, userRole);
+    }
 }
 
 void Admin_GUI::OnHideAdditionalSettings(bool state)
@@ -137,7 +140,7 @@ void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QStr
         {
             Q_EMIT ToCurrentUserRoleChanged();
         }
-        m_leftTopBar->SetData(FCS, rank, newRole);
+        m_leftTopBar->SetData(rank, FCS, newRole);
     }
     //удалить иконки с декскоп панели старые
     //добавить новые иконки с декскоп панели

@@ -12,10 +12,10 @@ MyWizardPage::~MyWizardPage()
    delete m_layout;
 }
 
-void MyWizardPage::SetWidget(QPushButton *themeChangeButton)
+void MyWizardPage::SetWizardNavigationBar(WizardNavigtionBar *wizardNavigtionBar)
 {
-   if (themeChangeButton) {
-      m_layout->insertWidget(0, themeChangeButton);
+   if (wizardNavigtionBar) {
+      m_layout->insertWidget(0, wizardNavigtionBar, 0, Qt::AlignCenter);
    }
 }
 

@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.0.6
+VERSION = 2.0.7
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -35,13 +35,15 @@ SOURCES += \
     Admin_GUI/Views/Wizards/roleappswizardsubwidget.cpp \
     Admin_GUI/Views/Wizards/userwizardpage.cpp \
     Admin_GUI/Views/Wizards/userwizardwidget.cpp \
+    Admin_GUI/Views/Wizards/wizardnavigtionbar.cpp \
     Admin_GUI/Views/topleftbar.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
+    Services/Settings/usersprogramiconmakingservice.cpp \
     Services/Settings/wizardservice.cpp \
     Services/Terminals/linuxsystemeditservice.cpp \
     Services/Terminals/terminal.cpp \
-    Services/sqldatabaseserivce.cpp \
+    Services/Sql/sqldatabaseserivce.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
@@ -103,16 +105,18 @@ HEADERS += \
     Admin_GUI/Views/Wizards/roleappswizardsubwidget.h \
     Admin_GUI/Views/Wizards/userwizardpage.h \
     Admin_GUI/Views/Wizards/userwizardwidget.h \
+    Admin_GUI/Views/Wizards/wizardnavigtionbar.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
     Admin_GUI/Views/topleftbar.h \
     Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \
+    Services/Settings/usersprogramiconmakingservice.h \
     Services/Settings/wizardservice.h \
     Services/Sql/tablecolumnsnames.h \
+    Services/Sql/isqlservice.h \
+    Services/Sql/sqldatabaseserivce.h \
     Services/Terminals/linuxsystemeditservice.h \
-    Services/isqlservice.h \
-    Services/sqldatabaseserivce.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \

@@ -9,7 +9,7 @@
 #include <QLineEdit>
 
 #include "Structs/programstruct.h"
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 #include "Services/fileexplorer.h"
 
 #include "Admin_GUI/Delegates/filedelegate.h"

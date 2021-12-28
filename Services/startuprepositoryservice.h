@@ -2,7 +2,7 @@
 #define SERVICES_STARTUPMANAGERSERVICE_H
 
 #include <QStringList>
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 #include "Services/Terminals/terminal.h"
 
 class StartupRepositoryPresenter

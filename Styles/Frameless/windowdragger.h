@@ -6,28 +6,27 @@
 #include <QPainter>
 #include <QStyleOption>
 
+class WindowTitleBar : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit WindowTitleBar(QWidget *parent);
+    ~WindowTitleBar();
 
-class WindowTitleBar : public QWidget {
-  Q_OBJECT
+Q_SIGNALS:
+    void ToDoubleClicked();
 
- public:
-  explicit WindowTitleBar(QWidget *parent = Q_NULLPTR);
-  virtual ~WindowTitleBar() {}
+protected:
+    virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
- signals:
-  void doubleClicked();
-
- protected:
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mouseDoubleClickEvent(QMouseEvent *event);
-  void paintEvent(QPaintEvent *event);
-
- protected:
-  QPoint mousePos;
-  QPoint wndPos;
-  bool mousePressed;
+protected:
+    QPoint m_mousePosition;
+    QPoint m_windowPosition;
+    bool m_isMousePressed;
 };
 
 #endif // STYLES_WINDOWDRAGGER_H

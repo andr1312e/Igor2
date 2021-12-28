@@ -33,8 +33,8 @@ QString Terminal::RunConsoleCommand(const QString &command, const QString called
 
 QStringList Terminal::GetAllUsersList(const QString calledFunc)
 {
-    QString getAllUsersTextCommand = CreateGetAllUsersCommand();
-    QString allUsers=RunConsoleCommand(getAllUsersTextCommand, calledFunc);
+    const QString getAllUsersTextCommand = CreateGetAllUsersCommand();
+    const QString allUsers=RunConsoleCommand(getAllUsersTextCommand, calledFunc);
     QStringList usersList=allUsers.split('\n');
     usersList.removeLast();
     return usersList;
@@ -138,7 +138,7 @@ bool Terminal::IsFileNotExists(const QString filePath, const QString calledFunc,
    }
 }
 
-void Terminal::CheckAndCreatePathToElement(const QString path, const QString calledFunc, bool hasRoot)
+void Terminal::CheckAndCreatePathToElement(const QString &path, const QString calledFunc, bool hasRoot)
 {
    QStringList listofSubFoldersToPath = FunctionsWithStrings::GetListofSubFoldersFromPath(path, "Terminal::CreatePathToFolderWithFolder");
    QString currentPath = "/";
@@ -246,12 +246,12 @@ QStringList Terminal::GetAllProcessList(const QString calledFunc)
     return processList;
 }
 
-QString Terminal::CreateGetAllUsersCommand()
+const QString Terminal::CreateGetAllUsersCommand() const
 {
     return "awk -F: '{print $1 \":\" $3}' /etc/passwd";
 }
 
-QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasRoot) const
 {
    if (hasRoot) {
       return "sudo mkdir '" + folderPath + "'";
@@ -260,7 +260,7 @@ QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasR
    }
 }
 
-QString Terminal::CreateCreateFileCommand(const QString &filePath, bool hasRoot)
+QString Terminal::CreateCreateFileCommand(const QString &filePath, bool hasRoot) const
 {
    if (hasRoot) {
       return "sudo touch '" + filePath + "'";
@@ -269,7 +269,7 @@ QString Terminal::CreateCreateFileCommand(const QString &filePath, bool hasRoot)
    }
 }
 
-QString Terminal::CreateGetFolderListCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateGetFolderListCommand(const QString &folderPath, bool hasRoot) const
 {
    if (hasRoot) {
       return "sudo ls '" + folderPath + "' -F -1 | grep /$ -";
@@ -278,7 +278,7 @@ QString Terminal::CreateGetFolderListCommand(const QString &folderPath, bool has
    }
 }
 
-QString Terminal::CreateGetFileListCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateGetFileListCommand(const QString &folderPath, bool hasRoot) const
 {
    if (hasRoot) {
       return "sudo ls '" + folderPath + "' -F -1 | grep /$ -v";
@@ -287,7 +287,7 @@ QString Terminal::CreateGetFileListCommand(const QString &folderPath, bool hasRo
    }
 }
 
-QString Terminal::CreateGetFileTextCommand(const QString &filePath, bool hasRoot)
+QString Terminal::CreateGetFileTextCommand(const QString &filePath, bool hasRoot) const
 {
    if (hasRoot) {
       return "sudo cat '" + filePath + "'";
@@ -296,37 +296,37 @@ QString Terminal::CreateGetFileTextCommand(const QString &filePath, bool hasRoot
    }
 }
 
-QString Terminal::CreateWriteTextToFileCommandSudo(const QString &filePath, const QByteArray &text)
+QString Terminal::CreateWriteTextToFileCommandSudo(const QString &filePath, const QByteArray &text) const
 {
    return "sudo sh -c 'echo \"" + text + "\" >> " + filePath + "'";
 }
 
-QString Terminal::CreateDeleteFileCommandSudo(const QString &filePath)
+QString Terminal::CreateDeleteFileCommandSudo(const QString &filePath) const
 {
    return "sudo rm '" + filePath + "'";
 }
 
-QString Terminal::CreateClearFileCommandSudo(const QString &filePath)
+QString Terminal::CreateClearFileCommandSudo(const QString &filePath) const
 {
    return "sudo truncate -s 0 '" + filePath + "'";
 }
 
-QString Terminal::CreateClearFolderCommandSudo(const QString &folderPath)
+QString Terminal::CreateClearFolderCommandSudo(const QString &folderPath) const
 {
    return "sudo rm -rf " + folderPath + "*";
 }
 
-QString Terminal::CreateDeleteEmptyFolderCommandSudo(const QString &folderPath)
+QString Terminal::CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) const
 {
    return "sudo rmdir -p " + folderPath;
 }
 
-QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString &destination)
+QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString &destination) const
 {
     return "sudo cp '" + source + "' '" + destination + "'";
 }
 
-QString Terminal::CreateGettAllProcessListCommand()
+QString Terminal::CreateGettAllProcessListCommand() const
 {
     return "ps -eo comm";
 }

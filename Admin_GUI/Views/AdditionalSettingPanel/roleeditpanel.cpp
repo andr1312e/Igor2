@@ -24,11 +24,13 @@ RoleEditPanel::~RoleEditPanel()
 
 void RoleEditPanel::OnRoleToViewChanged(const int &roleId)
 {
-    Q_ASSERT(roleId>=0 && roleId<Roles.count());
-    QString m_role=Roles.at(roleId);
-    m_currentRoleLabel->setText("Выбранная роль: "+ m_role);
-    m_roleDesktopPanel->SetRoleId(roleId);
-    m_roleRunningApplicationPanel->SetRoleId(roleId);
+    if(roleId>=0 && roleId<Roles.count())
+    {
+        QString m_role=Roles.at(roleId);
+        m_currentRoleLabel->setText("Выбранная роль: "+ m_role);
+        m_roleDesktopPanel->SetRoleId(roleId);
+        m_roleRunningApplicationPanel->SetRoleId(roleId);
+    }
 }
 
 

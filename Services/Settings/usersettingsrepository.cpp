@@ -3,7 +3,7 @@
 UsersDataWizardRepository::UsersDataWizardRepository(LinuxUserService *service)
     : m_service(service)
     , m_curerntUserName(m_service->GetCurrentUserName())
-    , m_curerntUserId(m_service->GetCurrentUserName())
+    , m_curerntUserId(m_service->GetCurrentUserId())
     , m_currentUserFCS("")
     , m_currenUserRank("")
 {
@@ -51,16 +51,16 @@ bool UsersDataWizardRepository::HasData() const
     return !m_usersList.isEmpty();
 }
 
-void UsersDataWizardRepository::GetFCSAndRolesFromXml(const QDomElement &usersNode)
+void UsersDataWizardRepository::SetUsersFromBackup(const QDomElement &usersNode)
 {
     m_usersList.clear();
 
     if (usersNode.tagName() == "USERS") {
-        QDomNodeList usersTags = usersNode.childNodes();
+        const QDomNodeList usersTags = usersNode.childNodes();
         int usersCount = usersTags.count();
 
         for (int i = 0; i < usersCount; ++i) {
-            QDomElement userElement = usersTags.at(i).toElement();
+            const QDomElement userElement = usersTags.at(i).toElement();
 
             if (userElement.attribute("name") == m_curerntUserName) {
                 m_currentUserFCS = userElement.attribute("FCS");
@@ -71,7 +71,7 @@ void UsersDataWizardRepository::GetFCSAndRolesFromXml(const QDomElement &usersNo
             user.FCS = userElement.attribute("FCS");
             user.name = userElement.attribute("name");
             user.rank = userElement.attribute("rank");
-            user.role = userElement.attribute("role").toInt();
+            user.role = GetKorrektUserRole(userElement);
             user.userId = userElement.attribute("userId");
 
             m_usersList.push_back(user);
@@ -101,24 +101,34 @@ void UsersDataWizardRepository::WriteUserRepositoryToDB(ISqlDatabaseService *m_i
     }
 }
 
+int UsersDataWizardRepository::GetKorrektUserRole(const QDomElement &userDomElement)
+{
+    int userRoleId=userDomElement.attribute("role").toInt();
+    if(userRoleId<=0 || userRoleId>=Roles.count())
+    {
+        userRoleId=Roles.count()-1;
+    }
+    return userRoleId;
+}
+
 void UsersDataWizardRepository::JuxtaposeUserIdAndUserNameWithSystemsData()
 {
 
-    QList<QPair<QString, QString> > nameIdList=m_service->GetSystemUsersNamesWithList();
+    const QList<QPair<QString, QString>> nameIdList=m_service->GetSystemUsersNamesWithList();
     for (int i=m_usersList.count()-1; i>=0; i--)
     {
-        QString userName=m_usersList.at(i).name;
-        QString userId=m_usersList.at(i).userId;
-        bool findet=false;
+        const QString userName=m_usersList.at(i).name;
+        const QString userId=m_usersList.at(i).userId;
+        bool finden=false;
         for(const QPair<QString, QString> &item:nameIdList)
         {
             if(userName==item.first && userId==item.second)
             {
-                findet=true;
+                finden=true;
                 break;
             }
         }
-        if(!findet)
+        if(!finden)
         {
             m_usersList.removeAt(i);
         }
@@ -129,8 +139,11 @@ bool UsersDataWizardRepository::FindAndUpdateAdminData()
 {
     for (User &user:m_usersList) {
         if (user.name == m_curerntUserName) {
+            CheckCurrentUserFcsAndRank();
             user.FCS = m_currentUserFCS;
             user.rank = m_currenUserRank;
+            user.role = Roles.count() - 1;
+            user.userId = m_curerntUserId;
             return true;
         }
     }
@@ -140,6 +153,7 @@ bool UsersDataWizardRepository::FindAndUpdateAdminData()
 
 void UsersDataWizardRepository::AppendAdminToCacheList()
 {
+    CheckCurrentUserFcsAndRank();
     User user;
     user.FCS = m_currentUserFCS;
     user.rank = m_currenUserRank;
@@ -159,6 +173,7 @@ void UsersDataWizardRepository::WriteAllUsersToDatabase(ISqlDatabaseService *m_i
 
 void UsersDataWizardRepository::WriteAdminToDatabase(ISqlDatabaseService *m_iSqlDatabaseService)
 {
+    CheckCurrentUserFcsAndRank();
     User admin;
     admin.userId=m_curerntUserId;
     admin.name=m_curerntUserName;
@@ -166,4 +181,16 @@ void UsersDataWizardRepository::WriteAdminToDatabase(ISqlDatabaseService *m_iSql
     admin.rank=m_currenUserRank;
     admin.role=Roles.count()-1;
     m_iSqlDatabaseService->AppendUserIntoTable(admin);
+}
+
+void UsersDataWizardRepository::CheckCurrentUserFcsAndRank()
+{
+    if(m_currentUserFCS.simplified()=="")
+    {
+        m_currentUserFCS="Администратор";
+    }
+    if(m_currenUserRank.isEmpty())
+    {
+        m_currenUserRank=Ranks.last();
+    }
 }

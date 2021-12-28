@@ -18,6 +18,27 @@ RoleAppsWizardSubWidget::~RoleAppsWizardSubWidget()
    delete m_desktopsTable;
 }
 
+void RoleAppsWizardSubWidget::CreateUI(const QString &title)
+{
+   m_mainLayout = new QVBoxLayout();
+   m_topLabel = new QLabel("Данные полученны из: " + title);
+   m_execsLabel = new QLabel("Исполняемые файлы для перезапуска:");
+   m_execsList = new QListWidget();
+   m_desktopsLabel = new QLabel("Ярлыки на рабочем столе:");
+   m_desktopsTable = new QTableWidget();
+   m_desktopsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+void RoleAppsWizardSubWidget::InsertWidgetsIntoLayout()
+{
+   m_mainLayout->addWidget(m_topLabel);
+   m_mainLayout->addWidget(m_execsLabel);
+   m_mainLayout->addWidget(m_execsList);
+   m_mainLayout->addWidget(m_desktopsLabel);
+   m_mainLayout->addWidget(m_desktopsTable);
+   setLayout(m_mainLayout);
+}
+
 void RoleAppsWizardSubWidget::SetWizardWidgetFileds(QList<DesktopEntity> &desktops, QStringList &ecexs)
 {
    m_execsList->clear();
@@ -36,23 +57,4 @@ void RoleAppsWizardSubWidget::SetWizardWidgetFileds(QList<DesktopEntity> &deskto
    }
 }
 
-void RoleAppsWizardSubWidget::CreateUI(const QString &title)
-{
-   m_mainLayout = new QVBoxLayout();
-   m_topLabel = new QLabel("Данные полученны из: " + title);
-   m_execsLabel = new QLabel("Исполняемые файлы:");
-   m_execsList = new QListWidget();
-   m_desktopsLabel = new QLabel("Ярлыки на рабочем столе:");
-   m_desktopsTable = new QTableWidget();
-   m_desktopsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-}
 
-void RoleAppsWizardSubWidget::InsertWidgetsIntoLayout()
-{
-   m_mainLayout->addWidget(m_topLabel);
-   m_mainLayout->addWidget(m_execsLabel);
-   m_mainLayout->addWidget(m_execsList);
-   m_mainLayout->addWidget(m_desktopsLabel);
-   m_mainLayout->addWidget(m_desktopsTable);
-   setLayout(m_mainLayout);
-}

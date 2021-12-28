@@ -1,7 +1,10 @@
 #ifndef SERVICES_SETTINGS_WIZARDSERVICE_H
 #define SERVICES_SETTINGS_WIZARDSERVICE_H
 
-#include "Services/isqlservice.h"
+#include <QDir>
+#include <QGuiApplication>
+
+#include "Services/Sql/isqlservice.h"
 
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 #include "Services/Settings/usersettingsrepository.h"
@@ -16,91 +19,64 @@ class WizardService : public QObject
 {
     Q_OBJECT
 public:
-
-    explicit WizardService(const QString &rlsTiFolder, LoadingState state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent);
-
+    explicit WizardService(const QString &rlsTiFolder,const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent);
     ~WizardService();
-
-Q_SIGNALS:
-
-    void ToWizardFinished();
-
 public Q_SLOTS:
-
-    void OnSetActionWithUserRepository(const QString &actionWithUserRepository);
+    void SetActionWithUserRepository(const QString &actionWithUserRepository);
 
 public:
-
     bool CheckAndParseBackupFile(const QString &backupPath);
+    bool HasUserData(bool isOldData) const;
+    bool HasAnyRolesData(bool isOldData) const;
+    bool HasRoleIdAnyData(bool isOldData, quint8 roleId) const;
 
-    bool HasUserBackup() const;
-
-    bool HasProgramBackUp() const;
-
-    bool HasUserOldData() const;
-
-    bool HastProgramOldData() const;
-
-    void GetDataFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QList<User> &userList);
-
+    void GetDataToViewFromUserRepository(const bool isOldData, QString &FCS, QString &rank, QList<User> &userList);
     int GetUserCountFromUserRepository(const bool isOldData) const;
 
-    void GetDataFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs);
+    void GetDataToViewFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs);
+    int GetAppsCountFromDesktopRepository(const int roleIndex, const bool isOldData) const;
 
-    int GetUserCountFromDesktopRepository(const int roleIndex, const bool isOldData);
 
-    QString &GetActionWithUserRepository();
-
+    const QString &GetActionWithUserRepository() const;
     void SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository);
-
-    const QString &GetActionWithRoleRepository(const int roleIndex);
+    const QString &GetActionWithRoleRepository(const int roleIndex) const;
 
     void ApplyWizardActions();
 
 private:
-
-    void GetExsistsRepositoriesData(LoadingState &state);
-
+    void GetExsistsRepositoriesData(const LoadingState &state);
     void GetExsistsUsersListFromDb();
-
     void GetExsistsExecsAndDesktopFilesFromDb();
-
-    void ParseBackupFile(const QString &backupPath, QDomDocument &backupXMLDocument);
+    void ParseBackupFile(const QString &backupPath,const QDomDocument &backupXMLDocument);
 
 private:
-
     void ApplySettingsWithUserRepository(const QString &actionWithUserRepository, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
-
-    void ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository, RolesAndStartupsWizardRepository *oldRepository);
-
+    void ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository);
     void CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList programs);
 
 private:
-
-    Terminal *m_terminal;
+    Terminal* const m_terminal;
 
 private:
-
     const QString m_rlsTiFolder;
 
     QString m_backupFolder;
-
     QString m_actionWithUserRepository;
 
     QStringList m_actionWithRolesRepository;
 
-    UsersDataWizardRepository *m_oldDataCurrentUserWizardRepositry;
 
-    UsersDataWizardRepository *m_backupDataUserWizardRepositry;
 
-    RolesAndStartupsWizardRepository *m_oldDataRolesAndStartupsWizardRepository;
+    UsersDataWizardRepository* const m_oldDataCurrentUserWizardRepositry;
+    UsersDataWizardRepository* const m_backupDataUserWizardRepositry;
 
-    RolesAndStartupsWizardRepository *m_backupDataRolesAndStartupsWizardRepository;
+    RolesAndStartupsWizardRepository* const m_oldDataRolesAndStartupsWizardRepository;
+    RolesAndStartupsWizardRepository* const m_backupDataRolesAndStartupsWizardRepository;
 
-    ISqlDatabaseService *m_iSqlDatabaseService;
+    ISqlDatabaseService* const m_iSqlDatabaseService;
 
 private:
-
+    const QString m_globalTagName="settings";
     const QStringList m_backupCorrectTagsList = {"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
 
 };

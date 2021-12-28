@@ -3,7 +3,7 @@
 #include <QStringList>
 #include <QDomDocument>
 
-#include "Services/isqlservice.h"
+#include "Services/Sql/isqlservice.h"
 
 #include "Services/Terminals/terminal.h"
 #include "Structs/programstruct.h"
@@ -13,31 +13,31 @@ class RolesAndStartupsWizardRepository
 {
 public:
 
-    explicit RolesAndStartupsWizardRepository(Terminal *terminal);
+    explicit RolesAndStartupsWizardRepository(Terminal * const terminal);
 
     ~RolesAndStartupsWizardRepository();
 
-    bool HasData();
+    bool HasData(quint8 roleId);
 
-    void GetRoleDesktopsAndStartupsFromLocalRepository(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups);
+    void GetRoleDesktopsAndStartupsFromLocalRepository(const int roleIndex, QList<DesktopEntity> &roleDesktops, QStringList &startups) const;
 
     void GetRoleDesktopsAndStartupsFromDb(ISqlDatabaseService *iSqlDatabaseService);
 
-    void SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex, QDomElement &backupNode, const QString &backupFolder);
+    void SetRoleDesktopsAndStartupsFromBackup(const int &roleIndex, const QDomElement &backupNode, const QString &backupFolder);
 
-    int GetRoleDesktopsAppCount(const int roleIndex);
+    int GetRoleDesktopsAppCount(const int roleIndex) const;
 
     void SaveRoleDesktopsToDb(ISqlDatabaseService *iSqlDatabaseService, const int roleIndex);
 
     void SaveRoleExecsToDb(ISqlDatabaseService *iSqlDatabaseService, const int roleIndex);
 
-    QStringList GetAllUniqueDesktopExecsAndStarups(const int roleIndex);
+    QStringList GetAllUniqueDesktopExecsAndStarups(const int roleIndex) const;
 
 private:
 
-    void SetRoleDesktopFromXml(const int roleIndex, QDomElement &desktops, const QString &backupFolder);
+    void SetRoleDesktopFromXml(const int roleIndex, const QDomElement &desktops, const QString &backupFolder);
 
-    void SetRoleStartupsFromXml(const int roleIndex, QDomElement &startups, const QString &backupFolder);
+    void SetRoleStartupsFromXml(const int roleIndex, const QDomElement &startups, const QString &backupFolder);
 
     void AppendRoleStartups(const int roleIndex, const QStringList &startupList);
 
@@ -45,13 +45,13 @@ private:
 
 private:
 
-    QList<DesktopEntity> &GetDesktopsByIndex(const int roleIndex);
+    const QList<DesktopEntity> &GetDesktopsByIndex(const int roleIndex) const;
 
-    QStringList &GetStatupsByIndex(const int roleIndex);
+    const QStringList &GetStatupsByIndex(const int roleIndex) const;
 
 private:
 
-    Terminal *m_terminal;
+    Terminal * const m_terminal;
 
     QStringList m_firstRoleStartup;
     QStringList m_secondRoleStartup;

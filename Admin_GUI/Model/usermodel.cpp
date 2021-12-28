@@ -25,7 +25,6 @@ void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const 
             user.FCS = FCS;
             user.rank = rank;
             user.role = role;
-            user.hasData = true;
             m_databaseService->AppendUserIntoTable(user);
             SetImageToUser(user);
             FillModelByList();
@@ -45,7 +44,6 @@ void UserModel::DeleteUser(const QString &userId)
             user.FCS.clear();
             user.rank.clear();
             user.role=-1;
-            user.hasData = false;
 //            m_databaseService->RemoveUserIntoTable(user);
             SetImageToUser(user);
             FillModelByList();
@@ -75,7 +73,6 @@ void UserModel::OnDataChanged()
                 systemUser.FCS=databaseUser.FCS;
                 systemUser.rank=databaseUser.rank;
                 systemUser.role=databaseUser.role;
-                systemUser.hasData=true;
                 SetImageToUser(systemUser);
             }
         }
@@ -97,7 +94,7 @@ QList<User> UserModel::FillListByUserService(const QList<QPair<QString, QString>
         user.name=userNameAndId.first;
         user.userId=userNameAndId.second;
         user.m_image=":/images/0.jpg";
-        user.hasData=false;
+        user.role=-1;
         usersInSystem.append(user);
     }
     return  usersInSystem;

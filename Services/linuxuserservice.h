@@ -17,7 +17,7 @@ public:
 
     void GetAllUsersWithIdInSystem();
 
-    QList<QPair<QString, QString>>& GetSystemUsersNamesWithList(){ return m_users;}
+    const QList<QPair<QString, QString>>& GetSystemUsersNamesWithList(){ return m_users;}
 
     Terminal* GetTerminal() {return m_terminal;}
 

@@ -29,7 +29,7 @@ void LinuxSystemEditService::SetProgramToStartup()
             const QString iconText=m_terminal->GetFileText(m_startupDirectory+m_myIconName, "LinuxSystemEditService::SetProgramToStartup", true);
             if(iconText!=startupIconText)
             {
-                m_terminal->DeleteFileSudo(m_startupDirectory+m_myIconName, "LinuxSystemEditService::SetProgramToStartup");
+                m_terminal->ClearFileSudo(m_startupDirectory+m_myIconName, "LinuxSystemEditService::SetProgramToStartup");
                 m_terminal->WriteTextToFileSudo(startupIconText.toLatin1(), m_startupDirectory+m_myIconName, "LinuxSystemEditService::SetProgramToStartup");
                 return;
             }

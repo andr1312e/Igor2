@@ -1,6 +1,6 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent)
+StartupWizard::StartupWizard(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent)
     : QWizard(parent)
 {
     CreateServices(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService);
@@ -17,42 +17,35 @@ StartupWizard::~StartupWizard()
     delete m_introPage;
     delete m_userWizardPage;
 
-    for (int i = 0; i < Roles.size(); ++i) {
+    for (int i = 0; i < Roles.count(); ++i) {
         delete m_rolesPages.at(i);
     }
 
     delete m_conclusionPage;
-    delete m_themePushButton;
+    delete m_wizardNavigationBar;
 }
 
 
-void StartupWizard::CreateServices(const QString &rlsTiFolder, LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService)
+void StartupWizard::CreateServices(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService* const linuxUserService, ISqlDatabaseService* const iSqlDataBaseService)
 {
     m_wizardService = new WizardService(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService, this);
+    m_iconMakingService=new UsersProgramIconMakingService(rlsTiFolder, "fd", linuxUserService, this);
 }
 
-void StartupWizard::CreateUI(LoadingState &loadedDbAdnRolesState)
+void StartupWizard::CreateUI(const LoadingState &loadedDbAdnRolesState)
 {
-    m_themePushButton = new QPushButton();
-    m_themePushButton->setCheckable(true);
-    m_themePushButton->setChecked(1);
-    m_themePushButton->setFlat(true);
-    m_themePushButton->setDefault(false);
-    m_themePushButton->setAutoDefault(false);
-    m_themePushButton->setFocusPolicy(Qt::NoFocus);
-    m_themePushButton->setIcon(QIcon(":/images/sun"));
-    m_themePushButton->setIconSize(QSize(30, 30));
+    m_wizardNavigationBar = new WizardNavigtionBar(this);
 
-    m_introPage = new IntroPage(loadedDbAdnRolesState, m_wizardService, m_themePushButton, this);
 
-    m_userWizardPage = new UserWizardPage(m_wizardService, m_themePushButton, this);
-    m_rolesPages.resize(Roles.size());
+    m_introPage = new IntroPage(loadedDbAdnRolesState, m_wizardService, this);
 
-    for (int i = 0; i < Roles.size(); i++) {
-        m_rolesPages[i] = new RoleAppsWizardPage(Roles.at(i), i, m_wizardService, this);
+    m_userWizardPage = new UserWizardPage(m_wizardService, this);
+
+    for (int i = 0; i < Roles.count(); i++) {
+        m_rolesPages.append(new RoleAppsWizardPage(Roles.at(i), i, m_wizardService, this));
     }
 
-    m_conclusionPage = new ConclusionWizardPage(m_wizardService, this);
+    m_conclusionPage = new ConclusionWizardPage(m_wizardService, m_iconMakingService, this);
 
 }
 
@@ -73,8 +66,8 @@ void StartupWizard::InitBehaviour()
     setPage(Page_Intro, m_introPage);
     setPage(Page_UserData, m_userWizardPage);
 
-    for (int i = 0; i < m_rolesPages.size(); i++) {
-        setPage(i + 2, m_rolesPages.at(i));
+    for (int i = 0; i < m_rolesPages.count(); i++) {
+        addPage(m_rolesPages.at(i));
     }
 
     setPage(Page_Conclusion, m_conclusionPage);
@@ -85,15 +78,16 @@ void StartupWizard::InitBehaviour()
 
 void StartupWizard::ConnectObjects()
 {
+    connect(this, &QWizard::currentIdChanged, this, &StartupWizard::OnCurrentPageChanged);
     connect(this, &QWizard::helpRequested, this, &StartupWizard::OnHelpButtonClick);
-    connect(m_themePushButton, &QPushButton::clicked, this, &StartupWizard::OnThemeButtonClick);
+    connect(m_wizardNavigationBar, &WizardNavigtionBar::ToPageNumMove, this, &StartupWizard::OnPageNumMove);
 }
 
 void StartupWizard::OnHelpButtonClick()
 {
     QString message;
-    bool hasBackUp = m_wizardService->HasUserBackup() || m_wizardService->HasProgramBackUp();
-    bool hasOldData = m_wizardService->HasUserOldData() || m_wizardService->HastProgramOldData();
+    bool hasBackUp = m_wizardService->HasUserData(false) || m_wizardService->HasAnyRolesData(false);
+    bool hasOldData = m_wizardService->HasUserData(true) || m_wizardService->HasAnyRolesData(true);
 
     switch (currentId()) {
     case Page_Intro:
@@ -153,12 +147,14 @@ void StartupWizard::OnHelpButtonClick()
                         "Необходимо выбрать только один источник, выбрать необходимый вы можете в самом"
                         "нижнем поле программы.\n"
                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                        "Если программы отстувуют в списке, а в файле восстановления они имеются, проверьте их наличие в соответвующей папке рядом с файлом восстановления\n"
                         "Затем, нажмите кнопку Далее...";
             } else {
                 message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() - 2) +
                         "\nВы предоставили программе предоставили файл восстановления, данный файл был успешно заружен.\n"
                         "Вы можете не использовать базу из файла восстановления, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
+                        "Если программы отстувуют в списке, а в файле восстановления они имеются, проверьте их наличие в соответвующей папке рядом с файлом восстановления\n"
                         "Затем, нажмите кнопку Далее...";
             }
         } else {
@@ -172,7 +168,7 @@ void StartupWizard::OnHelpButtonClick()
                 message = "Данные для программ-ярлыков в режиме киоска, а так же программ которые будут перезапущены для роли: " + Roles.at(currentId() + 2) +
                         "\nК сожалению, у вас нет ни данных, ни файла восстановления, поэтому "
                         "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
-                        "Затем, нажмите кнопку Далее...";
+                        "Нажмите кнопку Далее...";
             }
         }
 
@@ -190,20 +186,42 @@ void StartupWizard::OnHelpButtonClick()
     QMessageBox::information(this, "Окно справки", message);
 }
 
-void StartupWizard::OnThemeButtonClick(bool checked)
+void StartupWizard::OnCurrentPageChanged(int id)
 {
-    if (checked) {
-        m_themePushButton->setIcon(QIcon(":/images/sun"));
-    } else {
-        m_themePushButton->setIcon(QIcon(":/images/moon"));
-    }
+    Q_UNUSED(id);
+    if(MyWizardPage *nextPage = qobject_cast<MyWizardPage*>(currentPage())){
+         nextPage->SetWizardNavigationBar(m_wizardNavigationBar);
+     }
+}
 
-    m_themePushButton->setIconSize(QSize(30, 30));
-    Q_EMIT ToChangeTheme(checked);
+void StartupWizard::OnPageNumMove(int pageIdToMove)
+{
+    if(currentId()==pageIdToMove)
+    {
+        return;
+    }
+    else
+    {
+        if(currentId()<pageIdToMove)
+        {
+            while (pageIdToMove!=currentId())
+            {
+                this->next();
+            }
+        }
+        else
+        {
+            while (pageIdToMove!=currentId())
+            {
+                this->back();
+            }
+        }
+    }
 }
 
 void StartupWizard::accept()
 {
+    m_iconMakingService->ApplyWizardActions();
     m_wizardService->ApplyWizardActions();
     QWizard::accept();
 }
