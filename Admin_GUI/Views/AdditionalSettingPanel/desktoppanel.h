@@ -17,8 +17,8 @@
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h"
 
 enum ICONS_PANEL_TYPE {
-   USER_DESKTOP,
-   ROLE_DESKTOP
+   USER_ICONS,
+   ROLE_ICONS
 };
 
 class DesktopPanel: public QWidget
@@ -47,16 +47,16 @@ private Q_SLOTS:
 
 public:
    void SetUser(const User &user);
-   void SetRoleId(const int &roleId);//userName || role
+   void SetRoleId(const quint8 &roleId);//userName || role
    void DeleteUserAllRoleIcons();
 
 private:
 
-   int m_roleId;
+   quint8 m_roleId;
 
    ICONS_PANEL_TYPE m_type;
 
-   IconMakingService *m_desktopPanelPresenter;
+   IconMakingService *m_iconMakingService;
 
    QStringList *m_usersList;
 

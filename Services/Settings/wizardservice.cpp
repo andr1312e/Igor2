@@ -237,8 +237,11 @@ int WizardService::GetUserCountFromUserRepository(const bool isOldData) const
 void WizardService::GetDataToViewFromDesktopRepository(const int roleIndex, const bool isOldData, QList<DesktopEntity> &roleDesktops, QStringList &roleExecs)
 {
     RolesAndStartupsWizardRepository *currentRepository;
-
-
+    if (isOldData) {
+        currentRepository= m_oldDataRolesAndStartupsWizardRepository;
+    } else {
+        currentRepository=m_backupDataRolesAndStartupsWizardRepository;
+    }
     if (currentRepository->HasData(roleIndex)) {
         currentRepository->GetRoleDesktopsAndStartupsFromLocalRepository(roleIndex, roleDesktops, roleExecs);
     }
@@ -272,6 +275,11 @@ void WizardService::SetActionWithRoleRepository(const int roleIndex, const QStri
 const QString &WizardService::GetActionWithRoleRepository(const int roleIndex) const
 {
     return m_actionWithRolesRepository.at(roleIndex);
+}
+
+const QStringList &WizardService::GetAllDependenciesList() const
+{
+    return m_dependenciesService->GetAllDependenciesList();
 }
 
 void WizardService::ApplyWizardActions()

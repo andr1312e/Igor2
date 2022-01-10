@@ -96,7 +96,7 @@ LoadingState Program::GetProgramState()
 {
     if (m_sqlDatabaseService->CheckUsersTable())
     {
-        if(m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
+        if(m_sqlDatabaseService->CheckDesktopTables() && m_sqlDatabaseService->CheckStartupTables())
         {
             return LoadingState::Fine;
         }
@@ -127,6 +127,7 @@ void Program::InitTrayIcon()
 void Program::InitFramelessWindow()
 {
     m_framelessWindow = new FramelessWindow(Q_NULLPTR);
+    this->setWindowIcon(QIcon(":/images/ico.png"));
     m_framelessWindow->setObjectName("FramelessWindowObject");
     m_framelessWindow->OnSetWindowTitle("Мастер первоначальной настройки");
     m_framelessWindow->show();

@@ -14,7 +14,7 @@ DesktopPanel::DesktopPanel(ICONS_PANEL_TYPE type, Terminal *terminal, ISqlDataba
 
 DesktopPanel::~DesktopPanel()
 {
-    delete m_desktopPanelPresenter;
+    delete m_iconMakingService;
     delete m_fileDelegate;
 
     delete m_bottomLayout;
@@ -32,12 +32,12 @@ DesktopPanel::~DesktopPanel()
 
 void DesktopPanel::CreatePresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
 {
-    m_desktopPanelPresenter=new IconMakingService(terminal, sqlDatabaseService);
+    m_iconMakingService=new IconMakingService(terminal, sqlDatabaseService);
 }
 
 void DesktopPanel::SetPresenterModelToView()
 {
-    m_model=m_desktopPanelPresenter->GetModel();
+    m_model=m_iconMakingService->GetModel();
 }
 
 void DesktopPanel::CreateUI()
@@ -55,8 +55,8 @@ void DesktopPanel::CreateUI()
 
     m_bottomLayout=new QHBoxLayout();
 
-    m_addProgramButton=new QPushButton("Добавить программу");
-    m_deleteProgramButton=new QPushButton("Удалить выбранную программу");
+    m_addProgramButton=new QPushButton(QStringLiteral("Добавить программу"));
+    m_deleteProgramButton=new QPushButton(QStringLiteral("Удалить выбранную программу"));
 
     m_addProgramButton->setDisabled(true);
     m_deleteProgramButton->setDisabled(true);
@@ -71,8 +71,8 @@ void DesktopPanel::CreateUI()
 
 void DesktopPanel::SetBackgroundColor()
 {
-    m_addProgramButton->setObjectName("add");
-    m_deleteProgramButton->setObjectName("remove");
+    m_addProgramButton->setObjectName(QStringLiteral("add"));
+    m_deleteProgramButton->setObjectName(QStringLiteral("remove"));
 
     setBackgroundRole(QPalette::Window);
     setAutoFillBackground(true);
@@ -109,20 +109,21 @@ void DesktopPanel::ConnectObjects()
 
 void DesktopPanel::OnSetDefaultRoleApps(const quint8 &role)
 {
-    if (m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
+    if (m_type==ICONS_PANEL_TYPE::USER_ICONS)
     {
-        m_desktopPanelPresenter->SetDefaultIconsToUser(m_roleId, role, m_userName);
+        m_iconMakingService->SetDefaultIconsToUser(m_roleId, role, m_userName);
         m_roleId=role;
     }
     else
     {
-        qFatal("DesktopPanel::setDefaultApps невозможно установить для роли иконки по умолчанию");
+        qDebug()<<QStringLiteral("невозможно установить для роли иконки по умолчанию").toUtf8();
+        qFatal(Q_FUNC_INFO);
     }
 }
 
 void DesktopPanel::OnRoleDesktopChanges(const quint8 &roleId)
 {
-    if (m_roleId==roleId)
+    if (roleId==m_roleId)
     {
         update();
     }
@@ -131,16 +132,17 @@ void DesktopPanel::OnRoleDesktopChanges(const quint8 &roleId)
 
 void DesktopPanel::UpdateAllUsersWithCurrentRole()
 {
-    if (m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
+    if (m_type==ICONS_PANEL_TYPE::ROLE_ICONS)
     {
         for (const QString &user:*m_usersList)
         {
-            m_desktopPanelPresenter->SetDefaultIconsToUser(m_roleId, 1, user);
+            m_iconMakingService->SetDefaultIconsToUser(m_roleId, 1, user);
         }
     }
     else
     {
-        qFatal("Can't do it");
+        qDebug()<<QStringLiteral("невозможно обновить для виджета-роли иконки текущий роли").toUtf8();
+        qFatal(Q_FUNC_INFO);
     }
 }
 
@@ -150,27 +152,27 @@ void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, co
     entity.exec=exec;
     entity.icon=iconPath;
     entity.name=iconName;
-    if(m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
+    if(m_type==ICONS_PANEL_TYPE::ROLE_ICONS)
     {
-        m_desktopPanelPresenter->AddIconToRole(entity, m_roleId);
+        m_iconMakingService->AddIconToRole(entity, m_roleId);
 //        UpdateAllUsersWithCurrentRole();
     }
     else
     {
-        m_desktopPanelPresenter->AddIconToUser(entity, m_userName);
+        m_iconMakingService->AddIconToUser(entity, m_userName);
     }
 }
 
 void DesktopPanel::OnDeleteProgram()
 {
-    if(m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
+    if(m_type==ICONS_PANEL_TYPE::ROLE_ICONS)
     {
-        m_desktopPanelPresenter->DeleteIconToRole(m_selectedItemName, m_roleId);
+        m_iconMakingService->DeleteIconToRole(m_selectedItemName, m_roleId);
         UpdateAllUsersWithCurrentRole();
     }
     else
     {
-        m_desktopPanelPresenter->DeleteIconToUser(m_userName, m_selectedItemName);
+        m_iconMakingService->DeleteIconToUser(m_userName, m_selectedItemName);
     }
     m_deleteProgramButton->setDisabled(true);
 }
@@ -180,39 +182,41 @@ void DesktopPanel::OnProgramSelect(const QModelIndex &index)
     QVariant indexData=index.data(Qt::UserRole+1);
     DesktopEntity entity=indexData.value<DesktopEntity>();
     m_selectedItemName=entity.name;
-    m_deleteProgramButton->setText("Удалить с рабочего стола");
+    m_deleteProgramButton->setText(QStringLiteral("Удалить с рабочего стола"));
     m_deleteProgramButton->setEnabled(true);
 }
 
 void DesktopPanel::SetUser(const User &user)
 {
-    if(m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
+    if(m_type==ICONS_PANEL_TYPE::ROLE_ICONS)
     {
         qFatal("Irregular type");
     }
     else
     {
         m_userName=user.name;
-        m_programsToRun->setText("Ярлыки на рабочий стол для пользователя: "+ m_userName);
+        m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для пользователя: %1").arg(m_userName));
         m_addProgramButton->setEnabled(true);
         m_deleteProgramButton->setDisabled(true);
-        m_desktopPanelPresenter->GetAllUserDesktops(m_userName);
+        m_iconMakingService->GetAllUserDesktops(m_userName);
     }
 }
 
-void DesktopPanel::SetRoleId(const int &roleId)
+void DesktopPanel::SetRoleId(const quint8 &roleId)
 {
-    if(m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
-    {
-        qFatal("Irregular type");
-    }
-    else
+    if(m_type==ICONS_PANEL_TYPE::ROLE_ICONS)
     {
         m_roleId=roleId;
         m_programsToRun->setText("Ярлыки на рабочий стол для роли: "+ Roles.at(roleId));
         m_addProgramButton->setEnabled(true);
         m_deleteProgramButton->setDisabled(true);
-        m_desktopPanelPresenter->GetAllRoleDesktops(roleId);
+        m_iconMakingService->GetAllRoleDesktops(roleId);
+
+    }
+    else
+    {
+        qDebug()<< QStringLiteral("Невозможно для виджета рабочего стола получить ярлыки для роли, это другой виджет");
+        qFatal(Q_FUNC_INFO);
     }
 }
 
@@ -222,7 +226,7 @@ void DesktopPanel::DeleteUserAllRoleIcons()
     {
         if(!m_userName.isEmpty())
         {
-            m_desktopPanelPresenter->DeleteRoleIconFromUser(m_userName, m_roleId);
+            m_iconMakingService->DeleteRoleIconFromUser(m_userName, m_roleId);
         }
     }
 }

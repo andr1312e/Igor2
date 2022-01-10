@@ -42,6 +42,7 @@ public:
     const QString &GetActionWithUserRepository() const;
     void SetActionWithRoleRepository(const int roleIndex, const QString &actionWithRoleRepository);
     const QString &GetActionWithRoleRepository(const int roleIndex) const;
+    const QStringList &GetAllDependenciesList() const;
 
     void ApplyWizardActions();
 

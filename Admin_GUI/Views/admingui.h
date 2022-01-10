@@ -22,7 +22,6 @@ class Admin_GUI : public QWidget
     Q_OBJECT
 
 public:
-
     Admin_GUI(const QString &currentUserId, ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
     ~Admin_GUI();
 
@@ -49,7 +48,7 @@ private:
 private:
     int m_maxWidth;
     int m_maxHeight;
-    const QString &m_currentUserId;
+    const QString m_currentUserId;
 private:
     ISqlDatabaseService* const m_databaseService;
     LinuxUserService* const m_linuxUserService;

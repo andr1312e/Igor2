@@ -61,19 +61,19 @@ QStandardItemModel *UserModel::GetModel()
 
 void UserModel::OnDataChanged()
 {
-    QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
+    const QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
     m_users=FillListByUserService(namesAndIdsList);
-    QList<User> databaseUsers=FillListByDatabaseService();
-    for (User &systemUser : m_users)
+    const QList<User> databaseUsers=FillListByDatabaseService();
+    for (User &realUser : m_users)
     {
         for (const User &databaseUser: databaseUsers)
         {
-            if(systemUser.userId==databaseUser.userId && systemUser.name==databaseUser.name)
+            if(realUser.userId==databaseUser.userId && realUser.name==databaseUser.name)
             {
-                systemUser.FCS=databaseUser.FCS;
-                systemUser.rank=databaseUser.rank;
-                systemUser.role=databaseUser.role;
-                SetImageToUser(systemUser);
+                realUser.FCS=databaseUser.FCS;
+                realUser.rank=databaseUser.rank;
+                realUser.role=databaseUser.role;
+                SetImageToUser(realUser);
             }
         }
     }
@@ -104,8 +104,8 @@ QStringList *UserModel::GetUsersSystemNamesByRole(const QString &role)
 {
     m_currentRoleUsers->clear();
 
-    for (User &user:m_users) {
-        if (user.role == role) {
+    for (const User &user:m_users) {
+        if (role==user.role ) {
             m_currentRoleUsers->append(user.name);
         }
     }

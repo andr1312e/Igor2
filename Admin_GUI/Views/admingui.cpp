@@ -36,7 +36,7 @@ void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, LinuxUserService 
     m_usersListWidget = new LinuxUsersListWidget(databaseService, userService, this);
 
     m_centerSideLayout=new QVBoxLayout();
-    m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_DESKTOP, userService->GetTerminal(), databaseService, this);
+    m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_ICONS, userService->GetTerminal(), databaseService, this);
     m_userEditPanel = new UserEditPanel(userService->GetCurrentUserName(), userService->GetTerminal(), this);
 
     m_roleEditPanel = new RoleEditPanel(userService->GetTerminal(), databaseService, this);
@@ -145,6 +145,7 @@ void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QStr
         }
         m_leftTopBar->SetData(rank, FCS, newRole);
     }
+
     //удалить иконки с декскоп панели старые
     //добавить новые иконки с декскоп панели
 

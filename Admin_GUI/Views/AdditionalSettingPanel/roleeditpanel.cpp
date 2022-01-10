@@ -27,9 +27,10 @@ void RoleEditPanel::OnRoleToViewChanged(const int &roleId)
     if(roleId>=0 && roleId<Roles.count())
     {
         QString m_role=Roles.at(roleId);
-        m_currentRoleLabel->setText("Выбранная роль: "+ m_role);
-        m_roleDesktopPanel->SetRoleId(roleId);
-        m_roleRunningApplicationPanel->SetRoleId(roleId);
+        quint8 roleIdVal=(quint8)roleId;
+        m_currentRoleLabel->setText(QStringLiteral("Выбранная роль: ")+ m_role);
+        m_roleDesktopPanel->SetRoleId(roleIdVal);
+        m_roleRunningApplicationPanel->SetRoleId(roleIdVal);
     }
 }
 
@@ -43,7 +44,7 @@ void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabas
     m_currentRoleLabel=new QLabel();
     m_descriptionLabel=new QLabel();
 
-    m_roleDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::ROLE_DESKTOP, terminal, sqlDatabaseService,  this);
+    m_roleDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::ROLE_ICONS, terminal, sqlDatabaseService,  this);
     m_roleRunningApplicationPanel=new StartupPanel(terminal, sqlDatabaseService, this);
 }
 

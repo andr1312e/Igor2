@@ -20,7 +20,11 @@ void SortModel::UpdateSeachWordAndSeachAttribute(const QString &text, const QStr
 
 bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    if (m_searchText!="")
+    if (m_searchText.isEmpty())
+    {
+        return  true;
+    }
+    else
     {
         QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
         QVariant data=index.data(Qt::UserRole+1);
@@ -62,5 +66,4 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
             }
         }
     }
-    return true;
 }

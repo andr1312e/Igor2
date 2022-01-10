@@ -21,14 +21,17 @@ QString Terminal::RunConsoleCommand(const QString &command, const QString called
    m_process->waitForFinished(-1);
    QString processError = m_process->readAllStandardError();
    QString processOutput = m_process->readAllStandardOutput();
-
-   if (processError != "") {
-      qInfo() << processError;
-      qFatal("Работа невозможна метод: %s выдал ошибку при комманде %s . Cообщение об ошибке %s", calledFunc.toLatin1().constData(), command.toLatin1().constData(), processError.toLatin1().constData());
+   if (processError.isEmpty())
+   {
+       m_process->close();
+       return processOutput;
    }
-
-   m_process->close();
-   return processOutput;
+   else
+   {
+      qInfo() << processError;
+      QString error=QString("Работа невозможна метод: %1 выдал ошибку при комманде %2 . Cообщение об ошибке %3").arg(calledFunc).arg(command).arg(processError);
+      qFatal("%s", error.toUtf8().data());
+   }
 }
 
 QStringList Terminal::GetAllUsersList(const QString calledFunc)
@@ -373,10 +376,10 @@ QString Terminal::CreateGettingAllInstalledPackagesNamesListCommandSudo() const
 
 QString Terminal::CreateGettingAllNotInstalledPackageNamesListCommandSudo() const
 {
-    return  "apt list | grep -v 'установлен' | cut -f1 -d'/'";
+    return  "aptitude -F %p search '!~i'";
 }
 
 QString Terminal::CreateInstallPackageCommandSudo(const QString &packageName) const
 {
-    return "sudo apt-get install "+packageName;
+    return "sudo apt-get -qq install -y --install-suggests "+packageName;
 }

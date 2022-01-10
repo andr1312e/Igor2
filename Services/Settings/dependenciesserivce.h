@@ -12,13 +12,14 @@ public:
 public:
     void GetDependenciesFromBackUp(const QDomElement &dependenciedsXmlElement);
     void InstallDependencies();
+    const QStringList &GetAllDependenciesList() const;
 private:
     bool ValidateDependency(QString &dependency);
     void CloseSynapticIfItRunned();
     void InstallPackage(const QString &packageName);
 private:
     Terminal* const m_terminal;
-    QStringList m_dependenciesList;
+    QStringList* const m_dependenciesList;
 
     const QString m_astraPackageManagerName="synaptic";
     const QString m_astraPackageManagerNameService="synaptic-pkexec";

@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QCheckBox>
+#include <QListWidget>
 #include <QVBoxLayout>
 #include <QWizardPage>
 
@@ -33,6 +34,7 @@ public:
 private:
     void SetUserActionValueLabel(const QString &actionWithUserRepository);
     void SetRolesActionValueLabel(int &roleIndex, const QString &actionWithRoleReposiory);
+    void SetFutureInstalledPackagesToList();
 
 private:
     WizardService* const m_wizardService;
@@ -75,6 +77,9 @@ private:
     QLabel *m_fourthRoleActionValue;
     QLabel *m_fourthRoleCommentLabel;
     QLabel *m_fourthRoleCommentValue;
+
+    QLabel *m_packagesToInstallLabel;
+    QListWidget *m_packagesToInstallList;
 
     QLabel *m_additionalActionsLabel;
     QCheckBox *m_addIconToDesktopToCurrentUser;

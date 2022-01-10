@@ -50,8 +50,8 @@ void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
     }
     else
     {
-        qDebug()<< "Error" << "Database error" + m_db->lastError().text();
-        qDebug()<< "Error" << "query error" + query.lastError().text();
+        qDebug()<< QStringLiteral("Database error") + m_db->lastError().text();
+        qDebug()<< QStringLiteral("Query error") << query.lastError().text();
         qFatal("Не удалось создать бд с исполняемыми файлами");
     }
 }
@@ -223,7 +223,7 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
 void SqlDatabaseSerivce::ClearTable(QString tableName)
 {
     QSqlQuery query(*m_db);
-    QString request=" DELETE FROM "+tableName;
+    QString request=QStringLiteral(" DELETE FROM ")+tableName;
     query.prepare(request);
     if(query.exec())
     {
@@ -242,23 +242,22 @@ void SqlDatabaseSerivce::ClearUsersTable()
 
 void SqlDatabaseSerivce::ClearStartupsTable(quint8 roleId)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     ClearTable(startupTablePrefix+QString::number(roleId));
 }
 
 void SqlDatabaseSerivce::ClearDesktopTable(quint8 roleId)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     ClearTable(desktopTablePrefix+QString::number(roleId));
 }
 
 bool SqlDatabaseSerivce::CheckUsersTable()
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + usersTableName+ "')");
     if(query.exec())
     {
-        qDebug()<< query.size();
         return  GetBoolFromMessage(query);
     }
     else
@@ -269,28 +268,30 @@ bool SqlDatabaseSerivce::CheckUsersTable()
 
 bool SqlDatabaseSerivce::CheckStartupTables()
 {
-    bool result=true;
     for (int i=0; i<Roles.count(); ++i)
     {
-        QSqlQuery query;
+        QSqlQuery query(*m_db);
         query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + startupTablePrefix +QString::number(i)+ "')");
         if(query.exec())
         {
-            result=result&GetBoolFromMessage(query);
+            if(false==GetBoolFromMessage(query))
+            {
+                return false;
+            }
         }
         else
         {
             qFatal("Cant execute check user table query");
         }
     }
-    return  result;
+    return  true;
 }
 
 bool SqlDatabaseSerivce::CheckStartupTables(quint8 roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
-        QSqlQuery query;
+        QSqlQuery query(*m_db);
         query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + startupTablePrefix +QString::number(roleId)+ "')");
         if(query.exec())
         {
@@ -309,28 +310,30 @@ bool SqlDatabaseSerivce::CheckStartupTables(quint8 roleId)
 
 bool SqlDatabaseSerivce::CheckDesktopTables()
 {
-    bool result=true;
     for (int i=0; i<Roles.count(); ++i)
     {
-        QSqlQuery query;
+        QSqlQuery query(*m_db);
         query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + desktopTablePrefix +QString::number(i)+ "')");
         if(query.exec())
         {
-            result=result&GetBoolFromMessage(query);
+            if(false==GetBoolFromMessage(query))
+            {
+                return false;
+            }
         }
         else
         {
             qFatal("Cant execute check user table query");
         }
     }
-    return  result;
+    return  true;
 }
 
 bool SqlDatabaseSerivce::CheckDesktopTables(quint8 roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
-        QSqlQuery query;
+        QSqlQuery query(*m_db);
         query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + desktopTablePrefix +QString::number(roleId)+ "')");
         if(query.exec())
         {
@@ -349,7 +352,7 @@ bool SqlDatabaseSerivce::CheckDesktopTables(quint8 roleId)
 
 void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     QString request=
             "DO $$ BEGIN IF EXISTS(SELECT * FROM " + usersTableName+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
             "UPDATE " + usersTableName+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
@@ -374,7 +377,7 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 
 void SqlDatabaseSerivce::RemoveUserIntoTable(quint8 roleId,const User &user)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     query.prepare("DELETE FROM " + startupTablePrefix + QString::number(roleId) +
                   " WHERE" + userIdCN +"='?'");
     query.bindValue(0, user.userId);
@@ -392,7 +395,7 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
 {
     QSqlQueryModel sqlQueryModel(this);
     QList<User> userList;
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     QString request="SELECT "+ userIdCN +" , "+ userNameCN +" , "+ fcsCN +" , "+ rankCN +" , "+ roleCN +" FROM "+usersTableName;
     query.prepare(request);
 
@@ -425,7 +428,7 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
 
 void SqlDatabaseSerivce::AppendStartupIntoRole(quint8 roleId, const QString &exec)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     QString request="INSERT INTO "+ startupTablePrefix+QString::number(roleId)+
             " ( "+ startupPathCN + " ) VALUES (?)";
     query.prepare(request);
@@ -436,7 +439,8 @@ void SqlDatabaseSerivce::AppendStartupIntoRole(quint8 roleId, const QString &exe
     }
     else
     {
-        qFatal(QString("Не удалось записать  путь к программе: " + exec  + " для роли: " + QString::number(roleId)).toLocal8Bit());
+        const QString errorMessage=QString("Не удалось записать  путь к программе: %1 для роли: %2").arg(exec).arg(roleId);
+        qFatal("%s", errorMessage.toUtf8().data());
     }
 }
 
@@ -444,7 +448,7 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(quint8 roleId)
 {
     QSqlQueryModel sqlQueryModel(this);
     QStringList listOfStartups;
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     query.prepare("SELECT " + startupPathCN + " FROM "+ startupTablePrefix +QString::number(roleId));
     if(query.exec())
     {
@@ -467,7 +471,8 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(quint8 roleId)
     }
     else
     {
-        qFatal(QString("Не удалось получить  все исполняемые файлы  для роли: " +QString::number(roleId)).toLocal8Bit());
+        const QString errorMessage=QString("Не удалось получить  все исполняемые файлы  для роли: " ).arg(roleId);
+        qFatal("%s", errorMessage.toUtf8().constData());
     }
     return listOfStartups;
 }
@@ -491,7 +496,7 @@ void SqlDatabaseSerivce::RemoveStartupIntoRole(quint8 roleId, const QString &sta
 
 void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity &entity)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     QString request="INSERT INTO "+ desktopTablePrefix+QString::number(roleId)+
             " ( " + desktopNameCN + " , "+ desktopTypeCN + " , "+ execPathCN + " , "+ iconPathCN+" ) "+
             "VALUES ( ? , ? , ? , ? )";
@@ -507,13 +512,14 @@ void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity
     else
     {
         qDebug()<< query.lastError();
-        qFatal(QString("Не удалось записать  ярлык: " + entity.name  + " для роли: " +QString::number(roleId)).toLocal8Bit());
+        const QString stringError=QString("Не удалось записать  ярлык: %1 для роли: %2").arg(entity.name).arg(roleId);
+        qFatal("%s", stringError.toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity)
 {
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     query.prepare("DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
                   "WHERE "+ desktopNameCN +"='?'");
     query.bindValue(0, entity.name);
@@ -531,7 +537,7 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
 {
     QList<DesktopEntity> listOfExecs;
     QSqlQueryModel sqlQueryModel(this);
-    QSqlQuery query;
+    QSqlQuery query(*m_db);
     query.prepare("SELECT " + desktopNameCN + " , "+ desktopTypeCN + " , "+ execPathCN + " , "+ iconPathCN + " FROM "+ desktopTablePrefix +QString::number(roleId));
     if(query.exec())
     {
@@ -557,7 +563,8 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
     }
     else
     {
-        qFatal(QString("Не удалось получить  все ярлыки файлы  для роли: " +QString::number(roleId)).toLocal8Bit());
+        const QString errorMessage=QString("Не удалось получить  все ярлыки файлы  для роли: %1").arg(roleId);
+        qFatal("%s", errorMessage.toUtf8().constData());
     }
     return listOfExecs;
 }

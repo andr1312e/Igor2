@@ -19,7 +19,7 @@ public:
    QVBoxLayout *MainLayout() const;
 
 private:
-   QVBoxLayout *m_layout;
+   QVBoxLayout* const m_layout;
 };
 
 #endif // ADMIN_GUI_VIEWS_WIZARD_MYWIZARDPAGE_H

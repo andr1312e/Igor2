@@ -42,6 +42,14 @@ ConclusionWizardPage::~ConclusionWizardPage()
     delete m_fourthRoleActionValue;
     delete m_fourthRoleCommentLabel;
     delete m_fourthRoleCommentValue;
+
+    delete m_packagesToInstallLabel;
+    delete m_packagesToInstallList;
+
+    delete m_additionalActionsLabel;
+    delete m_addIconToDesktopToCurrentUser;
+    delete m_addIconToDesktopToAllUsers;
+    delete m_addIconToStartMenu;
 }
 
 int ConclusionWizardPage::nextId() const
@@ -61,6 +69,8 @@ void ConclusionWizardPage::initializePage()
         actionWithRoleRepository = m_wizardService->GetActionWithRoleRepository(i);
         SetRolesActionValueLabel(i, actionWithRoleRepository);
     }
+    SetFutureInstalledPackagesToList();
+
 }
 
 void ConclusionWizardPage::CreateUI()
@@ -103,6 +113,9 @@ void ConclusionWizardPage::CreateUI()
     m_fourthRoleActionValue = new QLabel();
     m_fourthRoleCommentLabel = new QLabel("Колличество программ:");
     m_fourthRoleCommentValue = new QLabel();
+
+    m_packagesToInstallLabel=new QLabel("Пакеты для установки:");
+    m_packagesToInstallList=new QListWidget();
 
     m_additionalActionsLabel=new QLabel("Дополнительные действия:");
     m_addIconToDesktopToCurrentUser=new QCheckBox("Добавить иконку на рабочий стол для текущего пользователя");
@@ -148,6 +161,9 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
     MainLayout()->addLayout(m_oldDataLayout);
     MainLayout()->addWidget(m_actionsLabel);
     MainLayout()->addLayout(m_dataLayout);
+
+    MainLayout()->addWidget(m_packagesToInstallLabel, 0, Qt::AlignCenter);
+    MainLayout()->addWidget(m_packagesToInstallList);
 
     MainLayout()->addSpacing(35);
     MainLayout()->addWidget(m_additionalActionsLabel, 0, Qt::AlignCenter);
@@ -259,4 +275,21 @@ void ConclusionWizardPage::SetRolesActionValueLabel(int &roleIndex, const QStrin
         qFatal("Роли только четрые");
         break;
     }
+}
+
+void ConclusionWizardPage::SetFutureInstalledPackagesToList()
+{
+    m_packagesToInstallList->clear();
+    const QStringList items=m_wizardService->GetAllDependenciesList();
+    if(items.isEmpty())
+    {
+        m_packagesToInstallLabel->hide();
+        m_packagesToInstallList->hide();
+    }
+    else
+    {
+        m_packagesToInstallLabel->show();
+        m_packagesToInstallList->show();
+    }
+    m_packagesToInstallList->addItems(items);
 }
