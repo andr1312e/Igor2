@@ -164,7 +164,7 @@ void Program::ProcessDataLoading(LoadingState &state)
 
 void Program::StartSettingsWizard(LoadingState &state)
 {
-    m_startupWizard = new StartupWizard(m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, nullptr);
+    m_startupWizard = new StartupWizard(this->applicationName(), m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, nullptr);
     connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
     connect(m_startupWizard, &QWizard::accepted, this, &Program::OnContinueLoading);
     connect(m_startupWizard, &QWizard::rejected, this, &QApplication::quit);

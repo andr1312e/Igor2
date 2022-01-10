@@ -40,15 +40,15 @@ public:
     virtual void ClearDesktopTable(quint8 roleId) Q_DECL_OVERRIDE;
 
     virtual void AppendUserIntoTable(const User &user) Q_DECL_OVERRIDE;
-    virtual void RemoveUserIntoTable(quint8 roleId, User &user) Q_DECL_OVERRIDE ;
+    virtual void RemoveUserIntoTable(quint8 roleId,const User &user) Q_DECL_OVERRIDE ;
     virtual QList<User> GetAllUsers() Q_DECL_OVERRIDE;
 
     virtual void AppendStartupIntoRole(quint8 roleId, const QString &exec) Q_DECL_OVERRIDE;
     virtual void RemoveStartupIntoRole(quint8 roleId, const QString &startupPath) Q_DECL_OVERRIDE;
     virtual QStringList GetAllRoleStartups(quint8 roleId) Q_DECL_OVERRIDE;
 
-    virtual void AppendDesktopIntoRole(quint8 roleId, DesktopEntity &entity) Q_DECL_OVERRIDE;
-    virtual void RemoveDesktopIntoRole(quint8 roleId, DesktopEntity &entity) Q_DECL_OVERRIDE;
+    virtual void AppendDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) Q_DECL_OVERRIDE;
+    virtual void RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) Q_DECL_OVERRIDE;
     virtual QList<DesktopEntity> GetAllRoleDesktops(quint8 roleId) Q_DECL_OVERRIDE;
 
 public:
@@ -58,17 +58,17 @@ public:
 
 public:
     virtual QStringList GetAdminsRoleUserName() Q_DECL_OVERRIDE;
-    virtual QString GetUserFCS(QString &currentUserName) Q_DECL_OVERRIDE;
-    virtual QString GetUserRank(QString &currentUserName) Q_DECL_OVERRIDE;
+    virtual QString GetUserFCS(const QString &currentUserName) Q_DECL_OVERRIDE;
+    virtual QString GetUserRank(const QString &currentUserName) Q_DECL_OVERRIDE;
     virtual int GetUserRole(const QString &currentUserName) Q_DECL_OVERRIDE;
 
 private:
     void ClearTable(QString tableName);
     bool GetBoolFromMessage(QSqlQuery &query);
-    void GetStringFromMessage(QString &inputString, const QSqlRecord &record, int rowPos);
+    void GetStringFromMessage( QString &inputString, const QSqlRecord &record,const int &rowPos);
 private:
-    QString postgeSqlDatabaseDriverStringKey="QPSQL";
-    QSqlDatabase *m_db;
+    const QString postgeSqlDatabaseDriverStringKey="QPSQL";
+    QSqlDatabase * m_db;
 
     const QString usersTableName="rlstiusers";
     const QString startupTablePrefix="rlstistartups";

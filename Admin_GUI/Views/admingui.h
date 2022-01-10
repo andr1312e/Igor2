@@ -49,10 +49,10 @@ private:
 private:
     int m_maxWidth;
     int m_maxHeight;
-    const QString m_currentUserId;
+    const QString &m_currentUserId;
 private:
-    ISqlDatabaseService *m_databaseService;
-    LinuxUserService *m_linuxUserService;
+    ISqlDatabaseService* const m_databaseService;
+    LinuxUserService* const m_linuxUserService;
 
     QHBoxLayout *m_mainLayout;
 

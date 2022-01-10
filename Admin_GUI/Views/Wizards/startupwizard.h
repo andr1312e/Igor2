@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QSharedPointer>
 
 #include "Services/linuxuserservice.h"
 
@@ -25,10 +26,10 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(const QString &rlsTiFolder,const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
+   StartupWizard(const QString &applicationName, const QString &rlsTiFolder,const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
    ~StartupWizard();
 private:
-   void CreateServices(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService * const linuxUserService, ISqlDatabaseService * const iSqlDataBaseService);
+   void CreateServices(const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService * const linuxUserService, ISqlDatabaseService * const iSqlDataBaseService);
    void CreateUI(const LoadingState &loadedDbAdnRolesState);
    void InitSizes();
    void InitStyles();
@@ -49,9 +50,8 @@ public:
    virtual void reject() Q_DECL_OVERRIDE;
 
 private:
-   UsersProgramIconMakingService *m_iconMakingService;
+   IconMaker *m_iconMakingService;
    WizardService *m_wizardService;
-
 
 private:
    WizardNavigtionBar *m_wizardNavigationBar;

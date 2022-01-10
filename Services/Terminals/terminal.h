@@ -50,6 +50,14 @@ public:
 
    QStringList GetAllProcessList(const QString calledFunc);
 
+   void KillProcess(const QString &processName, const QString calledFunc);
+
+   QStringList GetAllInstalledPackageNames(const QString calledFunc);
+
+   QStringList GetAllNotInstalledPackageNames(const QString calledFunc);
+
+   void InstallPackageSudo(const QString &packageName, const QString calledFunc);
+
 private:
 
    const QString CreateGetAllUsersCommand() const;
@@ -77,6 +85,14 @@ private:
    QString CreateCopyFileCommandSudo(const QString &source, const QString &destination) const;
 
    QString CreateGettAllProcessListCommand() const;
+
+   QString CreateKillProcessCommandSudo(const QString &processName) const;
+
+   QString CreateGettingAllInstalledPackagesNamesListCommandSudo() const;
+
+   QString CreateGettingAllNotInstalledPackageNamesListCommandSudo() const;
+
+   QString CreateInstallPackageCommandSudo(const QString &packageName) const;
 
 private:
 

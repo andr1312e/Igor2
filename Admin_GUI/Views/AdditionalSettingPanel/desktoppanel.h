@@ -56,7 +56,7 @@ private:
 
    ICONS_PANEL_TYPE m_type;
 
-   DesktopPanelPresenter *m_desktopPanelPresenter;
+   IconMakingService *m_desktopPanelPresenter;
 
    QStringList *m_usersList;
 

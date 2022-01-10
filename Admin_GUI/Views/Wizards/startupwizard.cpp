@@ -1,9 +1,9 @@
 #include "startupwizard.h"
 
-StartupWizard::StartupWizard(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent)
+StartupWizard::StartupWizard(const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent)
     : QWizard(parent)
 {
-    CreateServices(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService);
+    CreateServices(applicationName, rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService);
     CreateUI(loadedDbAdnRolesState);
     InitSizes();
     InitStyles();
@@ -14,6 +14,7 @@ StartupWizard::StartupWizard(const QString &rlsTiFolder, const LoadingState &loa
 StartupWizard::~StartupWizard()
 {
     delete m_wizardService;
+
     delete m_introPage;
     delete m_userWizardPage;
 
@@ -26,16 +27,15 @@ StartupWizard::~StartupWizard()
 }
 
 
-void StartupWizard::CreateServices(const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService* const linuxUserService, ISqlDatabaseService* const iSqlDataBaseService)
+void StartupWizard::CreateServices(const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService* const linuxUserService, ISqlDatabaseService* const iSqlDataBaseService)
 {
     m_wizardService = new WizardService(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService, this);
-    m_iconMakingService=new UsersProgramIconMakingService(rlsTiFolder, "fd", linuxUserService, this);
+    m_iconMakingService=new IconMaker(rlsTiFolder, applicationName, linuxUserService, this);
 }
 
 void StartupWizard::CreateUI(const LoadingState &loadedDbAdnRolesState)
 {
     m_wizardNavigationBar = new WizardNavigtionBar(this);
-
 
     m_introPage = new IntroPage(loadedDbAdnRolesState, m_wizardService, this);
 

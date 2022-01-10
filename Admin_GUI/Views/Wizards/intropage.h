@@ -11,6 +11,7 @@
 
 #include "Services/Settings/wizardservice.h"
 #include "Services/Settings/programfilesstate.h"
+#include "Services/Settings/dependenciesserivce.h"
 
 #include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
 #include "Admin_GUI/Views/Wizards/wizardpages.h"
@@ -18,36 +19,36 @@
 
 class IntroPage : public MyWizardPage
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   explicit IntroPage(const LoadingState &state, WizardService *service, QWidget *parent);
-   ~IntroPage();
+    explicit IntroPage(const LoadingState &state, WizardService *service, QWidget *parent);
+    ~IntroPage();
 
 private Q_SLOTS:
-   void OnCheckBackupFile();
+    void OnCheckBackupFile();
 
 public:
-   virtual int nextId() const Q_DECL_OVERRIDE;
+    virtual int nextId() const Q_DECL_OVERRIDE;
 
 private:
-   void SetWizardStyles();
-   void CreateUI();
-   void InsertWidgetsIntoLayout();
-   void CreateConnections();
+    void SetWizardStyles();
+    void CreateUI();
+    void InsertWidgetsIntoLayout();
+    void CreateConnections();
 
 private:
-   const LoadingState m_state;
-   WizardService *m_wizardService;
+    const LoadingState m_state;
+    WizardService *m_wizardService;
 
-   QLabel *m_topLabel;
-   QVBoxLayout *m_backupFileLayout;
-   QHBoxLayout *m_backupFileLoadLayout;
-   QPushButton *m_backupLoadButton;
-   QLabel *m_backupLabel;
-   QLineEdit *m_backupLineEdit;
-   QLabel *m_faqLabel;
+    QLabel *m_topLabel;
+    QVBoxLayout *m_backupFileLayout;
+    QHBoxLayout *m_backupFileLoadLayout;
+    QPushButton *m_backupLoadButton;
+    QLabel *m_backupLabel;
+    QLineEdit *m_backupLineEdit;
+    QLabel *m_faqLabel;
 
-   QString m_backupFilePath;
+    QString m_backupFilePath;
 
 };
 

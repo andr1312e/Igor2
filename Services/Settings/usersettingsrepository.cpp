@@ -114,7 +114,7 @@ int UsersDataWizardRepository::GetKorrektUserRole(const QDomElement &userDomElem
 void UsersDataWizardRepository::JuxtaposeUserIdAndUserNameWithSystemsData()
 {
 
-    const QList<QPair<QString, QString>> nameIdList=m_service->GetSystemUsersNamesWithList();
+    const QList<QPair<QString, QString>> nameIdList=m_service->GetSystemUsersNamesWithIdsList();
     for (int i=m_usersList.count()-1; i>=0; i--)
     {
         const QString userName=m_usersList.at(i).name;

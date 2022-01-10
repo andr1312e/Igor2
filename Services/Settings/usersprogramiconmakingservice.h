@@ -3,27 +3,34 @@
 
 #include <QObject>
 #include <QDir>
+
 #include "Services/linuxuserservice.h"
-class UsersProgramIconMakingService : public QObject
+
+class IconMaker : public QObject
 {
     Q_OBJECT
 public:
-    explicit UsersProgramIconMakingService(const QString &destinationFolder, const QString &applicationName, LinuxUserService *service, QObject *parent);
-    ~UsersProgramIconMakingService();
+    explicit IconMaker(const QString &destinationFolder, const QString &applicationName, LinuxUserService *service, QObject *parent);
+    ~IconMaker();
 
 public Q_SLOTS:
     void OnAddIconToDesktopToCurrentUser(bool state);
     void OnAddIconToDesktopToAllUsers(bool state);
     void OnAddIconToStartMenu(bool state);
+
 public:
     void ApplyWizardActions();
+
 private:
     void CopyMyAppToRLSTIFolder();
     void AddIconToStartMenu();
     void AddIconToCurrentUserDesktop();
     void AddIconToAllUserDesktops();
+    void AddIcon(const QString &desktopPath);
+
 private:
     const QString m_iconName="users.desktop";
+
 private:
     bool m_addIconToDesktopToCurrentUser;
     bool m_addIconToDesktopToAllUsers;

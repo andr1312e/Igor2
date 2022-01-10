@@ -246,6 +246,36 @@ QStringList Terminal::GetAllProcessList(const QString calledFunc)
     return processList;
 }
 
+void Terminal::KillProcess(const QString &processName, const QString calledFunc)
+{
+    const QString killProcessCommand=CreateKillProcessCommandSudo(processName);
+    RunConsoleCommand(killProcessCommand, calledFunc);
+}
+
+QStringList Terminal::GetAllInstalledPackageNames(const QString calledFunc)
+{
+    const QString allInstalledPackagesNamesCommand=CreateGettingAllInstalledPackagesNamesListCommandSudo();
+    QString packagesInstalled=RunConsoleCommand(allInstalledPackagesNamesCommand, calledFunc);
+    QStringList packageInstalledList=packagesInstalled.split('\n');
+    packageInstalledList.removeLast();
+    return packageInstalledList;
+}
+
+QStringList Terminal::GetAllNotInstalledPackageNames(const QString calledFunc)
+{
+    const QString allNotInstalledPackagesNamesCommand=CreateGettingAllNotInstalledPackageNamesListCommandSudo();
+    QString packagesNotInstalled=RunConsoleCommand(allNotInstalledPackagesNamesCommand, calledFunc);
+    QStringList packageNotInstalledList=packagesNotInstalled.split('\n');
+    packageNotInstalledList.removeLast();
+    return packageNotInstalledList;
+}
+
+void Terminal::InstallPackageSudo(const QString &packageName, const QString calledFunc)
+{
+    const QString installCommand=CreateInstallPackageCommandSudo(packageName);
+    RunConsoleCommand(installCommand, calledFunc);
+}
+
 const QString Terminal::CreateGetAllUsersCommand() const
 {
     return "awk -F: '{print $1 \":\" $3}' /etc/passwd";
@@ -329,4 +359,24 @@ QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString
 QString Terminal::CreateGettAllProcessListCommand() const
 {
     return "ps -eo comm";
+}
+
+QString Terminal::CreateKillProcessCommandSudo(const QString &processName) const
+{
+    return "sudo killall " +processName;
+}
+
+QString Terminal::CreateGettingAllInstalledPackagesNamesListCommandSudo() const
+{
+    return "apt-mark showmanual";
+}
+
+QString Terminal::CreateGettingAllNotInstalledPackageNamesListCommandSudo() const
+{
+    return  "apt list | grep -v 'установлен' | cut -f1 -d'/'";
+}
+
+QString Terminal::CreateInstallPackageCommandSudo(const QString &packageName) const
+{
+    return "sudo apt-get install "+packageName;
 }

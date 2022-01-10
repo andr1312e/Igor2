@@ -18,7 +18,7 @@ class ConclusionWizardPage: public MyWizardPage
 {
     Q_OBJECT
 public:
-    ConclusionWizardPage(WizardService *service, UsersProgramIconMakingService *iconMaker, QWidget *parent);
+    ConclusionWizardPage(WizardService *service, IconMaker *iconMaker, QWidget *parent);
     ~ConclusionWizardPage();
 
 private:
@@ -36,7 +36,7 @@ private:
 
 private:
     WizardService* const m_wizardService;
-    UsersProgramIconMakingService* const m_iconMakerSerivce;
+    IconMaker* const m_iconMakerSerivce;
 
 private:
     QLabel *m_titleLabel;

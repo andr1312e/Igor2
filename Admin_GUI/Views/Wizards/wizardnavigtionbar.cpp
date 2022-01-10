@@ -27,12 +27,13 @@ void WizardNavigtionBar::CreateUI()
     for (int i=0; i<=Page_Conclusion; i++)
     {
         QPushButton *button=new QPushButton(QString::number(i));
+        button->setCheckable(true);
+        button->setChecked(false);
         button->setFlat(true);
-        button->setDefault(false);
-        button->setAutoDefault(false);
         button->setFocusPolicy(Qt::NoFocus);
         button->setFixedWidth(30);
         SetButtonToolTip(button, i);
+        button->setStyleSheet("border: 0px;");
         m_buttonGroup->addButton(button, i);
     }
 }

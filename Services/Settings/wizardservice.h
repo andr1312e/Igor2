@@ -4,11 +4,13 @@
 #include <QDir>
 #include <QGuiApplication>
 
+
 #include "Services/Sql/isqlservice.h"
 
 #include "Services/Settings/roleappsandstartupsettingsrepository.h"
 #include "Services/Settings/usersettingsrepository.h"
 #include "Services/Settings/programfilesstate.h"
+#include "Services/Settings/dependenciesserivce.h"
 
 #include "Admin_GUI/Views/Wizards/actions.h"
 
@@ -52,15 +54,16 @@ private:
 private:
     void ApplySettingsWithUserRepository(const QString &actionWithUserRepository, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
     void ApplySettingsWithRolesRepository(const QStringList &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository);
+    void ApplySettingsWithDependencies();
     void CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList programs);
 
 private:
     Terminal* const m_terminal;
-
+    QSharedPointer<DependenciesService> m_dependenciesService;
 private:
     const QString m_rlsTiFolder;
 
-    QString m_backupFolder;
+    QString m_backupFolderPath;
     QString m_actionWithUserRepository;
 
     QStringList m_actionWithRolesRepository;
@@ -77,7 +80,7 @@ private:
 
 private:
     const QString m_globalTagName="settings";
-    const QStringList m_backupCorrectTagsList = {"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE"};
+    const QStringList m_backupCorrectTagsList = {"USERS", "FIRSTROLE", "SECONDROLE", "THIRDROLE", "FOURTHROLE", "DEPENDENCIES"};
 
 };
 

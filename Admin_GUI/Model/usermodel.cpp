@@ -61,7 +61,7 @@ QStandardItemModel *UserModel::GetModel()
 
 void UserModel::OnDataChanged()
 {
-    QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithList();
+    QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
     m_users=FillListByUserService(namesAndIdsList);
     QList<User> databaseUsers=FillListByDatabaseService();
     for (User &systemUser : m_users)

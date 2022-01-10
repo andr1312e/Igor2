@@ -1,6 +1,6 @@
 #include "conclusionwizardpage.h"
 
-ConclusionWizardPage::ConclusionWizardPage(WizardService *service, UsersProgramIconMakingService *iconMaker, QWidget *parent)
+ConclusionWizardPage::ConclusionWizardPage(WizardService *service, IconMaker *iconMaker, QWidget *parent)
     : MyWizardPage(parent)
     , m_wizardService(service)
     , m_iconMakerSerivce(iconMaker)
@@ -158,9 +158,9 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
 
 void ConclusionWizardPage::ConnectObjects()
 {
-    connect(m_addIconToDesktopToCurrentUser, &QCheckBox::clicked, m_iconMakerSerivce, &UsersProgramIconMakingService::OnAddIconToDesktopToCurrentUser);
-    connect(m_addIconToDesktopToAllUsers, &QCheckBox::clicked, m_iconMakerSerivce, &UsersProgramIconMakingService::OnAddIconToDesktopToAllUsers);
-    connect(m_addIconToStartMenu, &QCheckBox::clicked, m_iconMakerSerivce, &UsersProgramIconMakingService::OnAddIconToStartMenu);
+    connect(m_addIconToDesktopToCurrentUser, &QCheckBox::clicked, m_iconMakerSerivce, &IconMaker::OnAddIconToDesktopToCurrentUser);
+    connect(m_addIconToDesktopToAllUsers, &QCheckBox::clicked, m_iconMakerSerivce, &IconMaker::OnAddIconToDesktopToAllUsers);
+    connect(m_addIconToStartMenu, &QCheckBox::clicked, m_iconMakerSerivce, &IconMaker::OnAddIconToStartMenu);
 }
 
 void ConclusionWizardPage::SetUserActionValueLabel(const QString &actionWithUserRepository)

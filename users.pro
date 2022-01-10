@@ -15,7 +15,8 @@ TEMPLATE    = app
 DESTDIR     = $$PWD/../syncProgram
 RESOURCES += \
     resources.qrc
-CONFIG += c++latest strict_c strict_c++ precompile_header stl_off utf8_source
+
+CONFIG += no_lflags_merge rtti_off warn_on c++latest strict_c++ precompile_header stl_off utf8_source
 CONFIG -= cmdline qml_debug
  no_include_pwd
 DEFINES +=                 \
@@ -37,11 +38,11 @@ SOURCES += \
     Admin_GUI/Views/Wizards/userwizardwidget.cpp \
     Admin_GUI/Views/Wizards/wizardnavigtionbar.cpp \
     Admin_GUI/Views/topleftbar.cpp \
+    Services/Settings/dependenciesserivce.cpp \
     Services/Settings/roleappsandstartupsettingsrepository.cpp \
     Services/Settings/usersettingsrepository.cpp \
     Services/Settings/usersprogramiconmakingservice.cpp \
     Services/Settings/wizardservice.cpp \
-    Services/Terminals/linuxsystemeditservice.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
@@ -108,6 +109,7 @@ HEADERS += \
     Admin_GUI/Views/Wizards/wizardnavigtionbar.h \
     Admin_GUI/Views/Wizards/wizardpages.h \
     Admin_GUI/Views/topleftbar.h \
+    Services/Settings/dependenciesserivce.h \
     Services/Settings/programfilesstate.h \
     Services/Settings/roleappsandstartupsettingsrepository.h \
     Services/Settings/usersettingsrepository.h \
@@ -116,7 +118,6 @@ HEADERS += \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
     Services/Sql/sqldatabaseserivce.h \
-    Services/Terminals/linuxsystemeditservice.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \

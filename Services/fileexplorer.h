@@ -4,32 +4,35 @@
 #include <QDir>
 #include <QList>
 #include <QProcess>
-#include <QStandardItemModel>
 #include <QString>
+#include <QStandardItemModel>
 
 #include "Structs/programstruct.h"
 
 #include "Services/Terminals/terminal.h"
 #include "Services/Sql/isqlservice.h"
 
-class DesktopPanelPresenter
+class IconMakingService
 {
 public:
-    DesktopPanelPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
-    ~DesktopPanelPresenter();
+    IconMakingService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+    ~IconMakingService();
     QStandardItemModel *GetModel();
     Terminal *GetTerminal();
+
 public:
     void CheckRoleDesktopTable(const quint8 &roleId);
     void GetAllRoleDesktops(const quint8 &roleId);
     void SetDefaultIconsToUser(const quint8 &oldRoleId, const quint8& newRoleId, const QString &userName);
     void AddIconToRole(const DesktopEntity &entity, const quint8 &roleId);
     void DeleteIconToRole(const QString iconName, const quint8 &roleId);
+
 public:
     void GetAllUserDesktops(const QString &userName);
     void AddIconToUser(const DesktopEntity &entity, const QString &userName);
     void DeleteIconToUser(const QString &userName, const QString &iconName);
     void DeleteRoleIconFromUser(const QString &userName, const quint8 &roleId);
+
 private:
     void WriteIconPropertiesToFile(const QString &iconProperties,
                                    const QString &iconName, const QString &userName);
@@ -46,21 +49,22 @@ private:
                               const QString &iconInfo);
     void appendFileInfoToList(const QString &fileName);
     bool IsIcon(const QString &entityName) const;
-    void CreateIconFile(const QString userName, const QString &iconName);
+    void CreateIconFile(const QString &userName, const QString &iconName);
     const QString CreateIconProperties(const DesktopEntity &entity) const;
 
     void CheckFolderToFileAndFileExists(const QString &iconName);
 
 private:
-    Terminal *m_terminal;
-    ISqlDatabaseService *m_sqlDatabaseService;
+    Terminal *const m_terminal;
+    ISqlDatabaseService *const m_sqlDatabaseService;
 
-    QList<DesktopEntity> *m_filesList;
-    QStandardItemModel *m_fileModel;
+    QList<DesktopEntity> *const m_filesList;
+    QStandardItemModel *const m_fileModel;
 
     const QString m_destinationFolder="/usr/RLS_TI/";
 
     QString m_path;
+
 private:
     const QString m_desktopName = "/Desktop/";
     const QString m_homeName = "/home/";

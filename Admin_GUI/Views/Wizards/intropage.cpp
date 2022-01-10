@@ -7,7 +7,6 @@ IntroPage::IntroPage(const LoadingState &state, WizardService *service, QWidget 
    : MyWizardPage(parent)
    , m_state(state)
    , m_wizardService(service)
-
 {
    CreateUI();
    SetWizardStyles();

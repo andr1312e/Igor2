@@ -34,6 +34,7 @@ public:
 
 private:
    void InitTerminal();
+   void InitPackages();
    void InitUserService();
    void InitSqlService();
    void GetCurrentUserNameIdAndAdminPriviliges();

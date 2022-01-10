@@ -32,7 +32,7 @@ DesktopPanel::~DesktopPanel()
 
 void DesktopPanel::CreatePresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
 {
-    m_desktopPanelPresenter=new DesktopPanelPresenter(terminal, sqlDatabaseService);
+    m_desktopPanelPresenter=new IconMakingService(terminal, sqlDatabaseService);
 }
 
 void DesktopPanel::SetPresenterModelToView()

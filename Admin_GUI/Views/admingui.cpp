@@ -16,10 +16,13 @@ Admin_GUI::Admin_GUI(const QString &currentUserId, ISqlDatabaseService *database
 
 Admin_GUI::~Admin_GUI()
 {
+    delete m_centerSideLayout;
+    delete m_leftSideLayout;
     delete m_mainLayout;
 
     delete m_leftTopBar;
     delete m_usersListWidget;
+    delete m_userDesktopPanel;
     delete m_userEditPanel;
     delete m_roleEditPanel;
 }
@@ -134,7 +137,7 @@ void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QStr
 {
     m_usersListWidget->AddUserToModel(userId, FCS, rank, newRole);
     m_roleEditPanel->OnRoleToViewChanged(newRole);
-    if(userId==m_currentUserId)
+    if(m_currentUserId==userId)
     {
         if(oldRole!=newRole)
         {

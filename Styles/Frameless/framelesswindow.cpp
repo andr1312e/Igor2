@@ -616,6 +616,7 @@ void FramelessWindow::InitUI()
     m_changeDelegatesView->setAutoDefault(false);
     m_changeDelegatesView->setFocusPolicy(Qt::NoFocus);
     m_changeDelegatesView->setIcon(QIcon(":/images/horizontalDelegateWhite"));
+    m_changeDelegatesView->setStyleSheet("border: 0px;");
     m_changeDelegatesView->setIconSize(QSize(20, 20));
     m_changeDelegatesView->setToolTip("Изменить вид пользователей и программ");
 
@@ -626,6 +627,7 @@ void FramelessWindow::InitUI()
     m_changeThemePushButton->setAutoDefault(false);
     m_changeThemePushButton->setFocusPolicy(Qt::NoFocus);
     m_changeThemePushButton->setIcon(QIcon(":/images/moon"));
+    m_changeThemePushButton->setStyleSheet("border: 0px;");
     m_changeThemePushButton->setIconSize(QSize(20, 20));
     m_changeThemePushButton->setToolTip("Изменить тему");
 
@@ -638,6 +640,7 @@ void FramelessWindow::InitUI()
     m_changeAdditionalSettingsView->setAutoDefault(false);
     m_changeAdditionalSettingsView->setFocusPolicy(Qt::NoFocus);
     m_changeAdditionalSettingsView->setIcon(QIcon(":/images/settingsWhite"));
+    m_changeAdditionalSettingsView->setStyleSheet("border: 0px;");
     m_changeAdditionalSettingsView->setIconSize(QSize(20, 20));
     m_changeAdditionalSettingsView->setToolTip("Убрать/показать панель отображения ролей");
 

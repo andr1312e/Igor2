@@ -8,7 +8,10 @@ SqlDatabaseSerivce::SqlDatabaseSerivce(QObject *parent)
 
 SqlDatabaseSerivce::~SqlDatabaseSerivce()
 {
-    m_db->close();
+    if(m_db->isOpen())
+    {
+        m_db->close();
+    }
     delete m_db;
 }
 
@@ -116,7 +119,7 @@ QStringList SqlDatabaseSerivce::GetAdminsRoleUserName()
     }
 }
 
-QString SqlDatabaseSerivce::GetUserFCS(QString &currentUserName)
+QString SqlDatabaseSerivce::GetUserFCS(const QString &currentUserName)
 {
     QSqlQuery query;
     query.prepare("SELECT " + fcsCN+ " FROM "+ usersTableName+
@@ -147,7 +150,7 @@ QString SqlDatabaseSerivce::GetUserFCS(QString &currentUserName)
     }
 }
 
-QString SqlDatabaseSerivce::GetUserRank(QString &currentUserName)
+QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
 {
     QSqlQuery query;
     query.prepare("SELECT " + rankCN+ " FROM "+ usersTableName+
@@ -369,7 +372,7 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 }
 
 
-void SqlDatabaseSerivce::RemoveUserIntoTable(quint8 roleId, User &user)
+void SqlDatabaseSerivce::RemoveUserIntoTable(quint8 roleId,const User &user)
 {
     QSqlQuery query;
     query.prepare("DELETE FROM " + startupTablePrefix + QString::number(roleId) +
@@ -486,7 +489,7 @@ void SqlDatabaseSerivce::RemoveStartupIntoRole(quint8 roleId, const QString &sta
     }
 }
 
-void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId, DesktopEntity &entity)
+void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity &entity)
 {
     QSqlQuery query;
     QString request="INSERT INTO "+ desktopTablePrefix+QString::number(roleId)+
@@ -508,7 +511,7 @@ void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId, DesktopEntity &ent
     }
 }
 
-void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, DesktopEntity &entity)
+void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity)
 {
     QSqlQuery query;
     query.prepare("DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
@@ -579,7 +582,7 @@ bool SqlDatabaseSerivce::GetBoolFromMessage(QSqlQuery &query)
     }
 }
 
-void SqlDatabaseSerivce::GetStringFromMessage(QString &inputString,const QSqlRecord &record, int rowPos)
+void SqlDatabaseSerivce::GetStringFromMessage(QString &inputString, const QSqlRecord &record, const int &rowPos)
 {
     if(record.count()>rowPos)
     {

@@ -37,7 +37,7 @@ public:
     //users
     virtual void AppendUserIntoTable(const User &user) = 0;
 
-    virtual void RemoveUserIntoTable(quint8 roleId, User &user) = 0;
+    virtual void RemoveUserIntoTable(quint8 roleId,const User &user) = 0;
 
     virtual QList<User> GetAllUsers() = 0;
 
@@ -49,9 +49,9 @@ public:
     virtual QStringList GetAllRoleStartups(quint8 roleId) = 0;
 
     //desktops
-    virtual void AppendDesktopIntoRole(quint8 roleId, DesktopEntity &entity) = 0;
+    virtual void AppendDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) = 0;
 
-    virtual void RemoveDesktopIntoRole(quint8 roleId, DesktopEntity &entity) = 0;
+    virtual void RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) = 0;
 
     virtual QList<DesktopEntity> GetAllRoleDesktops(quint8 roleId) = 0;
 
@@ -59,9 +59,9 @@ public:
 
     virtual QStringList GetAdminsRoleUserName() = 0;
 
-    virtual QString GetUserFCS(QString &userName) = 0;
+    virtual QString GetUserFCS(const QString &userName) = 0;
 
-    virtual QString GetUserRank(QString &userName) = 0;
+    virtual QString GetUserRank(const QString &userName) = 0;
 
     virtual int GetUserRole(const QString &userName) = 0;
 
