@@ -6,7 +6,6 @@ enum LoadingState {
    NoUserDb = 1,
    NoRoleData = 2,
    Fine = 3,
-   CantRun = 4,
 };
 
 #endif // SERVICES_SETTINGS_PROGRAMFILESSTATE_H

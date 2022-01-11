@@ -2,8 +2,8 @@
 #include "linuxuserservice.h"
 #include <QDebug>
 
-LinuxUserService::LinuxUserService(Terminal *terminal)
-    : m_terminal(terminal)
+LinuxUserService::LinuxUserService()
+    : m_terminal(Terminal::GetTerminal())
 {
 
 }
@@ -18,27 +18,6 @@ void LinuxUserService::GetAllUsersWithIdInSystem()
     const QStringList allUsersList=m_terminal->GetAllUsersList("LinuxUserService::getAllUsersInSystem");
     RemoveSystemUsersFromAllUsersList(allUsersList);
 }
-
-//QList<QPair<QString, QString> >* LinuxUserService::GetAllUsersNamesWithIdInSystem()
-//{
-//    QList<QPair<QString, QString> > usersNameUserIdDictonary;
-//    const QString getAllUsersWithIdCommand= " awk -F: '{print $1 \":\" $3}' /etc/passwd";
-//    QString userListOneString=m_terminal->RunConsoleCommand(getAllUsersWithIdCommand, "LinuxUserService::GetAllUsersNamesWithIdInSystem");
-//    QStringList allNameIdList=userListOneString.split('\n');
-//    allNameIdList.removeLast();
-//    QStringList nameIdList=RemoveSystemUsers(allNameIdList);
-//    for(const QString &nameId:nameIdList)
-//    {
-//        int pos=nameId.indexOf(":");
-//        QString id=nameId.mid(pos+1);
-//        QString name=nameId.left(pos);
-//        QPair<QString, QString> nameAndId;
-//        nameAndId.first=name;
-//        nameAndId.second=id;
-//        usersNameUserIdDictonary.push_back(nameAndId);
-//    }
-//    return usersNameUserIdDictonary;
-//}
 
 const QString LinuxUserService::GetCurrentUserName()
 {
@@ -57,7 +36,7 @@ const QString LinuxUserService::GetCurrentUserId()
 bool LinuxUserService::HasCurrentUserAdminPrivileges()
 {
     QStringList listOfCurrentUserGroups=GetUserGroups(GetCurrentUserName());
-    if (listOfCurrentUserGroups.contains("astra-admin") || listOfCurrentUserGroups.contains("root"))
+    if (listOfCurrentUserGroups.contains(QStringLiteral("astra-admin")) || listOfCurrentUserGroups.contains(QStringLiteral("root")))
     {
         return true;
     }
@@ -86,9 +65,9 @@ void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allU
         int indexOfFirstDots=user.indexOf(':');
         if (indexOfFirstDots!=-1)
         {
-                    QString userName=user.left(indexOfFirstDots);
-                    QString userId=user.mid(indexOfFirstDots+1);
-                    int userIdNumber=userId.toInt(&convertOk, 10);
+                    const QString userName=user.left(indexOfFirstDots);
+                    const QString userId=user.mid(indexOfFirstDots+1);
+                    const int userIdNumber=userId.toInt(&convertOk, 10);
                     if (convertOk)
                     {
                         if (IsUserSystem(userIdNumber))
@@ -114,7 +93,7 @@ void LinuxUserService::PushUserToNameIdList(const QString &name, const QString &
     m_users.push_back(QPair<QString, QString>(name, userId));
 }
 
-bool LinuxUserService::IsUserSystem(int &userIdNumber)
+bool LinuxUserService::IsUserSystem(const int &userIdNumber)
 {
     if (userIdNumber>999&&userIdNumber<29991)
     {

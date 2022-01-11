@@ -1,26 +1,35 @@
 #include "usermodel.h"
 
-UserModel::UserModel(ISqlDatabaseService *databaseService, LinuxUserService *userService, QObject *parent)
-    : QObject(parent)
-    , m_model(new QStandardItemModel())
+UserModel::UserModel(ISqlDatabaseService *databaseService, LinuxUserService *userService)
+    : m_model(new QStandardItemModel())
     , m_databaseService(databaseService)
     , m_linuxUserService(userService)
-    , m_currentRoleUsers(new QStringList())
 {
-    OnDataChanged();
+    DataChanged();
 }
 
 UserModel::~UserModel()
 {
     delete m_model;
-    delete m_currentRoleUsers;
 }
 
-void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role)
+int UserModel::GetRoleIdByUserId(const QString &userId) const
+{
+    for (const User &user : m_users)
+    {
+        if (userId==user.userId)
+        {
+            return user.role;
+        }
+    }
+    return -1;
+}
+
+void UserModel::AddUserToModel(const QString &userId, const QString &userName, const QString &FCS, const QString &rank, const int &role)
 {
     for (User &user  : m_users)
     {
-        if (user.userId == userId)
+        if (userId==user.userId && userName==user.name)
         {
             user.FCS = FCS;
             user.rank = rank;
@@ -35,7 +44,7 @@ void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const 
     qFatal("нет юзера");
 }
 
-void UserModel::OnDeleteUser(const QString &userId)
+void UserModel::DeleteUser(const QString &userId)
 {
     for (User &user  : m_users)
     {
@@ -54,12 +63,12 @@ void UserModel::OnDeleteUser(const QString &userId)
     qFatal("нет юзера");
 }
 
-QStandardItemModel *UserModel::GetModel()
+QStandardItemModel *UserModel::GetModel() const
 {
     return m_model;
 }
 
-void UserModel::OnDataChanged()
+void UserModel::DataChanged()
 {
     const QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
     m_users=FillListByUserService(namesAndIdsList);
@@ -80,11 +89,6 @@ void UserModel::OnDataChanged()
     FillModelByList();
 }
 
-void UserModel::ClearList()
-{
-    m_users.clear();
-}
-
 QList<User> UserModel::FillListByUserService(const QList<QPair<QString, QString>> &namesAndIdsList) const
 {
     QList<User> usersInSystem;
@@ -98,19 +102,6 @@ QList<User> UserModel::FillListByUserService(const QList<QPair<QString, QString>
         usersInSystem.append(user);
     }
     return  usersInSystem;
-}
-
-QStringList *UserModel::GetUsersSystemNamesByRole(const QString &role)
-{
-    m_currentRoleUsers->clear();
-
-    for (const User &user:m_users) {
-        if (role==user.role ) {
-            m_currentRoleUsers->append(user.name);
-        }
-    }
-
-    return m_currentRoleUsers;
 }
 
 QList<User> UserModel::FillListByDatabaseService()

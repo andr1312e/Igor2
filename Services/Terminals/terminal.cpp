@@ -1,5 +1,16 @@
 #include "terminal.h"
 
+Terminal* Terminal::m_terminal = Q_NULLPTR;
+
+Terminal *Terminal::GetTerminal()
+{
+    if(m_terminal==Q_NULLPTR)
+    {
+        m_terminal=new Terminal();
+    }
+    return m_terminal;
+}
+
 Terminal::Terminal()
    : m_process(new QProcess())
    , m_consoleCommand(new QStringList())
@@ -47,29 +58,29 @@ bool Terminal::IsDirExists(const QString folderPath, const QString calledFunc, b
 {
     QStringList listofSubFoldersToPath = folderPath.split('/');
 
+    listofSubFoldersToPath.removeAll("");
     if (listofSubFoldersToPath.isEmpty()) {
-       qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toLatin1().constData(), folderPath.toLatin1().constData());
+       qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toUtf8().constData(), folderPath.toUtf8().constData());
     } else {
-       listofSubFoldersToPath.removeAll("");
        QString currentPath = "/";
 
-       for (QStringList::iterator it = listofSubFoldersToPath.begin(); it != listofSubFoldersToPath.end(); ++it) {
-          if (*it == "Desktop") {
+       for (const QString &pathPart: listofSubFoldersToPath) {
+          if (pathPart == "Desktop") {
              QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
              QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-             if (!(files.contains((*it) + "@")) && !(folders.contains((*it) + "/"))) {
+             if (!(files.contains((pathPart) + "@")) && !(folders.contains((pathPart) + "/"))) {
                 return false;
              }
           } else {
              QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-             if (!folders.contains((*it) + "/")) {
+             if (!folders.contains((pathPart) + "/")) {
                 return false;
              }
           }
 
-          currentPath = currentPath + *it + "/";
+          currentPath = currentPath + pathPart + "/";
        }
 
        return true;
@@ -81,28 +92,28 @@ bool Terminal::IsDirNotExists(const QString folderPath, const QString calledFunc
    QStringList listofSubFoldersToPath = folderPath.split('/');
 
    if (listofSubFoldersToPath.isEmpty()) {
-      qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toLatin1().constData(), folderPath.toLatin1().constData());
+      qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toUtf8().constData(), folderPath.toUtf8().constData());
    } else {
       listofSubFoldersToPath.removeAll("");
       QString currentPath = "/";
 
-      for (QStringList::iterator it = listofSubFoldersToPath.begin(); it != listofSubFoldersToPath.end(); ++it) {
-         if (*it == "Desktop") {
+      for (const QString &subFolderPath:listofSubFoldersToPath) {
+         if (subFolderPath == QStringLiteral("Desktop")) {
             QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
             QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-            if (!(files.contains((*it) + "@")) && !(folders.contains((*it) + "/"))) {
+            if (!(files.contains((subFolderPath) + "@")) && !(folders.contains((subFolderPath) + "/"))) {
                return true;
             }
          } else {
             QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-            if (!folders.contains((*it) + "/")) {
+            if (!folders.contains((subFolderPath) + "/")) {
                return true;
             }
          }
 
-         currentPath = currentPath + *it + "/";
+         currentPath = currentPath + subFolderPath + "/";
       }
 
       return false;
@@ -147,23 +158,23 @@ void Terminal::CheckAndCreatePathToElement(const QString &path, const QString ca
    QString currentPath = "/";
    listofSubFoldersToPath.removeLast();
 
-   for (QStringList::iterator it = listofSubFoldersToPath.begin(); it != listofSubFoldersToPath.end(); ++it) {
-      if (*it == "Desktop") {
+   for (const QString pathPart:listofSubFoldersToPath) {
+      if (pathPart == "Desktop") {
          QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
          QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-         if (!(files.contains((*it) + "@")) && !(folders.contains((*it) + "/"))) {
-            CreateFolder(currentPath + *it + "/", calledFunc, hasRoot);
+         if (!(files.contains((pathPart) + "@")) && !(folders.contains((pathPart) + "/"))) {
+            CreateFolder(currentPath + pathPart + "/", calledFunc, hasRoot);
          }
       } else {
          QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
-         if (!folders.contains((*it) + "/")) {
-            CreateFolder(currentPath + *it + "/", calledFunc, hasRoot);
+         if (!folders.contains((pathPart) + "/")) {
+            CreateFolder(currentPath + pathPart + "/", calledFunc, hasRoot);
          }
       }
 
-      currentPath = currentPath + *it + "/";
+      currentPath = currentPath + pathPart + "/";
    }
 }
 

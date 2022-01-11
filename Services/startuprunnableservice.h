@@ -14,7 +14,7 @@ class StartupRunnableManager: public QObject
     Q_OBJECT
 
 public:
-    StartupRunnableManager(const QString &currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent);
+    StartupRunnableManager(const QString &currentUserName, QStringView rlstiFolderPath, ISqlDatabaseService *sqlService, QObject *parent);
     ~StartupRunnableManager();
 
 Q_SIGNALS:
@@ -42,7 +42,7 @@ private:
 
 private:
     const QString m_currentUserName;
-    const QString m_rlsTiFolderPath;
+    const QStringView m_rlsTiFolderPath;
     ISqlDatabaseService *m_sqlService;
     Terminal *m_terminal;
     QList<QProcess*> m_runnableProcess;

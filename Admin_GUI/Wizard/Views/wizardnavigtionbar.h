@@ -7,7 +7,8 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include "Structs/userstruct.h"
-#include "Admin_GUI/Views/Wizards/wizardpages.h"
+
+#include "Admin_GUI/Wizard/Views/wizardpages.h"
 
 class WizardNavigtionBar : public QWidget
 {

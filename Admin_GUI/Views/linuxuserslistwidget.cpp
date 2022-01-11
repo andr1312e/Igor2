@@ -2,11 +2,11 @@
 
 #include <QDebug>
 
-LinuxUsersListWidget::LinuxUsersListWidget(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
+LinuxUsersListWidget::LinuxUsersListWidget(UserModel *userModel, QWidget *parent)
     : QWidget(parent)
     , m_oldFontSize(0)
 {
-    CreateModel(databaseService, userService);
+    SetModel(userModel);
     CreateProxyModel();
     CreateUI();
     InsertWidgetsIntoLayout();
@@ -28,9 +28,9 @@ LinuxUsersListWidget::~LinuxUsersListWidget()
     delete m_allUsersListView;
 }
 
-void LinuxUsersListWidget::CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService)
+void LinuxUsersListWidget::SetModel(UserModel *userModel)
 {
-    m_userModel = new UserModel(databaseService, userService, this);
+    m_userModel = userModel;
 }
 
 void LinuxUsersListWidget::CreateProxyModel()
@@ -114,16 +114,6 @@ void LinuxUsersListWidget::GetUserData(const QModelIndex &index)
     QVariant indexData = index.data(Qt::UserRole + 1);
     User user = indexData.value<User>();
     Q_EMIT ToUserClick(user);
-}
-
-void LinuxUsersListWidget::DeleteUser(const QString &userId)
-{
-    m_userModel->OnDeleteUser(userId);
-}
-
-void LinuxUsersListWidget::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role)
-{
-    m_userModel->AddUserToModel(userId, FCS, rank, role);
 }
 
 void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)

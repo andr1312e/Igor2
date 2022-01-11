@@ -22,12 +22,13 @@ class Admin_GUI : public QWidget
     Q_OBJECT
 
 public:
-    Admin_GUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent);
+    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent);
     ~Admin_GUI();
 
 private:
-    void CreateServices(Terminal *terminal,  ISqlDatabaseService *databaseService);
-    void CreateUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService);
+    void CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+    void CreateServices(ISqlDatabaseService *databaseService);
+    void CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService);
     void InsertWidgetsIntoLayout();
     void ConnectObjects();
     void SetMaximumWidgetSize();
@@ -40,20 +41,21 @@ public Q_SLOTS:
     void OnHideAdditionalSettings(bool state);
 private Q_SLOTS:
     void OnUserClick(const User &user);
-    void OnDeleteUser(const QString &userId);
-    void OnSaveUser(const QString&userId, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
+    void OnDeleteUser(const QString &userId, const QString &userName);
+    void OnSaveUser(const QString&userId, const QString &userName, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
 private:
     void InitTopBar();
 
 private:
     int m_maxWidth;
     int m_maxHeight;
-    const QString m_currentAdminId;
+    const QStringView m_currentAdminId;
 
     ISqlDatabaseService* const m_databaseService;
     LinuxUserService* const m_linuxUserService;
     UserDesktopService * m_userDesktopService;
     RoleDesktopService * m_roleDesktopService;
+    UserModel *m_userModel;
 
 private:
     QHBoxLayout *m_mainLayout;

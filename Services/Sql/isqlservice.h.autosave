@@ -31,7 +31,7 @@ public:
     //create Tables    
     virtual void CreateUsersTableIfNotExists() = 0;
 
-    virtual void CreateStartupsTableInNotExists(int roleId) = 0;
+    virtual void CreateStartupsTableIfNotExists(int roleId) = 0;
 
     virtual void CreateDesktopRolesIfNotExists(int roleId) = 0;
 

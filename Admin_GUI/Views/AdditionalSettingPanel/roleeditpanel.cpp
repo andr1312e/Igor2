@@ -7,10 +7,10 @@
 
 #include "roleeditpanel.h"
 
-RoleEditPanel::RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService * roleDesktopService,  QWidget *parent)
+RoleEditPanel::RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService * roleDesktopService,  QWidget *parent)
     : QWidget(parent)
 {
-    CreateUI(terminal, sqlDatabaseService, roleDesktopService);
+    CreateUI(sqlDatabaseService, roleDesktopService);
     InsertWidgetsIntoLayout();
     FillUI();
     ConnectObjects();
@@ -42,7 +42,7 @@ void RoleEditPanel::OnRoleToViewChanged(const int &roleId)
 }
 
 
-void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService)
+void RoleEditPanel::CreateUI(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService)
 {
     m_mainLayout=new QVBoxLayout();
     m_topLayout=new QHBoxLayout();
@@ -52,7 +52,7 @@ void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabas
     m_descriptionLabel=new QLabel();
 
     m_roleDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::ROLE_ICONS, Q_NULLPTR, roleDesktopService,  this);
-    m_roleRunningApplicationPanel=new StartupPanel(terminal, sqlDatabaseService, this);
+    m_roleRunningApplicationPanel=new StartupPanel(sqlDatabaseService, this);
 }
 
 void RoleEditPanel::InsertWidgetsIntoLayout()

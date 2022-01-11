@@ -4,15 +4,15 @@
 #include <QDir>
 #include <QGuiApplication>
 
-
 #include "Services/Sql/isqlservice.h"
 
-#include "Services/Settings/roleappsandstartupsettingsrepository.h"
-#include "Services/Settings/usersettingsrepository.h"
-#include "Services/Settings/programfilesstate.h"
-#include "Services/Settings/dependenciesserivce.h"
+#include "Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.h"
+#include "Admin_GUI/Wizard/Repositories/usersettingsrepository.h"
 
-#include "Admin_GUI/Views/Wizards/actions.h"
+#include "Admin_GUI/Wizard/Structs/programfilesstate.h"
+#include "Admin_GUI/Wizard/Services/dependenciesserivce.h"
+
+#include "Admin_GUI/Wizard/Views/actions.h"
 
 #include "Structs/programstruct.h"
 #include "Structs/userstruct.h"

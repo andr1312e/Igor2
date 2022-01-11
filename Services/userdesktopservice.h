@@ -17,14 +17,14 @@
 class UserDesktopService : public DesktopService
 {
 public:
-    UserDesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+    UserDesktopService(ISqlDatabaseService *sqlDatabaseService);
     ~UserDesktopService();
 
 public:
     void GetAllUserDesktops(const QString &userName);
     void AddIconToUser(const QString &userName, const DesktopEntity &entity);
     void DeleteIconToUser(const QString &userName, const QString &iconName);
-    void DeleteAllIconsToUser(const quint8 &roleId, const QString &userName);
+    void DeleteAllIconsToUser(const int &roleId, const QString &userName);
 private:
     void UpdateIconListDataAndModelFromUserDesktop(const QString &userDesktopPath);
     void UpdateIconsListFromUserDesktop(const QString &userDesktopPath);
@@ -33,7 +33,8 @@ private:
                               const QString &iconInfo);
     void ParseAndAppendFileInfoToList(const QString &fileName);
     bool IsIcon(const QString &entityName) const;
-
+private:
+    const QString m_desktopFileType;
 };
 
 #endif // SERVICES_FILEEXPLORER_H

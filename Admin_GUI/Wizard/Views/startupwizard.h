@@ -9,18 +9,18 @@
 
 #include "Services/linuxuserservice.h"
 
-#include "Services/Settings/wizardservice.h"
-#include "Services/Settings/programfilesstate.h"
-#include "Services/Settings/usersettingsrepository.h"
-#include "Services/Settings/usersprogramiconmakingservice.h"
-#include "Services/Settings/roleappsandstartupsettingsrepository.h"
+#include "Admin_GUI/Wizard/Services/wizardservice.h"
+#include "Admin_GUI/Wizard/Structs/programfilesstate.h"
+#include "Admin_GUI/Wizard/Repositories/usersettingsrepository.h"
+#include "Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h"
+#include "Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.h"
 
-#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
-#include "Admin_GUI/Views/Wizards/intropage.h"
-#include "Admin_GUI/Views/Wizards/wizardpages.h"
-#include "Admin_GUI/Views/Wizards/userwizardpage.h"
-#include "Admin_GUI/Views/Wizards/roleappswizardpage.h"
-#include "Admin_GUI/Views/Wizards/conclusionwizardpage.h"
+#include "Admin_GUI/Wizard/Views/wizardnavigtionbar.h"
+#include "Admin_GUI/Wizard/Views/intropage.h"
+#include "Admin_GUI/Wizard/Views/wizardpages.h"
+#include "Admin_GUI/Wizard/Views/userwizardpage.h"
+#include "Admin_GUI/Wizard/Views/roleappswizardpage.h"
+#include "Admin_GUI/Wizard/Views/conclusionwizardpage.h"
 
 class StartupWizard : public QWizard
 {

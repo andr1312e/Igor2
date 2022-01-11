@@ -7,7 +7,7 @@
 class DependenciesService
 {
 public:
-    DependenciesService(Terminal* const terminal);
+    DependenciesService();
     ~DependenciesService();
 public:
     void GetDependenciesFromBackUp(const QDomElement &dependenciedsXmlElement);

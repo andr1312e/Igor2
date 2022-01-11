@@ -39,17 +39,18 @@ FramelessWindow::~FramelessWindow()
     delete m_topLayout;
     delete m_mainLayout;
 
-    delete m_textShadow;
-
-    delete m_WindowTitleBar;
-    delete m_windowFrame;
-
     delete m_closeButton;
     delete m_maximizeButton;
     delete m_minimizeButton;
     delete m_zoomButton;
     delete m_icon;
+
+    delete m_textShadow;
     delete m_titleText;
+
+    delete m_WindowTitleBar;
+    delete m_windowFrame;
+
 }
 
 void FramelessWindow::OnRestoreButtonClicked()
@@ -718,9 +719,7 @@ void FramelessWindow::CreateConnections()
     });
     connect(m_maximizeButton, &QToolButton::clicked, this, &FramelessWindow::OnMaximizeButtonClicked);
     connect(m_zoomButton, &QToolButton::clicked, this, &FramelessWindow::OnRestoreButtonClicked);
-    connect(m_closeButton, &QToolButton::clicked, [&]() {
-        close();
-    });
+    connect(m_closeButton, &QToolButton::clicked, this, &QWidget::close);
     connect(m_WindowTitleBar, &WindowTitleBar::ToDoubleClicked, this, &FramelessWindow::OnWindowDraggerDoubleClicked);
     connect(m_changeThemePushButton, &QPushButton::clicked, this, &FramelessWindow::OnChangeThemeButtonClicked);
     connect(m_changeAdditionalSettingsView, &QPushButton::clicked, this, &FramelessWindow::OnChangeAdditionalSettingsButtonClicked);

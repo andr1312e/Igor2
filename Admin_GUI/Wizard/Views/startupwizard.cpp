@@ -30,7 +30,7 @@ StartupWizard::~StartupWizard()
 void StartupWizard::CreateServices(const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService* const linuxUserService, ISqlDatabaseService* const iSqlDataBaseService)
 {
     m_wizardService = new WizardService(rlsTiFolder, loadedDbAdnRolesState, linuxUserService, iSqlDataBaseService, this);
-    m_iconMakingService=new IconMaker(rlsTiFolder, applicationName, linuxUserService, this);
+    m_iconMakingService=new IconMaker(applicationName, rlsTiFolder, linuxUserService, this);
 }
 
 void StartupWizard::CreateUI(const LoadingState &loadedDbAdnRolesState)

@@ -1,4 +1,4 @@
-#include "Styles/Frameless/windowdragger.h"
+#include "Styles/Frameless/windowtitlebar.h"
 
 WindowTitleBar::WindowTitleBar(QWidget *parent)
     : QWidget(parent)

@@ -1,10 +1,10 @@
 #include "startuppanel.h"
 
-StartupPanel::StartupPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
+StartupPanel::StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
     : QWidget(parent)
 {
     CreateModel();
-    CreateServices(terminal, sqlDatabaseService);
+    CreateServices(sqlDatabaseService);
     CreateUI();
     SetBackGroundColor();
     InsertWidgetsIntoLayout();
@@ -34,9 +34,9 @@ void StartupPanel::CreateModel()
     m_appsList=new QStringListModel();
 }
 
-void StartupPanel::CreateServices(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
+void StartupPanel::CreateServices(ISqlDatabaseService *sqlDatabaseService)
 {
-    m_startupRepositoryPresenter=new StartupRepositoryPresenter(terminal, sqlDatabaseService);
+    m_startupRepositoryPresenter=new StartupRepositoryPresenter(sqlDatabaseService);
 }
 
 void StartupPanel::CreateUI()

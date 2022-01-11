@@ -6,14 +6,13 @@
 class KioskService
 {
 public:
-    KioskService(Terminal *terminal);
+    KioskService();
     ~KioskService();
 
 public:
     void LockUser(const QString &userName);
     void UnLockUser(const QString &userName);
     bool IsUserInKiosk(const QString &userName);
-    Terminal* GetTerminal() {return m_terminal;}
 
 private:
     Terminal * const m_terminal;

@@ -2,8 +2,8 @@
 
 WizardService::WizardService(const QString &rlsTiFolder, const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent)
     : QObject(parent)
-    , m_terminal(service->GetTerminal())
-    , m_dependenciesService(QSharedPointer<DependenciesService>(new DependenciesService(m_terminal)))
+    , m_terminal(Terminal::GetTerminal())
+    , m_dependenciesService(QSharedPointer<DependenciesService>(new DependenciesService()))
     , m_rlsTiFolder(rlsTiFolder)
     , m_actionWithUserRepository(userWizardPageComboBoxNoDataActions.front())
     , m_actionWithRolesRepository(QStringList({m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front()}))
@@ -27,9 +27,6 @@ WizardService::~WizardService()
 void WizardService::GetExsistsRepositoriesData(const LoadingState &state)
 {
     switch (state) {
-    case CantRun:
-        Q_UNREACHABLE();
-
     case NoFiles:
         break;
 
@@ -69,7 +66,7 @@ bool WizardService::CheckAndParseBackupFile(const QString &backupPath)
             const QDomNodeList list = settings.childNodes();
             QStringList tagList;
 
-            for (int i = 0; i < settings.childNodes().count(); i++) {
+            for (int i = 0; i < settings.childNodes().count(); ++i) {
                 tagList.append(list.at(i).toElement().tagName());
             }
 

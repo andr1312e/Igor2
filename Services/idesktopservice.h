@@ -9,7 +9,7 @@ class QStandardItemModel;
 
 class DesktopService {
 protected:
-    DesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+    DesktopService(ISqlDatabaseService *sqlDatabaseService);
     ~DesktopService();
 
 public:

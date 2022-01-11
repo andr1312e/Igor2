@@ -74,7 +74,7 @@ void RolesAndStartupsWizardRepository::SaveRoleDesktopsToDb(ISqlDatabaseService 
 
 void RolesAndStartupsWizardRepository::SaveRoleExecsToDb(ISqlDatabaseService *iSqlDatabaseService, const int roleIndex)
 {
-    iSqlDatabaseService->CreateStartupsTableInNotExists(roleIndex);
+    iSqlDatabaseService->CreateStartupsTableIfNotExists(roleIndex);
     iSqlDatabaseService->ClearStartupsTable(roleIndex);
     const QStringList currentRoleStartups(GetStatupsByIndex(roleIndex));
     for (const QString &exec :currentRoleStartups)

@@ -6,8 +6,8 @@
 
 #include "roledesktopservice.h"
 
-RoleDesktopService::RoleDesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
-    : DesktopService(terminal, sqlDatabaseService)
+RoleDesktopService::RoleDesktopService(ISqlDatabaseService *sqlDatabaseService)
+    : DesktopService(sqlDatabaseService)
 {
 
 }

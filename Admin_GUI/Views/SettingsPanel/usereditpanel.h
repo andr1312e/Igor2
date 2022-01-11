@@ -22,11 +22,11 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(const QString &userName, Terminal *terminal, QWidget *parent);
+    UserEditPanel(const QString &userName, QWidget *parent);
     ~UserEditPanel();
 
 private:
-    void InitServicesAndModel(Terminal *terminal);
+    void InitServicesAndModel();
     void CreateUI();
     void InsertWidgetsIntoLayout();
     void FillUI();
@@ -34,9 +34,9 @@ private:
     void ConnectObjects();
 
 Q_SIGNALS:
-    void ToDeleteUser(const QString &userId);
+    void ToDeleteUser(const QString &userId, const QString &userName);
     void ToRoleToViewChanged(const int &roleId);
-    void ToSaveUser(const QString&userId, const QString &FCS, const QString &rank, const int &oldRoleIndex, const int &newRoleIndex);
+    void ToSaveUser(const QString&userId, const QString&m_userName, const QString &FCS, const QString &rank, const int &oldRoleIndex, const int &newRoleIndex);
 
 private Q_SLOTS:
     void OnSaveUser();

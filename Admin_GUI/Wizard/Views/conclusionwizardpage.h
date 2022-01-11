@@ -9,11 +9,11 @@
 
 #include "Structs/userstruct.h"
 
-#include "Services/Settings/wizardservice.h"
-#include "Services/Settings/usersprogramiconmakingservice.h"
+#include "Admin_GUI/Wizard/Services/wizardservice.h"
+#include "Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h"
 
-#include "Admin_GUI/Views/Wizards/mywizardpage.h"
-#include "Admin_GUI/Views/Wizards/actions.h"
+#include "Admin_GUI/Wizard/Views/mywizardpage.h"
+#include "Admin_GUI/Wizard/Views/actions.h"
 
 class ConclusionWizardPage: public MyWizardPage
 {

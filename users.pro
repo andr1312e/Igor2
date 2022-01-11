@@ -25,29 +25,31 @@ DEFINES +=                 \
   QT_DEPRECATED_WARNINGS   \
   QT_USE_FAST_OPERATOR_PLUS\
   DQT_NO_URL_CAST_FROM_STRING\
+  QT_USE_STRING_BUILDER \
 
 
 SOURCES += \
     Admin_GUI/Validator/stringvalidator.cpp \
-    Admin_GUI/Views/Wizards/conclusionwizardpage.cpp \
-    Admin_GUI/Views/Wizards/intropage.cpp \
-    Admin_GUI/Views/Wizards/mywizardpage.cpp \
-    Admin_GUI/Views/Wizards/roleappswizardpage.cpp \
-    Admin_GUI/Views/Wizards/roleappswizardsubwidget.cpp \
-    Admin_GUI/Views/Wizards/userwizardpage.cpp \
-    Admin_GUI/Views/Wizards/userwizardwidget.cpp \
-    Admin_GUI/Views/Wizards/wizardnavigtionbar.cpp \
+    Admin_GUI/Wizard/Views/conclusionwizardpage.cpp \
+    Admin_GUI/Wizard/Views/intropage.cpp \
+    Admin_GUI/Wizard/Views/mywizardpage.cpp \
+    Admin_GUI/Wizard/Views/roleappswizardpage.cpp \
+    Admin_GUI/Wizard/Views/roleappswizardsubwidget.cpp \
+    Admin_GUI/Wizard/Views/userwizardpage.cpp \
+    Admin_GUI/Wizard/Views/userwizardwidget.cpp \
+    Admin_GUI/Wizard/Views/wizardnavigtionbar.cpp \
+    Admin_GUI/Wizard/Services/dependenciesserivce.cpp \
+    Admin_GUI/Wizard/Services/usersprogramiconmakingservice.cpp \
+    Admin_GUI/Wizard/Services/wizardservice.cpp \
+    Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.cpp \
+    Admin_GUI/Wizard/Repositories/usersettingsrepository.cpp \
     Admin_GUI/Views/topleftbar.cpp \
-    Services/Settings/dependenciesserivce.cpp \
-    Services/Settings/roleappsandstartupsettingsrepository.cpp \
-    Services/Settings/usersettingsrepository.cpp \
-    Services/Settings/usersprogramiconmakingservice.cpp \
-    Services/Settings/wizardservice.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
     Services/idesktopservice.cpp \
     Services/roledesktopservice.cpp \
     Services/userdesktopservice.cpp \
+    Styles/Frameless/windowtitlebar.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
@@ -92,31 +94,30 @@ SOURCES += \
     program.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     Styles/Frameless/framelesswindow.cpp \
-    Styles/Frameless/windowdragger.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp \
-    Admin_GUI/Views/Wizards/startupwizard.cpp \
+    Admin_GUI/Wizard/Views/startupwizard.cpp \
     tray.cpp
 
 HEADERS += \
     Admin_GUI/Validator/stringvalidator.h \
-    Admin_GUI/Views/Wizards/actions.h \
-    Admin_GUI/Views/Wizards/conclusionwizardpage.h \
-    Admin_GUI/Views/Wizards/intropage.h \
-    Admin_GUI/Views/Wizards/mywizardpage.h \
-    Admin_GUI/Views/Wizards/roleappswizardpage.h \
-    Admin_GUI/Views/Wizards/roleappswizardsubwidget.h \
-    Admin_GUI/Views/Wizards/userwizardpage.h \
-    Admin_GUI/Views/Wizards/userwizardwidget.h \
-    Admin_GUI/Views/Wizards/wizardnavigtionbar.h \
-    Admin_GUI/Views/Wizards/wizardpages.h \
+    Admin_GUI/Wizard/Views/actions.h \
+    Admin_GUI/Wizard/Views/conclusionwizardpage.h \
+    Admin_GUI/Wizard/Views/intropage.h \
+    Admin_GUI/Wizard/Views/mywizardpage.h \
+    Admin_GUI/Wizard/Views/roleappswizardpage.h \
+    Admin_GUI/Wizard/Views/roleappswizardsubwidget.h \
+    Admin_GUI/Wizard/Views/userwizardpage.h \
+    Admin_GUI/Wizard/Views/userwizardwidget.h \
+    Admin_GUI/Wizard/Views/wizardnavigtionbar.h \
+    Admin_GUI/Wizard/Views/wizardpages.h \
+    Admin_GUI/Wizard/Services/dependenciesserivce.h \
+    Admin_GUI/Wizard/Structs/programfilesstate.h \
+    Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.h \
+    Admin_GUI/Wizard/Repositories/usersettingsrepository.h \
+    Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h \
+    Admin_GUI/Wizard/Services/wizardservice.h \
     Admin_GUI/Views/topleftbar.h \
-    Services/Settings/dependenciesserivce.h \
-    Services/Settings/programfilesstate.h \
-    Services/Settings/roleappsandstartupsettingsrepository.h \
-    Services/Settings/usersettingsrepository.h \
-    Services/Settings/usersprogramiconmakingservice.h \
-    Services/Settings/wizardservice.h \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
     Services/Sql/sqldatabaseserivce.h \
@@ -125,6 +126,7 @@ HEADERS += \
     Services/userdesktopservice.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
+    Styles/Frameless/windowtitlebar.h \
     Styles/InteractiveButtons/closewindowbutton.h \
     Styles/InteractiveButtons/interactivebuttonbase.h \
     Styles/InteractiveButtons/maximizewindowbutton.h \
@@ -143,7 +145,6 @@ HEADERS += \
     Styles/MaterialWidgets/qtmaterialstatetransition.h \
     Styles/MaterialWidgets/qtmaterialstatetransitionevent.h \
     Styles/Frameless/framelesswindow.h \
-    Styles/Frameless/windowdragger.h \
     Admin_GUI/Model/usermodel.h \
     Admin_GUI/Model/sortmodel.h \
     Admin_GUI/Delegates/userdelegate.h \
@@ -180,7 +181,7 @@ HEADERS += \
     Server/dataHandler.h \
     functionswithstrings.h \
     program.h \
-    Admin_GUI/Views/Wizards/startupwizard.h \
+    Admin_GUI/Wizard/Views/startupwizard.h \
     tray.h
 
 *-g++* {

@@ -1,7 +1,7 @@
 #include "startuprepositoryservice.h"
 
-StartupRepositoryPresenter::StartupRepositoryPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
-    : m_terminal(terminal)
+StartupRepositoryPresenter::StartupRepositoryPresenter(ISqlDatabaseService *sqlDatabaseService)
+    : m_terminal(Terminal::GetTerminal())
     , m_sqlDatabaseService(sqlDatabaseService)
 {
 
@@ -14,7 +14,7 @@ StartupRepositoryPresenter::~StartupRepositoryPresenter()
 
 void StartupRepositoryPresenter::CheckStartupTable(const quint8 &roleId)
 {
-    m_sqlDatabaseService->CreateStartupsTableInNotExists(roleId);
+    m_sqlDatabaseService->CreateStartupsTableIfNotExists(roleId);
 }
 
 QStringList StartupRepositoryPresenter::GetAllStartups(const quint8 &roleId)
@@ -23,10 +23,10 @@ QStringList StartupRepositoryPresenter::GetAllStartups(const quint8 &roleId)
     return startupsList;
 }
 
-void StartupRepositoryPresenter::DeleteStartup(const quint8 &roleId, const QString &startupPath)
+void StartupRepositoryPresenter::DeleteStartup(const quint8 &roleId, const QString &startupName)
 {
-    m_sqlDatabaseService->RemoveStartupIntoRole(roleId, startupPath);
-    TryDeleteFile(startupPath);
+    m_sqlDatabaseService->RemoveStartupIntoRole(roleId, startupName);
+//    TryDeleteFile(m_destinationFolder+startupName);
 }
 
 void StartupRepositoryPresenter::AppendStartup(const quint8 &roleId, const QString &startupPath)
@@ -37,25 +37,25 @@ void StartupRepositoryPresenter::AppendStartup(const quint8 &roleId, const QStri
 
 void StartupRepositoryPresenter::TryDeleteFile(const QString &startupPath)
 {
-    if(m_terminal->IsFileExists(startupPath, "StartupRepositoryPresenter::DeleteStartup", true))
-    {
-        m_terminal->DeleteFileSudo(startupPath, "StartupRepositoryPresenter::DeleteStartup");
-    }
+//    if(m_terminal->IsFileExists(startupPath, Q_FUNC_INFO, true))
+//    {
+//        m_terminal->DeleteFileSudo(startupPath, Q_FUNC_INFO);
+//    }
 }
 
 void StartupRepositoryPresenter::TryToCopyFile(const QString &startupPath)
 {
     int index=startupPath.lastIndexOf('/');
     QString startupFileName=startupPath.mid(index);
-    if(m_terminal->IsDirNotExists(m_destinationFolder, "StartupRepositoryPresenter::AppendStartup", true))
+    if(m_terminal->IsDirNotExists(m_destinationFolder, Q_FUNC_INFO, true))
     {
-        m_terminal->CreateFolder(m_destinationFolder, "StartupRepositoryPresenter::AppendStartup", true);
+        m_terminal->CreateFolder(m_destinationFolder, Q_FUNC_INFO, true);
     }
-    if(m_terminal->IsFileExists(m_destinationFolder+startupFileName, "StartupRepositoryPresenter::AppendStartup", true))
+    if(m_terminal->IsFileExists(m_destinationFolder+startupFileName, Q_FUNC_INFO, true))
     {
-        m_terminal->DeleteFileSudo(m_destinationFolder+startupFileName, "StartupRepositoryPresenter::AppendStartup");
+        m_terminal->DeleteFileSudo(m_destinationFolder+startupFileName, Q_FUNC_INFO);
     }
-    m_terminal->CopyFileSudo(startupPath, m_destinationFolder, "StartupRepositoryPresenter::AppendStartup");
+    m_terminal->CopyFileSudo(startupPath, m_destinationFolder, Q_FUNC_INFO);
 }
 
 

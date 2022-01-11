@@ -10,7 +10,7 @@ class ISqlDatabaseService;
 class RoleDesktopService : public DesktopService
 {
 public:
-    RoleDesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+    RoleDesktopService(ISqlDatabaseService *sqlDatabaseService);
     ~RoleDesktopService();
 
 public:

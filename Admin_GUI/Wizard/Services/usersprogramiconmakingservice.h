@@ -10,7 +10,7 @@ class IconMaker : public QObject
 {
     Q_OBJECT
 public:
-    explicit IconMaker(const QString &destinationFolder, const QString &applicationName, LinuxUserService *service, QObject *parent);
+    explicit IconMaker(const QString &applicationName, const QString &destinationFolder , LinuxUserService *service, QObject *parent);
     ~IconMaker();
 
 public Q_SLOTS:
@@ -37,7 +37,7 @@ private:
     bool m_addIconToStartMenu;
 
 private:
-    const QString m_applicationName;
+    const QStringView m_applicationName;
     const QString m_destinationFolder;
     LinuxUserService* const m_linuxUserService;
     Terminal* const m_terminal;

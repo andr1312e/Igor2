@@ -1,7 +1,7 @@
 #include "kioskservice.h"
 
-KioskService::KioskService(Terminal *terminal)
-    : m_terminal(terminal)
+KioskService::KioskService()
+    : m_terminal(Terminal::GetTerminal())
 {
 }
 

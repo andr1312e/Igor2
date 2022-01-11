@@ -56,13 +56,13 @@ void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
     }
 }
 
-void SqlDatabaseSerivce::CreateStartupsTableInNotExists(quint8 roleId)
+void SqlDatabaseSerivce::CreateStartupsTableIfNotExists(int roleId)
 {
     QSqlQuery query;
     QString request="CREATE TABLE IF NOT EXISTS " + startupTablePrefix +QString::number(roleId)+
             " (id             SERIAL   PRIMARY KEY, "+
             startupPathCN + " VARCHAR(100) NOT NULL)";
-    if (query.exec(request.toLatin1()))
+    if (query.exec(request.toUtf8()))
     {
         return;
     }
@@ -73,7 +73,7 @@ void SqlDatabaseSerivce::CreateStartupsTableInNotExists(quint8 roleId)
     }
 }
 
-void SqlDatabaseSerivce::CreateDesktopRolesIfNotExists(quint8 roleId)
+void SqlDatabaseSerivce::CreateDesktopRolesIfNotExists(int roleId)
 {
     QSqlQuery query;
     if(query.exec("CREATE TABLE IF NOT EXISTS " + desktopTablePrefix +QString::number(roleId)+
@@ -240,13 +240,13 @@ void SqlDatabaseSerivce::ClearUsersTable()
     ClearTable(usersTablePrefix);
 }
 
-void SqlDatabaseSerivce::ClearStartupsTable(quint8 roleId)
+void SqlDatabaseSerivce::ClearStartupsTable(int roleId)
 {
     QSqlQuery query(*m_db);
     ClearTable(startupTablePrefix+QString::number(roleId));
 }
 
-void SqlDatabaseSerivce::ClearDesktopTable(quint8 roleId)
+void SqlDatabaseSerivce::ClearDesktopTable(int roleId)
 {
     QSqlQuery query(*m_db);
     ClearTable(desktopTablePrefix+QString::number(roleId));
@@ -287,7 +287,7 @@ bool SqlDatabaseSerivce::CheckStartupTables()
     return  true;
 }
 
-bool SqlDatabaseSerivce::CheckStartupTables(quint8 roleId)
+bool SqlDatabaseSerivce::CheckStartupTables(int roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
@@ -329,7 +329,7 @@ bool SqlDatabaseSerivce::CheckDesktopTables()
     return  true;
 }
 
-bool SqlDatabaseSerivce::CheckDesktopTables(quint8 roleId)
+bool SqlDatabaseSerivce::CheckDesktopTables(int roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
@@ -375,19 +375,20 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 }
 
 
-void SqlDatabaseSerivce::RemoveUserIntoTable(quint8 roleId,const User &user)
+void SqlDatabaseSerivce::RemoveUserIntoTable(int roleId,const User &user)
 {
     QSqlQuery query(*m_db);
-    query.prepare("DELETE FROM " + startupTablePrefix + QString::number(roleId) +
-                  " WHERE" + userIdCN +"='?'");
-    query.bindValue(0, user.userId);
+    const QString request="DELETE FROM " + startupTablePrefix + QString::number(roleId) +
+                  " WHERE" + userIdCN +"=\'"+ user.userId +"\'";
+    query.prepare(request);
     if(query.exec())
     {
         return;
     }
     else
     {
-        qFatal("Can't delete user from dataBase");
+        qDebug()<< query.lastError();
+        qFatal("%s", QStringLiteral("Не возможно удалить пользователя с бд").toUtf8().constData());
     }
 }
 
@@ -426,7 +427,7 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
     return userList;
 }
 
-void SqlDatabaseSerivce::AppendStartupIntoRole(quint8 roleId, const QString &exec)
+void SqlDatabaseSerivce::AppendStartupIntoRole(int roleId, const QString &exec)
 {
     QSqlQuery query(*m_db);
     QString request="INSERT INTO "+ startupTablePrefix+QString::number(roleId)+
@@ -444,7 +445,7 @@ void SqlDatabaseSerivce::AppendStartupIntoRole(quint8 roleId, const QString &exe
     }
 }
 
-QStringList SqlDatabaseSerivce::GetAllRoleStartups(quint8 roleId)
+QStringList SqlDatabaseSerivce::GetAllRoleStartups(int roleId)
 {
     QSqlQueryModel sqlQueryModel(this);
     QStringList listOfStartups;
@@ -477,13 +478,13 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(quint8 roleId)
     return listOfStartups;
 }
 
-void SqlDatabaseSerivce::RemoveStartupIntoRole(quint8 roleId, const QString &startupPath)
+void SqlDatabaseSerivce::RemoveStartupIntoRole(int roleId, const QString &startupPath)
 {
 
     QSqlQuery query;
-    query.prepare("DELETE FROM "+ startupTablePrefix + QString::number(roleId) +
-                  " WHERE "+ startupPathCN +"='?'");
-    query.bindValue(0, startupPath);
+    const QString request="DELETE FROM "+ startupTablePrefix + QString::number(roleId) +
+                  " WHERE "+ startupPathCN +"=\'"+ startupPath+ "\'";
+    query.prepare(request);
     if(query.exec())
     {
         return;
@@ -494,7 +495,7 @@ void SqlDatabaseSerivce::RemoveStartupIntoRole(quint8 roleId, const QString &sta
     }
 }
 
-void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity &entity)
+void SqlDatabaseSerivce::AppendDesktopIntoRole(int roleId,const DesktopEntity &entity)
 {
     QSqlQuery query(*m_db);
     QString request="INSERT INTO "+ desktopTablePrefix+QString::number(roleId)+
@@ -517,23 +518,25 @@ void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity
     }
 }
 
-void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, const QString &entityName)
+void SqlDatabaseSerivce::RemoveDesktopIntoRole(int roleId, const QString &entityName)
 {
     QSqlQuery query(*m_db);
-    query.prepare("DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
-                  "WHERE "+ desktopNameCN +"='?'");
-    query.bindValue(0, entityName);
+
+    QString request="DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
+            " WHERE "+ desktopNameCN +"=\'" + entityName + "\'";
+    query.prepare(request);
     if(query.exec())
     {
         return;
     }
     else
     {
+        qDebug()<< query.lastError();
         qFatal("Cant delete desktop from table");
     }
 }
 
-QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
+QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(int roleId)
 {
     QList<DesktopEntity> listOfExecs;
     QSqlQueryModel sqlQueryModel(this);
@@ -569,7 +572,7 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
     return listOfExecs;
 }
 
-QStringList SqlDatabaseSerivce::GetAllUsersWithRoleId(quint8 roleId)
+QStringList SqlDatabaseSerivce::GetAllUsersWithRoleId(int roleId)
 {
     Q_ASSERT(roleId>=0 && roleId<Roles.count());
     QSqlQueryModel sqlQueryModel(this);

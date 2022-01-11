@@ -9,7 +9,7 @@ class StartupRepositoryPresenter
 {
 public:
 
-    StartupRepositoryPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+    StartupRepositoryPresenter(ISqlDatabaseService *sqlDatabaseService);
 
     ~StartupRepositoryPresenter();
 
@@ -17,7 +17,7 @@ public:
 
     QStringList GetAllStartups(const quint8 &roleId);
 
-    void DeleteStartup(const quint8 &roleId, const QString &startupPath);
+    void DeleteStartup(const quint8 &roleId, const QString &startupName);
 
     void AppendStartup(const quint8 &roleId, const QString &startupPath);
 

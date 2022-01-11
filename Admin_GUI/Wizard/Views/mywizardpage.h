@@ -5,7 +5,7 @@
 #include <QWizardPage>
 #include <QPushButton>
 
-#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
+#include "Admin_GUI/Wizard/Views/wizardnavigtionbar.h"
 
 class MyWizardPage: public QWizardPage
 {

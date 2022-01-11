@@ -17,12 +17,12 @@ class RoleEditPanel : public QWidget
 
 public:
 
-   RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService,  QWidget *parent);
+   RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService,  QWidget *parent);
 
    ~RoleEditPanel();
 
 private:
-   void CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService);
+   void CreateUI(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService);
    void InsertWidgetsIntoLayout();
    void FillUI();
    void ConnectObjects();

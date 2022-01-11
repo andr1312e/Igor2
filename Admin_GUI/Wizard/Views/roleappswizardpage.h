@@ -9,11 +9,11 @@
 #include <QTableWidget>
 #include <QComboBox>
 
-#include "Services/Settings/wizardservice.h"
+#include "Admin_GUI/Wizard/Services/wizardservice.h"
 
-#include "Admin_GUI/Views/Wizards/mywizardpage.h"
-#include "Admin_GUI/Views/Wizards/actions.h"
-#include "Admin_GUI/Views/Wizards/roleappswizardsubwidget.h"
+#include "Admin_GUI/Wizard/Views/mywizardpage.h"
+#include "Admin_GUI/Wizard/Views/actions.h"
+#include "Admin_GUI/Wizard/Views/roleappswizardsubwidget.h"
 
 class RoleAppsWizardPage : public MyWizardPage
 {

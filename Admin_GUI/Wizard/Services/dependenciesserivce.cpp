@@ -1,7 +1,7 @@
 #include "dependenciesserivce.h"
 
-DependenciesService::DependenciesService(Terminal * const terminal)
-    : m_terminal(terminal)
+DependenciesService::DependenciesService()
+    : m_terminal(Terminal::GetTerminal())
     , m_dependenciesList(new QStringList())
 {
 

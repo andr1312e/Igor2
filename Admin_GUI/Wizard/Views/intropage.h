@@ -9,13 +9,13 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 
-#include "Services/Settings/wizardservice.h"
-#include "Services/Settings/programfilesstate.h"
-#include "Services/Settings/dependenciesserivce.h"
+#include "Admin_GUI/Wizard/Services/wizardservice.h"
+#include "Admin_GUI/Wizard/Structs/programfilesstate.h"
+#include "Admin_GUI/Wizard/Services/dependenciesserivce.h"
 
-#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
-#include "Admin_GUI/Views/Wizards/wizardpages.h"
-#include "Admin_GUI/Views/Wizards/mywizardpage.h"
+#include "Admin_GUI/Wizard/Views/wizardnavigtionbar.h"
+#include "Admin_GUI/Wizard/Views/wizardpages.h"
+#include "Admin_GUI/Wizard/Views/mywizardpage.h"
 
 class IntroPage : public MyWizardPage
 {

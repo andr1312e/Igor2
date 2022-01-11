@@ -10,23 +10,14 @@
 class LinuxUserService
 {
 public:
-
-    LinuxUserService(Terminal *terminal);
-
+    LinuxUserService();
     ~LinuxUserService();
-
     void GetAllUsersWithIdInSystem();
-
     const QList<QPair<QString, QString>>& GetSystemUsersNamesWithIdsList(){ return m_users;}
 
-    Terminal* GetTerminal() {return m_terminal;}
-
 public:
-
     const QString GetCurrentUserName();
-
     const QString GetCurrentUserId();
-
     bool HasCurrentUserAdminPrivileges();
 
 private:
@@ -37,11 +28,11 @@ private:
 
     void RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
 
-    static bool IsUserSystem(int &userIdNumber);
+    static bool IsUserSystem(const int &userIdNumber);
 
 private:
 
-    Terminal *m_terminal;
+    Terminal * const m_terminal;
 
     QList<QPair<QString, QString>> m_users;
 

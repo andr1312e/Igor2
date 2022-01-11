@@ -3,8 +3,8 @@
 
 #include "Services/idesktopservice.h"
 
-DesktopService::DesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
-    : m_terminal (terminal)
+DesktopService::DesktopService(ISqlDatabaseService *sqlDatabaseService)
+    : m_terminal (Terminal::GetTerminal())
     , m_sqlDatabaseService(sqlDatabaseService)
     , m_fileModel(new QStandardItemModel())
 {

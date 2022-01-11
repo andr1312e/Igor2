@@ -22,11 +22,11 @@ class LinuxUsersListWidget : public QWidget
    Q_OBJECT
 public:
 
-   LinuxUsersListWidget(ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
+   LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
    ~LinuxUsersListWidget();
 
 private:
-   void CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+   void SetModel(UserModel *userModel);
    void CreateProxyModel();
    void CreateUI();
    void InsertWidgetsIntoLayout();
@@ -44,11 +44,6 @@ private Q_SLOTS:
    void OnComboBoxChange(const QString &attribute);
    void GetUserData(const QModelIndex &index);
 
-public:
-   void SetDelegateView(bool state);
-   void DeleteUser(const QString &userId);
-   void AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role);
-
 private:
    void UpdateFontSize();
 
@@ -61,7 +56,7 @@ private:
 
 private:
 
-   UserModel *m_userModel;
+   const UserModel *m_userModel;
    SortModel *m_sortModel;
 
 private:

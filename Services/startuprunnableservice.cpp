@@ -2,12 +2,12 @@
 #include <QDebug>
 #include <QFile>
 
-StartupRunnableManager::StartupRunnableManager(const QString &currentUserName, const QString &rlstiFolderPath, ISqlDatabaseService *sqlService, Terminal *terminal, QObject *parent)
+StartupRunnableManager::StartupRunnableManager(const QString &currentUserName, QStringView rlstiFolderPath, ISqlDatabaseService *sqlService, QObject *parent)
     : QObject(parent)
     , m_currentUserName(currentUserName)
     , m_rlsTiFolderPath(rlstiFolderPath)
     , m_sqlService(sqlService)
-    , m_terminal(terminal)
+    , m_terminal(Terminal::GetTerminal())
 {
 
 }

@@ -1,8 +1,9 @@
 #include "userdesktopservice.h"
 #include <QDebug>
 
-UserDesktopService::UserDesktopService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
-    : DesktopService(terminal, sqlDatabaseService)
+UserDesktopService::UserDesktopService(ISqlDatabaseService *sqlDatabaseService)
+    : DesktopService(sqlDatabaseService)
+    , m_desktopFileType(".desktop")
 {
 
 }
@@ -39,14 +40,14 @@ void UserDesktopService::DeleteIconToUser(const QString &userName, const QString
     UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
 }
 
-void UserDesktopService::DeleteAllIconsToUser(const quint8 &roleId, const QString &userName)
+void UserDesktopService::DeleteAllIconsToUser(const int &roleId, const QString &userName)
 {
     const QString userDesktopPath = GetUserDesktopPath(userName);
     CheckPath(userDesktopPath);
     const QList<DesktopEntity> entities=m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     for (const DesktopEntity &entity : entities)
     {
-        DeleteIcon(userDesktopPath+entity.name);
+        DeleteIcon(userDesktopPath+entity.name+m_desktopFileType);
     }
 }
 

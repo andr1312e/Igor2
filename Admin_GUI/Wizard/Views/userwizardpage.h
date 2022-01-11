@@ -11,18 +11,19 @@
 #include <QSizePolicy>
 #include <QPushButton>
 
-#include "Services/Settings/programfilesstate.h"
-#include "Services/Settings/usersettingsrepository.h"
-#include "Services/Settings/wizardservice.h"
+#include "Admin_GUI/Wizard/Structs/programfilesstate.h"
+#include "Admin_GUI/Wizard/Repositories/usersettingsrepository.h"
 
-#include "Admin_GUI/Views/Wizards/wizardpages.h"
+#include "Admin_GUI/Wizard/Services/wizardservice.h"
+
+#include "Admin_GUI/Wizard/Views/wizardpages.h"
 #include "Admin_GUI/Validator/stringvalidator.h"
 
 
-#include "Admin_GUI/Views/Wizards/wizardnavigtionbar.h"
-#include "Admin_GUI/Views/Wizards/actions.h"
-#include "Admin_GUI/Views/Wizards/userwizardwidget.h"
-#include "Admin_GUI/Views/Wizards/mywizardpage.h"
+#include "Admin_GUI/Wizard/Views/wizardnavigtionbar.h"
+#include "Admin_GUI/Wizard/Views/actions.h"
+#include "Admin_GUI/Wizard/Views/userwizardwidget.h"
+#include "Admin_GUI/Wizard/Views/mywizardpage.h"
 
 class UserWizardPage: public MyWizardPage
 {

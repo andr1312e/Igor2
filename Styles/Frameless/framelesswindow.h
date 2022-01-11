@@ -10,7 +10,7 @@
 #include "Styles/InteractiveButtons/maximizewindowbutton.h"
 #include "Styles/InteractiveButtons/restorewindowbutton.h"
 #include "Styles/InteractiveButtons/closewindowbutton.h"
-#include "Styles/Frameless/windowdragger.h"
+#include "Styles/Frameless/windowtitlebar.h"
 
 class FramelessWindow : public QWidget
 {

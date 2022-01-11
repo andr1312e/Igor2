@@ -54,7 +54,7 @@ public:
 
 public:
     virtual void CreateUsersTableIfNotExists() Q_DECL_OVERRIDE;
-    virtual void CreateStartupsTableInNotExists(int roleId) Q_DECL_OVERRIDE;
+    virtual void CreateStartupsTableIfNotExists(int roleId) Q_DECL_OVERRIDE;
     virtual void CreateDesktopRolesIfNotExists(int roleId) Q_DECL_OVERRIDE;
 
 public:

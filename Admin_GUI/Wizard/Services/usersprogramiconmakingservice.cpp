@@ -1,6 +1,6 @@
 #include "usersprogramiconmakingservice.h"
 
-IconMaker::IconMaker(const QString &destinationFolder, const QString &applicationName, LinuxUserService *service, QObject *parent)
+IconMaker::IconMaker(const QString &applicationName, const QString &destinationFolder, LinuxUserService *service, QObject *parent)
     : QObject(parent)
     , m_addIconToDesktopToCurrentUser(false)
     , m_addIconToDesktopToAllUsers(false)
@@ -8,7 +8,7 @@ IconMaker::IconMaker(const QString &destinationFolder, const QString &applicatio
     , m_applicationName(applicationName)
     , m_destinationFolder(destinationFolder)
     , m_linuxUserService(service)
-    , m_terminal(service->GetTerminal())
+    , m_terminal(Terminal::GetTerminal())
 {
 
 }
@@ -92,7 +92,7 @@ void IconMaker::AddIconToStartMenu()
     const QString directoryIconFilePath=rlsTiStartupFolderPath+".directory";
     m_terminal->CreateFile(directoryIconFilePath, Q_FUNC_INFO, true);
 
-    QString iconString="[Desktop Entry]\nName=Group\nName[ru]=РЛС ТИ Программы\nType=Directory\nNoDisplay=false\nIcon=preferences-desktop-locale\nIcon[ru]=preferences-desktop-locale\nHidden=false";
+    QString iconString=QStringLiteral("[Desktop Entry]\nName=Group\nName[ru]=РЛС ТИ Программы\nType=Directory\nNoDisplay=false\nIcon=preferences-desktop-locale\nIcon[ru]=preferences-desktop-locale\nHidden=false");
     m_terminal->WriteTextToFileSudo(iconString.toUtf8(), directoryIconFilePath, Q_FUNC_INFO);
 
     const QString syncProgramIconFilePath=rlsTiStartupFolderPath+m_iconName;

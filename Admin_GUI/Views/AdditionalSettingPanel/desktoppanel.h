@@ -51,7 +51,6 @@ private Q_SLOTS:
 public:
    void SetUser(const User &user);
    void SetRoleId(const quint8 &roleId);//userName || role
-   void DeleteUserAllRoleIcons();
 private:
    bool IsUserData();
 private:

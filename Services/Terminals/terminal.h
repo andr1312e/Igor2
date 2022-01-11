@@ -9,11 +9,15 @@
 class Terminal
 {
 public:
+    static Terminal* GetTerminal();
 
+private:
    Terminal();
 
+public:
    ~Terminal();
 
+public:
    QString RunConsoleCommand(const QString &command, QString calledFunc);
 
    QStringList GetAllUsersList(const QString calledFunc);
@@ -95,6 +99,8 @@ private:
    QString CreateInstallPackageCommandSudo(const QString &packageName) const;
 
 private:
+
+   static Terminal* m_terminal;
 
    QProcess* const m_process;
 

@@ -23,11 +23,11 @@ class StartupPanel : public QWidget
    Q_OBJECT
 
 public:
-   StartupPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
+   StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
    ~StartupPanel();
 
 private:
-   void CreateServices(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
+   void CreateServices(ISqlDatabaseService *sqlDatabaseService);
    void SetBackGroundColor();
    void CreateUI();
    void CreateModel();

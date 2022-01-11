@@ -1,11 +1,11 @@
 #include <QDebug>
 #include "usereditpanel.h"
 
-UserEditPanel::UserEditPanel(const QString &userName, Terminal *terminal, QWidget *parent)
+UserEditPanel::UserEditPanel(const QString &userName, QWidget *parent)
     : QWidget(parent)
     , m_currentUserName(userName)
 {
-    InitServicesAndModel(terminal);
+    InitServicesAndModel();
     CreateUI();
     InsertWidgetsIntoLayout();
     FillUI();
@@ -41,9 +41,9 @@ UserEditPanel::~UserEditPanel()
     delete m_messagBox;
 }
 
-void UserEditPanel::InitServicesAndModel(Terminal *terminal)
+void UserEditPanel::InitServicesAndModel()
 {
-    m_kioskService=new KioskService(terminal);
+    m_kioskService=new KioskService();
 }
 
 void UserEditPanel::CreateUI()
@@ -163,7 +163,7 @@ void UserEditPanel::OnSaveUser()
     {
         const QString rank=m_rankComboBox->currentText();
         const int roleIndex=m_roleComboBox->currentIndex();
-        Q_EMIT ToSaveUser(m_userId, FCS, rank, m_oldRoleIndex, roleIndex);
+        Q_EMIT ToSaveUser(m_userId, m_userName, FCS, rank, m_oldRoleIndex, roleIndex);
         m_oldRoleIndex=roleIndex;
         ShowSaveUserToast(m_userName);
     }
@@ -176,7 +176,7 @@ void UserEditPanel::OnDeleteUser()
         m_rankComboBox->setCurrentIndex(0);
         m_FCSLineEdit->clear();
         m_roleComboBox->setCurrentIndex(0);
-        Q_EMIT ToDeleteUser(m_userId);
+        Q_EMIT ToDeleteUser(m_userId, m_userName);
     }
 }
 

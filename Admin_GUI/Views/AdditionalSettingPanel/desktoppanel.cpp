@@ -144,6 +144,7 @@ void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, co
     entity.exec=exec;
     entity.icon=iconPath;
     entity.name=iconName;
+    entity.type="Application";
     if(IsUserData())
     {
         m_userDesktopService->AddIconToUser(m_userName, entity);
@@ -207,22 +208,6 @@ void DesktopPanel::SetRoleId(const quint8 &roleId)
         m_addProgramButton->setEnabled(true);
         m_deleteProgramButton->setDisabled(true);
         m_roleDesktopService->GetAllRoleDesktops(roleId);
-    }
-}
-
-void DesktopPanel::DeleteUserAllRoleIcons()
-{
-    if(IsUserData())
-    {
-        if(m_roleId>=0 && m_roleId<Roles.count())
-        {
-            m_userDesktopService->DeleteAllIconsToUser(m_roleId, m_userName);
-        }
-    }
-    else
-    {
-        qDebug()<< QStringLiteral("Невозможно для виджета роли удалить все иконки с параметром пользователя").toUtf8();
-        qFatal(Q_FUNC_INFO);
     }
 }
 

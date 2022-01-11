@@ -16,7 +16,7 @@
 
 #include "tray.h"
 #include "Admin_GUI/Views/admingui.h"
-#include "Admin_GUI/Views/Wizards/startupwizard.h"
+#include "Admin_GUI/Wizard/Views/startupwizard.h"
 
 #include "User_GUI/User_GUI.h"
 
@@ -28,62 +28,55 @@ class Program : public QApplication
    Q_OBJECT
 public:
    explicit Program(int &argc, char **argv);
-   virtual ~Program();
+   ~Program();
    bool HasNoRunningInscance();
-   void CreateApp();
+   void CreateAndRunApp();
 
 private:
-   void InitTerminal();
-   void InitPackages();
-   void InitUserService();
-   void InitSqlService();
+   void ConnectToDatabase();
    void GetCurrentUserNameIdAndAdminPriviliges();
 
    LoadingState GetProgramState();
 
    void ProcessDataLoading(const LoadingState &state);
-   void InitStyle();
-   void InitTrayIcon();
+   void InitStyleChanger();
    void InitFramelessWindow();
    void StartSettingsWizard(const LoadingState &state);
 
+private:
+   void UserLoading();
+
 private Q_SLOTS:
-   void OnContinueLoading();
+   void OnFullLoading();
 
 public:
-   void InitRunnableService();
-   bool AllAppsRunned();
+   bool AllAppsRunnedWell();
    void GetAllUsersWithIdInSystem();
    void InitRarmSocket();
    void InitAdminUI();
-   void ConnectObjects();
+   void ConnectUserObjects();
+   void ConnectAdminObjects();
 
 private:
    bool CanGetAdminAccess();
 private:
    const QString m_rlstiFolder;
-   QString m_currentUserId;
-   QString m_currentUserName;
+   QSharedMemory* const m_sharedMemory;
+   Terminal* const m_terminal;
+   LinuxUserService* const m_linuxUserService;
+   const QString m_currentUserName;
+   const QString m_currentUserId;
 
-   QSharedMemory *m_sharedMemory;
+   SqlDatabaseSerivce* const m_sqlDatabaseService;
+   StartupRunnableManager *m_startupRunnableService;
 
-   QString m_userDBPath;
-
-   Terminal *m_terminal;
-   LinuxUserService *m_linuxUserService;
+   Tray* const m_tray;
 
    StartupWizard *m_startupWizard;
-
-   SqlDatabaseSerivce *m_sqlDatabaseService;
-   StartupRunnableManager *m_startupRunnableService;
    SocketToRarm *m_socketToRarm;
-
-   Tray *m_tray;
    Admin_GUI *m_AdminGui;
-
    FramelessWindow *m_framelessWindow;
 
    StyleChanger *m_styleChanger;
-
 };
 #endif // PROGRAM_H
