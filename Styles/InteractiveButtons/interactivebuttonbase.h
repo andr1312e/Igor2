@@ -15,7 +15,6 @@
 #include <QBitmap>
 #include <QtMath>
 
-#define PI 3.1415926
 #define GOLDEN_RATIO 0.618
 
 #define DOUBLE_PRESS_INTERVAL 300
@@ -45,9 +44,9 @@ class InteractiveButtonBase : public QPushButton
     Q_PROPERTY(bool fixed_fore_pos READ getFixedTextPos WRITE setFixedTextPos)                  // 是否固定前景位置（false）
     Q_PROPERTY(bool text_dynamic_size READ getTextDynamicSize WRITE setTextDynamicSize)         // 修改字体大小时调整按钮最小尺寸（false）
     Q_PROPERTY(bool leave_after_clicked READ getLeaveAfterClick WRITE setLeaveAfterClick)       // 鼠标单击松开后取消悬浮效果（针对菜单、弹窗）
-    Q_PROPERTY(bool show_animation READ getShowAni WRITE setShowAni)                            // 是否启用出现动画（鼠标移开则消失）（false）
-    Q_PROPERTY(bool water_animation READ getWaterRipple WRITE setWaterRipple)                   // 是否启用点击水波纹动画（否则使用渐变）（true）
-    Q_PROPERTY(int font_size READ getFontSizeT WRITE setFontSizeT)                              // 动：按钮字体动画效果（自动，不应该设置）
+    Q_PROPERTY(bool isShowAnimation READ getShowAni WRITE setShowAni)                            // 是否启用出现动画（鼠标移开则消失）（false）
+    Q_PROPERTY(bool waterAnimation READ getWaterRipple WRITE setWaterRipple)                   // 是否启用点击水波纹动画（否则使用渐变）（true）
+    Q_PROPERTY(int fontSize READ getFontSizeT WRITE setFontSizeT)                              // 动：按钮字体动画效果（自动，不应该设置）
 public:
     InteractiveButtonBase(QWidget *parent = nullptr);
     InteractiveButtonBase(QString text, QWidget *parent = nullptr);
@@ -221,8 +220,8 @@ public:
     bool getFixedTextPos() { return fixed_fore_pos; }
     bool getTextDynamicSize() { return text_dynamic_size; }
     bool getLeaveAfterClick() { return leave_after_clicked; }
-    bool getShowAni() { return show_animation; }
-    bool getWaterRipple() { return water_animation; }
+    bool getShowAni() { return isShowAnimation; }
+    bool getWaterRipple() { return waterAnimation; }
 
     virtual bool inArea(QPoint point);
     virtual bool inArea(QPointF point);
@@ -239,7 +238,7 @@ protected:
     virtual void changeEvent(QEvent *event) Q_DECL_OVERRIDE;
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
-    virtual QPainterPath getBgPainterPath();
+    virtual QPainterPath GetBackGroundPainterPath();
     virtual QPainterPath getWaterPainterPath(Water water);
     virtual void drawIconBeforeText(QPainter &painter, QRect icon_rect);
 
@@ -263,7 +262,7 @@ protected:
     double getNolinearProg(int p, NolinearType type);
     QIcon::Mode getIconMode();
 
-signals:
+Q_SIGNALS:
     void showAniFinished();
     void hideAniFinished();
     void pressAppearAniFinished();
@@ -283,10 +282,10 @@ signals:
     void signalMouseRelease(QMouseEvent *event);
     void signalMouseReleaseLater(QMouseEvent *event);
 
-public slots:
+public Q_SLOTS:
     virtual void anchorTimeOut();
     virtual void slotClicked();
-    void slotCloseState();
+    void OnCloseState();
 
 protected:
     PaintModel model;
@@ -297,11 +296,11 @@ protected:
     EdgeVal fore_paddings;
 
 protected:
-    // 总体开关
+
     bool self_enabled, parent_enabled, fore_enabled; // 是否启用子类、启动父类、绘制子类前景
 
     // 出现前景的动画
-    bool show_animation, show_foreground;
+    bool isShowAnimation, isShowForeground;
     bool show_ani_appearing, show_ani_disappearing;
     int show_duration;
     qint64 show_timestamp, hide_timestamp;
@@ -331,7 +330,7 @@ protected:
     int icon_text_padding, icon_text_size;           // 图标+文字模式共存时，两者间隔、图标大小
     int border_width;
     int radius_x, radius_y;
-    int font_size;
+    int fontSize;
     bool fixed_fore_pos;    // 鼠标进入时是否固定文字位置
     bool fixed_fore_size;   // 鼠标进入/点击时是否固定前景大小
     bool text_dynamic_size; // 设置字体时自动调整最小宽高
@@ -354,7 +353,7 @@ protected:
     int jitter_duration; // 抖动一次，多次效果叠加
 
     // 鼠标按下水波纹动画效果
-    bool water_animation; // 是否开启水波纹动画
+    bool waterAnimation; // 是否开启水波纹动画
     QList<Water> waters;
     int water_press_duration, water_release_duration, water_finish_duration;
     int water_radius;

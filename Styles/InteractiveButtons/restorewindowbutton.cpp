@@ -11,7 +11,8 @@ RestoreWindowButton::RestoreWindowButton(QWidget* parent)
     , m_bottomRight(new QPoint())
     , m_points(new std::array<QPoint, 5>())
 {
-    initGeometry();
+
+    InitGeometry();
     setUnifyGeomerey(true);
 }
 
@@ -31,18 +32,20 @@ RestoreWindowButton::~RestoreWindowButton()
 void RestoreWindowButton::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
+
+    if (!isShowForeground) return ;
+
+    int width = _w, h = _h;
+    int dx = offset_pos.x(), dy = offset_pos.y();
+    m_br->setRect(_l+width/3+dx, _t+h/3+dy, width/3, h/3);
+
     m_painter=new QPainter(this);
     m_painter->setPen(*m_pen);
-    if (!show_foreground) return ;
-
-    int w = _w, h = _h;
-    int dx = offset_pos.x(), dy = offset_pos.y();
-    m_br->setRect(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
 //    m_painter->begin(this);
     m_painter->drawRect(*m_br);
 
     dx /= 2; dy /= 2;
-    int l = _l+w*4/9+dx, t = _t+h*2/9+dy, r = _l+w*7/9+dx, b = _t+h*5/9+dy;
+    int l = _l+width*4/9+dx, t = _t+h*2/9+dy, r = _l+width*7/9+dx, b = _t+h*5/9+dy;
     m_topLeft->setX(l);
     m_topLeft->setY(t);
 
@@ -120,7 +123,7 @@ QSize RestoreWindowButton::sizeHint() const
     return *m_buttonSize;
 }
 
-void RestoreWindowButton::initGeometry()
+void RestoreWindowButton::InitGeometry()
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setUnifyGeomerey(true);

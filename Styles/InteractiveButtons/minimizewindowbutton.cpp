@@ -22,7 +22,7 @@ MinimizeWindowButton::~MinimizeWindowButton()
 
 void MinimizeWindowButton::paintEvent(QPaintEvent* event)
 {
-    if (show_foreground)
+    if (isShowForeground)
     {
         InteractiveButtonBase::paintEvent(event);
         QPainter *m_painter=new QPainter(this);

@@ -38,7 +38,7 @@ bool SqlDatabaseSerivce::ConnectToDataBase(const QString &hostName, const quint1
 void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
 {
     QSqlQuery query;
-    if (query.exec("CREATE TABLE IF NOT EXISTS " + usersTableName +
+    if (query.exec("CREATE TABLE IF NOT EXISTS " + usersTablePrefix +
                    " (id        SERIAL    PRIMARY KEY, "+
                    userIdCN  +" VARCHAR(100) NOT NULL, "+
                    userNameCN+" VARCHAR(100) NOT NULL, "+
@@ -95,7 +95,7 @@ QStringList SqlDatabaseSerivce::GetAdminsRoleUserName()
 {
     QStringList adminsUserNameList;
     QSqlQuery query;
-    query.prepare("SELECT "+ userNameCN + " FROM " + usersTableName+
+    query.prepare("SELECT "+ userNameCN + " FROM " + usersTablePrefix+
                   " WHERE " + rankCN + " = '" + Roles.at(Roles.count()-1) + "'"
                   );
     if(query.exec())
@@ -122,7 +122,7 @@ QStringList SqlDatabaseSerivce::GetAdminsRoleUserName()
 QString SqlDatabaseSerivce::GetUserFCS(const QString &currentUserName)
 {
     QSqlQuery query;
-    query.prepare("SELECT " + fcsCN+ " FROM "+ usersTableName+
+    query.prepare("SELECT " + fcsCN+ " FROM "+ usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName.simplified());
     if(query.exec())
@@ -153,7 +153,7 @@ QString SqlDatabaseSerivce::GetUserFCS(const QString &currentUserName)
 QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
 {
     QSqlQuery query;
-    query.prepare("SELECT " + rankCN+ " FROM "+ usersTableName+
+    query.prepare("SELECT " + rankCN+ " FROM "+ usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName);
     if(query.exec())
@@ -184,7 +184,7 @@ QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
 int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
 {
     QSqlQuery query;
-    query.prepare("SELECT " + roleCN+ " FROM "+ usersTableName+
+    query.prepare("SELECT " + roleCN+ " FROM "+ usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName);
     if(query.exec())
@@ -237,7 +237,7 @@ void SqlDatabaseSerivce::ClearTable(QString tableName)
 
 void SqlDatabaseSerivce::ClearUsersTable()
 {
-    ClearTable(usersTableName);
+    ClearTable(usersTablePrefix);
 }
 
 void SqlDatabaseSerivce::ClearStartupsTable(quint8 roleId)
@@ -255,7 +255,7 @@ void SqlDatabaseSerivce::ClearDesktopTable(quint8 roleId)
 bool SqlDatabaseSerivce::CheckUsersTable()
 {
     QSqlQuery query(*m_db);
-    query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + usersTableName+ "')");
+    query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + usersTablePrefix+ "')");
     if(query.exec())
     {
         return  GetBoolFromMessage(query);
@@ -354,10 +354,10 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 {
     QSqlQuery query(*m_db);
     QString request=
-            "DO $$ BEGIN IF EXISTS(SELECT * FROM " + usersTableName+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
-            "UPDATE " + usersTableName+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
+            "DO $$ BEGIN IF EXISTS(SELECT * FROM " + usersTablePrefix+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
+            "UPDATE " + usersTablePrefix+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
             "ELSE "
-            "INSERT INTO " + usersTableName+ " (" +userIdCN + ", " +userNameCN + ", "+ fcsCN + ", "+ rankCN + ", "+ roleCN + ") "+
+            "INSERT INTO " + usersTablePrefix+ " (" +userIdCN + ", " +userNameCN + ", "+ fcsCN + ", "+ rankCN + ", "+ roleCN + ") "+
             "VALUES ('"+ user.userId+ "',  '"+ user.name+ "', '"+ user.FCS+ "', '"+ user.rank+ "',  "+ QString::number(user.role)+ ");  "
                                                                                                                                    "END IF; "
                                                                                                                                    "END $$; ";
@@ -396,7 +396,7 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
     QSqlQueryModel sqlQueryModel(this);
     QList<User> userList;
     QSqlQuery query(*m_db);
-    QString request="SELECT "+ userIdCN +" , "+ userNameCN +" , "+ fcsCN +" , "+ rankCN +" , "+ roleCN +" FROM "+usersTableName;
+    QString request="SELECT "+ userIdCN +" , "+ userNameCN +" , "+ fcsCN +" , "+ rankCN +" , "+ roleCN +" FROM "+usersTablePrefix;
     query.prepare(request);
 
     if(query.exec()){
@@ -517,12 +517,12 @@ void SqlDatabaseSerivce::AppendDesktopIntoRole(quint8 roleId,const DesktopEntity
     }
 }
 
-void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity)
+void SqlDatabaseSerivce::RemoveDesktopIntoRole(quint8 roleId, const QString &entityName)
 {
     QSqlQuery query(*m_db);
     query.prepare("DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
                   "WHERE "+ desktopNameCN +"='?'");
-    query.bindValue(0, entity.name);
+    query.bindValue(0, entityName);
     if(query.exec())
     {
         return;
@@ -546,7 +546,7 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
         qDebug()<<sqlQueryModel.rowCount();
         if(sqlQueryModel.columnCount()==4)
         {
-            for(int i = 0; i < sqlQueryModel.rowCount(); i++)
+            for(int i = 0; i < sqlQueryModel.rowCount(); ++i)
             {
                 DesktopEntity entity;
                 GetStringFromMessage(entity.name, sqlQueryModel.record(i), 0);
@@ -567,6 +567,40 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(quint8 roleId)
         qFatal("%s", errorMessage.toUtf8().constData());
     }
     return listOfExecs;
+}
+
+QStringList SqlDatabaseSerivce::GetAllUsersWithRoleId(quint8 roleId)
+{
+    Q_ASSERT(roleId>=0 && roleId<Roles.count());
+    QSqlQueryModel sqlQueryModel(this);
+    QStringList usersNamesWithRoleId;
+    QSqlQuery query(*m_db);
+    query.prepare("SELECT " + userNameCN + " FROM "+ usersTablePrefix + " WHERE " + roleCN + " = " +QString::number(roleId));
+    if(query.exec())
+    {
+        sqlQueryModel.setQuery(query);
+        qDebug()<<sqlQueryModel.columnCount();
+        qDebug()<<sqlQueryModel.rowCount();
+        if(sqlQueryModel.columnCount()==1)
+        {
+            for(int i = 0; i < sqlQueryModel.rowCount(); ++i)
+            {
+                QString userName;
+                GetStringFromMessage(userName, sqlQueryModel.record(i), 0);
+                usersNamesWithRoleId.append(userName);
+            }
+        }
+        else
+        {
+            qFatal("Wrong column count");
+        }
+    }
+    else
+    {
+        const QString errorMessage=QString("Не удалось получить  всех пользователей для роли: " ).arg(roleId);
+        qFatal("%s", errorMessage.toUtf8().constData());
+    }
+    return usersNamesWithRoleId;
 }
 
 bool SqlDatabaseSerivce::GetBoolFromMessage(QSqlQuery &query)

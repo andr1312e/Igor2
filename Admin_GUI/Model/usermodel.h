@@ -25,7 +25,7 @@ public:
 
 public Q_SLOTS:
 
-   void DeleteUser(const QString &userId);
+   void OnDeleteUser(const QString &userId);
 
    void OnDataChanged();
 

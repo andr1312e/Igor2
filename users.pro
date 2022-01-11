@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.0.9
+VERSION = 2.1.0
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -17,8 +17,8 @@ RESOURCES += \
     resources.qrc
 
 CONFIG += no_lflags_merge rtti_off warn_on c++latest strict_c++ precompile_header stl_off utf8_source
-CONFIG -= cmdline qml_debug
- no_include_pwd
+CONFIG -= cmdline qml_debug no_include_pwd
+
 DEFINES +=                 \
   QT_DISABLE_DEPRECATED_BEFORE=0x050B00 \# отключить API, устаревший в 5.11 или более ранних версиях
   QT_USE_FAST_CONCATENATION\
@@ -45,6 +45,9 @@ SOURCES += \
     Services/Settings/wizardservice.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
+    Services/idesktopservice.cpp \
+    Services/roledesktopservice.cpp \
+    Services/userdesktopservice.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
     Styles/InteractiveButtons/maximizewindowbutton.cpp \
@@ -72,7 +75,6 @@ SOURCES += \
     Admin_GUI/Widgets/qtmaterialdialog_internal.cpp \
     Admin_GUI/Widgets/qtmaterialdialog.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.cpp \
-    Services/fileexplorer.cpp \
     Services/kioskservice.cpp \
     Services/linuxuserservice.cpp \
     Services/toolbardisableservice.cpp \
@@ -118,6 +120,9 @@ HEADERS += \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
     Services/Sql/sqldatabaseserivce.h \
+    Services/idesktopservice.h \
+    Services/roledesktopservice.h \
+    Services/userdesktopservice.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -164,7 +169,6 @@ HEADERS += \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.h \
     Admin_GUI/Widgets/qtmaterialtextfield_p.h \
     Admin_GUI/Widgets/qtmaterialtextfield.h \
-    Services/fileexplorer.h \
     Services/kioskservice.h \
     Services/linuxuserservice.h \
     Services/Terminals/terminal.h \

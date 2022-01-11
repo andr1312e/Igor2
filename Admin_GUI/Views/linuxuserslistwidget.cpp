@@ -16,8 +16,6 @@ LinuxUsersListWidget::LinuxUsersListWidget(ISqlDatabaseService *databaseService,
 
 LinuxUsersListWidget::~LinuxUsersListWidget()
 {
-    delete m_font;
-
     delete m_searchLayout;
     delete m_mainLayout;
 
@@ -38,7 +36,7 @@ void LinuxUsersListWidget::CreateModel(ISqlDatabaseService *databaseService, Lin
 void LinuxUsersListWidget::CreateProxyModel()
 {
     m_model = m_userModel->GetModel();
-    m_sortModel = new SortModel(nullptr);
+    m_sortModel = new SortModel(this);
     m_sortModel->setSourceModel(m_model);
     m_sortModel->setDynamicSortFilter(true);
 }
@@ -54,7 +52,7 @@ void LinuxUsersListWidget::CreateUI()
 
     m_linuxUsersLabel = new QLabel("Пользователи операционной системы Astra Linux: ");
 
-    m_font = new QFont(m_linuxUsersLabel->font());
+    m_font =m_linuxUsersLabel->font();
 
     m_userDelegate = new UserDelegate(m_font, this);
 
@@ -92,11 +90,11 @@ void LinuxUsersListWidget::CreateConnections()
 
 void LinuxUsersListWidget::UpdateFontSize()
 {
-    m_font->setPointSize(m_oldFontSize);
-    m_linuxUsersLabel->setFont(*m_font);
-    m_searchLineEdit->setFont(*m_font);
-    m_searchTypeComboBox->setFont(*m_font);
-    m_allUsersListView->setFont(*m_font);
+    m_font.setPointSize(m_oldFontSize);
+    m_linuxUsersLabel->setFont(m_font);
+    m_searchLineEdit->setFont(m_font);
+    m_searchTypeComboBox->setFont(m_font);
+    m_allUsersListView->setFont(m_font);
 }
 
 void LinuxUsersListWidget::OnLineEditChange(const QString &text)
@@ -120,7 +118,7 @@ void LinuxUsersListWidget::GetUserData(const QModelIndex &index)
 
 void LinuxUsersListWidget::DeleteUser(const QString &userId)
 {
-    m_userModel->DeleteUser(userId);
+    m_userModel->OnDeleteUser(userId);
 }
 
 void LinuxUsersListWidget::AddUserToModel(const QString &userId, const QString &FCS, const QString &rank, const int &role)
@@ -131,7 +129,7 @@ void LinuxUsersListWidget::AddUserToModel(const QString &userId, const QString &
 void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
 {
     int width = event->size().width();
-    qDebug() << width;
+//    qDebug() << width;
 
     if (width > 930) {
         if (m_oldFontSize != 20) {

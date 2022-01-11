@@ -256,14 +256,14 @@ void UserEditPanel::InsertUserData(const User &user)
 {
     if (user.role==-1)
     {
-        m_editFieldsLabel->setText(userEditFields.at(0));
+        m_editFieldsLabel->setText(userEditFields.front());
         m_FCSLineEdit->clear();
         m_rankComboBox->setCurrentIndex(0);
         m_roleComboBox->setCurrentIndex(0);
     }
     else
     {
-        m_editFieldsLabel->setText(userEditFields.at(1));
+        m_editFieldsLabel->setText(userEditFields.back());
         m_FCSLineEdit->setText(user.FCS);
         m_rankComboBox->setCurrentText(user.rank);
         m_roleComboBox->setCurrentText(Roles.at(user.role));

@@ -10,26 +10,24 @@ MaximizeWindowButton::MaximizeWindowButton(QWidget *parent)
 MaximizeWindowButton::~MaximizeWindowButton()
 {
     delete m_pen;
-    delete m_painter;
 }
 
 void MaximizeWindowButton::paintEvent(QPaintEvent *event)
 {
     InteractiveButtonBase::paintEvent(event);
-    m_painter=new QPainter(this);
-    m_painter->setPen(*m_pen);
-    if (!show_foreground) return ; // 不显示前景
-
+    QPainter painter(this);
+    painter.setPen(*m_pen);
+    if (!isShowForeground)
+    {
+        return ;
+    }
     int w = _w, h = _h;
     int dx = offset_pos.x(), dy = offset_pos.y();
     QRect r;
 
     r = QRect(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
 
-
-//    m_painter->begin(this);
-    m_painter->drawRect(r);
-    m_painter->end();
+    painter.drawRect(r);
 }
 
 QSize MaximizeWindowButton::sizeHint() const

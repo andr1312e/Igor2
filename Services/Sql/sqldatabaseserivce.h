@@ -48,8 +48,9 @@ public:
     virtual QStringList GetAllRoleStartups(quint8 roleId) Q_DECL_OVERRIDE;
 
     virtual void AppendDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) Q_DECL_OVERRIDE;
-    virtual void RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) Q_DECL_OVERRIDE;
+    virtual void RemoveDesktopIntoRole(quint8 roleId, const QString &entityName) Q_DECL_OVERRIDE;
     virtual QList<DesktopEntity> GetAllRoleDesktops(quint8 roleId) Q_DECL_OVERRIDE;
+    virtual QStringList GetAllUsersWithRoleId(quint8 roleId) Q_DECL_OVERRIDE;
 
 public:
     virtual void CreateUsersTableIfNotExists() Q_DECL_OVERRIDE;
@@ -70,7 +71,7 @@ private:
     const QString postgeSqlDatabaseDriverStringKey="QPSQL";
     QSqlDatabase * m_db;
 
-    const QString usersTableName="rlstiusers";
+    const QString usersTablePrefix="rlstiusers";
     const QString startupTablePrefix="rlstistartups";
     const QString desktopTablePrefix="rlstidesktops";
 };

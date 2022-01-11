@@ -53,12 +53,13 @@ bool Program::HasNoRunningInscance()
 
 void Program::CreateApp()//MAIN
 {
+
     InitTerminal();
     InitUserService();
     GetAllUsersWithIdInSystem();
     InitSqlService();
     GetCurrentUserNameIdAndAdminPriviliges();
-    LoadingState state=GetProgramState();
+    const LoadingState state=GetProgramState();
     InitTrayIcon();
     InitFramelessWindow();
     InitStyle();
@@ -127,7 +128,7 @@ void Program::InitTrayIcon()
 void Program::InitFramelessWindow()
 {
     m_framelessWindow = new FramelessWindow(Q_NULLPTR);
-    this->setWindowIcon(QIcon(":/images/ico.png"));
+    this->setWindowIcon(QIcon(":/images/0.jpg"));
     m_framelessWindow->setObjectName("FramelessWindowObject");
     m_framelessWindow->OnSetWindowTitle("Мастер первоначальной настройки");
     m_framelessWindow->show();
@@ -141,7 +142,7 @@ void Program::InitStyle()
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
 }
 
-void Program::ProcessDataLoading(LoadingState &state)
+void Program::ProcessDataLoading(const LoadingState &state)
 {
     switch (state) {
     case NoFiles:
@@ -163,7 +164,7 @@ void Program::ProcessDataLoading(LoadingState &state)
     }
 }
 
-void Program::StartSettingsWizard(LoadingState &state)
+void Program::StartSettingsWizard(const LoadingState &state)
 {
     m_startupWizard = new StartupWizard(this->applicationName(), m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, nullptr);
     connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
@@ -201,7 +202,7 @@ bool Program::AllAppsRunned()
 
 void Program::InitRarmSocket()
 {
-    m_socketToRarm = new SocketToRarm("127.0.0.1:4242", this);
+    m_socketToRarm = new SocketToRarm(QStringLiteral("127.0.0.1:4242"), this);
 }
 
 void Program::GetAllUsersWithIdInSystem()
@@ -213,7 +214,7 @@ void Program::InitAdminUI()
 {
     //    if (CanGetAdminAccess())
     {
-        m_AdminGui = new Admin_GUI(m_linuxUserService->GetCurrentUserId(), m_sqlDatabaseService, m_linuxUserService, nullptr);
+        m_AdminGui = new Admin_GUI(m_terminal, m_sqlDatabaseService, m_linuxUserService, m_currentUserId, Q_NULLPTR);
         m_framelessWindow->OnSetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
         m_framelessWindow->SetMainWidget(m_AdminGui);
         m_framelessWindow->show();

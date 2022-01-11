@@ -1,21 +1,24 @@
 #include "admingui.h"
 
-Admin_GUI::Admin_GUI(const QString &currentUserId, ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
+Admin_GUI::Admin_GUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent)
     :  QWidget(parent)
-    ,  m_currentUserId(currentUserId)
+    ,  m_currentAdminId(currentAdminId)
     ,  m_databaseService(databaseService)
     ,  m_linuxUserService(userService)
 {
-    CreateUI(databaseService, userService);
+    CreateServices(terminal, databaseService);
+    CreateUI(terminal, databaseService, userService);
     InsertWidgetsIntoLayout();
     InitTopBar();
-    SetWidgetSizes();
     ConnectObjects();
     SetMaximumWidgetSize();
 }
 
 Admin_GUI::~Admin_GUI()
 {
+    delete m_userDesktopService;
+    delete m_roleDesktopService;
+
     delete m_centerSideLayout;
     delete m_leftSideLayout;
     delete m_mainLayout;
@@ -27,7 +30,13 @@ Admin_GUI::~Admin_GUI()
     delete m_roleEditPanel;
 }
 
-void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService)
+void Admin_GUI::CreateServices(Terminal *terminal,  ISqlDatabaseService *databaseService)
+{
+    m_userDesktopService=new UserDesktopService(terminal, databaseService);
+    m_roleDesktopService=new RoleDesktopService(terminal, databaseService);
+}
+
+void Admin_GUI::CreateUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService)
 {
     m_mainLayout = new QHBoxLayout();
 
@@ -36,16 +45,10 @@ void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, LinuxUserService 
     m_usersListWidget = new LinuxUsersListWidget(databaseService, userService, this);
 
     m_centerSideLayout=new QVBoxLayout();
-    m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_ICONS, userService->GetTerminal(), databaseService, this);
-    m_userEditPanel = new UserEditPanel(userService->GetCurrentUserName(), userService->GetTerminal(), this);
+    m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_ICONS, m_userDesktopService, Q_NULLPTR, this);
+    m_userEditPanel = new UserEditPanel(userService->GetCurrentUserName(), terminal, this);
 
-    m_roleEditPanel = new RoleEditPanel(userService->GetTerminal(), databaseService, this);
-}
-
-void Admin_GUI::SetWidgetSizes()
-{
-//    m_usersListWidget->setMaximumWidth(336);
-//    m_userSettingsPanel->setMaximumWidth(450);
+    m_roleEditPanel = new RoleEditPanel(terminal, databaseService, m_roleDesktopService, this);
 }
 
 void Admin_GUI::InsertWidgetsIntoLayout()
@@ -85,11 +88,11 @@ void Admin_GUI::SetMaximumWidgetSize()
 void Admin_GUI::InitTopBar()
 {
     QString currentUserLinuxUserName = m_linuxUserService->GetCurrentUserName();
-    int userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
+    const int userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
     if(userRole!=-1)
     {
-        QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
-        QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
+        const QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
+        const QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
         m_leftTopBar->SetData(userRank, userFCS, userRole);
     }
 }
@@ -121,7 +124,7 @@ void Admin_GUI::OnUserClick(const User &user)
 {
     m_userEditPanel->SetUser(user);
     m_userDesktopPanel->SetUser(user);
-    if(user.role!=0)
+    if(user.role>0 && user.role<Roles.count())
     {
         m_roleEditPanel->OnRoleToViewChanged(user.role);
     }
@@ -137,13 +140,15 @@ void Admin_GUI::OnSaveUser(const QString &userId, const QString &FCS, const QStr
 {
     m_usersListWidget->AddUserToModel(userId, FCS, rank, newRole);
     m_roleEditPanel->OnRoleToViewChanged(newRole);
-    if(m_currentUserId==userId)
+    m_roleDesktopService->SetDefaultIconsToUserOnUserRoleUpdate(oldRole, newRole, m_currentAdminId);
+    if(userId==m_currentAdminId)
     {
         if(oldRole!=newRole)
         {
             Q_EMIT ToCurrentUserRoleChanged();
         }
         m_leftTopBar->SetData(rank, FCS, newRole);
+//        m_userDesktopService->GetAllUserDesktops()
     }
 
     //удалить иконки с декскоп панели старые

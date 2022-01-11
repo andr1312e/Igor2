@@ -18,7 +18,6 @@ private:
 
 private:
     QPen *m_pen;
-    QPainter *m_painter;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_MAXIMIZEWINDOWBUTTON_H

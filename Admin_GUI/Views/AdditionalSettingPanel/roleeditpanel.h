@@ -1,12 +1,12 @@
 #ifndef ADMIN_GUI_VIEWS_ROLEEDITPANEL_H
 #define ADMIN_GUI_VIEWS_ROLEEDITPANEL_H
 
-#include <QFrame>
-#include <QWidget>
-#include <QLabel>
-#include <QListView>
-#include <QVBoxLayout>
-#include <QPushButton>
+class QFrame;
+class QWidget;
+class QLabel;
+class QListView;
+class QVBoxLayout;
+class QPushButton;
 
 #include "Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/startuppanel.h"
@@ -17,18 +17,14 @@ class RoleEditPanel : public QWidget
 
 public:
 
-   RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
+   RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService,  QWidget *parent);
 
    ~RoleEditPanel();
 
 private:
-
-   void CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
-
+   void CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService);
    void InsertWidgetsIntoLayout();
-
    void FillUI();
-
    void ConnectObjects();
 
 Q_SIGNALS:

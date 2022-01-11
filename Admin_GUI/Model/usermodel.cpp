@@ -35,7 +35,7 @@ void UserModel::AddUserToModel(const QString &userId, const QString &FCS, const 
     qFatal("нет юзера");
 }
 
-void UserModel::DeleteUser(const QString &userId)
+void UserModel::OnDeleteUser(const QString &userId)
 {
     for (User &user  : m_users)
     {

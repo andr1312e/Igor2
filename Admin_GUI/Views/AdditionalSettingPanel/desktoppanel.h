@@ -6,11 +6,14 @@
 #include <QFrame>
 #include <QListView>
 #include <QPushButton>
+#include <QSharedPointer>
 #include <QLineEdit>
 
 #include "Structs/programstruct.h"
 #include "Services/Sql/isqlservice.h"
-#include "Services/fileexplorer.h"
+
+#include "Services/userdesktopservice.h"
+#include "Services/roledesktopservice.h"
 
 #include "Admin_GUI/Delegates/filedelegate.h"
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
@@ -25,19 +28,19 @@ class DesktopPanel: public QWidget
 {
    Q_OBJECT
 public:
-   DesktopPanel(ICONS_PANEL_TYPE type, Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
+   DesktopPanel(const ICONS_PANEL_TYPE type, UserDesktopService * userDesktopService, RoleDesktopService * roleDesktopService, QWidget *parent);
    ~DesktopPanel();
 
 private:
-   void CreatePresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService);
    void CreateUI();
+   void FillUI();
    void SetBackgroundColor();
    void SetPresenterModelToView();
    void InsertWidgetsIntoLayout();
    void ConnectObjects();
 
 public Q_SLOTS:
-   void OnSetDefaultRoleApps(const quint8 &role);
+   void OnSetDefaultRoleApps(const quint8 &roleId);
    void OnRoleDesktopChanges(const quint8 &roleId);
 
 private Q_SLOTS:
@@ -49,14 +52,16 @@ public:
    void SetUser(const User &user);
    void SetRoleId(const quint8 &roleId);//userName || role
    void DeleteUserAllRoleIcons();
-
+private:
+   bool IsUserData();
 private:
 
    quint8 m_roleId;
 
-   ICONS_PANEL_TYPE m_type;
+   const ICONS_PANEL_TYPE m_type;
 
-   IconMakingService *m_iconMakingService;
+   UserDesktopService* const m_userDesktopService;
+   RoleDesktopService* const m_roleDesktopService;
 
    QStringList *m_usersList;
 
@@ -81,9 +86,6 @@ private:
    QtMaterialDialog *m_dialog;
    QVBoxLayout *m_dialogLayout;
    DesktopUploadDialogWidget *m_dialogWidget;
-
-private:
-   void UpdateAllUsersWithCurrentRole();
 };
 
 #endif // ADMIN_GUI_VIEWS_DESKTOPPANEL_H

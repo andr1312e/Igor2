@@ -2,6 +2,8 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QApplication::setDesktopSettingsAware(false);
     Program a(argc, argv);
     a.CreateApp();
     return Program::exec();

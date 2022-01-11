@@ -1,9 +1,16 @@
+#include <QFrame>
+#include <QWidget>
+#include <QLabel>
+#include <QListView>
+#include <QVBoxLayout>
+#include <QPushButton>
+
 #include "roleeditpanel.h"
 
-RoleEditPanel::RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
+RoleEditPanel::RoleEditPanel(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService * roleDesktopService,  QWidget *parent)
     : QWidget(parent)
 {
-    CreateUI(terminal, sqlDatabaseService);
+    CreateUI(terminal, sqlDatabaseService, roleDesktopService);
     InsertWidgetsIntoLayout();
     FillUI();
     ConnectObjects();
@@ -35,7 +42,7 @@ void RoleEditPanel::OnRoleToViewChanged(const int &roleId)
 }
 
 
-void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
+void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService)
 {
     m_mainLayout=new QVBoxLayout();
     m_topLayout=new QHBoxLayout();
@@ -44,7 +51,7 @@ void RoleEditPanel::CreateUI(Terminal *terminal, ISqlDatabaseService *sqlDatabas
     m_currentRoleLabel=new QLabel();
     m_descriptionLabel=new QLabel();
 
-    m_roleDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::ROLE_ICONS, terminal, sqlDatabaseService,  this);
+    m_roleDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::ROLE_ICONS, Q_NULLPTR, roleDesktopService,  this);
     m_roleRunningApplicationPanel=new StartupPanel(terminal, sqlDatabaseService, this);
 }
 
@@ -71,5 +78,5 @@ void RoleEditPanel::FillUI()
 
 void RoleEditPanel::ConnectObjects()
 {
-    connect(m_roleRunningApplicationPanel, &StartupPanel::ToRoleStartupChanges, this, &RoleEditPanel::ToRoleDesktopChanges);
+//    connect(m_roleRunningApplicationPanel, &StartupPanel::ToRoleStartupChanges, this, &RoleEditPanel::ToRoleDesktopChanges);
 }

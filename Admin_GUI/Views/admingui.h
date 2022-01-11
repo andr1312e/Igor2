@@ -22,13 +22,13 @@ class Admin_GUI : public QWidget
     Q_OBJECT
 
 public:
-    Admin_GUI(const QString &currentUserId, ISqlDatabaseService *databaseService, LinuxUserService *userService, QWidget *parent);
+    Admin_GUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent);
     ~Admin_GUI();
 
 private:
-    void CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+    void CreateServices(Terminal *terminal,  ISqlDatabaseService *databaseService);
+    void CreateUI(Terminal *terminal, ISqlDatabaseService *databaseService, LinuxUserService *userService);
     void InsertWidgetsIntoLayout();
-    void SetWidgetSizes();
     void ConnectObjects();
     void SetMaximumWidgetSize();
 
@@ -48,11 +48,14 @@ private:
 private:
     int m_maxWidth;
     int m_maxHeight;
-    const QString m_currentUserId;
-private:
+    const QString m_currentAdminId;
+
     ISqlDatabaseService* const m_databaseService;
     LinuxUserService* const m_linuxUserService;
+    UserDesktopService * m_userDesktopService;
+    RoleDesktopService * m_roleDesktopService;
 
+private:
     QHBoxLayout *m_mainLayout;
 
     QVBoxLayout *m_leftSideLayout;

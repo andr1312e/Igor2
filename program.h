@@ -41,11 +41,11 @@ private:
 
    LoadingState GetProgramState();
 
-   void ProcessDataLoading(LoadingState &state);
+   void ProcessDataLoading(const LoadingState &state);
    void InitStyle();
    void InitTrayIcon();
    void InitFramelessWindow();
-   void StartSettingsWizard(LoadingState &state);
+   void StartSettingsWizard(const LoadingState &state);
 
 private Q_SLOTS:
    void OnContinueLoading();

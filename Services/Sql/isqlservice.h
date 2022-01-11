@@ -1,6 +1,7 @@
 #ifndef ISQLSERVICE_H
 #define ISQLSERVICE_H
 
+
 #include "Structs/userstruct.h"
 #include "Structs/programstruct.h"
 
@@ -51,9 +52,11 @@ public:
     //desktops
     virtual void AppendDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) = 0;
 
-    virtual void RemoveDesktopIntoRole(quint8 roleId, const DesktopEntity &entity) = 0;
+    virtual void RemoveDesktopIntoRole(quint8 roleId, const QString &entityName) = 0;
 
     virtual QList<DesktopEntity> GetAllRoleDesktops(quint8 roleId) = 0;
+
+    virtual QStringList GetAllUsersWithRoleId(quint8 roleId) = 0;
 
     //admin
 

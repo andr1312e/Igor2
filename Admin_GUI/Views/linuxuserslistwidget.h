@@ -56,7 +56,7 @@ protected:
    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 
 private:
-   QFont *m_font;
+   QFont m_font;
    int m_oldFontSize;
 
 private:

@@ -1,7 +1,7 @@
 #include "userdelegate.h"
 #include <QDebug>
 
-UserDelegate::UserDelegate(QFont *font, QObject *parent)
+UserDelegate::UserDelegate(QFont &font, QObject *parent)
     : QStyledItemDelegate(parent)
     , m_globalRect(new QRect())
     , m_iconRect(new QRect())
@@ -87,16 +87,16 @@ void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
             m_textPen->setColor(option.palette.color(QPalette::WindowText));
         }
 
-        m_iconRect->setRect(m_globalRect->left() + 5, m_globalRect->top() + 5, m_font->pointSize() * 4 + 40, m_font->pointSize() * 4 + 40);
-        m_userIdRect->setRect(m_iconRect->right() + 5, m_iconRect->top(), m_globalRect->width() - 10 - m_iconRect->width(), m_font->pointSize() + 10);
-        m_userNameRect->setRect(m_userIdRect->left(), m_userIdRect->bottom() + 1, m_globalRect->width() - m_iconRect->width(), m_font->pointSize() + 10);
-        m_userFCSRect->setRect(m_userIdRect->left(), m_userNameRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font->pointSize() + 10);
-        m_userRoleRect->setRect(m_userIdRect->left(), m_userFCSRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font->pointSize() + 10);
+        m_iconRect->setRect(m_globalRect->left() + 5, m_globalRect->top() + 5, m_font.pointSize() * 4 + 40, m_font.pointSize() * 4 + 40);
+        m_userIdRect->setRect(m_iconRect->right() + 5, m_iconRect->top(), m_globalRect->width() - 10 - m_iconRect->width(), m_font.pointSize() + 10);
+        m_userNameRect->setRect(m_userIdRect->left(), m_userIdRect->bottom() + 1, m_globalRect->width() - m_iconRect->width(), m_font.pointSize() + 10);
+        m_userFCSRect->setRect(m_userIdRect->left(), m_userNameRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font.pointSize() + 10);
+        m_userRoleRect->setRect(m_userIdRect->left(), m_userFCSRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font.pointSize() + 10);
 
         painter->drawImage(*m_iconRect, QImage(user.m_image));
 
         painter->setPen(*m_titlePen);
-        painter->setFont(*m_font);
+        painter->setFont(m_font);
         painter->drawText(*m_userIdRect, "Идентификатор: " + user.userId);
 
         painter->setPen(*m_textPen);
@@ -121,6 +121,6 @@ QSize UserDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     //    {
     m_size->setWidth(300);
     //    }
-    m_size->setHeight(m_font->pointSize() * 4 + 50);
+    m_size->setHeight(m_font.pointSize() * 4 + 50);
     return *m_size;
 }

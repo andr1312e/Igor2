@@ -1,7 +1,7 @@
 #include "fileexplorer.h"
 #include <QDebug>
 
-IconMakingService::IconMakingService(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
+DesktopPresenter::DesktopPresenter(Terminal *terminal, ISqlDatabaseService *sqlDatabaseService)
     : m_terminal(terminal)
     , m_sqlDatabaseService(sqlDatabaseService)
     , m_filesList(new QList<DesktopEntity>())
@@ -10,42 +10,42 @@ IconMakingService::IconMakingService(Terminal *terminal, ISqlDatabaseService *sq
 
 }
 
-IconMakingService::~IconMakingService()
+DesktopPresenter::~DesktopPresenter()
 {
     delete m_filesList;
     delete m_fileModel;
 }
 
-QStandardItemModel *IconMakingService::GetModel()
+QStandardItemModel *DesktopPresenter::GetModel()
 {
     return m_fileModel;
 }
 
-Terminal *IconMakingService::GetTerminal()
+Terminal *DesktopPresenter::GetTerminal()
 {
     return m_terminal;
 }
 
-void IconMakingService::CheckRoleDesktopTable(const quint8 &roleId)
+void DesktopPresenter::CheckRoleDesktopTable(const quint8 &roleId)
 {
     m_sqlDatabaseService->CreateDesktopRolesIfNotExists(roleId);
 }
 
 //ROLES
-void IconMakingService::GetAllRoleDesktops(const quint8 &roleId)
+void DesktopPresenter::GetAllRoleDesktops(const quint8 &roleId)
 {
     const QList<DesktopEntity> listOfDesktops= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     UpdateModel(listOfDesktops);
 }
 
-void IconMakingService::GetAllUserDesktops(const QString &userName)
+void DesktopPresenter::GetAllUserDesktops(const QString &userName)
 {
     const QString userDesktopPath = GetUserDesktopPath(userName);
     CheckUserPath(userDesktopPath);
     UpdateIconListDataAndModel(userName);
 }
 
-void IconMakingService::AddIconToUser(const DesktopEntity &entity, const QString &userName)
+void DesktopPresenter::AddIconToUser(const DesktopEntity &entity, const QString &userName)
 {
     QString fileName(entity.name);
     fileName.replace(' ', '_');
@@ -55,7 +55,7 @@ void IconMakingService::AddIconToUser(const DesktopEntity &entity, const QString
     UpdateIconListDataAndModel(userName);
 }
 
-void IconMakingService::DeleteIconToUser(const QString &userName, const QString &iconName)
+void DesktopPresenter::DeleteIconToUser(const QString &userName, const QString &iconName)
 {
     const QString userDesktopPath = GetUserDesktopPath(userName);
     if(m_terminal->IsDirExists(userDesktopPath, Q_FUNC_INFO, true))
@@ -68,12 +68,12 @@ void IconMakingService::DeleteIconToUser(const QString &userName, const QString 
     UpdateIconListDataAndModel(userName);
 }
 
-void IconMakingService::DeleteRoleIconFromUser(const QString &userName, const quint8 &roleId)
+void DesktopPresenter::DeleteRoleIconFromUser(const QString &userName, const quint8 &roleId)
 {
 
 }
 
-void IconMakingService::CheckUserPath(const QString &pathToDesktop)
+void DesktopPresenter::CheckUserPath(const QString &pathToDesktop)
 {
     if(m_terminal->IsDirNotExists(pathToDesktop, Q_FUNC_INFO, true))
     {
@@ -82,7 +82,7 @@ void IconMakingService::CheckUserPath(const QString &pathToDesktop)
     }
 }
 
-void IconMakingService::SetDefaultIconsToUser(const quint8 &oldRoleId, const quint8 &newRoleId,
+void DesktopPresenter::SetDefaultIconsToUser(const quint8 &oldRoleId, const quint8 &newRoleId,
                                                   const QString &userName)
 {
     const QString desktopPath=GetUserDesktopPath(userName);
@@ -123,7 +123,7 @@ void IconMakingService::SetDefaultIconsToUser(const quint8 &oldRoleId, const qui
     UpdateIconListDataAndModel(userName);
 }
 
-void IconMakingService::AddIconToRole(const DesktopEntity &entity, const quint8 &roleId)
+void DesktopPresenter::AddIconToRole(const DesktopEntity &entity, const quint8 &roleId)
 {
     DesktopEntity entityinRootFolder;
     entityinRootFolder.name=entity.name;
@@ -160,7 +160,7 @@ void IconMakingService::AddIconToRole(const DesktopEntity &entity, const quint8 
     m_fileModel->appendRow(item);
 }
 
-void IconMakingService::DeleteIconToRole(const QString iconName, const quint8 &roleId)
+void DesktopPresenter::DeleteIconToRole(const QString iconName, const quint8 &roleId)
 {
     if (m_terminal->IsFileExists(m_destinationFolder+iconName, Q_FUNC_INFO, true))
     {
@@ -171,13 +171,13 @@ void IconMakingService::DeleteIconToRole(const QString iconName, const quint8 &r
     m_sqlDatabaseService->RemoveDesktopIntoRole(roleId, entity);
 }
 
-void IconMakingService::UpdateIconListDataAndModel(const QString &userName)
+void DesktopPresenter::UpdateIconListDataAndModel(const QString &userName)
 {
     UpdateIconsList(userName);
     UpdateModel(*m_filesList);
 }
 
-void IconMakingService::UpdateIconsList(const QString &userName)
+void DesktopPresenter::UpdateIconsList(const QString &userName)
 {
     const QString userDesktopPath=GetUserDesktopPath(userName);
     QStringList allUserDesktopIconsAndFiles = GetAllDesktopEntities(userName);
@@ -200,7 +200,7 @@ void IconMakingService::UpdateIconsList(const QString &userName)
     }
 }
 
-void IconMakingService::UpdateModel(const QList<DesktopEntity> &listOfDesktopEntities)
+void DesktopPresenter::UpdateModel(const QList<DesktopEntity> &listOfDesktopEntities)
 {
     m_fileModel->clear();
 
@@ -211,7 +211,7 @@ void IconMakingService::UpdateModel(const QList<DesktopEntity> &listOfDesktopEnt
     }
 }
 
-QString IconMakingService::GetFullIconPath(const QString &iconName)
+QString DesktopPresenter::GetFullIconPath(const QString &iconName)
 {
     QDir astraIconsDirs(m_astraIconPath);
     const QStringList dirList = astraIconsDirs.entryList(QDir::Dirs| QDir::NoDot| QDir::NoDotDot);
@@ -230,12 +230,12 @@ QString IconMakingService::GetFullIconPath(const QString &iconName)
     return m_astraIconPath+m_defaulIconPath;
 }
 
-const QString IconMakingService::GetUserDesktopPath(const QString &userName) const
+const QString DesktopPresenter::GetUserDesktopPath(const QString &userName) const
 {
     return m_homeName + userName + m_desktopName;
 }
 
-QStringList IconMakingService::GetAllDesktopEntities(const QString &userName)
+QStringList DesktopPresenter::GetAllDesktopEntities(const QString &userName)
 {
     QString desktoPath=GetUserDesktopPath(userName);
     QStringList desktopEntites;
@@ -248,7 +248,7 @@ QStringList IconMakingService::GetAllDesktopEntities(const QString &userName)
     return desktopEntites;
 }
 
-void IconMakingService::appendIconInfoToList(const QString &programName,
+void DesktopPresenter::appendIconInfoToList(const QString &programName,
                                                  const QString &iconInfo)
 {
     DesktopEntity program;
@@ -280,7 +280,7 @@ void IconMakingService::appendIconInfoToList(const QString &programName,
     m_filesList->append(program);
 }
 
-void IconMakingService::appendFileInfoToList(const QString &fileName)
+void DesktopPresenter::appendFileInfoToList(const QString &fileName)
 {
     DesktopEntity file;
     file.name = fileName;
@@ -290,7 +290,7 @@ void IconMakingService::appendFileInfoToList(const QString &fileName)
     m_filesList->append(file);
 }
 
-bool IconMakingService::IsIcon(const QString &entityName) const
+bool DesktopPresenter::IsIcon(const QString &entityName) const
 {
     if (entityName.endsWith(".desktop")) {
         return true;
@@ -299,7 +299,7 @@ bool IconMakingService::IsIcon(const QString &entityName) const
     }
 }
 
-void IconMakingService::CreateIconFile(const QString &userName, const QString &iconName)
+void DesktopPresenter::CreateIconFile(const QString &userName, const QString &iconName)
 {
     const QString pathToDesktop=GetUserDesktopPath(userName);
     CheckUserPath(pathToDesktop);
@@ -312,7 +312,7 @@ void IconMakingService::CreateIconFile(const QString &userName, const QString &i
     }
 }
 
-const QString IconMakingService::CreateIconProperties(const DesktopEntity &entity) const
+const QString DesktopPresenter::CreateIconProperties(const DesktopEntity &entity) const
 {
     QString iconText = "[Desktop Entry]\nType=Application\nExec='" + entity.exec + "'\n";
     iconText += "Name= " + entity.name + "\nName[ru]= " + entity.name +
@@ -320,7 +320,7 @@ const QString IconMakingService::CreateIconProperties(const DesktopEntity &entit
     return iconText;
 }
 
-void IconMakingService::WriteIconPropertiesToFile(const QString &iconProperties, const QString &iconName, const QString &userName)
+void DesktopPresenter::WriteIconPropertiesToFile(const QString &iconProperties, const QString &iconName, const QString &userName)
 {
     const QString userDesktopPath=GetUserDesktopPath(userName);
     m_terminal->WriteTextToFileSudo(iconProperties.toLatin1(),
@@ -328,7 +328,7 @@ void IconMakingService::WriteIconPropertiesToFile(const QString &iconProperties,
                                     Q_FUNC_INFO);
 }
 
-void IconMakingService::CheckFolderToFileAndFileExists(const QString &iconName)
+void DesktopPresenter::CheckFolderToFileAndFileExists(const QString &iconName)
 {
     m_terminal->CheckAndCreatePathToElement(m_path, Q_FUNC_INFO, true);
     if (m_terminal->IsDirNotExists(m_path, Q_FUNC_INFO, true))
