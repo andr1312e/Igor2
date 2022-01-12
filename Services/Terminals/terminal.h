@@ -10,57 +10,54 @@ class Terminal
 {
 public:
     static Terminal* GetTerminal();
-
+     ~Terminal();
 private:
    Terminal();
 
 public:
-   ~Terminal();
+   QString RunConsoleCommand(const QString &command, const char *calledFunc);
 
-public:
-   QString RunConsoleCommand(const QString &command, QString calledFunc);
+   QStringList GetAllUsersList(const char *calledFunc);
 
-   QStringList GetAllUsersList(const QString calledFunc);
+   bool IsDirExists(const QString folderPath, const char *calledFunc, bool hasRoot = true);
 
-   bool IsDirExists(const QString folderPath, const QString calledFunc, bool hasRoot = true);
+   bool IsDirNotExists(const QString folderPath, const char *calledFunc, bool hasRoot = true);
 
-   bool IsDirNotExists(const QString folderPath, const QString calledFunc, bool hasRoot = true);
+   bool IsFileExists(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-   bool IsFileExists(const QString filePath, const QString calledFunc, bool hasRoot = true);
+   bool IsFileNotExists(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-   bool IsFileNotExists(const QString filePath, const QString calledFunc, bool hasRoot = true);
+   void CheckAndCreatePathToElement(const QString &path, const char *calledFunc, bool hasRoot);
 
-   void CheckAndCreatePathToElement(const QString &path, const QString calledFunc, bool hasRoot);
+   void CreateFolder(const QString &folderPath, const char *callerFunc, bool hasRoot = true);
 
-   void CreateFolder(const QString &folderPath, const QString callerFunc, bool hasRoot = true);
+   void CreateFile(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-   void CreateFile(const QString filePath, const QString calledFunc, bool hasRoot = true);
+   QStringList GetFolderList(const QString &folderPath, const char *calledFulc, bool hasRoot = true);
 
-   QStringList GetFolderList(const QString &folderPath, QString calledFulc, bool hasRoot = true);
+   QStringList GetFileList(const QString &folderPath, const char *calledFulc, bool hasRoot = true);
 
-   QStringList GetFileList(const QString &folderPath, QString calledFulc, bool hasRoot = true);
+   QString GetFileText(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-   QString GetFileText(const QString filePath, const QString calledFunc, bool hasRoot = true);
+   void WriteTextToFileSudo(const QByteArray &text, const QString filePath, const char* calledFunc);
 
-   void WriteTextToFileSudo(const QByteArray &text, const QString filePath, const QString calledFunc);
+   void DeleteFileSudo(const QString filePath, const char *calledFunc);
 
-   void DeleteFileSudo(const QString filePath, const QString calledFunc);
+   void ClearFolderSudo(const QString &folderPath, const char *calledFunc);
 
-   void ClearFolderSudo(const QString &folderPath, const QString calledFunc);
+   void ClearFileSudo(const QString &filePath, const char *calledFunc);
 
-   void ClearFileSudo(const QString &filePath, const QString calledFunc);
+   void CopyFileSudo(const QString source, const QString &destination, const char *calledFunc);
 
-   void CopyFileSudo(const QString source, const QString &destination, const QString calledFunc);
+   QStringList GetAllProcessList(const char *calledFunc);
 
-   QStringList GetAllProcessList(const QString calledFunc);
+   void KillProcess(const QString &processName, const char *calledFunc);
 
-   void KillProcess(const QString &processName, const QString calledFunc);
+   QStringList GetAllInstalledPackageNames(const char *calledFunc);
 
-   QStringList GetAllInstalledPackageNames(const QString calledFunc);
+   QStringList GetAllNotInstalledPackageNames(const char *calledFunc);
 
-   QStringList GetAllNotInstalledPackageNames(const QString calledFunc);
-
-   void InstallPackageSudo(const QString &packageName, const QString calledFunc);
+   void InstallPackageSudo(const QString &packageName, const char *calledFunc);
 
 private:
 

@@ -23,7 +23,7 @@ public:
 
 private:
     void TryDeleteFile(const QString &startupPath);
-    void TryToCopyFile(const QString &startupPath);
+    QString TryToCopyFile(const QString &startupPath);
 
 private:
     Terminal *m_terminal;

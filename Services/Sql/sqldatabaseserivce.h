@@ -54,7 +54,7 @@ public:
 
 public:
     virtual void CreateUsersTableIfNotExists() Q_DECL_OVERRIDE;
-    virtual void CreateStartupsTableInNotExists(int roleId) Q_DECL_OVERRIDE;
+    virtual void CreateStartupsTableIfNotExists(int roleId) Q_DECL_OVERRIDE;
     virtual void CreateDesktopRolesIfNotExists(int roleId) Q_DECL_OVERRIDE;
 
 public:
@@ -62,6 +62,10 @@ public:
     virtual QString GetUserFCS(const QString &currentUserName) Q_DECL_OVERRIDE;
     virtual QString GetUserRank(const QString &currentUserName) Q_DECL_OVERRIDE;
     virtual int GetUserRole(const QString &currentUserName) Q_DECL_OVERRIDE;
+
+    virtual QString GetUserFCS(QStringView currentUserName) Q_DECL_OVERRIDE;
+    virtual QString GetUserRank(QStringView currentUserName) Q_DECL_OVERRIDE;
+    virtual int GetUserRole(QStringView currentUserName) Q_DECL_OVERRIDE;
 
 private:
     void ClearTable(QString tableName);

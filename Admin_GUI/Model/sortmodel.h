@@ -14,7 +14,7 @@ public:
     ~SortModel();
 public:
 
-   void UpdateSeachWordAndSeachAttribute(const QString &text, const QString &attribute);
+   void UpdateSeachTextAndSeachAttribute(const QString &text, const QString &attribute);
 
 protected:
 

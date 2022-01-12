@@ -206,7 +206,7 @@ void Program::InitRarmSocket()
 
 void Program::InitAdminUI()
 {
-    m_AdminGui = new Admin_GUI(m_sqlDatabaseService, m_linuxUserService, m_currentUserId, Q_NULLPTR);
+    m_AdminGui = new Admin_GUI(m_sqlDatabaseService, m_linuxUserService, m_currentUserId, m_currentUserName, Q_NULLPTR);
     m_framelessWindow->OnSetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
     m_framelessWindow->SetMainWidget(m_AdminGui);
     m_framelessWindow->show();

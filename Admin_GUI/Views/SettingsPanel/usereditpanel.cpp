@@ -1,9 +1,9 @@
 #include <QDebug>
 #include "usereditpanel.h"
 
-UserEditPanel::UserEditPanel(const QString &userName, QWidget *parent)
+UserEditPanel::UserEditPanel(QStringView currentUserName, QWidget *parent)
     : QWidget(parent)
-    , m_currentUserName(userName)
+    , m_currentUserName(currentUserName)
 {
     InitServicesAndModel();
     CreateUI();

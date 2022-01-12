@@ -22,7 +22,7 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(const QString &userName, QWidget *parent);
+    UserEditPanel(QStringView currentUserName, QWidget *parent);
     ~UserEditPanel();
 
 private:
@@ -54,7 +54,7 @@ private:
     void ShowSaveUserToast(const QString &userName);
 
 private:
-    const QString m_currentUserName;
+    const QStringView m_currentUserName;
 
     QFont m_editPanelFont;
 

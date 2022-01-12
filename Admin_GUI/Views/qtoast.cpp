@@ -29,7 +29,7 @@ void QToast::InitUI()
 {
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
     setAttribute(Qt::WA_TranslucentBackground);
-    m_drawFont.setPointSize(20);
+    m_drawFont.setPointSize(15);
     SetToastPos();
 }
 

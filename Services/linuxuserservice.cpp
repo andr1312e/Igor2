@@ -15,21 +15,21 @@ LinuxUserService::~LinuxUserService()
 
 void LinuxUserService::GetAllUsersWithIdInSystem()
 {
-    const QStringList allUsersList=m_terminal->GetAllUsersList("LinuxUserService::getAllUsersInSystem");
+    const QStringList allUsersList=m_terminal->GetAllUsersList(Q_FUNC_INFO);
     RemoveSystemUsersFromAllUsersList(allUsersList);
 }
 
 const QString LinuxUserService::GetCurrentUserName()
 {
     const QString getCurrentUserNameCommand="id -u -n";
-    QString userName=m_terminal->RunConsoleCommand(getCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
+    QString userName=m_terminal->RunConsoleCommand(getCurrentUserNameCommand, Q_FUNC_INFO).remove('\n');
     return userName;
 }
 
 const QString LinuxUserService::GetCurrentUserId()
 {
     const QString getCurrentUserIdCommand="id -u";
-    QString userId=m_terminal->RunConsoleCommand(getCurrentUserIdCommand, "LinuxUserService::getCurrentUserId").remove('\n');
+    QString userId=m_terminal->RunConsoleCommand(getCurrentUserIdCommand, Q_FUNC_INFO).remove('\n');
     return userId;
 }
 
@@ -49,7 +49,7 @@ bool LinuxUserService::HasCurrentUserAdminPrivileges()
 QStringList LinuxUserService::GetUserGroups(const QString &userName)
 {
     const QString getAllCurrentUserGroupCommand="id -Gn "+userName;
-    QString userGroups=m_terminal->RunConsoleCommand(getAllCurrentUserGroupCommand, "LinuxUserService::getUserGroups");
+    QString userGroups=m_terminal->RunConsoleCommand(getAllCurrentUserGroupCommand, Q_FUNC_INFO);
     userGroups.remove('\n');
     QStringList list=userGroups.split(' ');
     return list;
@@ -78,12 +78,12 @@ void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allU
                     }
                     else
                     {
-                        qFatal("RemoveSystemUsers не смог получить userId");
+                        qFatal("%s", QStringLiteral("RemoveSystemUsers не смог получить userId").toUtf8().constData());
                     }
             }
             else
             {
-                qFatal("RemoveSystemUsers не смог получить позицию вторых : строка имеет неверный параметр");
+                qFatal("%s", QStringLiteral("RemoveSystemUsers не смог получить позицию вторых : строка имеет неверный параметр").toUtf8().constData());
             }
         }
 }

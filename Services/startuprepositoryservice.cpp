@@ -31,8 +31,8 @@ void StartupRepositoryPresenter::DeleteStartup(const quint8 &roleId, const QStri
 
 void StartupRepositoryPresenter::AppendStartup(const quint8 &roleId, const QString &startupPath)
 {
-    m_sqlDatabaseService->AppendStartupIntoRole(roleId, startupPath);
-    TryToCopyFile(startupPath);
+    const QString startupFileName=TryToCopyFile(startupPath);
+    m_sqlDatabaseService->AppendStartupIntoRole(roleId, startupFileName);
 }
 
 void StartupRepositoryPresenter::TryDeleteFile(const QString &startupPath)
@@ -43,10 +43,10 @@ void StartupRepositoryPresenter::TryDeleteFile(const QString &startupPath)
 //    }
 }
 
-void StartupRepositoryPresenter::TryToCopyFile(const QString &startupPath)
+QString StartupRepositoryPresenter::TryToCopyFile(const QString &startupPath)
 {
     int index=startupPath.lastIndexOf('/');
-    QString startupFileName=startupPath.mid(index);
+    const QString startupFileName=startupPath.mid(index+1);
     if(m_terminal->IsDirNotExists(m_destinationFolder, Q_FUNC_INFO, true))
     {
         m_terminal->CreateFolder(m_destinationFolder, Q_FUNC_INFO, true);
@@ -56,6 +56,7 @@ void StartupRepositoryPresenter::TryToCopyFile(const QString &startupPath)
         m_terminal->DeleteFileSudo(m_destinationFolder+startupFileName, Q_FUNC_INFO);
     }
     m_terminal->CopyFileSudo(startupPath, m_destinationFolder, Q_FUNC_INFO);
+    return startupFileName;
 }
 
 

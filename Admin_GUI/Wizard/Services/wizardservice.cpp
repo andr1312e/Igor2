@@ -164,7 +164,7 @@ void WizardService::ApplySettingsWithRolesRepository(const QStringList &actionsW
     for (int i=0; i<Roles.count(); ++i)
     {
         if (actionsWithRoleRepository.at(i) == m_rolesWizardPageComboBoxBackupAndOldDataActions.at(0)) {
-            m_iSqlDatabaseService->CreateStartupsTableInNotExists(i);
+            m_iSqlDatabaseService->CreateStartupsTableIfNotExists(i);
             m_iSqlDatabaseService->ClearStartupsTable(i);
             m_iSqlDatabaseService->CreateDesktopRolesIfNotExists(i);
             m_iSqlDatabaseService->ClearDesktopTable(i);

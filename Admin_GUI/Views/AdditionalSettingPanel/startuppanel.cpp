@@ -124,17 +124,19 @@ void StartupPanel::OnDeleteProgram()
 
 void StartupPanel::OnAddProgram(const QString &startupPath)
 {
-    QStringList startupsList=m_appsList->stringList();
-    if (startupsList.contains(startupPath))
+    const int indexOfName=startupPath.lastIndexOf('/');
+    const QString startupName=startupPath.mid(indexOfName+1);
+    const QStringList startupsList=m_appsList->stringList();
+    if (startupsList.contains(startupName))
     {
-        QToast* pToast=QToast::CreateToast("Программа " + startupPath + " уже в базе есть", QToast::LENGTH_LONG, this);
+        QToast* pToast=QToast::CreateToast("Программа " + startupName + " уже в базе есть. Если это другая, удалите старую", QToast::LENGTH_LONG, this);
         pToast->show();
     }
     else
     {
         m_startupRepositoryPresenter->AppendStartup(m_roleId, startupPath);
-        AppendStartupToModel(startupPath);
-        QToast* pToast=QToast::CreateToast("Программа " + startupPath + " добавлена",QToast::LENGTH_LONG, this);
+        AppendStartupToModel(startupName);
+        QToast* pToast=QToast::CreateToast("Программа " + startupName + " добавлена",QToast::LENGTH_LONG, this);
         pToast->show();
     }
 }
@@ -157,7 +159,8 @@ void StartupPanel::AppendStartupToModel(const QString &startupPath)
 {
     if(m_appsList->insertRow(m_appsList->rowCount()))
     {
-        QModelIndex index = m_appsList->index(m_appsList->rowCount() - 1, 0);
+        const QModelIndex index = m_appsList->index(m_appsList->rowCount() - 1, 0);
+        qDebug()<< index.row() << " row" << index.column();
         m_appsList->setData(index, startupPath);
     }
 }

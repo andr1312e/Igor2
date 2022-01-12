@@ -122,7 +122,7 @@ void UserModel::FillModelByList()
 
 void UserModel::SetImageToUser(User &user)
 {
-    if (user.role == 0) {
+    if (0 == user.role) {
         user.m_image = ":/images/0.jpg";
     } else {
         if (user.role == 1) {

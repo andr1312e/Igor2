@@ -31,7 +31,7 @@ public:
     //create Tables    
     virtual void CreateUsersTableIfNotExists() = 0;
 
-    virtual void CreateStartupsTableInNotExists(int roleId) = 0;
+    virtual void CreateStartupsTableIfNotExists(int roleId) = 0;
 
     virtual void CreateDesktopRolesIfNotExists(int roleId) = 0;
 
@@ -67,6 +67,12 @@ public:
     virtual QString GetUserRank(const QString &userName) = 0;
 
     virtual int GetUserRole(const QString &userName) = 0;
+
+    virtual QString GetUserFCS(QStringView userName) = 0;
+
+    virtual QString GetUserRank(QStringView userName) = 0;
+
+    virtual int GetUserRole(QStringView userName) = 0;
 
 };
 

@@ -11,7 +11,7 @@ SortModel::~SortModel()
 
 }
 
-void SortModel::UpdateSeachWordAndSeachAttribute(const QString &text, const QString &attribute)
+void SortModel::UpdateSeachTextAndSeachAttribute(const QString &text, const QString &attribute)
 {
     m_searchText=text;
     m_searchAttribute=attribute;

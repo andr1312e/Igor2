@@ -84,7 +84,7 @@ void LinuxUsersListWidget::CreateConnections()
     connect(m_allUsersListView, &QListView::clicked, this, &LinuxUsersListWidget::GetUserData);
     connect(m_searchLineEdit, &QLineEdit::textChanged, this, &LinuxUsersListWidget::OnLineEditChange);
     connect(m_searchTypeComboBox, &QComboBox::currentTextChanged, this, &LinuxUsersListWidget::OnComboBoxChange);
-    connect(this, &LinuxUsersListWidget::ToSearch, m_sortModel, &SortModel::UpdateSeachWordAndSeachAttribute);
+    connect(this, &LinuxUsersListWidget::ToSearch, m_sortModel, &SortModel::UpdateSeachTextAndSeachAttribute);
     connect(this, &LinuxUsersListWidget::ToSetDelegateView, m_userDelegate, &UserDelegate::OnSetDelegateView);
 }
 
@@ -100,13 +100,13 @@ void LinuxUsersListWidget::UpdateFontSize()
 void LinuxUsersListWidget::OnLineEditChange(const QString &text)
 {
     const QString attribute = m_searchTypeComboBox->currentText();
-    m_sortModel->UpdateSeachWordAndSeachAttribute(text, attribute);
+    m_sortModel->UpdateSeachTextAndSeachAttribute(text, attribute);
 }
 
 void LinuxUsersListWidget::OnComboBoxChange(const QString &attribute)
 {
     const QString text = m_searchLineEdit->text();
-    m_sortModel->UpdateSeachWordAndSeachAttribute(text, attribute);
+    m_sortModel->UpdateSeachTextAndSeachAttribute(text, attribute);
 }
 
 void LinuxUsersListWidget::GetUserData(const QModelIndex &index)

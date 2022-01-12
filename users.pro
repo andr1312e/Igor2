@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.1.0
+VERSION = 2.1.1
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 

@@ -172,7 +172,7 @@ QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
         }
         else
         {
-            return "";
+            return QString();
         }
     }
     else
@@ -187,6 +187,107 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
     query.prepare("SELECT " + roleCN+ " FROM "+ usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName);
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            if(query.value(0).type()==QVariant::Int)
+            {
+                bool ok;
+                int role=query.value(0).toInt(&ok);
+                if(ok)
+                {
+                    return role;
+                }
+                else
+                {
+                    qFatal("Can't convert to int string value");
+                }
+            }
+            else
+            {
+                qFatal("Name type is incorrect");
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        qFatal("Can't delete from database exec");
+    }
+}
+
+QString SqlDatabaseSerivce::GetUserFCS(QStringView currentUserName)
+{
+    QSqlQuery query;
+    const QString request="SELECT " + fcsCN+ " FROM "+ usersTablePrefix+
+            " WHERE "+ userNameCN +"=\'" + currentUserName+ "\'";
+    query.prepare(request);
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            if(query.value(0).type()==QVariant::String)
+            {
+                QString fcs=query.value(0).toString();
+                return fcs;
+            }
+            else
+            {
+                qFatal("Name type is incorrect");
+            }
+        }
+        else
+        {
+            return "";
+        }
+    }
+    else
+    {
+        qFatal("Cant delete from database exec");
+    }
+}
+
+QString SqlDatabaseSerivce::GetUserRank(QStringView currentUserName)
+{
+    QSqlQuery query;
+    const QString request="SELECT " + rankCN+ " FROM "+ usersTablePrefix+
+            " WHERE "+ userNameCN +"=\'" + currentUserName + "\'";
+    query.prepare(request);
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            if(query.value(0).type()==QVariant::String)
+            {
+                QString rank=query.value(0).toString();
+                return rank;
+            }
+            else
+            {
+                qFatal("Name type is incorrect");
+            }
+        }
+        else
+        {
+            return QString();
+        }
+    }
+    else
+    {
+        qFatal("Cant delete from database exec");
+    }
+}
+
+int SqlDatabaseSerivce::GetUserRole(QStringView currentUserName)
+{
+    QSqlQuery query;
+    const QString request="SELECT " + roleCN+ " FROM "+ usersTablePrefix+
+            " WHERE "+ userNameCN +"=\'" + currentUserName +"\'";
+    query.prepare(request);
     if(query.exec())
     {
         if(query.next())
@@ -379,7 +480,7 @@ void SqlDatabaseSerivce::RemoveUserIntoTable(int roleId,const User &user)
 {
     QSqlQuery query(*m_db);
     const QString request="DELETE FROM " + startupTablePrefix + QString::number(roleId) +
-                  " WHERE" + userIdCN +"=\'"+ user.userId +"\'";
+            " WHERE" + userIdCN +"=\'"+ user.userId +"\'";
     query.prepare(request);
     if(query.exec())
     {
@@ -483,7 +584,7 @@ void SqlDatabaseSerivce::RemoveStartupIntoRole(int roleId, const QString &startu
 
     QSqlQuery query;
     const QString request="DELETE FROM "+ startupTablePrefix + QString::number(roleId) +
-                  " WHERE "+ startupPathCN +"=\'"+ startupPath+ "\'";
+            " WHERE "+ startupPathCN +"=\'"+ startupPath+ "\'";
     query.prepare(request);
     if(query.exec())
     {

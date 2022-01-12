@@ -1,6 +1,6 @@
 #include "admingui.h"
 
-Admin_GUI::Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent)
+Admin_GUI::Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QStringView currentAdminId, QStringView currentUserName, QWidget *parent)
     :  QWidget(parent)
     ,  m_currentAdminId(currentAdminId)
     ,  m_databaseService(databaseService)
@@ -8,9 +8,9 @@ Admin_GUI::Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *use
 {
     CreateModel(databaseService, userService);
     CreateServices(databaseService);
-    CreateUI(databaseService, userService);
+    CreateUI(databaseService, currentUserName);
     InsertWidgetsIntoLayout();
-    InitTopBar();
+    InitTopBar(currentUserName);
     ConnectObjects();
     SetMaximumWidgetSize();
 }
@@ -42,7 +42,7 @@ void Admin_GUI::CreateServices(ISqlDatabaseService *databaseService)
     m_roleDesktopService=new RoleDesktopService(databaseService);
 }
 
-void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService)
+void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, QStringView currentUserName)
 {
     m_mainLayout = new QHBoxLayout();
 
@@ -52,7 +52,7 @@ void Admin_GUI::CreateUI(ISqlDatabaseService *databaseService, LinuxUserService 
 
     m_centerSideLayout=new QVBoxLayout();
     m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_ICONS, m_userDesktopService, Q_NULLPTR, this);
-    m_userEditPanel = new UserEditPanel(userService->GetCurrentUserName(), this);
+    m_userEditPanel = new UserEditPanel(currentUserName, this);
 
     m_roleEditPanel = new RoleEditPanel(databaseService, m_roleDesktopService, this);
 }
@@ -91,14 +91,13 @@ void Admin_GUI::SetMaximumWidgetSize()
     //    this->setMaximumHeight(m_maxHeight);
 }
 
-void Admin_GUI::InitTopBar()
+void Admin_GUI::InitTopBar(QStringView currentUserName)
 {
-    QString currentUserLinuxUserName = m_linuxUserService->GetCurrentUserName();
-    const int userRole = m_databaseService->GetUserRole(currentUserLinuxUserName);
+    const int userRole = m_databaseService->GetUserRole(currentUserName);
     if(userRole!=-1)
     {
-        const QString userFCS = m_databaseService->GetUserFCS(currentUserLinuxUserName);
-        const QString userRank = m_databaseService->GetUserRank(currentUserLinuxUserName);
+        const QString userFCS = m_databaseService->GetUserFCS(currentUserName);
+        const QString userRank = m_databaseService->GetUserRank(currentUserName);
         m_leftTopBar->SetData(userRank, userFCS, userRole);
     }
 }
@@ -107,22 +106,8 @@ void Admin_GUI::OnHideAdditionalSettings(bool state)
 {
     if (state) {
         m_roleEditPanel->hide();
-        //        m_usersListWidget->setMaximumWidth(width() / 2);
-        //        m_userEditPanel->setMaximumWidth(width() / 2);
-        //        this->setMinimumSize(m_usersListWidget->minimumWidth() + m_userEditPanel->minimumWidth(), 600);
     } else {
-        //        if (m_maxWidth > 1713) {
-        //            m_usersListWidget->setFixedWidth(350);
-        //            m_userEditPanel->setFixedWidth(450);
-        //            this->setMinimumSize(1700, 600);
-        //        } else {
-        //            m_usersListWidget->setFixedWidth(250);
-        //            m_userEditPanel->setFixedWidth(350);
-        //            this->setMinimumSize(500, 600);
-        //        }
-        //        this->setMaximumSize(m_maxWidth, m_maxHeight);
         m_roleEditPanel->show();
-
     }
 }
 
@@ -138,7 +123,7 @@ void Admin_GUI::OnUserClick(const User &user)
 
 void Admin_GUI::OnDeleteUser(const QString &userId, const QString &userName)
 {
-    int roleId=m_userModel->GetRoleIdByUserId(userId);
+    const int roleId=m_userModel->GetRoleIdByUserId(userId);
     m_userModel->DeleteUser(userId);
     if(roleId>=0)
     {

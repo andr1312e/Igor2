@@ -22,13 +22,14 @@ class Admin_GUI : public QWidget
     Q_OBJECT
 
 public:
-    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, const QString &currentAdminId, QWidget *parent);
+    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QStringView currentAdminId, QStringView currentUserName, QWidget *parent);
     ~Admin_GUI();
 
 private:
     void CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
     void CreateServices(ISqlDatabaseService *databaseService);
-    void CreateUI(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+    void CreateUI(ISqlDatabaseService *databaseService, QStringView currentUserName);
+    void InitTopBar(QStringView currentUserName);
     void InsertWidgetsIntoLayout();
     void ConnectObjects();
     void SetMaximumWidgetSize();
@@ -43,9 +44,6 @@ private Q_SLOTS:
     void OnUserClick(const User &user);
     void OnDeleteUser(const QString &userId, const QString &userName);
     void OnSaveUser(const QString&userId, const QString &userName, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
-private:
-    void InitTopBar();
-
 private:
     int m_maxWidth;
     int m_maxHeight;
