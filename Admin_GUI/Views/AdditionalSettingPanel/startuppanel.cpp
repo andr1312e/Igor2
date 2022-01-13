@@ -2,8 +2,9 @@
 
 StartupPanel::StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
     : QWidget(parent)
+    , m_roleId(0)
+    , m_selectedItemIndex(-1)
 {
-    CreateModel();
     CreateServices(sqlDatabaseService);
     CreateUI();
     SetBackGroundColor();
@@ -14,7 +15,6 @@ StartupPanel::StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *par
 StartupPanel::~StartupPanel()
 {
     delete m_startupRepositoryPresenter;
-    delete m_appsList;
 
     delete m_dialogLayout;
     delete m_bottomLayout;
@@ -29,25 +29,19 @@ StartupPanel::~StartupPanel()
     delete m_deleteProgramButton;
 }
 
-void StartupPanel::CreateModel()
-{
-    m_appsList=new QStringListModel();
-}
-
 void StartupPanel::CreateServices(ISqlDatabaseService *sqlDatabaseService)
 {
-    m_startupRepositoryPresenter=new StartupRepositoryPresenter(sqlDatabaseService);
+    m_startupRepositoryPresenter=new StartupPanelPresenter(sqlDatabaseService);
 }
 
 void StartupPanel::CreateUI()
 {
-
     m_mainLayout=new QVBoxLayout();
 
     m_titleLabel=new QLabel("Список процессов которые будут перезапущены:");
 
     m_allProgramsListView=new QListView();
-    m_allProgramsListView->setModel(m_appsList);
+    m_allProgramsListView->setModel(m_startupRepositoryPresenter->GetRoleStartupsModel());
     m_allProgramsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     m_bottomLayout=new QHBoxLayout();
@@ -65,14 +59,12 @@ void StartupPanel::CreateUI()
     m_dialogLayout = new QVBoxLayout();
 
     m_dialogWidget->setMaximumHeight(200);
-
-
 }
 
 void StartupPanel::SetBackGroundColor()
 {
-    m_addProgramButton->setObjectName("add");
-    m_deleteProgramButton->setObjectName("remove");
+    m_addProgramButton->setObjectName(QStringLiteral("add"));
+    m_deleteProgramButton->setObjectName(QStringLiteral("remove"));
 
     setBackgroundRole(QPalette::Window);
     setAutoFillBackground(true);
@@ -108,17 +100,13 @@ void StartupPanel::ConnectObjects()
 
 void StartupPanel::OnDeleteProgram()
 {
-    if (m_selectedItemIndex>-1 && m_selectedItemIndex<m_appsList->rowCount())
+    if (m_selectedItemIndex>-1 && m_selectedItemIndex<m_startupRepositoryPresenter->GetMaxStartupCount())
     {
         m_deleteProgramButton->setDisabled(true);
-        QModelIndex index = m_appsList->index(m_selectedItemIndex, 0);
-        QString startupFilePath=m_appsList->data(index, Qt::DisplayRole).toString();
-        m_appsList->removeRow(m_selectedItemIndex);
-        m_selectedItemIndex=-1;
-        m_startupRepositoryPresenter->DeleteStartup(m_roleId, startupFilePath);
-        QToast* pToast=QToast::CreateToast("Программа "  + startupFilePath + " удалена",QToast::LENGTH_LONG, this);
+        const QString currentStartupNameToDelete=m_startupRepositoryPresenter->DeleteStartup(m_roleId, m_selectedItemIndex);
+        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ")  + currentStartupNameToDelete + QStringLiteral(" удалена"),QToast::LENGTH_LONG, this);
         pToast->show();
-
+        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
     }
 }
 
@@ -126,18 +114,17 @@ void StartupPanel::OnAddProgram(const QString &startupPath)
 {
     const int indexOfName=startupPath.lastIndexOf('/');
     const QString startupName=startupPath.mid(indexOfName+1);
-    const QStringList startupsList=m_appsList->stringList();
-    if (startupsList.contains(startupName))
+    if (m_startupRepositoryPresenter->HasDuplicateStartup(startupName))
     {
-        QToast* pToast=QToast::CreateToast("Программа " + startupName + " уже в базе есть. Если это другая, удалите старую", QToast::LENGTH_LONG, this);
+        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" уже в базе есть. Если это другая, удалите старую"), QToast::LENGTH_LONG, this);
         pToast->show();
     }
     else
     {
         m_startupRepositoryPresenter->AppendStartup(m_roleId, startupPath);
-        AppendStartupToModel(startupName);
-        QToast* pToast=QToast::CreateToast("Программа " + startupName + " добавлена",QToast::LENGTH_LONG, this);
+        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" добавлена"),QToast::LENGTH_LONG, this);
         pToast->show();
+        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
     }
 }
 
@@ -155,18 +142,7 @@ void StartupPanel::SetRoleId(const quint8 &roleId)
     GetAllStartups();
 }
 
-void StartupPanel::AppendStartupToModel(const QString &startupPath)
-{
-    if(m_appsList->insertRow(m_appsList->rowCount()))
-    {
-        const QModelIndex index = m_appsList->index(m_appsList->rowCount() - 1, 0);
-        qDebug()<< index.row() << " row" << index.column();
-        m_appsList->setData(index, startupPath);
-    }
-}
-
 void StartupPanel::GetAllStartups()
 {
-    QStringList list=m_startupRepositoryPresenter->GetAllStartups(m_roleId);
-    m_appsList->setStringList(list);
+    m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
 }

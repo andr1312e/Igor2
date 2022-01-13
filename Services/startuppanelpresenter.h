@@ -1,28 +1,27 @@
 #ifndef SERVICES_STARTUPMANAGERSERVICE_H
 #define SERVICES_STARTUPMANAGERSERVICE_H
-
+#include <QSqlQueryModel>
 #include <QStringList>
 #include "Services/Sql/isqlservice.h"
 #include "Services/Terminals/terminal.h"
 
-class StartupRepositoryPresenter
+class StartupPanelPresenter
 {
 public:
 
-    StartupRepositoryPresenter(ISqlDatabaseService *sqlDatabaseService);
+    StartupPanelPresenter(ISqlDatabaseService *sqlDatabaseService);
+    ~StartupPanelPresenter();
 
-    ~StartupRepositoryPresenter();
-
+public:
     void CheckStartupTable(const quint8 &roleId);
-
-    QStringList GetAllStartups(const quint8 &roleId);
-
-    void DeleteStartup(const quint8 &roleId, const QString &startupName);
-
+    QSqlQueryModel *GetRoleStartupsModel();
+    int GetMaxStartupCount();
+    bool HasDuplicateStartup(QStringView startupName);
+    void GetAllStartupsIntoModel(const quint8 &roleId);
+    QString DeleteStartup(const int &roleId, const int &selectedItem);
     void AppendStartup(const quint8 &roleId, const QString &startupPath);
 
 private:
-    void TryDeleteFile(const QString &startupPath);
     QString TryToCopyFile(const QString &startupPath);
 
 private:

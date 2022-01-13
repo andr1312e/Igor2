@@ -28,7 +28,7 @@ class DesktopPanel: public QWidget
 {
    Q_OBJECT
 public:
-   DesktopPanel(const ICONS_PANEL_TYPE type, UserDesktopService * userDesktopService, RoleDesktopService * roleDesktopService, QWidget *parent);
+   explicit DesktopPanel(const ICONS_PANEL_TYPE type, UserDesktopService * userDesktopService, RoleDesktopService * roleDesktopService, QWidget *parent);
    ~DesktopPanel();
 
 private:
@@ -52,7 +52,7 @@ public:
    void SetUser(const User &user);
    void SetRoleId(const quint8 &roleId);//userName || role
 private:
-   bool IsUserData();
+   bool IsUserData() const;
 private:
 
    quint8 m_roleId;

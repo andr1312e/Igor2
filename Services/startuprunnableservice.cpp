@@ -60,7 +60,7 @@ void StartupRunnableManager::timerEvent(QTimerEvent *event)
     else
     {
         QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList("StartupRunnableManager::InitStartupProcessList");
-        for (const QString &alreadyRunningApp:m_listAlreadyRunningsApps)
+        for (const QString &alreadyRunningApp:qAsConst(m_listAlreadyRunningsApps))
         {
             if(!listOfAlreadyRunningProcessName.contains(alreadyRunningApp))
             {

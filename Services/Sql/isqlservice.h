@@ -1,9 +1,11 @@
 #ifndef ISQLSERVICE_H
 #define ISQLSERVICE_H
 
+class QSqlQueryModel;
 
 #include "Structs/userstruct.h"
 #include "Structs/programstruct.h"
+
 
 class ISqlDatabaseService
 {
@@ -48,6 +50,10 @@ public:
     virtual void RemoveStartupIntoRole(int roleId, const QString &startupPath) = 0;
 
     virtual QStringList GetAllRoleStartups(int roleId) = 0;
+
+    virtual void GetAllRoleStartupsIntoModel(int roleId) = 0;
+
+    virtual QSqlQueryModel* GetRoleStartupsModel() = 0;
 
     //desktops
     virtual void AppendDesktopIntoRole(int roleId, const DesktopEntity &entity) = 0;

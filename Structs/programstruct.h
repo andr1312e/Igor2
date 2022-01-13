@@ -11,7 +11,7 @@ struct DesktopEntity{
     QString icon;
 };
 
-Q_DECLARE_TYPEINFO(DesktopEntity, Q_PRIMITIVE_TYPE);
+Q_DECLARE_TYPEINFO(DesktopEntity, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(DesktopEntity)
 
 

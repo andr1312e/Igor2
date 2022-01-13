@@ -48,6 +48,7 @@ SOURCES += \
     Services/Sql/sqldatabaseserivce.cpp \
     Services/idesktopservice.cpp \
     Services/roledesktopservice.cpp \
+    Services/startuppanelpresenter.cpp \
     Services/userdesktopservice.cpp \
     Styles/Frameless/windowtitlebar.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
@@ -57,6 +58,8 @@ SOURCES += \
     Styles/InteractiveButtons/restorewindowbutton.cpp \
     Styles/Themes/stylechanger.cpp \
     Styles/Themes/theme.cpp \
+    Tray/traymenu.cpp \
+    Tray/traymenuitem.cpp \
     functionswithstrings.cpp \
     main.cpp \
     User_GUI/User_GUI.cpp \
@@ -87,7 +90,6 @@ SOURCES += \
     Admin_GUI/Views/admingui.cpp \
     Admin_GUI/Views/linuxuserslistwidget.cpp \
     Admin_GUI/Views/SettingsPanel/usereditpanel.cpp \
-    Services/startuprepositoryservice.cpp \
     Services/startuprunnableservice.cpp \
     Server/messagesrepository.cpp \
     Server/dataHandler.cpp \
@@ -97,7 +99,7 @@ SOURCES += \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp \
     Admin_GUI/Wizard/Views/startupwizard.cpp \
-    tray.cpp
+    Tray/tray.cpp
 
 HEADERS += \
     Admin_GUI/Validator/stringvalidator.h \
@@ -123,6 +125,7 @@ HEADERS += \
     Services/Sql/sqldatabaseserivce.h \
     Services/idesktopservice.h \
     Services/roledesktopservice.h \
+    Services/startuppanelpresenter.h \
     Services/userdesktopservice.h \
     Structs/userstruct.h \
     Structs/programstruct.h \
@@ -173,8 +176,10 @@ HEADERS += \
     Services/kioskservice.h \
     Services/linuxuserservice.h \
     Services/Terminals/terminal.h \
-    Services/startuprepositoryservice.h \
     Services/startuprunnableservice.h \
+    Tray/traymenu.h \
+    Tray/traymenuanimation.h \
+    Tray/traymenuitem.h \
     User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
@@ -182,7 +187,7 @@ HEADERS += \
     functionswithstrings.h \
     program.h \
     Admin_GUI/Wizard/Views/startupwizard.h \
-    tray.h
+    Tray/tray.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt

@@ -19,7 +19,7 @@ private:
     void InstallPackage(const QString &packageName);
 private:
     Terminal* const m_terminal;
-    QStringList* const m_dependenciesList;
+    QStringList m_dependenciesList;
 
     const QString m_astraPackageManagerName="synaptic";
     const QString m_astraPackageManagerNameService="synaptic-pkexec";

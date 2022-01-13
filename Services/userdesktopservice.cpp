@@ -47,7 +47,7 @@ void UserDesktopService::DeleteAllIconsToUser(const int &roleId, const QString &
     const QList<DesktopEntity> entities=m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     for (const DesktopEntity &entity : entities)
     {
-        DeleteIcon(userDesktopPath+entity.name+m_desktopFileType);
+        DeleteIcon(userDesktopPath, entity.name);
     }
 }
 

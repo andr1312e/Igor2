@@ -3,9 +3,12 @@
 
 #include <QObject>
 #include <QAction>
-#include <QMenu>
 #include <QSystemTrayIcon>
 #include <QMovie>
+#include <QLabel>
+#include <QPushButton>
+
+#include "Tray/traymenu.h"
 
 class Tray : public QObject
 {
@@ -16,7 +19,7 @@ public:
 private:
     void InitActions();
     void CreateUI();
-    void InitUI();
+    void InitUIAndInsertWidgetIntoLayouts();
     void ConnectObjects();
 Q_SIGNALS:
     void ToHideApp();
@@ -33,14 +36,28 @@ private:
     QString m_userName;
     QString m_userRole;
 
-   QAction *m_minimizeAction;
-   QAction *m_restoreAction;
-   QAction *m_quitAction;
+private:
 
-   QMenu *m_trayIconMenu;
-   QSystemTrayIcon *m_trayIcon;
+    QAction *m_minimizeAction;
+    QAction *m_restoreAction;
 
-   QMovie *m_movie;
+    QAction *m_slopRunnableServiceButton;
+    QAction *m_restartAllAppsRunnableServiceButton;
+    QAction *m_startRunnableServiceButton;
+
+    QAction *m_activateLogs;
+    QAction *m_disactivateLogs;
+
+    QAction *m_weatherIcon;
+
+    QAction *m_dropAllDbAndClose;
+    QAction *m_quitAction;
+
+    TrayMenu *m_trayIconMenu;
+    QSystemTrayIcon *m_trayIcon;
+
+    QMovie *m_trayMenuIconMovie;
+    const int m_spacing=5;
 
 };
 

@@ -9,6 +9,7 @@
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
 #include <QStringList>
+#include <QListView>
 
 #include "Services/Sql/tablecolumnsnames.h"
 
@@ -46,6 +47,8 @@ public:
     virtual void AppendStartupIntoRole(int roleId, const QString &exec) Q_DECL_OVERRIDE;
     virtual void RemoveStartupIntoRole(int roleId, const QString &startupPath) Q_DECL_OVERRIDE;
     virtual QStringList GetAllRoleStartups(int roleId) Q_DECL_OVERRIDE;
+    virtual void GetAllRoleStartupsIntoModel(int roleId) Q_DECL_OVERRIDE;
+    virtual QSqlQueryModel * GetRoleStartupsModel() Q_DECL_OVERRIDE;
 
     virtual void AppendDesktopIntoRole(int roleId, const DesktopEntity &entity) Q_DECL_OVERRIDE;
     virtual void RemoveDesktopIntoRole(int roleId, const QString &entityName) Q_DECL_OVERRIDE;
@@ -74,7 +77,7 @@ private:
 private:
     const QString postgeSqlDatabaseDriverStringKey="QPSQL";
     QSqlDatabase * m_db;
-
+    QSqlQueryModel* const m_currentRoleModel;
     const QString usersTablePrefix="rlstiusers";
     const QString startupTablePrefix="rlstistartups";
     const QString desktopTablePrefix="rlstidesktops";

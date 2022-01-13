@@ -26,6 +26,58 @@ Terminal *DesktopService::GetTerminal()
     return m_terminal;
 }
 
+DesktopEntity DesktopService::MoveFilesToProgramFolder(const DesktopEntity &entity)
+{
+    DesktopEntity movedEntity=entity;
+    movedEntity.exec=CopyExecFile(entity.exec);
+    movedEntity.icon=CopyIconFile(entity.icon);
+    return  movedEntity;
+}
+
+QString DesktopService::CopyExecFile(const QString &pathToDesktopExec)
+{
+    const int indexOfFileNameBegin=pathToDesktopExec.lastIndexOf('/');
+    const QString execFileName=pathToDesktopExec.mid(indexOfFileNameBegin+1);
+    const QStringRef execFolderName=pathToDesktopExec.leftRef(indexOfFileNameBegin+1);
+    if(m_destinationFolder==execFolderName)
+    {
+        return pathToDesktopExec;
+    }
+    else
+    {
+        if(m_terminal->IsDirNotExists(m_destinationFolder, Q_FUNC_INFO, true))
+        {
+            m_terminal->CreateFolder(m_destinationFolder, Q_FUNC_INFO, true);
+        }
+        if(m_terminal->IsFileExists(m_destinationFolder+execFileName, Q_FUNC_INFO, true))
+        {
+            m_terminal->DeleteFileSudo(m_destinationFolder+execFileName, Q_FUNC_INFO);
+        }
+        m_terminal->CopyFileSudo(pathToDesktopExec, m_destinationFolder, Q_FUNC_INFO);
+        return m_destinationFolder+execFileName;
+    }
+}
+
+QString DesktopService::CopyIconFile(const QString &pathToDesktopIcon)
+{
+    const int indexOfIconNameBegin=pathToDesktopIcon.lastIndexOf('/');
+    const QString iconFileName=pathToDesktopIcon.mid(indexOfIconNameBegin+1);
+    const QStringRef iconFolderName=pathToDesktopIcon.leftRef(indexOfIconNameBegin+1);
+    if(m_destinationFolder==pathToDesktopIcon)
+    {
+        return pathToDesktopIcon;
+    }
+    else
+    {
+        if(m_terminal->IsFileExists(m_destinationFolder+iconFileName, Q_FUNC_INFO, true))
+        {
+            m_terminal->DeleteFileSudo(m_destinationFolder+iconFileName, Q_FUNC_INFO);
+        }
+        m_terminal->CopyFileSudo(pathToDesktopIcon, m_destinationFolder, Q_FUNC_INFO);
+        return m_destinationFolder+iconFileName;
+    }
+}
+
 void DesktopService::CheckPath(const QString &pathToDesktop)
 {
     if(m_terminal->IsDirNotExists(pathToDesktop, Q_FUNC_INFO, true))
@@ -42,30 +94,30 @@ void DesktopService::CreateIconWithData(const QString &userDesktopPath, const De
     WriteIconDataToFile(userDesktopPath, iconProperties, entity.name);
 }
 
-void DesktopService::DeleteIcon(const QString &pathToIcon)
+void DesktopService::DeleteIcon(const QString &pathToDesktop, const QString &desktopName)
 {
-    if (m_terminal->IsFileExists(pathToIcon, Q_FUNC_INFO, true))
+    const QString fullPathToIcon=pathToDesktop+desktopName+m_iconType;
+    if (m_terminal->IsFileExists(fullPathToIcon, Q_FUNC_INFO, true))
     {
-        m_terminal->DeleteFileSudo(pathToIcon, Q_FUNC_INFO);
+        m_terminal->DeleteFileSudo(fullPathToIcon, Q_FUNC_INFO);
     }
 }
 
 void DesktopService::CreateIcon(const QString &userDesktopPath, const QString &iconName)
 {
-    const QString pathToDesktopIcon = userDesktopPath + iconName + ".desktop";
-
-    if (m_terminal->IsFileNotExists(pathToDesktopIcon, Q_FUNC_INFO, true)) {
-        m_terminal->CreateFile(pathToDesktopIcon, Q_FUNC_INFO, true);
+    const QString fullPathToIcon = userDesktopPath + iconName + m_iconType;
+    if (m_terminal->IsFileNotExists(fullPathToIcon, Q_FUNC_INFO, true)) {
+        m_terminal->CreateFile(fullPathToIcon, Q_FUNC_INFO, true);
     } else {
-        m_terminal->ClearFileSudo(pathToDesktopIcon, Q_FUNC_INFO);
+        m_terminal->ClearFileSudo(fullPathToIcon, Q_FUNC_INFO);
     }
 }
 
 const QString DesktopService::CreateIconData(const DesktopEntity &entity) const
 {
     QString iconText = "[Desktop Entry]\nType=Application\nExec='" + entity.exec + "'\n";
-    iconText += "Name= " + entity.name + "\nName[ru]= " + entity.name +
-            "\nIcon= " + entity.icon + "\n";
+    iconText += "Name="+ entity.name + "\nName[ru]="+ entity.name +
+            "\nIcon="+ entity.icon + "\n";
     return iconText;
 }
 

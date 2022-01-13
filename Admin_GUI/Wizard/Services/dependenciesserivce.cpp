@@ -2,19 +2,18 @@
 
 DependenciesService::DependenciesService()
     : m_terminal(Terminal::GetTerminal())
-    , m_dependenciesList(new QStringList())
 {
 
 }
 
 DependenciesService::~DependenciesService()
 {
-    delete m_dependenciesList;
+
 }
 
 void DependenciesService::GetDependenciesFromBackUp(const QDomElement &dependenciedsXmlElement)
 {
-    m_dependenciesList->clear();
+    m_dependenciesList.clear();
     const QDomNodeList dependencies=dependenciedsXmlElement.childNodes();
     for (int i=0; i<dependencies.count(); ++i)
     {
@@ -23,16 +22,16 @@ void DependenciesService::GetDependenciesFromBackUp(const QDomElement &dependenc
         QString dependecyName=dependencyDomElement.text();
         if(ValidateDependency(dependecyName))
         {
-            m_dependenciesList->push_back(dependecyName);
+            m_dependenciesList.push_back(dependecyName);
         }
     }
-    m_dependenciesList->removeDuplicates();
-    m_dependenciesList->removeAll("");
+    m_dependenciesList.removeDuplicates();
+    m_dependenciesList.removeAll("");
 }
 
 void DependenciesService::InstallDependencies()
 {
-    if(m_dependenciesList->isEmpty())
+    if(m_dependenciesList.isEmpty())
     {
         return;
     }
@@ -41,7 +40,7 @@ void DependenciesService::InstallDependencies()
         CloseSynapticIfItRunned();
         const QStringList installedInSystemPackages=m_terminal->GetAllInstalledPackageNames(Q_FUNC_INFO);
         const QStringList notInstalledInSystemPackages=m_terminal->GetAllNotInstalledPackageNames(Q_FUNC_INFO);
-        for (const QString &dependency: *m_dependenciesList)
+        for (const QString &dependency: qAsConst(m_dependenciesList))
         {
             if(notInstalledInSystemPackages.contains(dependency))
             {
@@ -64,7 +63,7 @@ void DependenciesService::InstallDependencies()
 
 const QStringList &DependenciesService::GetAllDependenciesList() const
 {
-    return  *m_dependenciesList;
+    return m_dependenciesList;
 }
 
 bool DependenciesService::ValidateDependency(QString &dependency)

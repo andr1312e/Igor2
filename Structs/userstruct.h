@@ -20,73 +20,69 @@ struct User{
 //    }
 };
 
-static const QStringList Roles={    "Пользователь",
-                                    "Оператор",
-                                    "Специалист",
-                                    "Администратор", };
+Q_DECLARE_TYPEINFO(User, Q_MOVABLE_TYPE);
 
-static const QVarLengthArray<QString,4> RolesToolTip={"Просмотр базы данных недоступен. Доступны только базовые возможности",
-                                                      "Просмотр базы данных недоступен. В запускаемых программах будут включены возможности: ",
-                                                      "Обладает возможностями по просмотру базы данных",
-                                                      "Обладает неограниченными возможностями по редактированию базы данных, устанавливаете эту роль только по необходимости", };
+static const QStringList Roles={    QStringLiteral("Пользователь"),
+                                    QStringLiteral("Оператор"),
+                                    QStringLiteral("Специалист"),
+                                    QStringLiteral("Администратор"), };
+
+static const QVarLengthArray<QString,4> RolesToolTip={
+                                                      QStringLiteral("Просмотр базы данных недоступен. Доступны только базовые возможности"),
+                                                      QStringLiteral("Просмотр базы данных недоступен. В запускаемых программах будут включены возможности: QStringLiteral"),
+                                                      QStringLiteral("Обладает возможностями по просмотру базы данных"),
+                                                      QStringLiteral("Обладает неограниченными возможностями по редактированию базы данных, устанавливаете эту роль только по необходимости"), };
 
 
 //Звание
-static const QStringList Ranks={    "Рядовой",
-                                    "Ефрейтор",
-                                    "Младший сержант",
-                                    "Сержант",
-                                    "Старший сержант",
-                                    "Старшина",
-                                    "Прапорщик",
-                                    "Старший прапорщик",
-                                    "Младший лейтенант",
-                                    "Лейтенант",
-                                    "Старший лейтенант",
-                                    "Капитан",
-                                    "Майор",
-                                    "Подполковник",
-                                    "Полковник",
-                                    "Генерал-майор",
-                                    "Генерал-лейтенант",
-                                    "Генерал-полковник", };
+static const QStringList Ranks={    QStringLiteral("Рядовой"),
+                                    QStringLiteral("Ефрейтор"),
+                                    QStringLiteral("Младший сержант"),
+                                    QStringLiteral("Сержант"),
+                                    QStringLiteral("Старший сержант"),
+                                    QStringLiteral("Старшина"),
+                                    QStringLiteral("Прапорщик"),
+                                    QStringLiteral("Старший прапорщик"),
+                                    QStringLiteral("Младший лейтенант"),
+                                    QStringLiteral("Лейтенант"),
+                                    QStringLiteral("Старший лейтенант"),
+                                    QStringLiteral("Капитан"),
+                                    QStringLiteral("Майор"),
+                                    QStringLiteral("Подполковник"),
+                                    QStringLiteral("Полковник"),
+                                    QStringLiteral("Генерал-майор"),
+                                    QStringLiteral("Генерал-лейтенант"),
+                                    QStringLiteral("Генерал-полковник"), };
 
 
-static const QVarLengthArray<QString,18>  RanksICO={":/images/Звания/Рядовой",
-                                                    ":/images/Звания/Ефрейтор",
-                                                    ":/images/Звания/Младший-сержант",
-                                                    ":/images/Звания/Сержант",
-                                                    ":/images/Звания/Старший-сержант",
-                                                    ":/images/Звания/Старшина",
-                                                    ":/images/Звания/Прапорщик",
-                                                    ":/images/Звания/Старший-прапорщик",
-                                                    ":/images/Звания/Младший-лейтенант",
-                                                    ":/images/Звания/Лейтенант",
-                                                    ":/images/Звания/Старший-лейтенант",
-                                                    ":/images/Звания/Капитан",
-                                                    ":/images/Звания/Майор",
-                                                    ":/images/Звания/Подполковник",
-                                                    ":/images/Звания/Полковник",
-                                                    ":/images/Звания/Генерал-майор",
-                                                    ":/images/Звания/Генерал-лейтенант",
-                                                    ":/images/Звания/Генерал-полковник", };
-
-
-
-static const QStringList UserKeys={ "1-",
-                                    "1+",
-                                    "2-",
-                                    "2+", };
+static const QVarLengthArray<QString,18>  RanksICO={QStringLiteral(":/images/Звания/Рядовой"),
+                                                    QStringLiteral(":/images/Звания/Ефрейтор"),
+                                                    QStringLiteral(":/images/Звания/Младший-сержант"),
+                                                    QStringLiteral(":/images/Звания/Сержант"),
+                                                    QStringLiteral(":/images/Звания/Старший-сержант"),
+                                                    QStringLiteral(":/images/Звания/Старшина"),
+                                                    QStringLiteral(":/images/Звания/Прапорщик"),
+                                                    QStringLiteral(":/images/Звания/Старший-прапорщик"),
+                                                    QStringLiteral(":/images/Звания/Младший-лейтенант"),
+                                                    QStringLiteral(":/images/Звания/Лейтенант"),
+                                                    QStringLiteral(":/images/Звания/Старший-лейтенант"),
+                                                    QStringLiteral(":/images/Звания/Капитан"),
+                                                    QStringLiteral(":/images/Звания/Майор"),
+                                                    QStringLiteral(":/images/Звания/Подполковник"),
+                                                    QStringLiteral(":/images/Звания/Полковник"),
+                                                    QStringLiteral(":/images/Звания/Генерал-майор"),
+                                                    QStringLiteral(":/images/Звания/Генерал-лейтенант"),
+                                                    QStringLiteral(":/images/Звания/Генерал-полковник"), };
 
 static const QStringList comboBoxSearchAttributes={
-    "ФИО",
-    "ID",
-    "Имя в ОС Astra",
+    QStringLiteral("ФИО"),
+    QStringLiteral("ID"),
+    QStringLiteral("Имя в ОС Astra"),
 };
 
 static const QStringList userEditFields={
-    "Добавить пользователя в базу:",
-    "Изменить данные пользователя:"
+    QStringLiteral("Добавить пользователя в базу:"),
+    QStringLiteral("Изменить данные пользователя:")
 };
 
 Q_DECLARE_METATYPE(User)

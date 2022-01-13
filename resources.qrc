@@ -63,5 +63,11 @@
         <file>images/iconDelegateWhite.ico</file>
         <file>images/data-cleaning-blacked.ico</file>
         <file>images/data-clearing_white.ico</file>
+        <file>images/tray/checkBlack.png</file>
+        <file>images/tray/closeBlack.png</file>
+        <file>images/tray/playBlack.png</file>
+        <file>images/tray/refreshBlack.png</file>
+        <file>images/tray/stopBlack.png</file>
+        <file>images/tray/weatherNotBlack.png</file>
     </qresource>
 </RCC>

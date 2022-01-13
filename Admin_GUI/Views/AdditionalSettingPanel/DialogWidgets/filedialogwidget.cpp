@@ -84,7 +84,7 @@ void DesktopUploadDialogWidget::InsertWidgetsIntoLayout()
 
 void DesktopUploadDialogWidget::FillUI()
 {
-   m_iconPath->setLabel("Путь к иконке: (если отдельно от приложения)");
+   m_iconPath->setLabel("Путь к иконке: (необязательно)");
    m_titleLabel->setAlignment(Qt::AlignCenter);
    m_execButton->setText("Выбрать файл");
    m_exec->setLabel("Путь к исполняемому файлу: (Обязательно)");

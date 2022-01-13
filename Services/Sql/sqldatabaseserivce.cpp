@@ -2,8 +2,11 @@
 
 SqlDatabaseSerivce::SqlDatabaseSerivce(QObject *parent)
     : QObject(parent)
+    , m_currentRoleModel(new QSqlQueryModel(this))
+
 {
     qDebug()<< "DbDrivers" << QSqlDatabase::drivers();
+
 }
 
 SqlDatabaseSerivce::~SqlDatabaseSerivce()
@@ -13,6 +16,7 @@ SqlDatabaseSerivce::~SqlDatabaseSerivce()
         m_db->close();
     }
     delete m_db;
+    delete m_currentRoleModel;
 }
 
 bool SqlDatabaseSerivce::ConnectToDataBase(const QString &hostName, const quint16 &port, const QString &databaseName, const QString &userName, const QString &dbPassword)
@@ -548,6 +552,7 @@ void SqlDatabaseSerivce::AppendStartupIntoRole(int roleId, const QString &exec)
 
 QStringList SqlDatabaseSerivce::GetAllRoleStartups(int roleId)
 {
+
     QSqlQueryModel sqlQueryModel(this);
     QStringList listOfStartups;
     QSqlQuery query(*m_db);
@@ -579,9 +584,35 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(int roleId)
     return listOfStartups;
 }
 
+void SqlDatabaseSerivce::GetAllRoleStartupsIntoModel(int roleId)
+{
+    QStringList listOfStartups;
+    QSqlQuery query(*m_db);
+    query.prepare("SELECT " + startupPathCN + " FROM "+ startupTablePrefix +QString::number(roleId));
+    if(query.exec())
+    {
+        m_currentRoleModel->setQuery(query);
+        qDebug()<<m_currentRoleModel->columnCount();
+        qDebug()<<m_currentRoleModel->rowCount();
+        if(m_currentRoleModel->columnCount()!=1)
+        {
+            qFatal("Wrong column count");
+        }
+    }
+    else
+    {
+        const QString errorMessage=QString("Не удалось получить  все исполняемые файлы  для роли: " ).arg(roleId);
+        qFatal("%s", errorMessage.toUtf8().constData());
+    }
+}
+
+QSqlQueryModel *SqlDatabaseSerivce::GetRoleStartupsModel()
+{
+    return m_currentRoleModel;
+}
+
 void SqlDatabaseSerivce::RemoveStartupIntoRole(int roleId, const QString &startupPath)
 {
-
     QSqlQuery query;
     const QString request="DELETE FROM "+ startupTablePrefix + QString::number(roleId) +
             " WHERE "+ startupPathCN +"=\'"+ startupPath+ "\'";

@@ -31,12 +31,13 @@ void RoleDesktopService::GetAllRoleDesktops(const quint8 &roleId)
 void RoleDesktopService::AddIconToRole(const quint8 &roleId, const DesktopEntity &entity)
 {
     const QStringList userWithThisRoleId=m_sqlDatabaseService->GetAllUsersWithRoleId(roleId);
+    const DesktopEntity newEntity=MoveFilesToProgramFolder(entity);
     for (const QString &userName: userWithThisRoleId)
     {
         const QString userDesktopPath = GetUserDesktopPath(userName);
-        CreateIconWithData(userDesktopPath, entity);
+        CreateIconWithData(userDesktopPath, newEntity);
     }
-    m_sqlDatabaseService->AppendDesktopIntoRole(roleId, entity);
+    m_sqlDatabaseService->AppendDesktopIntoRole(roleId, newEntity);
     GetAllRoleDesktops(roleId);
 }
 
@@ -47,7 +48,7 @@ void RoleDesktopService::DeleteIconToRole(const quint8 &roleId, const QString ic
     {
         const QString userDesktopPath = GetUserDesktopPath(userName);
         CheckPath(userDesktopPath);
-        DeleteIcon(userDesktopPath+iconName);
+        DeleteIcon(userDesktopPath, iconName);
     }
     m_sqlDatabaseService->RemoveDesktopIntoRole(roleId, iconName);
     GetAllRoleDesktops(roleId);
@@ -70,7 +71,7 @@ void RoleDesktopService::DeleteOldIconsFromUser(const quint8 &roleId, const QStr
 
     for (const DesktopEntity &entityToDelete: listOfDesktopsToDelete)
     {
-        DeleteIcon(userDesktopPath+entityToDelete.name);
+        DeleteIcon(userDesktopPath, entityToDelete.name);
     }
 }
 
@@ -79,10 +80,7 @@ void RoleDesktopService::SetIconsToUser(const quint8 &roleId, const QString &use
     const QList<DesktopEntity> listOfDesktops= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     for (const DesktopEntity &entity: listOfDesktops)
     {
-        if (m_terminal->IsFileNotExists(userDesktopPath+entity.name, Q_FUNC_INFO, true))
-        {
-            CreateIconWithData(userDesktopPath, entity);
-        }
+        CreateIconWithData(userDesktopPath, entity);
     }
 }
 

@@ -144,7 +144,7 @@ void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, co
     entity.exec=exec;
     entity.icon=iconPath;
     entity.name=iconName;
-    entity.type="Application";
+    entity.type=QStringLiteral("Application");
     if(IsUserData())
     {
         m_userDesktopService->AddIconToUser(m_userName, entity);
@@ -211,7 +211,7 @@ void DesktopPanel::SetRoleId(const quint8 &roleId)
     }
 }
 
-bool DesktopPanel::IsUserData()
+bool DesktopPanel::IsUserData() const
 {
     return m_type==ICONS_PANEL_TYPE::USER_ICONS;
 }

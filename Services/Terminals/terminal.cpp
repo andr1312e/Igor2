@@ -25,7 +25,7 @@ Terminal::~Terminal()
    delete m_process;
 }
 
-QString Terminal::RunConsoleCommand(const QString &command, const char* calledFunc)
+QString Terminal::RunConsoleCommand(const QString &command, const char *calledFunc)
 {
    m_consoleCommand->last() = command;
    m_process->start("/bin/sh", *m_consoleCommand);

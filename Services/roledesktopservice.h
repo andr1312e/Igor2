@@ -23,6 +23,7 @@ public:
 private:
     void DeleteOldIconsFromUser(const quint8 &roleId, const QString &userDesktopPath);
     void SetIconsToUser(const quint8 &roleId, const QString &userDesktopPath);
+    DesktopEntity CopyExecToRlsTIFolderAndReturnNewEntity(const DesktopEntity &entity);
 };
 
 #endif // ROLEDESKTOPSERVICE_H

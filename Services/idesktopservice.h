@@ -17,14 +17,19 @@ public:
     Terminal *GetTerminal();
 
 protected:
+    DesktopEntity MoveFilesToProgramFolder(const DesktopEntity &entity);
+
     void CheckPath(const QString &pathToDesktop);
     void CreateIconWithData(const QString &userDesktopPath, const DesktopEntity &entity);
-    void DeleteIcon(const QString &pathToIcon);
+    void DeleteIcon(const QString &pathToDesktop, const QString &desktopName);
 private:
+    QString CopyExecFile(const QString &pathToDesktopExec);
+    QString CopyIconFile(const QString &pathToDesktopIcon);
+
     void CreateIcon(const QString &userDesktopPath, const QString &iconName);
     const QString CreateIconData(const DesktopEntity &entity) const;
     void WriteIconDataToFile(const QString &userDesktopPath,
-                                   const QString &iconName, const QString &userName);
+                             const QString &iconName, const QString &userName);
 protected:
     const QString GetUserDesktopPath(const QString &userName) const;
 

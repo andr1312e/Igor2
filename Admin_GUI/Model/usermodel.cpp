@@ -15,7 +15,7 @@ UserModel::~UserModel()
 
 int UserModel::GetRoleIdByUserId(const QString &userId) const
 {
-    for (const User &user : m_users)
+    for (const User &user : qAsConst(m_users))
     {
         if (userId==user.userId)
         {
@@ -113,7 +113,7 @@ void UserModel::FillModelByList()
 {
     m_model->clear();
 
-    for (const User & user :m_users) {
+    for (const User & user :qAsConst(m_users)) {
         QStandardItem *item = new QStandardItem();
         item->setData(QVariant::fromValue(user), Qt::UserRole + 1);
         m_model->appendRow(item);

@@ -14,7 +14,7 @@
 
 #include "Server/dataHandler.h"
 
-#include "tray.h"
+#include "Tray/tray.h"
 #include "Admin_GUI/Views/admingui.h"
 #include "Admin_GUI/Wizard/Views/startupwizard.h"
 
