@@ -48,17 +48,10 @@ private:
     void SetStyleToButton(InteractiveButtonBase* button);
 private:
     void CalculateWidgetRectOnScreen();
-<<<<<<< HEAD
     void SetRoundedFormToWidget();
     void MakeBlurImageOnBackGroundForPaintEvent();
     void ShowedButtonAnimationStart();
     void HiddenButtonAnimationStart(std::vector<TrayMenuItem*>::iterator indexOfButtonInFocusNow);
-=======
-    void SetRoundedRectToWidgetBackground();
-    void MakeBlurImageOnBackGroundForPaintEvent(QScreen *screen, const QRect &widgetRect, const int &radius);
-    void StartButtonAnimationOnShowedMainRectange();
-    void StartAnimationOnHidden(int focusIndex);
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
 
 private:
     QColor m_normalBackGroud; // Обычный фон (используется как глобальный для упрощения настройки)
@@ -82,17 +75,11 @@ private:
 private:
     const QRect m_availableGeometry;
     const int m_durationToAnimateElementsMiliseconds = 700;
-<<<<<<< HEAD
     const int m_minDurationToAnimateHidedElementsInMiliseconds=400;
     const int m_itemPadding = 8; // пустое пространство вокруг каждого элемента
     const int m_blurAlphaValue=30; // Уровень отображения фонового изображения, 0 отключен, 1~100 — прозрачность размытия
     const int m_borderRadius = 20; // закругленные углы
     const int m_blurRadius=64; //радиус размытия
-=======
-    const int m_itemPadding = 8; // пустое пространство вокруг каждого элемента
-    const int m_blurAlphaValue=30; // Уровень отображения фонового изображения, 0 отключен, 1~100 — прозрачность размытия
-    const int m_borderRadius = 20; // закругленные углы
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
     QRect m_trayMenuPosition;
 
     // Изменяемые свойства конфигурации

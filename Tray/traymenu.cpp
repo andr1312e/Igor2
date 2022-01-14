@@ -197,7 +197,6 @@ void TrayMenu::SetStyleToButton(InteractiveButtonBase *button)
     QFont font(button->font());
     font.setWeight(QFont::Medium);
     button->setFont(font);
-<<<<<<< HEAD
 }
 
 void TrayMenu::CalculateWidgetRectOnScreen()
@@ -222,38 +221,6 @@ void TrayMenu::CalculateWidgetRectOnScreen()
  */
 void TrayMenu::SetRoundedFormToWidget()
 {
-=======
-}
-
-void TrayMenu::CalculateWidgetRectOnScreen()
-{
-    // Автоматически регулировать диапазон на основе высоты и ширины
-    QRect widgetRect = geometry();
-    widgetRect.moveTo(QPoint(1750, 550));
-
-    QRect expt=QRect(QPoint(1750, 750), QSize(150, 200));
-    if (widgetRect.left() <= expt.right() && widgetRect.right() > expt.right())
-        widgetRect.moveLeft(expt.right());
-    widgetRect.moveTop(expt.top());
-
-    // Избегайте положения вне экрана
-    if (expt.left() > widgetRect.width() && widgetRect.right() >= m_availableGeometry.right())
-        widgetRect.moveLeft(expt.left() - widgetRect.width());
-    if (widgetRect.bottom() >= m_availableGeometry.bottom())
-    {
-        if (expt.top() > widgetRect.height())
-            widgetRect.moveTop(expt.bottom() - widgetRect.height());
-        else
-            widgetRect.moveTop(m_availableGeometry.bottom() - widgetRect.height());
-    }
-
-    // переместить окно
-    move(widgetRect.topLeft());
-}
-
-void TrayMenu::SetRoundedRectToWidgetBackground()
-{
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
     QPixmap pixmap(size());//создаем картинку
     pixmap.fill(Qt::transparent);//заполняем прозрачным все
     QPainter pixmapPainter(&pixmap);
@@ -261,7 +228,6 @@ void TrayMenu::SetRoundedRectToWidgetBackground()
     QPainterPath path;
     path.addRoundedRect(0, 0, width(), height(), m_borderRadius, m_borderRadius);//заполняем белым все кроме углов, они прозрачные
     pixmapPainter.fillPath(path, Qt::white);
-<<<<<<< HEAD
     QWidget::setMask(pixmap.mask());
 }
 
@@ -278,35 +244,6 @@ void TrayMenu::MakeBlurImageOnBackGroundForPaintEvent()
     painter.fillRect(0, 0, pixmap.width(), pixmap.height(), newBackgroundColor);
 
     m_backgroundPixmap = pixmap.copy(m_blurRadius, m_blurRadius, pixmap.width()-m_blurRadius*2, pixmap.height()-m_blurRadius*2);
-=======
-    this->setMask(pixmap.mask());
-}
-
-void TrayMenu::MakeBlurImageOnBackGroundForPaintEvent(QScreen* screen, const QRect &widgetRect,const int &radius)
-{
-
-
-
-    QPixmap backGroundImage = screen->grabWindow(QApplication::desktop()->winId(), widgetRect.left(), widgetRect.top(), widgetRect.width(), widgetRect.height());
-
-    // начать размывать
-    QT_BEGIN_NAMESPACE
-    extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
-    QT_END_NAMESPACE
-
-    QPixmap pixmap = backGroundImage;
-    QPainter painter(&pixmap);
-    // Заполните полупрозрачным цветом фона, чтобы не быть слишком прозрачным.
-    QColor backGroundColor(m_normalBackGroud);
-    backGroundColor.setAlpha(m_normalBackGroud.alpha() * (100 - m_blurAlphaValue) / 100);
-    painter.fillRect(0, 0, pixmap.width(), pixmap.height(), backGroundColor);
-    QImage img = pixmap.toImage();
-    qt_blurImage(&painter, img, radius, true, false );
-    // Обрежьте края (после размытия будут черные границы)
-    int c = std::min(backGroundImage.width(), backGroundImage.height());
-    c = std::min(c/2, radius);
-    m_backgroundPixmap = pixmap.copy(c, c, pixmap.width()-c*2, pixmap.height()-c*2);
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
 }
 
 /**
@@ -346,18 +283,13 @@ void TrayMenu::ShowedButtonAnimationStart()
         propertyActionAnimation->setEndValue(item->pos());
         propertyActionAnimation->setEasingCurve(m_buttonsAnimatingCurve);
         propertyActionAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-<<<<<<< HEAD
         connect(propertyActionAnimation, &QPropertyAnimation::finished, propertyActionAnimation, &QObject::deleteLater);
         connect(propertyActionAnimation, &QPropertyAnimation::finished, item, [=]{
-=======
-        connect(&(*propertyActionAnimation), &QPropertyAnimation::finished, item, [=]{
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
             item->setBlockHover(false);
         });
         propertyActionAnimation->start();
     }
     for (QLabel *label: m_menuLabels)
-<<<<<<< HEAD
     {
         QPropertyAnimation* propertyLabelAnimation = new QPropertyAnimation(label, "pos", Q_NULLPTR);
         propertyLabelAnimation->setStartValue(startPosition);
@@ -374,24 +306,6 @@ void TrayMenu::ShowedButtonAnimationStart()
         horizontalSeparate->hide();
     }
 
-=======
-    {
-        QPropertyAnimation* propertyLabelAnimation = new QPropertyAnimation(label, "pos", Q_NULLPTR);
-        propertyLabelAnimation->setStartValue(startPosition);
-        propertyLabelAnimation->setEndValue(label->pos());
-        propertyLabelAnimation->setEasingCurve(m_buttonsAnimatingCurve);
-        propertyLabelAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-        connect(propertyLabelAnimation, &QPropertyAnimation::finished, propertyLabelAnimation, &QObject::deleteLater);
-        propertyLabelAnimation->start();
-    }
-
-    // скрыть строки разделители и потом анимировать
-    for (TrayMenuItem *horizontalSeparate: m_horizontalSeparatorsList)
-    {
-        horizontalSeparate->hide();
-    }
-
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
     QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, [=]{
         for (InteractiveButtonBase* interactiveButton: m_horizontalSeparatorsList)
         {
@@ -417,25 +331,16 @@ void TrayMenu::ShowedButtonAnimationStart()
  * 关闭前显示隐藏动画
  * @param focusIndex 聚焦的item，如果不存在则为-1
  */
-<<<<<<< HEAD
 void TrayMenu::HiddenButtonAnimationStart(std::vector<TrayMenuItem*>::iterator indexOfButtonInFocusNow)
-=======
-void TrayMenu::StartAnimationOnHidden(int focusIndex)
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
 {
     m_mainVerticalLayout->setEnabled(false);
     m_startShowingAnimationMode = true;
     // Управление анимацией движения
     int up_end = m_trayMenuItems.size() ? -m_trayMenuItems.at(0)->height() : 0;
     int flow_end = height();
-<<<<<<< HEAD
     //    int focus_top = focusIndex > -1 ? m_trayMenuItems.at(focusIndex)->pos().y() : 0;
 
     if (indexOfButtonInFocusNow == m_trayMenuItems.end())
-=======
-    int focus_top = focusIndex > -1 ? m_trayMenuItems.at(focusIndex)->pos().y() : 0;
-    for (size_t i = 0; i < m_trayMenuItems.size(); i++)
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
     {
         for (TrayMenuItem * item: m_trayMenuItems)
         {
@@ -544,38 +449,15 @@ void TrayMenu::showEvent(QShowEvent *event)
 {
     CalculateWidgetRectOnScreen();//Получаем координаты виджета, вдруг юзер разрешение поменяет
     m_currentElementIndex =m_trayMenuItems.end();//Сбрасываем текущий индекс у кнопки
-<<<<<<< HEAD
     SetRoundedFormToWidget();
     MakeBlurImageOnBackGroundForPaintEvent();
     QWidget::setFocus();
     ShowedButtonAnimationStart();
-=======
-
-    // Установите в фон  прямоугольник со скругленными углами
-    SetRoundedRectToWidgetBackground();
-    // Захватывать ли изображения с размытым фоном
-    // получаем изображение
-    QRect widgetRect = geometry();
-    int radius = std::min(64, qMin(width(), height())); // Радиус размытия, а также граница
-    widgetRect.adjust(-radius, -radius, +radius, +radius);
-    QScreen* screen = QApplication::screenAt(QCursor::pos());
-    if (screen!=nullptr)
-    {
-        // рисуем размытую картинку
-        MakeBlurImageOnBackGroundForPaintEvent(screen, widgetRect, radius);
-        // устанавливаем фокус на этот виджет
-        setFocus();
-        // показать анимацию
-        StartButtonAnimationOnShowedMainRectange();
-    }
-
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
     QWidget::showEvent(event);
 }
 
 void TrayMenu::hideEvent(QHideEvent *event)
 {
-<<<<<<< HEAD
     HiddenButtonAnimationStart(m_trayMenuItems.end());
     QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, [=]{
         m_mainVerticalLayout->setEnabled(true);
@@ -584,11 +466,6 @@ void TrayMenu::hideEvent(QHideEvent *event)
         QWidget::hideEvent(event);
     });
 
-=======
-    this->clearFocus();
-    this->close(); // Подменю закрыто, само  меню себя не закроет, нужно закрывать вручную
-    QWidget::hideEvent(event);
->>>>>>> 0f238a6175c2caee80abad2a289858b127276965
 }
 /**
  * Только фоновая картинка с размытием

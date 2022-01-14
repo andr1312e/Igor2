@@ -1,0 +1,48 @@
+<!--SYNC-MODULE-SETTINGS-->
+<settings>
+<USERS lastUpdate="14.12.2021" version="1.1">
+    <user userId="1000" rank="Старшина" name="user" role="4" FCS="Боченев"/>
+    <user userId="1001" rank="Сержант" name="user1" role="2" FCS="Ермолаев В.Ю."/>
+    <user userId="1002" rank="Полковник" name="user2" role="1" FCS="Микеров Игорь"/>
+</USERS>
+<FIRSTROLE roleName="Пользователь">
+    <desktops>
+        <desktopApp name="app1" exec="application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="application2"></startupApp>
+        <startupApp exec="application3"></startupApp>
+        <startupApp exec="application4"></startupApp>
+        <startupApp exec="application5"></startupApp>
+        <startupApp exec="application6"></startupApp>
+        <startupApp exec="application7"></startupApp>
+    </startups>
+</FIRSTROLE>
+<SECONDROLE roleName="Оператор">
+    <desktops>
+        <desktopApp name="app1" exec="application" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="application"></startupApp>
+    </startups>
+</SECONDROLE>
+<THIRDROLE roleName="Специалист">
+    <desktops>
+        <desktopApp name="app2" exec="application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="application2"></startupApp>
+    </startups>
+</THIRDROLE>
+<FOURTHROLE roleName="Администратор">
+    <desktops>
+        <desktopApp name="app1" exec="application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="application"></startupApp>
+        <startupApp exec="application2"></startupApp>
+    </startups>
+</FOURTHROLE>
+</settings>
