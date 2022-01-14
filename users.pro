@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.1.1
+VERSION = 2.1.2
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -44,6 +44,7 @@ SOURCES += \
     Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.cpp \
     Admin_GUI/Wizard/Repositories/usersettingsrepository.cpp \
     Admin_GUI/Views/topleftbar.cpp \
+    Server/sockettorarm.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
     Services/idesktopservice.cpp \
@@ -92,7 +93,6 @@ SOURCES += \
     Admin_GUI/Views/SettingsPanel/usereditpanel.cpp \
     Services/startuprunnableservice.cpp \
     Server/messagesrepository.cpp \
-    Server/dataHandler.cpp \
     program.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.cpp \
     Styles/Frameless/framelesswindow.cpp \
@@ -120,6 +120,7 @@ HEADERS += \
     Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h \
     Admin_GUI/Wizard/Services/wizardservice.h \
     Admin_GUI/Views/topleftbar.h \
+    Server/sockettorarm.h \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
     Services/Sql/sqldatabaseserivce.h \
@@ -183,7 +184,6 @@ HEADERS += \
     User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
-    Server/dataHandler.h \
     functionswithstrings.h \
     program.h \
     Admin_GUI/Wizard/Views/startupwizard.h \

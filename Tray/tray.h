@@ -25,6 +25,7 @@ Q_SIGNALS:
     void ToHideApp();
     void ToShowApp();
     void ToCloseApp();
+    void ToUpdateViewColors();
 public Q_SLOTS:
     void OnShowMessage(const QString &message);
 private Q_SLOTS:
@@ -53,7 +54,7 @@ private:
     QAction *m_dropAllDbAndClose;
     QAction *m_quitAction;
 
-    TrayMenu *m_trayIconMenu;
+    TrayMenu *m_trayMenu;
     QSystemTrayIcon *m_trayIcon;
 
     QMovie *m_trayMenuIconMovie;

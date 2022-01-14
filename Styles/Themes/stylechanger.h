@@ -16,8 +16,11 @@ public:
    StyleChanger(QApplication *app);
    ~StyleChanger();
 
+Q_SIGNALS:
+   void ToUpdateViewColors();
+
 public Q_SLOTS:
-   void OnChangeTheme(bool setWhiteTheme);
+   void OnChangeTheme(bool isDarkTheme);
 
 private:
    bool currentThemeIsWhite;
@@ -26,7 +29,7 @@ private:
    Theme *m_whiteTheme;
 
    QString m_styleSheet;
-   QApplication *m_myApp;
+   QApplication* const m_myApp;
 };
 
 #endif // STYLES_THEMES_STYLECHANGER_H

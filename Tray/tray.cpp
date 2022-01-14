@@ -2,7 +2,6 @@
 
 Tray::Tray(QObject *parent)
     : QObject(parent)
-
 {
     InitActions();
     CreateUI();
@@ -13,7 +12,7 @@ Tray::Tray(QObject *parent)
 Tray::~Tray()
 {
     delete m_trayMenuIconMovie;
-    delete m_trayIconMenu;
+    delete m_trayMenu;
 
     delete m_quitAction;
     delete m_restoreAction;
@@ -49,48 +48,49 @@ void Tray::InitActions()
 void Tray::CreateUI()
 {
     m_trayIcon=new QSystemTrayIcon(this);
-    m_trayIconMenu=new TrayMenu(Q_NULLPTR);
+    m_trayMenu=new TrayMenu(Q_NULLPTR);
 }
 
 void Tray::InitUIAndInsertWidgetIntoLayouts()
 {
 
-    m_trayIconMenu->AddAction(m_minimizeAction);
-    m_trayIconMenu->AddAction(m_restoreAction);
+    m_trayMenu->AddAction(m_minimizeAction);
+    m_trayMenu->AddAction(m_restoreAction);
 
-    m_trayIconMenu->addSpacing(m_spacing);
-    m_trayIconMenu->addSeparator();
-    m_trayIconMenu->AddTextToMenu(QStringLiteral("Действия над контролем перезапуска:"));
-    m_trayIconMenu->BeginRow();
-    m_trayIconMenu->AddAction(m_slopRunnableServiceButton);
-    m_trayIconMenu->AddAction(m_restartAllAppsRunnableServiceButton);
-    m_trayIconMenu->AddAction(m_startRunnableServiceButton);
-    m_trayIconMenu->EndRow();
+    m_trayMenu->AddSpacing(m_spacing);
+    m_trayMenu->AddSeparatorLineHorizontal();
+    m_trayMenu->AddTextToMenu(QStringLiteral("Действия над контролем перезапуска:"));
+    m_trayMenu->BeginRow();
+    m_trayMenu->AddAction(m_slopRunnableServiceButton);
+    m_trayMenu->AddAction(m_restartAllAppsRunnableServiceButton);
+    m_trayMenu->AddAction(m_startRunnableServiceButton);
+    m_trayMenu->EndRow();
 
-    m_trayIconMenu->addSpacing(m_spacing);
-    m_trayIconMenu->addSeparator();
-    m_trayIconMenu->AddTextToMenu("Действия над логами:");
-    m_trayIconMenu->BeginRow();
-    m_trayIconMenu->AddAction(m_activateLogs);
-    m_trayIconMenu->AddAction(m_disactivateLogs);
-    m_trayIconMenu->EndRow();
-    m_trayIconMenu->addSeparator();
-    m_trayIconMenu->AddAction(m_weatherIcon);
-    m_trayIconMenu->addSeparator();
-    m_trayIconMenu->AddAction(m_dropAllDbAndClose);
-    m_trayIconMenu->addSeparator();
-    m_trayIconMenu->AddAction(m_quitAction);
+    m_trayMenu->AddSpacing(m_spacing);
+    m_trayMenu->AddSeparatorLineHorizontal();
+    m_trayMenu->AddTextToMenu("Действия над логами:");
+    m_trayMenu->BeginRow();
+    m_trayMenu->AddAction(m_activateLogs);
+    m_trayMenu->AddAction(m_disactivateLogs);
+    m_trayMenu->EndRow();
+    m_trayMenu->AddSeparatorLineHorizontal();
+    m_trayMenu->AddAction(m_weatherIcon);
+    m_trayMenu->AddSeparatorLineHorizontal();
+    m_trayMenu->AddAction(m_dropAllDbAndClose);
+    m_trayMenu->AddSeparatorLineHorizontal();
+    m_trayMenu->AddAction(m_quitAction);
 
     m_trayMenuIconMovie=new QMovie(this);
     m_trayMenuIconMovie->setFileName(QStringLiteral(":/images/myapptray.gif"));
     m_trayMenuIconMovie->start();
-    m_trayIcon->setContextMenu(m_trayIconMenu);
+    m_trayIcon->setContextMenu(m_trayMenu);
     m_trayIcon->setToolTip(QStringLiteral("Программа синхронизации пользователей"));
     m_trayIcon->show();
 }
 
 void Tray::ConnectObjects()
 {
+    connect(this, &Tray::ToUpdateViewColors, m_trayMenu, &TrayMenu::OnUpdateViewColors);
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &Tray::OnActivated);
 
     connect(m_restoreAction, &QAction::triggered, this, &Tray::ToShowApp);

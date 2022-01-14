@@ -26,13 +26,14 @@ StyleChanger::~StyleChanger()
    delete m_whiteTheme;
 }
 
-void StyleChanger::OnChangeTheme(bool setDarkTheme)
+void StyleChanger::OnChangeTheme(bool isDarkTheme)
 {
-   if (setDarkTheme) {
+   if (isDarkTheme) {
       m_darkTheme->ApplyTheme(m_myApp);
    } else {
       m_whiteTheme->ApplyTheme(m_myApp);
    }
 
    m_myApp->setStyleSheet(m_styleSheet);
+   Q_EMIT ToUpdateViewColors();
 }

@@ -31,7 +31,7 @@ private:
    void CreateConnections();
 
 Q_SIGNALS:
-   void ToChangeTheme(bool state);
+   void ToChangeTheme(bool isDarkTheme);
    void ToHideAdditionalSettings(bool state);
    void ToSetDelegateView(bool state);
 

@@ -3,7 +3,7 @@
 
 #include <QPalette>
 
-const QVector<QPair<QPalette::ColorRole, QColor>> darkThemeColor = {
+const std::array<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(53, 53, 53)),
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, Qt::white),
    QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(42, 42, 42)),
@@ -21,7 +21,7 @@ const QVector<QPair<QPalette::ColorRole, QColor>> darkThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::gray),
 };
 
-const QVector<QPair<QPalette::ColorRole, QColor>> darkThemeDisabledColor = {
+const std::array<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::Text, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText, QColor(127, 127, 127)),
@@ -29,7 +29,7 @@ const QVector<QPair<QPalette::ColorRole, QColor>> darkThemeDisabledColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, QColor(127, 127, 127)),
 };
 
-const QVector<QPair<QPalette::ColorRole, QColor>> astraThemeColor = {
+const std::array<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(255, 255, 255)), // цвет фона приложения
    QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(214, 214, 214)), //цвет фона листвиджетов и линеедитов
    QPair<QPalette::ColorRole, QColor>(QPalette::AlternateBase, QColor(146, 146, 146)),//цвет скролла
@@ -47,7 +47,7 @@ const QVector<QPair<QPalette::ColorRole, QColor>> astraThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor(255, 255, 255)), //тайтл у листов
 };
 
-const QVector<QPair<QPalette::ColorRole, QColor>> astraThemeDisabledColor = {
+const std::array<QPair<QPalette::ColorRole, QColor>, 5> astraThemeDisabledColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::Text, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText, QColor(127, 127, 127)),

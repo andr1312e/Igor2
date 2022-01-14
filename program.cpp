@@ -77,7 +77,7 @@ void Program::ConnectToDatabase()
 {
     if (!m_sqlDatabaseService->ConnectToDataBase("localhost", 5432, "postgres", "postgres", "user1234"))
     {
-        QMessageBox::warning(nullptr, "Подключите базу данных postgres", "Подключение к бд не удалось");
+        QMessageBox::warning(nullptr, QStringLiteral("Подключите базу данных postgres"), "Подключение к бд не удалось");
         this->exit(-1);
     }
 }
@@ -123,7 +123,7 @@ void Program::ProcessDataLoading(const LoadingState &state)
         }
         else
         {
-            QMessageBox::critical(nullptr, "Приложение не может запуститься", "Права разработчика недоступны, запустите программу от имени администратора и повторите попытку...", QMessageBox::Ok);
+            QMessageBox::critical(Q_NULLPTR, "Приложение не может запуститься", "Права разработчика недоступны, запустите программу от имени администратора и повторите попытку...", QMessageBox::Ok);
         }
         break;
     }
@@ -152,7 +152,7 @@ void Program::InitFramelessWindow()
     m_framelessWindow = new FramelessWindow(Q_NULLPTR);
     this->setWindowIcon(QIcon(":/images/0.jpg"));
     m_framelessWindow->setObjectName("FramelessWindowObject");
-    m_framelessWindow->OnSetWindowTitle("Мастер первоначальной настройки");
+    m_framelessWindow->OnSetWindowTitle(QStringLiteral("Мастер первоначальной настройки"));
     m_framelessWindow->show();
 }
 
@@ -162,6 +162,7 @@ void Program::InitStyleChanger()
     m_styleChanger = new StyleChanger(this);
     m_styleChanger->OnChangeTheme(1);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+    connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
 }
 
 void Program::StartSettingsWizard(const LoadingState &state)
@@ -201,7 +202,7 @@ bool Program::AllAppsRunnedWell()
 
 void Program::InitRarmSocket()
 {
-    m_socketToRarm = new SocketToRarm(QStringLiteral("127.0.0.1:4242"), this);
+    m_socketToRarm = new SocketToRarm(QStringLiteral("127.0.0.1"), 4242, this);
 }
 
 void Program::InitAdminUI()

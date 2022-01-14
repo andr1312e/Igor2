@@ -7,11 +7,11 @@
 class Theme
 {
 public:
-   Theme(const QVector<QPair<QPalette::ColorRole, QColor>> &colors, const QVector<QPair<QPalette::ColorRole, QColor>> &disabledColor);
+   Theme(const std::array<QPair<QPalette::ColorRole, QColor>, 15> &colors, const std::array<QPair<QPalette::ColorRole, QColor>, 5> &disabledColor);
    ~Theme();
    void ApplyTheme(QApplication *app);
 private:
-   QPalette *m_palette;
+   QPalette *const m_palette;
 };
 
 #endif // STYLES_THEMES_THEME_H
