@@ -33,13 +33,13 @@ InteractiveButtonBase::InteractiveButtonBase(QWidget *parent)
 
     anchor_timer = new QTimer(this);
     anchor_timer->setInterval(10);
-    connect(anchor_timer, SIGNAL(timeout()), this, SLOT(anchorTimeOut()));
+    connect(anchor_timer, SIGNAL(timeout()), this, SLOT(OnAnchorTimeOut()));
 
     setWaterRipple();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(slotClicked()));
+    connect(this, SIGNAL(clicked()), this, SLOT(OnClicked()));
 
-    setFocusPolicy(Qt::NoFocus); // 避免一个按钮还获取Tab键焦点
+//    setFocusPolicy(Qt::NoFocus); // 避免一个按钮还获取Tab键焦点
 }
 
 /**
@@ -925,9 +925,9 @@ void InteractiveButtonBase::delayShowed(int time, QPoint point)
     setShowAni(true);
     QTimer::singleShot(time, [=] {
         showForeground2(point);
-        connect(this, &InteractiveButtonBase::showAniFinished, [=] {
+        connect(this, &InteractiveButtonBase::ToShowAnimationFinished, [=] {
             setShowAni(false);
-            disconnect(this, SIGNAL(showAniFinished()), nullptr, nullptr);
+            disconnect(this, SIGNAL(ToShowAnimationFinished()), nullptr, nullptr);
         });
     });
 }
@@ -1052,11 +1052,6 @@ void InteractiveButtonBase::discardHoverPress(bool force)
     if (!force && inArea(mapFromGlobal(QCursor::pos()))) // 鼠标还在这范围内
         return;
 
-    if (hovering)
-    {
-        leaveEvent(nullptr);
-    }
-
     if (pressing)
     {
         mouseReleaseEvent(new QMouseEvent(QMouseEvent::Type::None, QPoint(width() / 2, height() / 2), Qt::LeftButton, Qt::NoButton, Qt::NoModifier));
@@ -1084,7 +1079,7 @@ void InteractiveButtonBase::enterEvent(QEvent *event)
     leave_timestamp = 0;
     if (mouse_pos == QPoint(-1, -1))
         mouse_pos = mapFromGlobal(QCursor::pos());
-    emit signalMouseEnter();
+    emit ToMouseEnter();
 
     return QPushButton::enterEvent(event);
 }
@@ -1097,7 +1092,7 @@ void InteractiveButtonBase::leaveEvent(QEvent *event)
     hovering = false;
     if (!pressing)
         mouse_pos = QPoint(width() / 2, height() / 2);
-    emit signalMouseLeave();
+    emit ToMouseLeave();
 
     return QPushButton::leaveEvent(event);
 }
@@ -1127,7 +1122,7 @@ void InteractiveButtonBase::mousePressEvent(QMouseEvent *event)
                 double_prevent = true; // 阻止本次的release识别为单击
                 press_timestamp = 0;   // 避免很可能出现的三击、四击...
                 double_timer->stop();  // 取消延迟一小会儿的单击信号
-                emit doubleClicked();
+                emit ToDoubleClicked();
                 return;
             }
             else
@@ -1153,7 +1148,7 @@ void InteractiveButtonBase::mousePressEvent(QMouseEvent *event)
         }
     }
     mouse_press_event = event;
-    emit signalMousePress(event);
+    emit ToMousePress(event);
 
     return QPushButton::mousePressEvent(event);
 }
@@ -1211,10 +1206,10 @@ void InteractiveButtonBase::mouseReleaseEvent(QMouseEvent *event)
     else if (event->button() == Qt::RightButton && event->buttons() == Qt::NoButton)
     {
         if ((release_pos - press_pos).manhattanLength() < QApplication::startDragDistance())
-            emit rightClicked();
+            emit ToRightClicked();
     }
     mouse_release_event = event;
-    emit signalMouseRelease(event);
+    emit ToMouseRelease(event);
 
     return QPushButton::mouseReleaseEvent(event);
 }
@@ -1275,7 +1270,7 @@ void InteractiveButtonBase::focusInEvent(QFocusEvent *event)
         InteractiveButtonBase::enterEvent(new QEvent(QEvent::Type::None));
 
     focusing = true;
-    emit signalFocusIn();
+    emit ToFocusIn();
 
     return QPushButton::focusInEvent(event);
 }
@@ -1303,7 +1298,7 @@ void InteractiveButtonBase::focusOutEvent(QFocusEvent *event)
     }
 
     focusing = false;
-    emit signalFocusOut();
+    emit ToFocusOut();
 
     return QPushButton::focusOutEvent(event);
 }
@@ -1787,7 +1782,7 @@ QIcon::Mode InteractiveButtonBase::getIconMode()
  * 锚点变成到鼠标位置的定时时钟
  * 同步计算所有和时间或者帧数有关的动画和属性
  */
-void InteractiveButtonBase::anchorTimeOut()
+void InteractiveButtonBase::OnAnchorTimeOut()
 {
     qint64 timestamp = getTimestamp();
     if (pressing) // 鼠标按下
@@ -1800,7 +1795,7 @@ void InteractiveButtonBase::anchorTimeOut()
                 press_progress = 100;
                 if (mouse_press_event)
                 {
-                    emit signalMousePressLater(mouse_press_event);
+                    emit ToMousePressLater(mouse_press_event);
                     mouse_press_event = nullptr;
                 }
             }
@@ -1811,7 +1806,7 @@ void InteractiveButtonBase::anchorTimeOut()
             if (hover_progress >= 100)
             {
                 hover_progress = 100;
-                emit signalMouseEnterLater();
+                emit ToMouseEnterLater();
             }
         }
     }
@@ -1825,7 +1820,7 @@ void InteractiveButtonBase::anchorTimeOut()
                 press_progress = 0;
                 if (mouse_release_event)
                 {
-                    emit signalMouseReleaseLater(mouse_release_event);
+                    emit ToMouseReleaseLater(mouse_release_event);
                     mouse_release_event = nullptr;
                 }
             }
@@ -1839,7 +1834,7 @@ void InteractiveButtonBase::anchorTimeOut()
                 if (hover_progress >= 100)
                 {
                     hover_progress = 100;
-                    emit signalMouseEnterLater();
+                    emit ToMouseEnterLater();
                 }
             }
         }
@@ -1851,7 +1846,7 @@ void InteractiveButtonBase::anchorTimeOut()
                 if (hover_progress <= 0)
                 {
                     hover_progress = 0;
-                    emit signalMouseLeaveLater();
+                    emit ToMouseLeaveLater();
                 }
             }
         }
@@ -1871,7 +1866,7 @@ void InteractiveButtonBase::anchorTimeOut()
                     waters.removeAt(i--);
                     if (mouse_release_event) // 还没有发送按下延迟信号
                     {
-                        emit signalMouseReleaseLater(mouse_release_event);
+                        emit ToMouseReleaseLater(mouse_release_event);
                         mouse_release_event = nullptr;
                     }
                 }
@@ -1902,7 +1897,7 @@ void InteractiveButtonBase::anchorTimeOut()
                         water.progress = 100;
                         if (mouse_press_event) // 还没有发送按下延迟信号
                         {
-                            emit signalMousePressLater(mouse_press_event);
+                            emit ToMousePressLater(mouse_press_event);
                             mouse_press_event = nullptr;
                         }
                     }
@@ -1920,7 +1915,7 @@ void InteractiveButtonBase::anchorTimeOut()
             if (show_ani_progress >= 100) // 出现结束
             {
                 show_ani_appearing = false;
-                emit showAniFinished();
+                emit ToShowAnimationFinished();
             }
             else
             {
@@ -1937,7 +1932,7 @@ void InteractiveButtonBase::anchorTimeOut()
                 show_ani_disappearing = false;
                 isShowForeground = false;
                 show_ani_point = QPoint(0, 0);
-                emit hideAniFinished();
+                emit ToHideAnimationFinished();
             }
             else
             {
@@ -1960,7 +1955,7 @@ void InteractiveButtonBase::anchorTimeOut()
         {
             click_ani_progress = 0;
             click_ani_disappearing = false;
-            emit pressAppearAniFinished();
+            emit ToPressAppearAnimationFinished();
         }
     }
     if (click_ani_appearing) // 点击动画效果
@@ -1975,7 +1970,7 @@ void InteractiveButtonBase::anchorTimeOut()
             click_ani_progress = 100; // 保持100的状态，下次点击时回到0
             click_ani_appearing = false;
             click_ani_disappearing = true;
-            emit pressDisappearAniFinished();
+            emit ToPressDisappearAnimationFinished();
         }
     }
 
@@ -1997,7 +1992,7 @@ void InteractiveButtonBase::anchorTimeOut()
         if (jitters.size() == 1)
         {
             jitters.clear();
-            emit jitterAniFinished();
+            emit ToJitterAnimationFinished();
         }
     }
     else if (anchor_pos != mouse_pos) // 移动效果
@@ -2027,7 +2022,7 @@ void InteractiveButtonBase::anchorTimeOut()
     update();
 }
 
-void InteractiveButtonBase::slotClicked()
+void InteractiveButtonBase::OnClicked()
 {
     click_ani_appearing = true;
     click_ani_disappearing = false;

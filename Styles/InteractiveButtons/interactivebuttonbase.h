@@ -263,28 +263,28 @@ protected:
     QIcon::Mode getIconMode();
 
 Q_SIGNALS:
-    void showAniFinished();
-    void hideAniFinished();
-    void pressAppearAniFinished();
-    void pressDisappearAniFinished();
-    void jitterAniFinished();
-    void doubleClicked();
-    void rightClicked();
-    void signalFocusIn();
-    void signalFocusOut();
+    void ToShowAnimationFinished();
+    void ToHideAnimationFinished();
+    void ToPressAppearAnimationFinished();
+    void ToPressDisappearAnimationFinished();
+    void ToJitterAnimationFinished();
+    void ToDoubleClicked();
+    void ToRightClicked();
+    void ToFocusIn();
+    void ToFocusOut();
 
-    void signalMouseEnter();
-    void signalMouseEnterLater(); // 进入后延迟信号（以渐变动画完成为准，相当于可手动设置）
-    void signalMouseLeave();
-    void signalMouseLeaveLater(); // 离开后延迟的信号（直至渐变动画完成（要是划过一下子离开，这个也会变快））
-    void signalMousePress(QMouseEvent *event);
-    void signalMousePressLater(QMouseEvent *event);
-    void signalMouseRelease(QMouseEvent *event);
-    void signalMouseReleaseLater(QMouseEvent *event);
+    void ToMouseEnter();
+    void ToMouseEnterLater(); // 进入后延迟信号（以渐变动画完成为准，相当于可手动设置）
+    void ToMouseLeave();
+    void ToMouseLeaveLater(); // 离开后延迟的信号（直至渐变动画完成（要是划过一下子离开，这个也会变快））
+    void ToMousePress(QMouseEvent *event);
+    void ToMousePressLater(QMouseEvent *event);
+    void ToMouseRelease(QMouseEvent *event);
+    void ToMouseReleaseLater(QMouseEvent *event);
 
 public Q_SLOTS:
-    virtual void anchorTimeOut();
-    virtual void slotClicked();
+    virtual void OnAnchorTimeOut();
+    virtual void OnClicked();
     void OnCloseState();
 
 protected:

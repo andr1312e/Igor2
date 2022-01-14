@@ -381,7 +381,7 @@ TrayMenuItem *TrayMenuItem::bind(bool &val)
  */
 TrayMenuItem *TrayMenuItem::longPress(FuncType func)
 {
-    connect(this, &InteractiveButtonBase::signalMousePressLater, this, [=](QMouseEvent*){
+    connect(this, &InteractiveButtonBase::ToMousePressLater, this, [=](QMouseEvent*){
         func();
     });
     return this;
