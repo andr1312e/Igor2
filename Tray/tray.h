@@ -59,6 +59,7 @@ private:
 
     QMovie *m_trayMenuIconMovie;
     const int m_spacing=5;
+public:
 
 };
 

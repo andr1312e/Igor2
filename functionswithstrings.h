@@ -2,6 +2,7 @@
 #define FUNCTIONSWITHSTRINGS_H
 
 #include <QString>
+#include <array>
 #include <QStringList>
 
 class FunctionsWithStrings
@@ -9,7 +10,7 @@ class FunctionsWithStrings
 
 public:
    static bool StringContainsBadCharecters(const QString &fileName);
-   static QStringList GetListofSubFoldersFromPath(const QString &path, QString calledFunc);
+   static QStringList GetListofSubFoldersFromPath(const QString &path, const char *calledFunc);
 };
 
 #endif // FUNCTIONSWITHSTRINGS_H

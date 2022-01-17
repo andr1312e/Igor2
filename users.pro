@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.1.2
+VERSION = 2.1.4
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -16,7 +16,7 @@ DESTDIR     = $$PWD/../syncProgram
 RESOURCES += \
     resources.qrc
 
-CONFIG += no_lflags_merge rtti_off warn_on c++latest strict_c++ precompile_header stl_off utf8_source
+CONFIG += no_lflags_merge rtti_off warn_on c++latest strict_c++ precompile_header utf8_source
 CONFIG -= cmdline qml_debug no_include_pwd
 
 DEFINES +=                 \

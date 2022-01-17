@@ -18,7 +18,7 @@ class FacileSwitchWidget : public QWidget
     Q_PROPERTY(double switch_ani READ getSwitchAni WRITE setSwitchAni)
 public:
     FacileSwitchWidget(QWidget* w1, QWidget* w2)
-        : QWidget(nullptr)
+        : QWidget(Q_NULLPTR)
     {
         // 设置属性
         setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
@@ -69,7 +69,7 @@ public:
         connect(ani, &QPropertyAnimation::stateChanged, this, [=](QPropertyAnimation::State state) {
             if (state == QPropertyAnimation::State::Stopped)
             {
-                emit finished();
+                Q_EMIT finished();
                 ani->deleteLater();
                 this->deleteLater();
             }

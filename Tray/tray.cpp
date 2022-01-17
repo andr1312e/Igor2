@@ -60,19 +60,19 @@ void Tray::InitUIAndInsertWidgetIntoLayouts()
     m_trayMenu->AddSpacing(m_spacing);
     m_trayMenu->AddSeparatorLineHorizontal();
     m_trayMenu->AddTextToMenu(QStringLiteral("Действия над контролем перезапуска:"));
-    m_trayMenu->BeginRow();
+    m_trayMenu->BeginInsertInRow();
     m_trayMenu->AddAction(m_slopRunnableServiceButton);
     m_trayMenu->AddAction(m_restartAllAppsRunnableServiceButton);
     m_trayMenu->AddAction(m_startRunnableServiceButton);
-    m_trayMenu->EndRow();
+    m_trayMenu->EndInsertInRow();
 
     m_trayMenu->AddSpacing(m_spacing);
     m_trayMenu->AddSeparatorLineHorizontal();
     m_trayMenu->AddTextToMenu("Действия над логами:");
-    m_trayMenu->BeginRow();
+    m_trayMenu->BeginInsertInRow();
     m_trayMenu->AddAction(m_activateLogs);
     m_trayMenu->AddAction(m_disactivateLogs);
-    m_trayMenu->EndRow();
+    m_trayMenu->EndInsertInRow();
     m_trayMenu->AddSeparatorLineHorizontal();
     m_trayMenu->AddAction(m_weatherIcon);
     m_trayMenu->AddSeparatorLineHorizontal();

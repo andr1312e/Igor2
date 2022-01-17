@@ -140,9 +140,9 @@ bool Terminal::IsFileExists(const QString filePath, const char* calledFunc, bool
 bool Terminal::IsFileNotExists(const QString filePath, const char* calledFunc, bool hasRoot)
 {
    int backSlashPos = filePath.lastIndexOf('/', filePath.count() - 2);
-   QString folderPath = filePath.left(backSlashPos);
-   QString fileName = filePath.mid(backSlashPos + 1);
-   QStringList files = GetFileList(folderPath, calledFunc, hasRoot);
+   const QString folderPath = filePath.left(backSlashPos);
+   const QString fileName = filePath.mid(backSlashPos + 1);
+   const QStringList files = GetFileList(folderPath, calledFunc, hasRoot);
 
    if (files.contains(fileName)) {
       return false;
@@ -153,20 +153,20 @@ bool Terminal::IsFileNotExists(const QString filePath, const char* calledFunc, b
 
 void Terminal::CheckAndCreatePathToElement(const QString &path, const char* calledFunc, bool hasRoot)
 {
-   QStringList listofSubFoldersToPath = FunctionsWithStrings::GetListofSubFoldersFromPath(path, "Terminal::CreatePathToFolderWithFolder");
+   QStringList listofSubFoldersToPath = FunctionsWithStrings::GetListofSubFoldersFromPath(path, Q_FUNC_INFO);
    QString currentPath = "/";
    listofSubFoldersToPath.removeLast();
 
    for (const QString pathPart:listofSubFoldersToPath) {
-      if (pathPart == "Desktop") {
-         QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
-         QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+      if (QStringLiteral("Desktop") == pathPart) {
+         const QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
+         const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
          if (!(files.contains((pathPart) + "@")) && !(folders.contains((pathPart) + "/"))) {
             CreateFolder(currentPath + pathPart + "/", calledFunc, hasRoot);
          }
       } else {
-         QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+         const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
 
          if (!folders.contains((pathPart) + "/")) {
             CreateFolder(currentPath + pathPart + "/", calledFunc, hasRoot);
@@ -208,37 +208,37 @@ QStringList Terminal::GetFileList(const QString &folderPath, const char* calledF
 
 QString Terminal::GetFileText(const QString filePath, const char *calledFunc, bool hasRoot)
 {
-   QString getFileTextCommand = CreateGetFileTextCommand(filePath, hasRoot);
+   const  QString getFileTextCommand = CreateGetFileTextCommand(filePath, hasRoot);
    return RunConsoleCommand(getFileTextCommand, calledFunc);
 }
 
 void Terminal::WriteTextToFileSudo(const QByteArray &text, const QString filePath, const char* calledFunc)
 {
-   QString writeTextToFileCommand = CreateWriteTextToFileCommandSudo(filePath, text);
+   const QString writeTextToFileCommand = CreateWriteTextToFileCommandSudo(filePath, text);
    RunConsoleCommand(writeTextToFileCommand, calledFunc);
 }
 
 void Terminal::DeleteFileSudo(const QString filePath, const char* calledFunc)
 {
-   QString deleteFileCommand = CreateDeleteFileCommandSudo(filePath);
+   const  QString deleteFileCommand = CreateDeleteFileCommandSudo(filePath);
    RunConsoleCommand(deleteFileCommand, calledFunc);
 }
 
 void Terminal::ClearFolderSudo(const QString &folderPath, const char* calledFunc)
 {
-   QString deleteAllFilesCommand = CreateClearFolderCommandSudo(folderPath);
+   const QString deleteAllFilesCommand = CreateClearFolderCommandSudo(folderPath);
    RunConsoleCommand(deleteAllFilesCommand, calledFunc);
 }
 
 void Terminal::ClearFileSudo(const QString &filePath, const char* calledFunc)
 {
-   QString clearFileCommand = CreateClearFileCommandSudo(filePath);
+   const QString clearFileCommand = CreateClearFileCommandSudo(filePath);
    RunConsoleCommand(clearFileCommand, calledFunc);
 }
 
 void Terminal::CopyFileSudo(const QString source, const QString &destination, const char* calledFunc)
 {
-   QString copyFileCommand = CreateCopyFileCommandSudo(source, destination);
+   const QString copyFileCommand = CreateCopyFileCommandSudo(source, destination);
    RunConsoleCommand(copyFileCommand, calledFunc);
 }
 

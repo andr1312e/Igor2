@@ -288,12 +288,12 @@ void SocketToRarm::OnConnectToRarm()
 
 void SocketToRarm::OnCheckConnection()
 {
-    qDebug() << "Время проверить поключение";
+//    qDebug() << "Время проверить поключение";
 
-    if (!IsRarmConnected()) {
-        ReconnectToRarm();
-        qDebug() << "Переподключаемся";
-    }
+//    if (!IsRarmConnected()) {
+//        ReconnectToRarm();
+//        qDebug() << "Переподключаемся";
+//    }
 }
 
 void SocketToRarm::StopRarmConnect()
