@@ -5,6 +5,7 @@ TrayMenu::TrayMenu(QWidget *parent)
     , m_buttonsAnimatingCurve(QEasingCurve::OutBack)
     , m_rowAnimationCurve(QEasingCurve::OutQuad)
     , m_availableGeometry(QGuiApplication::primaryScreen()->availableGeometry())
+    , m_backgroundImage(QWidget::size(), QImage::Format_ARGB32_Premultiplied)
 {
     OnUpdateViewColors();
     setObjectName(QStringLiteral("TrayMenu"));
@@ -124,7 +125,7 @@ void TrayMenu::OnUpdateViewColors()
     const QColor newTextColor=palette.color(QPalette::Text);
     //    qDebug()<< newBackGroundColor.name() << newHoverBackgroudColor.name() << newTextColor.name();
     SetTrayMenuColors(newBackGroundColor, newHoverBackgroudColor, newPressBackgroudColor, newTextColor);
-
+    MakeTransparentImage();
     for (TrayMenuItem *horizontalSeparate: m_horizontalSeparatorsList)
     {
         horizontalSeparate->setNormalColor(newTextColor);
@@ -231,50 +232,138 @@ void TrayMenu::SetRoundedFormToWidget()
     QWidget::setMask(pixmap.mask());
 }
 
+void TrayMenu::MakeTransparentImage()
+{
+    QColor newBackgroundColor(m_normalBackGroud);
+    newBackgroundColor.setAlpha(m_alphaValue);
+    m_backgroundImage.fill(newBackgroundColor);
+}
+
 /**
  * Записываем в m_backgroundPixmap готовый QPixmap с афльфа каналом размытия
  */
-void TrayMenu::MakeBlurImageOnBackGroundForPaintEvent()
+void TrayMenu::ChangeBackgroundImageAplha()
 {
-    QPixmap pixmap(size());
-    QPainter painter(&pixmap);
+    if(!m_backgroundImage.isNull())
+    {
+        for (int y = 0; y < m_backgroundImage.height(); ++y)
+        {
+            QRgb *row = (QRgb*)m_backgroundImage.scanLine(y);
+            for (int x = 0; x < m_backgroundImage.width(); ++x) {
+                ((unsigned char*)&row[x])[3] = m_alphaValue;
+            }
+        }
+    }
+}
 
-    QColor newBackgroundColor(m_normalBackGroud);
-    newBackgroundColor.setAlpha(m_normalBackGroud.alpha() * (100 - m_blurAlphaValue) / 100);
-    painter.fillRect(0, 0, pixmap.width(), pixmap.height(), newBackgroundColor);
-
-    m_backgroundPixmap = pixmap.copy(m_blurRadius, m_blurRadius, pixmap.width()-m_blurRadius*2, pixmap.height()-m_blurRadius*2);
+QPoint TrayMenu::CalculateStartAndEndAnimationPostionFromUserMousePos() const
+{
+    QPoint startPosition(mapFromGlobal(QCursor::pos()));
+    const QRect widgetRect(QWidget::rect());
+    if(widgetRect.contains(startPosition))//нажали на кнопку
+    {
+        if (startPosition.x() < 0)
+            startPosition.setX(0);
+        else if (startPosition.x() > width())
+            startPosition.setX(width());
+        if (startPosition.y() < 0)
+            startPosition.setY(0);
+        else if (startPosition.y() > height())
+            startPosition.setY(height());
+        return startPosition;
+    }
+    else
+    {
+        if(startPosition.x()<widgetRect.x())//если точка слева
+        {
+            if(startPosition.x()+QWidget::width()>widgetRect.x())//точка слева но надписи могут выступать
+            {
+                startPosition.setX(startPosition.x()-QWidget::width());
+            }
+        }
+        else
+        {
+            if(startPosition.x()-QWidget::width()<widgetRect.right())//точка справа, надписи могут выступать
+            {
+                startPosition.setX(startPosition.x()+QWidget::width());
+            }
+        }
+    }
+    return  startPosition;
 }
 
 /**
  * В меню появляется анимация при раскрытии
  */
-void TrayMenu::ShowedButtonAnimationStart()
+void TrayMenu::ShowStartAnimation()
 {
     /**
      * Не заворачивай анимацию в умные указатели!!!!
      * Перед любой анимацией делай виджеты недоступными!!
      */
     // анимация кнопок задается параметром m_buttonsAnimatingCurve a m_rowAnimationCurve отвечает за тип анимаций линий;
+
     m_mainVerticalLayout->setEnabled(false);
     m_isAnimationMode = true;
 
+    const QPoint startPosition=CalculateStartAndEndAnimationPostionFromUserMousePos();
+    HideHorizontalSeparates();
 
-    QPoint startPosition = mapFromGlobal(QCursor::pos());
-    //    qDebug()<< m_trayMenuItems.size() << " pos " << startPosition;
-    //    for (InteractiveButtonBase *item : m_trayMenuItems)
-    //    {
-    //        qDebug()<< item->pos();
-    //    }
-    if (startPosition.x() < 0)
-        startPosition.setX(0);
-    else if (startPosition.x() > width())
-        startPosition.setX(width());
-    if (startPosition.y() < 0)
-        startPosition.setY(0);
-    else if (startPosition.y() > height())
-        startPosition.setY(height());
+    DisclosureOfAllButtonsAnimate(startPosition)->start(QAbstractAnimation::DeleteWhenStopped);
 
+    QTimer::singleShot(m_showAnimateDurationInMiliseconds, this, [=]{
+        DisclosureHorizontalSeparatesAnimate();
+    });
+
+    //включаем кнопки и режим анимации выключаем после анимации кнопок
+    QTimer::singleShot(m_showAnimateDurationInMiliseconds*2, this, [=]{
+        m_mainVerticalLayout->setEnabled(true);
+        m_isAnimationMode = false;
+
+    });
+}
+
+/**
+ * HiddenButtonAnimationStart скрываем кнопки при закрытии
+ */
+void TrayMenu::HiddenButtonAnimationStart()
+{
+    m_isAnimationMode = true;
+    m_mainVerticalLayout->setEnabled(false);
+
+    //    AnimateFoldingHorizontalSeparates();
+    QTimer::singleShot(m_hideAnimateDurationInMiliseconds, this, [=]
+    {
+        HideHorizontalSeparates();
+        AnimateWindowDisappearance();
+        //        const QPoint startPosition=CalculateStartAndEndAnimationPostionFromUserMousePos();
+        //        AnimateFoldingOfAllButtons(startPosition)->start(QAbstractAnimation::DeleteWhenStopped);
+    });
+
+    QTimer::singleShot(2*m_showAnimateDurationInMiliseconds, this, [=]{
+        m_isAnimationMode = false;
+    });
+}
+
+void TrayMenu::DisclosureHorizontalSeparatesAnimate()
+{
+    for (InteractiveButtonBase* interactiveButton: m_horizontalSeparatorsList)
+    {
+        interactiveButton->show();
+        interactiveButton->setMinimumSize(0, 0);
+        QPropertyAnimation *propertyAnimation = new QPropertyAnimation(interactiveButton, "geometry", Q_NULLPTR);
+        propertyAnimation->setStartValue(QRect(interactiveButton->geometry().center(), QSize(1,1)));
+        propertyAnimation->setEndValue(interactiveButton->geometry());
+        propertyAnimation->setEasingCurve(m_rowAnimationCurve);
+        propertyAnimation->setDuration(m_showAnimateDurationInMiliseconds);
+        connect(propertyAnimation, &QPropertyAnimation::finished, propertyAnimation, &QObject::deleteLater);
+        propertyAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+}
+
+QParallelAnimationGroup* TrayMenu::DisclosureOfAllButtonsAnimate(const QPoint &startPosition)
+{
+    QParallelAnimationGroup *const allButtonsAnimation = new QParallelAnimationGroup(Q_NULLPTR);
     for (InteractiveButtonBase *item : m_trayMenuItems)
     {
         item->setBlockHover(true);
@@ -282,137 +371,145 @@ void TrayMenu::ShowedButtonAnimationStart()
         propertyActionAnimation->setStartValue(startPosition);
         propertyActionAnimation->setEndValue(item->pos());
         propertyActionAnimation->setEasingCurve(m_buttonsAnimatingCurve);
-        propertyActionAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-        connect(propertyActionAnimation, &QPropertyAnimation::finished, propertyActionAnimation, &QObject::deleteLater);
+        propertyActionAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         connect(propertyActionAnimation, &QPropertyAnimation::finished, item, [=]{
             item->setBlockHover(false);
         });
-        propertyActionAnimation->start();
+        allButtonsAnimation->addAnimation(propertyActionAnimation);
+    }
+    for (QLabel *label: m_menuLabels)
+    {
+        QPropertyAnimation* propertyLabelAnimation = new QPropertyAnimation(label, "pos", this);
+        propertyLabelAnimation->setStartValue(startPosition);
+        propertyLabelAnimation->setEndValue(label->pos());
+        propertyLabelAnimation->setEasingCurve(m_buttonsAnimatingCurve);
+        propertyLabelAnimation->setDuration(m_showAnimateDurationInMiliseconds);
+        allButtonsAnimation->addAnimation(propertyLabelAnimation);
+    }
+    return allButtonsAnimation;
+}
+
+void TrayMenu::AnimateFoldingHorizontalSeparates()
+{
+    for (InteractiveButtonBase* horizontalSeparate: m_horizontalSeparatorsList)
+    {
+        horizontalSeparate->setMinimumSize(0, 0);
+        QPropertyAnimation* const horizontalSepareteHideAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
+        horizontalSepareteHideAnimation->setEndValue(QRect(horizontalSeparate->geometry().center(), QSize(1,1)));
+        horizontalSepareteHideAnimation->setEasingCurve(m_rowAnimationCurve);
+        horizontalSepareteHideAnimation->setDuration(m_hideAnimateDurationInMiliseconds);
+        horizontalSepareteHideAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+}
+
+QParallelAnimationGroup* TrayMenu::AnimateFoldingOfAllButtons(const QPoint &startPosition)
+{
+    QParallelAnimationGroup *const allButtonsAnimation = new QParallelAnimationGroup(Q_NULLPTR);
+    for (InteractiveButtonBase *item : m_trayMenuItems)
+    {
+        item->setBlockHover(true);
+        QPropertyAnimation* propertyActionAnimation = new QPropertyAnimation(item, "pos", Q_NULLPTR);
+        const QPoint *position=new QPoint(item->pos());
+        propertyActionAnimation->setStartValue(item->pos());
+        propertyActionAnimation->setEndValue(startPosition);
+        propertyActionAnimation->setEasingCurve(m_buttonsAnimatingCurve);
+        propertyActionAnimation->setDuration(m_showAnimateDurationInMiliseconds);
+        connect(propertyActionAnimation, &QPropertyAnimation::finished, item, [=]{
+            item->setBlockHover(false);
+            item->move(*position);
+            delete position;
+        });
+        allButtonsAnimation->addAnimation(propertyActionAnimation);
     }
     for (QLabel *label: m_menuLabels)
     {
         QPropertyAnimation* propertyLabelAnimation = new QPropertyAnimation(label, "pos", Q_NULLPTR);
-        propertyLabelAnimation->setStartValue(startPosition);
-        propertyLabelAnimation->setEndValue(label->pos());
+        const QPoint position(label->pos());
+        propertyLabelAnimation->setStartValue(label->pos());
+        propertyLabelAnimation->setEndValue(startPosition);
         propertyLabelAnimation->setEasingCurve(m_buttonsAnimatingCurve);
-        propertyLabelAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-        connect(propertyLabelAnimation, &QPropertyAnimation::finished, propertyLabelAnimation, &QObject::deleteLater);
-        propertyLabelAnimation->start();
+        propertyLabelAnimation->setDuration(m_showAnimateDurationInMiliseconds);
+        connect(propertyLabelAnimation, &QPropertyAnimation::finished, label, [position, label]{
+            label->move(position);
+        });
+        allButtonsAnimation->addAnimation(propertyLabelAnimation);
     }
+    return allButtonsAnimation;
+}
 
-    // скрыть строки разделители и потом анимировать
-    for (TrayMenuItem *horizontalSeparate: m_horizontalSeparatorsList)
+void TrayMenu::AnimateWindowDisappearance()
+{
+    QPropertyAnimation *windowDisappearanceAnimation=new QPropertyAnimation(this, "m_alphaValue",this);
+    windowDisappearanceAnimation->setStartValue(60);
+    windowDisappearanceAnimation->setEndValue(0);
+    windowDisappearanceAnimation->setDuration(m_hideAnimateDurationInMiliseconds);
+    windowDisappearanceAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+int TrayMenu::GetAlphaValue() const
+{
+    return m_alphaValue;
+}
+
+void TrayMenu::SetAlphaValue(int alphaValue)
+{
+    qDebug()<< Q_FUNC_INFO << " " << alphaValue;
+    m_alphaValue = alphaValue;
+    ChangeBackgroundImageAplha();
+    update();
+}
+
+void TrayMenu::HideHorizontalSeparates()
+{
+    for (InteractiveButtonBase* horizontalSeparate: m_horizontalSeparatorsList)
     {
         horizontalSeparate->hide();
     }
-
-    QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, [=]{
-        for (InteractiveButtonBase* interactiveButton: m_horizontalSeparatorsList)
-        {
-            interactiveButton->show();
-            interactiveButton->setMinimumSize(0, 0);
-            QPropertyAnimation *propertyAnimation = new QPropertyAnimation(interactiveButton, "geometry", Q_NULLPTR);
-            propertyAnimation->setStartValue(QRect(interactiveButton->geometry().center(), QSize(1,1)));
-            propertyAnimation->setEndValue(interactiveButton->geometry());
-            propertyAnimation->setEasingCurve(m_rowAnimationCurve);
-            propertyAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-            connect(propertyAnimation, &QPropertyAnimation::finished, propertyAnimation, &QObject::deleteLater);
-            propertyAnimation->start();
-        }
-    });
-    //включаем кнопки и режим анимации выключаем после анимации кнопок
-    QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, [=]{
-        m_mainVerticalLayout->setEnabled(true);
-        m_isAnimationMode = false;
-    });
-}
-
-/**
- * 关闭前显示隐藏动画
- * @param focusIndex 聚焦的item，如果不存在则为-1
- */
-void TrayMenu::HiddenButtonAnimationStart(std::vector<TrayMenuItem*>::iterator indexOfButtonInFocusNow)
-{
-    qDebug()<< Q_FUNC_INFO;
-    m_mainVerticalLayout->setEnabled(false);
-    m_isAnimationMode = true;
-    QPoint startPosition(0, 0);
-    //сначала анимируем полосочки
-    for (InteractiveButtonBase* horizontalSeparate: m_horizontalSeparatorsList)
-    {
-        horizontalSeparate->setMinimumSize(0, 0);
-        QPropertyAnimation *horizontalSepareteHideAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
-        horizontalSepareteHideAnimation->setStartValue(horizontalSeparate->geometry());
-        horizontalSepareteHideAnimation->setEndValue(QRect(horizontalSeparate->geometry().center(), QSize(1,1)));
-        horizontalSepareteHideAnimation->setEasingCurve(m_rowAnimationCurve);
-        horizontalSepareteHideAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-        connect(horizontalSepareteHideAnimation, &QPropertyAnimation::finished, horizontalSepareteHideAnimation, &QObject::deleteLater);
-        horizontalSepareteHideAnimation->start();
-    }
-    //смотрим есть ли в фокусе кнопка, если нет то:
-    if (indexOfButtonInFocusNow==m_trayMenuItems.end())
-    {
-        for (InteractiveButtonBase *item : m_trayMenuItems)
-        {
-            item->setBlockHover(true);
-            QPropertyAnimation* propertyActionAnimation = new QPropertyAnimation(item, "pos", Q_NULLPTR);
-            propertyActionAnimation->setStartValue(item->pos());
-            propertyActionAnimation->setEndValue(startPosition);
-            propertyActionAnimation->setEasingCurve(m_buttonsAnimatingCurve);
-            propertyActionAnimation->setDuration(m_durationToAnimateElementsMiliseconds);
-            connect(propertyActionAnimation, &QPropertyAnimation::finished, propertyActionAnimation, &QObject::deleteLater);
-            propertyActionAnimation->start();
-        }
-    }
-    else
-    {
-
-    }
-
-    QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, [=]{
-        m_mainVerticalLayout->setEnabled(true);
-        m_isAnimationMode = false;
-    });
 }
 
 void TrayMenu::showEvent(QShowEvent *event)
 {
-    CalculateWidgetRectOnScreen();//Получаем координаты виджета, вдруг юзер разрешение поменяет
-    m_currentElementIndex =m_trayMenuItems.end();//Сбрасываем текущий индекс у кнопки
-    SetRoundedFormToWidget();
-    MakeBlurImageOnBackGroundForPaintEvent();
-    QWidget::setFocus();
-    ShowedButtonAnimationStart();
-    QWidget::showEvent(event);
+    if(!m_isAnimationMode)
+    {
+        CalculateWidgetRectOnScreen();//Получаем координаты виджета, вдруг юзер разрешение поменяет
+        m_currentElementIndex =m_trayMenuItems.end();//Сбрасываем текущий индекс у кнопки
+        SetRoundedFormToWidget();
+        ChangeBackgroundImageAplha();
+        QWidget::setFocus();
+        ShowStartAnimation();
+        QWidget::showEvent(event);
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 void TrayMenu::closeEvent(QCloseEvent *event)
 {
-    qDebug()<< Q_FUNC_INFO;
+    if (!m_isAnimationMode)
+    {
+//        HiddenButtonAnimationStart();
+//        QWidget::clearFocus();
+//        QTimer::singleShot(m_showAnimateDurationInMiliseconds*1.5, this, &QWidget::hide);
+    }
     event->ignore();
-    HiddenButtonAnimationStart(m_trayMenuItems.end());
-    QWidget::clearFocus();
-    QTimer::singleShot(m_durationToAnimateElementsMiliseconds, this, &QWidget::hide);
 }
 
-void TrayMenu::hideEvent(QHideEvent *event)
-{
-    qDebug()<< Q_FUNC_INFO;
-    event->ignore();
-}
 /**
  * Только фоновая картинка с размытием
  */
 void TrayMenu::paintEvent(QPaintEvent *event)
 {
-    if (m_backgroundPixmap.isNull())
+    if (m_backgroundImage.isNull())
     {
-        QWidget::paintEvent(event);
+        qDebug()<< Q_FUNC_INFO << " backgroud picture should not be a null";
+        event->ignore();
     }
     else
     {
         QPainter painter(this);
-        painter.drawPixmap(0,0,width(),height(), m_backgroundPixmap);
+        painter.drawImage(0,0, m_backgroundImage);
     }
 }
 

@@ -6,7 +6,7 @@
 
 QT += core xml network widgets sql
 
-VERSION = 2.1.4
+VERSION = 2.1.6
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -179,7 +179,6 @@ HEADERS += \
     Services/Terminals/terminal.h \
     Services/startuprunnableservice.h \
     Tray/traymenu.h \
-    Tray/traymenuanimation.h \
     Tray/traymenuitem.h \
     User_GUI/User_GUI.h \
     Server/DataMessage.h \
