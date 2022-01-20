@@ -51,9 +51,9 @@ public:
     InteractiveButtonBase(QWidget *parent = nullptr);
     InteractiveButtonBase(QString text, QWidget *parent = nullptr);
     InteractiveButtonBase(QIcon icon, QWidget *parent = nullptr);
-    InteractiveButtonBase(QPixmap pixmap, QWidget *parent = nullptr);
+    InteractiveButtonBase(QPixmap m_pixmap, QWidget *parent = nullptr);
     InteractiveButtonBase(QIcon icon, QString text, QWidget *parent = nullptr);
-    InteractiveButtonBase(QPixmap pixmap, QString text, QWidget *parent = nullptr);
+    InteractiveButtonBase(QPixmap m_pixmap, QString text, QWidget *parent = nullptr);
 
     /**
      * 前景实体
@@ -137,8 +137,8 @@ public:
     virtual void setIconPath(QString path);
     virtual void setIcon(QIcon icon);
     virtual void setPixmapPath(QString path);
-    virtual void setPixmap(QPixmap pixmap);
-    virtual void setPaintAddin(QPixmap pixmap, Qt::Alignment align = Qt::AlignRight, QSize size = QSize(0, 0));
+    virtual void setPixmap(QPixmap m_pixmap);
+    virtual void setPaintAddin(QPixmap m_pixmap, Qt::Alignment align = Qt::AlignRight, QSize size = QSize(0, 0));
 
     void setSelfEnabled(bool e = true);
     void setParentEnabled(bool e = false);
@@ -239,7 +239,7 @@ protected:
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
     virtual QPainterPath GetBackGroundPainterPath();
-    virtual QPainterPath getWaterPainterPath(Water water);
+    virtual QPainterPath GetWaterPainterPath(Water water);
     virtual void drawIconBeforeText(QPainter &painter, QRect icon_rect);
 
     QRectF getUnifiedGeometry();
@@ -291,7 +291,7 @@ protected:
     PaintModel model;
     QIcon icon;
     QString text;
-    QPixmap pixmap;
+    QPixmap m_pixmap;
     PaintAddin paint_addin;
     EdgeVal fore_paddings;
 
@@ -300,7 +300,7 @@ protected:
     bool self_enabled, parent_enabled, fore_enabled; // 是否启用子类、启动父类、绘制子类前景
 
     // 出现前景的动画
-    bool isShowAnimation, isShowForeground;
+    bool isShowAnimation, m_isShowForeground;
     bool show_ani_appearing, show_ani_disappearing;
     int show_duration;
     qint64 show_timestamp, hide_timestamp;
@@ -349,12 +349,12 @@ protected:
     // 鼠标拖拽弹起来回抖动效果
     bool jitter_animation;      // 是否开启鼠标松开时的抖动效果
     double elastic_coefficient; // 弹性系数
-    QList<Jitter> jitters;
+    QList<Jitter> m_jittersList;
     int jitter_duration; // 抖动一次，多次效果叠加
 
     // 鼠标按下水波纹动画效果
     bool waterAnimation; // 是否开启水波纹动画
-    QList<Water> waters;
+    QList<Water> m_watersList;
     int water_press_duration, water_release_duration, water_finish_duration;
     int water_radius;
 

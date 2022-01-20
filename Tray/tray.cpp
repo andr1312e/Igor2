@@ -26,13 +26,13 @@ void Tray::InitActions()
     m_minimizeAction=new QAction("Скрыть программу", this);
     m_restoreAction=new QAction("Показать программу", this);
 
-
+    m_pauseRunnableServiceButton=new QAction(QIcon(":/images/tray/pauseWhite.png"), "", this);
     m_slopRunnableServiceButton=new QAction(QIcon(":/images/tray/stopBlack.png"), "", this);
     m_slopRunnableServiceButton->setToolTip("Остановить контроль");
     m_restartAllAppsRunnableServiceButton=new QAction(QIcon(":/images/tray/refreshBlack.png"), "", this);
     m_restartAllAppsRunnableServiceButton->setToolTip("Перезапустить все программы");
-    m_startRunnableServiceButton=new QAction(QIcon(":/images/tray/playBlack.png"), "", this);
-    m_startRunnableServiceButton->setToolTip("Запустить контроль");
+    m_resumeRunnableServiceButton=new QAction(QIcon(":/images/tray/playBlack.png"), "", this);
+    m_resumeRunnableServiceButton->setToolTip("Запустить контроль");
 
     m_activateLogs=new QAction(QIcon(":/images/tray/checkBlack.png"), "", this);
     m_activateLogs->setToolTip("Включить информационные сообщения");
@@ -54,31 +54,32 @@ void Tray::CreateUI()
 void Tray::InitUIAndInsertWidgetIntoLayouts()
 {
 
-    m_trayMenu->AddAction(m_minimizeAction);
-    m_trayMenu->AddAction(m_restoreAction);
+    m_trayMenu->AddButtonToMenu(m_minimizeAction);
+    m_trayMenu->AddButtonToMenu(m_restoreAction);
 
     m_trayMenu->AddSpacing(m_spacing);
     m_trayMenu->AddSeparatorLineHorizontal();
     m_trayMenu->AddTextToMenu(QStringLiteral("Действия над контролем перезапуска:"));
     m_trayMenu->BeginInsertInRow();
-    m_trayMenu->AddAction(m_slopRunnableServiceButton);
-    m_trayMenu->AddAction(m_restartAllAppsRunnableServiceButton);
-    m_trayMenu->AddAction(m_startRunnableServiceButton);
+    m_trayMenu->AddButtonToMenu(m_pauseRunnableServiceButton);
+    m_trayMenu->AddButtonToMenu(m_slopRunnableServiceButton);
+    m_trayMenu->AddButtonToMenu(m_restartAllAppsRunnableServiceButton);
+    m_trayMenu->AddButtonToMenu(m_resumeRunnableServiceButton);
     m_trayMenu->EndInsertInRow();
 
     m_trayMenu->AddSpacing(m_spacing);
     m_trayMenu->AddSeparatorLineHorizontal();
     m_trayMenu->AddTextToMenu("Действия над логами:");
     m_trayMenu->BeginInsertInRow();
-    m_trayMenu->AddAction(m_activateLogs);
-    m_trayMenu->AddAction(m_disactivateLogs);
+    m_trayMenu->AddButtonToMenu(m_activateLogs);
+    m_trayMenu->AddButtonToMenu(m_disactivateLogs);
     m_trayMenu->EndInsertInRow();
     m_trayMenu->AddSeparatorLineHorizontal();
-    m_trayMenu->AddAction(m_weatherIcon);
+    m_trayMenu->AddButtonToMenu(m_weatherIcon);
     m_trayMenu->AddSeparatorLineHorizontal();
-    m_trayMenu->AddAction(m_dropAllDbAndClose);
+    m_trayMenu->AddButtonToMenu(m_dropAllDbAndClose);
     m_trayMenu->AddSeparatorLineHorizontal();
-    m_trayMenu->AddAction(m_quitAction);
+    m_trayMenu->AddButtonToMenu(m_quitAction);
 
     m_trayMenuIconMovie=new QMovie(this);
     m_trayMenuIconMovie->setFileName(QStringLiteral(":/images/myapptray.gif"));
@@ -102,6 +103,11 @@ void Tray::ConnectObjects()
     {
         connect(m_trayMenuIconMovie,&QMovie::finished,m_trayMenuIconMovie,&QMovie::start);
     }
+
+    connect(m_pauseRunnableServiceButton, &QAction::triggered, this, &Tray::ToPauseUserControl);
+    connect(m_slopRunnableServiceButton, &QAction::triggered, this, &Tray::ToStopUserControl);
+    connect(m_restartAllAppsRunnableServiceButton, &QAction::triggered, this, &Tray::ToRestartUserControl);
+    connect(m_resumeRunnableServiceButton, &QAction::triggered, this, &Tray::ToResumeUserControl);
 }
 
 void Tray::OnShowMessage(const QString &message)

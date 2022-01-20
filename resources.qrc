@@ -69,5 +69,7 @@
         <file>images/tray/refreshBlack.png</file>
         <file>images/tray/stopBlack.png</file>
         <file>images/tray/weatherNotBlack.png</file>
+        <file>images/tray/pauseBlack.png</file>
+        <file>images/tray/pauseWhite.png</file>
     </qresource>
 </RCC>

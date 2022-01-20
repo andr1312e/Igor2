@@ -163,6 +163,7 @@ void Program::InitStyleChanger()
     m_styleChanger->OnChangeTheme(1);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
     connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
+    Q_EMIT m_tray->ToUpdateViewColors();
 }
 
 void Program::StartSettingsWizard(const LoadingState &state)
@@ -197,7 +198,7 @@ void Program::OnFullLoading()
 
 bool Program::AllAppsRunnedWell()
 {
-    return m_startupRunnableService->RunStartups();
+    return m_startupRunnableService->OnRunStartupRunnableManager();
 }
 
 void Program::InitRarmSocket()
@@ -219,6 +220,10 @@ void Program::ConnectUserObjects()
     connect(m_tray, &Tray::ToShowApp, m_framelessWindow, &FramelessWindow::show);
     connect(m_tray, &Tray::ToHideApp, m_framelessWindow, &QWidget::hide);
     connect(m_startupRunnableService, &StartupRunnableManager::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
+    connect(m_tray, &Tray::ToPauseUserControl, m_startupRunnableService, &StartupRunnableManager::OnPauseStartupRunnableManager);
+    connect(m_tray, &Tray::ToStopUserControl, m_startupRunnableService, &StartupRunnableManager::OnStopStartupRunnableManager);
+    connect(m_tray, &Tray::ToRestartUserControl, m_startupRunnableService, &StartupRunnableManager::OnRestartStartupRunnableManager);
+    connect(m_tray, &Tray::ToResumeUserControl, m_startupRunnableService, &StartupRunnableManager::OnRunStartupRunnableManager);
 }
 
 void Program::ConnectAdminObjects()

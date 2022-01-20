@@ -2,27 +2,26 @@
 
 #include <QPainterPath>
 
-TrayMenuItem::TrayMenuItem(QWidget *parent) : InteractiveButtonBase(parent)
+TrayMenuItem::TrayMenuItem(QWidget *parent)
+    : InteractiveButtonBase(parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QString t, QWidget *parent) : InteractiveButtonBase(t, parent)
+TrayMenuItem::TrayMenuItem(QString t, QWidget *parent)
+    : InteractiveButtonBase(t, parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QIcon i, QWidget *parent) : InteractiveButtonBase(i, parent)
+TrayMenuItem::TrayMenuItem(QIcon i, QWidget *parent)
+    : InteractiveButtonBase(i, parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QIcon i, QString t, QWidget *parent) : InteractiveButtonBase(i, t, parent)
-{
-
-}
-
-TrayMenuItem::TrayMenuItem(QPixmap p, QString t, QWidget *parent) : InteractiveButtonBase(p, t, parent)
+TrayMenuItem::TrayMenuItem(QIcon i, QString t, QWidget *parent)
+    : InteractiveButtonBase(i, t, parent)
 {
 
 }
@@ -61,83 +60,9 @@ bool TrayMenuItem::isChecked()
     return getState();
 }
 
-TrayMenuItem *TrayMenuItem::setKey(Qt::Key key)
+void TrayMenuItem::SetTooltipText(const QString &tooltipText)
 {
-    this->key = key;
-    return this;
-}
-
-bool TrayMenuItem::isKey(Qt::Key key) const
-{
-    return key == this->key;
-}
-
-TrayMenuItem *TrayMenuItem::setSubMenu(TrayMenu *menu)
-{
-    sub_menu = menu;
-    return this;
-}
-
-bool TrayMenuItem::isSubMenu() const
-{
-    return sub_menu != nullptr;
-}
-
-bool TrayMenuItem::isLinger() const
-{
-    return trigger_linger;
-}
-
-TrayMenuItem *TrayMenuItem::setData(QVariant data)
-{
-    this->data = data;
-    return this;
-}
-
-QVariant TrayMenuItem::getData()
-{
-    return data;
-}
-
-TrayMenuItem *TrayMenuItem::tip(QString sc)
-{
-    shortcut_tip = sc;
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tip(bool exp, QString sc)
-{
-    if (exp)
-        tip(sc);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tooltip(QString tt)
-{
-    setToolTip(tt);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tooltip(bool exp, QString tt)
-{
-    if (exp)
-        tooltip(tt);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::triggered(FuncType func)
-{
-    connect(this, &InteractiveButtonBase::clicked, this, [=]{
-        func();
-    });
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::triggered(bool exp, FuncType func)
-{
-    if (!exp)
-        triggered(func);
-    return this;
+    QWidget::setToolTip(tooltipText);
 }
 
 TrayMenuItem *TrayMenuItem::disable(bool exp)
@@ -346,21 +271,6 @@ TrayMenuItem *TrayMenuItem::borderR(int radius, QColor co)
     return this;
 }
 
-TrayMenuItem *TrayMenuItem::linger()
-{
-    trigger_linger = true;
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::lingerText(QString textAfterClick)
-{
-    this->linger();
-    connect(this, &TrayMenuItem::clicked, this, [=]{
-        setText(textAfterClick);
-    });
-    return this;
-}
-
 /**
  * 绑定某一布尔类型的变量（只能全局变量）
  * 点击即切换值
@@ -550,45 +460,6 @@ TrayMenuItem *TrayMenuItem::defaulter()
     if (switch_matched) // 已经有 caser 匹配了
         return createTempItem(); // 返回无效临时实例
     return this; // 能用，返回自己
-}
-
-/**
- * 返回自己的子菜单对象
- */
-TrayMenu *TrayMenuItem::subMenu()
-{
-    return sub_menu;
-}
-
-void TrayMenuItem::paintEvent(QPaintEvent *event)
-{
-    InteractiveButtonBase::paintEvent(event);
-
-    int right = width()- 8;
-
-    QPainter painter(this);
-    if (isSubMenu())
-    {
-        right -= icon_text_size;
-        // 画右边箭头的图标
-        QRect rect(right, fore_paddings.top, icon_text_size, icon_text_size);
-        painter.drawPixmap(rect, QPixmap(":/icons/sub_menu_arrow"));
-    }
-
-    right -= icon_text_padding;
-    if (!shortcut_tip.isEmpty())
-    {
-        // 画右边的文字
-        QFontMetrics fm(this->font());
-        int width = fm.horizontalAdvance(shortcut_tip);
-        painter.save();
-        auto c = painter.pen().color();
-        c.setAlpha(c.alpha() / 2);
-        painter.setPen(c);
-        painter.drawText(QRect(right-width, fore_paddings.top, width, height()-fore_paddings.top-fore_paddings.bottom),
-                         Qt::AlignRight, shortcut_tip);
-        painter.restore();
-    }
 }
 
 void TrayMenuItem::drawIconBeforeText(QPainter &painter, QRect icon_rect)

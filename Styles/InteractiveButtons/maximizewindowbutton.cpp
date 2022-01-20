@@ -17,7 +17,7 @@ void MaximizeWindowButton::paintEvent(QPaintEvent *event)
     InteractiveButtonBase::paintEvent(event);
     QPainter painter(this);
     painter.setPen(*m_pen);
-    if (!isShowForeground)
+    if (!m_isShowForeground)
     {
         return ;
     }

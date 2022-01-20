@@ -16,13 +16,13 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
     virtual QPainterPath GetBackGroundPainterPath() Q_DECL_OVERRIDE;
-    virtual QPainterPath getWaterPainterPath(Water water) Q_DECL_OVERRIDE;
+    virtual QPainterPath GetWaterPainterPath(Water water) Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
     int m_radius;
-    QPen *m_pen;
-    QSize *m_buttonSize;
+    QPen* const m_pen;
+    QSize* const m_buttonSize;
 
 private:
     void InitGeometry();

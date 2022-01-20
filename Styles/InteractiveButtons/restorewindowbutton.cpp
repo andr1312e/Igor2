@@ -33,7 +33,7 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
 
-    if (!isShowForeground) return ;
+    if (!m_isShowForeground) return ;
 
     int width = _w, h = _h;
     int dx = offset_pos.x(), dy = offset_pos.y();

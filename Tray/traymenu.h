@@ -23,7 +23,6 @@
 class TrayMenu : public QMenu
 {
     Q_OBJECT
-    Q_PROPERTY(int m_alphaValue READ GetAlphaValue WRITE SetAlphaValue)
 public:
     explicit TrayMenu(QWidget *parent);
     ~TrayMenu();
@@ -33,15 +32,12 @@ public Q_SLOTS:
 private Q_SLOTS:
     void OnItemMouseEntered(TrayMenuItem* item);
 public:
-    void AddAction(QAction* action);
-    TrayMenu* BeginInsertInRow();
-    TrayMenu* EndInsertInRow();
+    void AddButtonToMenu(QAction* action);
+    void BeginInsertInRow();
+    void EndInsertInRow();
     void AddTextToMenu(const QString &text);
     void AddSpacing(int size);
     void AddSeparatorLineHorizontal();
-public:
-    int GetAlphaValue() const;
-    void SetAlphaValue(int GetAlphaValue);
 
 protected:
     virtual void showEvent(QShowEvent *event) Q_DECL_OVERRIDE;
@@ -49,28 +45,27 @@ protected:
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 private:
     QBoxLayout* GetCurrentLayout() const;
-    TrayMenu* InstertLabelIntoMenu(QLabel *labelWidget);
+    void InstertLabelIntoMenu(QLabel *labelWidget);
     void SetTrayMenuColors(const QColor& normalColor, const QColor&  hoverColor, const QColor&  pressColor, const QColor&  textColor);
-    TrayMenuItem* CreateMenuItem(const QIcon &icon,const QString &text);
+    TrayMenuItem* CreateMenuItem(QAction *action);
     void SetStyleToButton(InteractiveButtonBase* button);
 private:
 
     void CalculateWidgetRectOnScreen();
     void SetRoundedFormToWidget();
     void MakeTransparentImage();
-    void ChangeBackgroundImageAplha();
+    void ChangeBackgroundImageAplha(int &alpha);
     QPoint CalculateStartAndEndAnimationPostionFromUserMousePos() const;
-    void ShowStartAnimation();
-    void HiddenButtonAnimationStart();
+    void ShowAnimationPlay();
+    void HiddenAnimationPlay();
 
 private:
     void HideHorizontalSeparates();
 private:
-    QParallelAnimationGroup* DisclosureOfAllButtonsAnimate(const QPoint &startPosition);
-    void DisclosureHorizontalSeparatesAnimate();
+    QParallelAnimationGroup* AnimateDisclosureOfAllButtons(const QPoint &startPosition);
+    void AnimateDisclosureHorizontalSeparates();
     void AnimateFoldingHorizontalSeparates();
     QParallelAnimationGroup* AnimateFoldingOfAllButtons(const QPoint &startPosition);
-    void AnimateWindowDisappearance();
 
 
 private:
@@ -97,14 +92,12 @@ private:
     const int m_showAnimateDurationInMiliseconds=700;
     const int m_hideAnimateDurationInMiliseconds=400;
     const int m_itemPadding = 8; // пустое пространство вокруг каждого элемента
-    int m_alphaValue=255; // Уровень прозрачности
+    const int m_alphaValue=70; // Уровень прозрачности
     const int m_borderRadius = 20; // закругленные углы
     const int m_blurRadius=64; //радиус размытия
     // Изменяемые свойства конфигурации
     bool m_addingHorizontMode = false; // добавляем горизонте или кладем вертикально
     bool m_isAnimationMode = false;
-    bool m_enableDisappearAnimation = true;
-
 };
 
 #endif // FACILEMENU_H

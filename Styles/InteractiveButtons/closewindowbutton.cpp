@@ -21,7 +21,7 @@ void CloseWindowButton::paintEvent(QPaintEvent *event)
 {
     InteractiveButtonBase::paintEvent(event);
 
-    if (!isShowForeground)
+    if (!m_isShowForeground)
     {
         return ;
     }
@@ -71,9 +71,9 @@ QPainterPath CloseWindowButton::GetBackGroundPainterPath()
     return path;
 }
 
-QPainterPath CloseWindowButton::getWaterPainterPath(Water water)
+QPainterPath CloseWindowButton::GetWaterPainterPath(Water water)
 {
-    return InteractiveButtonBase::getWaterPainterPath(water) & CloseWindowButton::GetBackGroundPainterPath();
+    return InteractiveButtonBase::GetWaterPainterPath(water) & CloseWindowButton::GetBackGroundPainterPath();
 }
 
 QSize CloseWindowButton::sizeHint() const
