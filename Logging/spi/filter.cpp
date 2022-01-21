@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-#include "spi/filter.h"
+#include "Logging/spi/filter.h"
 
 namespace Log4Qt
 {
@@ -48,4 +48,3 @@ void Filter::activateOptions()
 
 } // namespace Log4Qt
 
-#include "moc_filter.cpp"

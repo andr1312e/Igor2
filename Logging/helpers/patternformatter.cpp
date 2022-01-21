@@ -27,14 +27,14 @@
  *
  ******************************************************************************/
 
-#include "helpers/patternformatter.h"
+#include "Logging/helpers/patternformatter.h"
 
-#include "helpers/datetime.h"
-#include "helpers/logerror.h"
-#include "layout.h"
-#include "logger.h"
-#include "loggingevent.h"
-#include "logmanager.h"
+#include "Logging/helpers/datetime.h"
+#include "Logging/helpers/logerror.h"
+#include "Logging/layout.h"
+#include "Logging/logger.h"
+#include "Logging/loggingevent.h"
+#include "Logging/logmanager.h"
 
 #include <QString>
 

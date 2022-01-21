@@ -47,7 +47,7 @@ void Tray::InitActions()
 
 void Tray::CreateUI()
 {
-    m_trayIcon=new QSystemTrayIcon(this);
+    m_trayIcon=new QSystemTrayIcon(QIcon(), this);
     m_trayMenu=new TrayMenu(Q_NULLPTR);
 }
 

@@ -25,8 +25,8 @@
 #ifndef LOG4QT_LISTAPPENDER_H
 #define LOG4QT_LISTAPPENDER_H
 
-#include <log4qt/appenderskeleton.h>
-#include <log4qt/loggingevent.h>
+#include "Logging/appenderskeleton.h"
+#include "Logging/loggingevent.h"
 
 #include <QList>
 

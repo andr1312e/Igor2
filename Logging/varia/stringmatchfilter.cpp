@@ -23,9 +23,9 @@
  ******************************************************************************/
 
 
-#include "varia/stringmatchfilter.h"
+#include "Logging/varia/stringmatchfilter.h"
 
-#include "loggingevent.h"
+#include "Logging/loggingevent.h"
 
 namespace Log4Qt
 {

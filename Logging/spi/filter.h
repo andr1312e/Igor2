@@ -25,8 +25,8 @@
 #ifndef LOG4QT_FILTER_H
 #define LOG4QT_FILTER_H
 
-#include <log4qt/log4qt.h>
-#include <log4qt/log4qtsharedptr.h>
+#include "Logging/log4qt.h"
+#include "Logging/log4qtsharedptr.h"
 
 #include <QObject>
 

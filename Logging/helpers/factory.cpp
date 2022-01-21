@@ -22,52 +22,52 @@
  *
  ******************************************************************************/
 
-#include "helpers/factory.h"
+#include "Logging/helpers/factory.h"
 
-#include "consoleappender.h"
-#include "dailyrollingfileappender.h"
-#include "fileappender.h"
-#include "helpers/logerror.h"
-#include "helpers/initialisationhelper.h"
-#include "helpers/optionconverter.h"
-#include "patternlayout.h"
-#include "rollingfileappender.h"
-#include "signalappender.h"
-#include "simplelayout.h"
-#include "simpletimelayout.h"
-#include "ttcclayout.h"
-#include "binarylayout.h"
-#include "binarytotextlayout.h"
-#include "xmllayout.h"
+#include "Logging/consoleappender.h"
+#include "Logging/dailyrollingfileappender.h"
+#include "Logging/fileappender.h"
+#include "Logging/helpers/logerror.h"
+#include "Logging/helpers/initialisationhelper.h"
+#include "Logging/helpers/optionconverter.h"
+#include "Logging/patternlayout.h"
+#include "Logging/rollingfileappender.h"
+#include "Logging/signalappender.h"
+#include "Logging/simplelayout.h"
+#include "Logging/simpletimelayout.h"
+#include "Logging/ttcclayout.h"
+#include "Logging/binarylayout.h"
+#include "Logging/binarytotextlayout.h"
+#include "Logging/xmllayout.h"
 
 #if defined(QT_NETWORK_LIB)
-#include "telnetappender.h"
+#include "Logging/telnetappender.h"
 #endif
 
 #if defined(QT_SQL_LIB)
-#include "databaseappender.h"
-#include "databaselayout.h"
+#include "Logging/databaseappender.h"
+#include "Logging/databaselayout.h"
 #endif //#ifdef QT_SQL_LIB
 
-#include "asyncappender.h"
-#include "mainthreadappender.h"
-#include "systemlogappender.h"
-#include "binaryfileappender.h"
-#include "rollingbinaryfileappender.h"
-#include "dailyfileappender.h"
+#include "Logging/asyncappender.h"
+#include "Logging/mainthreadappender.h"
+#include "Logging/systemlogappender.h"
+#include "Logging/binaryfileappender.h"
+#include "Logging/rollingbinaryfileappender.h"
+#include "Logging/dailyfileappender.h"
 #ifdef Q_OS_WIN
 #include "colorconsoleappender.h"
 #include "wdcappender.h"
 #endif
 
-#include "varia/debugappender.h"
-#include "varia/denyallfilter.h"
-#include "varia/levelmatchfilter.h"
-#include "varia/levelrangefilter.h"
-#include "varia/listappender.h"
-#include "varia/nullappender.h"
-#include "varia/stringmatchfilter.h"
-#include "varia/binaryeventfilter.h"
+#include "Logging/varia/debugappender.h"
+#include "Logging/varia/denyallfilter.h"
+#include "Logging/varia/levelmatchfilter.h"
+#include "Logging/varia/levelrangefilter.h"
+#include "Logging/varia/listappender.h"
+#include "Logging/varia/nullappender.h"
+#include "Logging/varia/stringmatchfilter.h"
+#include "Logging/varia/binaryeventfilter.h"
 
 #include <QMetaObject>
 #include <QMetaProperty>

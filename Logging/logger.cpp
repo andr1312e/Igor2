@@ -45,7 +45,7 @@ namespace Log4Qt
 
 Logger::Logger(LoggerRepository *loggerRepository, Level level,
                const QString &name, Logger *parent) :
-    QObject(nullptr),
+    QObject(Q_NULLPTR),
     mName(name), mLoggerRepository(loggerRepository), mAdditivity(true),
     mLevel(level), mParentLogger(parent)
 {
@@ -62,7 +62,7 @@ Logger::~Logger()
 
 void Logger::setLevel(Level level)
 {
-    if ((parentLogger() == nullptr) && (level == Level::NULL_INT))
+    if ((parentLogger() == Q_NULLPTR) && (level == Level::NULL_INT))
     {
         logger()->warn(
             QStringLiteral("Invalid root logger level NULL_INT. Using DEBUG_INT instead"));
@@ -79,7 +79,7 @@ void Logger::callAppenders(const LoggingEvent &event) const
 
     for (auto &&appender : qAsConst(mAppenders))
         appender->doAppend(event);
-    if (additivity() && (parentLogger() != nullptr))
+    if (additivity() && (parentLogger() != Q_NULLPTR))
         parentLogger()->callAppenders(event);
 }
 
@@ -342,14 +342,29 @@ void Logger::warn(const LogError &logError) const
         forcedLog(Level::WARN_INT, logError.toString());
 }
 
+MessageLogger::MessageLogger(Logger *logger, Level level)
+    : m_Logger(logger)
+    , m_LogLevel(level)
+{
+
+}
+
+MessageLogger::MessageLogger(Logger *logger, Level level, const char *file, int line, const char *function)
+    : m_Logger(logger)
+    , m_LogLevel(level)
+    , m_messageContext(file, line, function)
+{
+
+}
+
 void MessageLogger::log(const QString &message) const
 {
-    mLogger->logWithLocation(mLevel, mContext.file, mContext.line, mContext.function, message);
+    m_Logger->logWithLocation(m_LogLevel, m_messageContext.file, m_messageContext.line, m_messageContext.function, message);
 }
 
 LogStream MessageLogger::log() const
 {
-    return LogStream(*mLogger.data(), mLevel);
+    return LogStream(*m_Logger.data(), m_LogLevel);
 }
 
 } // namespace Log4Qt

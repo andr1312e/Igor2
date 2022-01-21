@@ -17,7 +17,7 @@ Theme::~Theme()
    delete m_palette;
 }
 
-void Theme::ApplyTheme(QApplication *app)
+void Theme::ApplyTheme(QApplication *app) const
 {
    app->setPalette(*m_palette);
 }

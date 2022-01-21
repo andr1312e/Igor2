@@ -1,5 +1,5 @@
-#ifndef STRINGVALIDATOR_H
-#define STRINGVALIDATOR_H
+#ifndef ADMIN_GUI_VALIDATOR_STRINGVALIDATOR_H
+#define ADMIN_GUI_VALIDATOR_STRINGVALIDATOR_H
 #include <QValidator>
 
 #include "functionswithstrings.h"
@@ -13,4 +13,4 @@ public:
     virtual void fixup(QString &input) const Q_DECL_OVERRIDE;
 };
 
-#endif // STRINGVALIDATOR_H
+#endif // ADMIN_GUI_VALIDATOR_STRINGVALIDATOR_H

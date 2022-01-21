@@ -4,7 +4,8 @@
 #include <QLabel>
 #include <QDebug>
 #include <QScreen>
-#include <QGuiApplication>
+
+#include "Logging/logger.h"
 
 #include "Services/Sql/isqlservice.h"
 #include "Services/linuxuserservice.h"
@@ -26,9 +27,9 @@ public:
     ~Admin_GUI();
 
 private:
-    void CreateModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
-    void CreateServices(ISqlDatabaseService *databaseService);
-    void CreateUI(ISqlDatabaseService *databaseService, QStringView currentUserName);
+    void CreateModel();
+    void CreateServices();
+    void CreateUI(QStringView currentUserName);
     void InitTopBar(QStringView currentUserName);
     void InsertWidgetsIntoLayout();
     void ConnectObjects();
@@ -43,13 +44,13 @@ public Q_SLOTS:
 private Q_SLOTS:
     void OnUserClick(const User &user);
     void OnDeleteUser(const QString &userId, const QString &userName);
-    void OnSaveUser(const QString&userId, const QString &userName, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
+    void OnSaveUser(const QString& userId, const QString &userName, const QString &FCS, const QString &rank, const int&oldRole, const int &newRole);
 private:
     int m_maxWidth;
     int m_maxHeight;
     const QStringView m_currentAdminId;
 
-    ISqlDatabaseService* const m_databaseService;
+    ISqlDatabaseService* const m_sqlDatabaseService;
     LinuxUserService* const m_linuxUserService;
     UserDesktopService * m_userDesktopService;
     RoleDesktopService * m_roleDesktopService;

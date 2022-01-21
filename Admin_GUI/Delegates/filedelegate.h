@@ -22,17 +22,17 @@ public:
    QSize sizeHint(const QStyleOptionViewItem &option,
                   const QModelIndex &index) const Q_DECL_OVERRIDE;
 private:
-   QRect *m_globalRect;
-   QRect *m_iconRect;
-   QRect *m_programNameRect;
-   QRect *m_pathRect;
-   QRect *m_typeRect;
-   QRect *m_userRoleRect;
-   QPen *m_textPen;
-   QPen *m_titlePen;
-   QPen *m_mouseOverPen;
-   QPen *m_mouseSelectedPen;
-   QSize *m_size;
+   QRect *const m_globalRect;
+   QRect *const m_iconRect;
+   QRect *const m_programNameRect;
+   QRect *const m_pathRect;
+   QRect *const m_typeRect;
+   QRect *const m_userRoleRect;
+   QPen *const m_textPen;
+   QPen *const m_titlePen;
+   QPen *const m_mouseOverPen;
+   QPen *const m_mouseSelectedPen;
+   QSize * const m_size;
 };
 
 #endif // ADMIN_GUI_DELEGATES_FILEDELEGATE_H

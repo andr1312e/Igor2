@@ -270,18 +270,6 @@ public:
      */
     static void startup();
 
-    /*!
-     * Returns the version number of Log4Qt at run-time. This may be a
-     * different version than the version the application was compiled
-     * against.
-     *
-     * \sa \ref Log4Qt::LOG4QT_VERSION "LOG4QT_VERSION",
-     *     \ref Log4Qt::LOG4QT_VERSION_STR "LOG4QT_VERSION_STR"
-
-     */
-    static const char *version();
-    static QVersionNumber versionNumber();
-
 private:
     void doSetHandleQtMessages(bool handleQtMessages);
     void doSetWatchThisFile(bool watchThisFile);

@@ -27,11 +27,11 @@
  *
  ******************************************************************************/
 
-#include "helpers/initialisationhelper.h"
+#include "Logging/helpers/initialisationhelper.h"
 
-#include "helpers/datetime.h"
-#include "helpers/logerror.h"
-#include "loggingevent.h"
+#include "Logging/helpers/datetime.h"
+#include "Logging/helpers/logerror.h"
+#include "Logging/loggingevent.h"
 
 #include <QCoreApplication>
 #include <QMutex>

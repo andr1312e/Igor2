@@ -34,8 +34,8 @@ namespace Log4Qt
 {
 
 AsyncAppender::AsyncAppender(QObject *parent) : AppenderSkeleton(parent)
-    , mThread(nullptr)
-    , mDispatcher(nullptr)
+    , mThread(Q_NULLPTR)
+    , mDispatcher(Q_NULLPTR)
 {
 }
 
@@ -51,7 +51,7 @@ bool AsyncAppender::requiresLayout() const
 
 void AsyncAppender::activateOptions()
 {
-    if (mThread != nullptr)
+    if (mThread != Q_NULLPTR)
         return;
 
     mThread = new QThread();
@@ -75,15 +75,15 @@ void AsyncAppender::closeInternal()
     if (isClosed())
         return;
 
-    if (mThread != nullptr)
+    if (mThread != Q_NULLPTR)
     {
-        mDispatcher->setAsyncAppender(nullptr);
+        mDispatcher->setAsyncAppender(Q_NULLPTR);
         mThread->quit();
         mThread->wait();
         delete mThread;
-        mThread = nullptr;
+        mThread = Q_NULLPTR;
         delete mDispatcher;
-        mDispatcher = nullptr;
+        mDispatcher = Q_NULLPTR;
     }
 }
 
@@ -103,7 +103,7 @@ void AsyncAppender::append(const LoggingEvent &event)
 
 bool AsyncAppender::checkEntryConditions() const
 {
-    if ((mThread != nullptr) && !mThread->isRunning())
+    if ((mThread != Q_NULLPTR) && !mThread->isRunning())
     {
         LogError e =
             LOG4QT_QCLASS_ERROR(QT_TR_NOOP("Use of appender '%1' without a running dispatcher thread"),

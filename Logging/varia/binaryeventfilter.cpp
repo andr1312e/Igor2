@@ -1,6 +1,6 @@
-#include "varia/binaryeventfilter.h"
+#include "Logging/varia/binaryeventfilter.h"
 
-#include "binaryloggingevent.h"
+#include "Logging/binaryloggingevent.h"
 
 namespace Log4Qt
 {

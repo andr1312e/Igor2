@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 
-QT += core xml network widgets sql
+QT += core xml network widgets sql concurrent
 
-VERSION = 2.1.7
+VERSION = 2.1.8
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -44,6 +44,70 @@ SOURCES += \
     Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.cpp \
     Admin_GUI/Wizard/Repositories/usersettingsrepository.cpp \
     Admin_GUI/Views/topleftbar.cpp \
+    Logging/appender.cpp \
+    Logging/appenderskeleton.cpp \
+    Logging/asyncappender.cpp \
+    Logging/basicconfigurator.cpp \
+    Logging/binaryfileappender.cpp \
+    Logging/binarylayout.cpp \
+    Logging/binarylogger.cpp \
+    Logging/binaryloggingevent.cpp \
+    Logging/binarylogstream.cpp \
+    Logging/binarytotextlayout.cpp \
+    Logging/binarywriterappender.cpp \
+    Logging/colorconsoleappender.cpp \
+    Logging/consoleappender.cpp \
+    Logging/dailyfileappender.cpp \
+    Logging/dailyrollingfileappender.cpp \
+    Logging/databaseappender.cpp \
+    Logging/databaselayout.cpp \
+    Logging/fileappender.cpp \
+    Logging/helpers/appenderattachable.cpp \
+    Logging/helpers/binaryclasslogger.cpp \
+    Logging/helpers/classlogger.cpp \
+    Logging/helpers/configuratorhelper.cpp \
+    Logging/helpers/datetime.cpp \
+    Logging/helpers/dispatcher.cpp \
+    Logging/helpers/factory.cpp \
+    Logging/helpers/initialisationhelper.cpp \
+    Logging/helpers/logerror.cpp \
+    Logging/helpers/optionconverter.cpp \
+    Logging/helpers/patternformatter.cpp \
+    Logging/helpers/properties.cpp \
+    Logging/hierarchy.cpp \
+    Logging/layout.cpp \
+    Logging/level.cpp \
+    Logging/logger.cpp \
+    Logging/loggerrepository.cpp \
+    Logging/loggingevent.cpp \
+    Logging/logmanager.cpp \
+    Logging/logstream.cpp \
+    Logging/mainthreadappender.cpp \
+    Logging/mdc.cpp \
+    Logging/ndc.cpp \
+    Logging/patternlayout.cpp \
+    Logging/propertyconfigurator.cpp \
+    Logging/qmllogger.cpp \
+    Logging/rollingbinaryfileappender.cpp \
+    Logging/rollingfileappender.cpp \
+    Logging/signalappender.cpp \
+    Logging/simplelayout.cpp \
+    Logging/simpletimelayout.cpp \
+    Logging/spi/filter.cpp \
+    Logging/systemlogappender.cpp \
+    Logging/telnetappender.cpp \
+    Logging/ttcclayout.cpp \
+    Logging/varia/binaryeventfilter.cpp \
+    Logging/varia/debugappender.cpp \
+    Logging/varia/denyallfilter.cpp \
+    Logging/varia/levelmatchfilter.cpp \
+    Logging/varia/levelrangefilter.cpp \
+    Logging/varia/listappender.cpp \
+    Logging/varia/nullappender.cpp \
+    Logging/varia/stringmatchfilter.cpp \
+    Logging/wdcappender.cpp \
+    Logging/writerappender.cpp \
+    Logging/xmllayout.cpp \
     Server/sockettorarm.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
@@ -63,7 +127,6 @@ SOURCES += \
     Tray/traymenuitem.cpp \
     functionswithstrings.cpp \
     main.cpp \
-    User_GUI/User_GUI.cpp \
     Admin_GUI/Model/usermodel.cpp \
     Admin_GUI/Model/sortmodel.cpp \
     Admin_GUI/Delegates/userdelegate.cpp \
@@ -120,6 +183,73 @@ HEADERS += \
     Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h \
     Admin_GUI/Wizard/Services/wizardservice.h \
     Admin_GUI/Views/topleftbar.h \
+    Logging/appender.h \
+    Logging/appenderskeleton.h \
+    Logging/asyncappender.h \
+    Logging/basicconfigurator.h \
+    Logging/binaryfileappender.h \
+    Logging/binarylayout.h \
+    Logging/binarylogger.h \
+    Logging/binaryloggingevent.h \
+    Logging/binarylogstream.h \
+    Logging/binarytotextlayout.h \
+    Logging/binarywriterappender.h \
+    Logging/colorconsoleappender.h \
+    Logging/consoleappender.h \
+    Logging/dailyfileappender.h \
+    Logging/dailyrollingfileappender.h \
+    Logging/databaseappender.h \
+    Logging/databaselayout.h \
+    Logging/fileappender.h \
+    Logging/helpers/appenderattachable.h \
+    Logging/helpers/binaryclasslogger.h \
+    Logging/helpers/classlogger.h \
+    Logging/helpers/configuratorhelper.h \
+    Logging/helpers/datetime.h \
+    Logging/helpers/dispatcher.h \
+    Logging/helpers/factory.h \
+    Logging/helpers/initialisationhelper.h \
+    Logging/helpers/logerror.h \
+    Logging/helpers/optionconverter.h \
+    Logging/helpers/patternformatter.h \
+    Logging/helpers/properties.h \
+    Logging/hierarchy.h \
+    Logging/layout.h \
+    Logging/level.h \
+    Logging/log4qt.h \
+    Logging/log4qtshared.h \
+    Logging/log4qtsharedptr.h \
+    Logging/logger.h \
+    Logging/loggerrepository.h \
+    Logging/loggingevent.h \
+    Logging/logmanager.h \
+    Logging/logstream.h \
+    Logging/mainthreadappender.h \
+    Logging/mdc.h \
+    Logging/ndc.h \
+    Logging/patternlayout.h \
+    Logging/propertyconfigurator.h \
+    Logging/qmllogger.h \
+    Logging/rollingbinaryfileappender.h \
+    Logging/rollingfileappender.h \
+    Logging/signalappender.h \
+    Logging/simplelayout.h \
+    Logging/simpletimelayout.h \
+    Logging/spi/filter.h \
+    Logging/systemlogappender.h \
+    Logging/telnetappender.h \
+    Logging/ttcclayout.h \
+    Logging/varia/binaryeventfilter.h \
+    Logging/varia/debugappender.h \
+    Logging/varia/denyallfilter.h \
+    Logging/varia/levelmatchfilter.h \
+    Logging/varia/levelrangefilter.h \
+    Logging/varia/listappender.h \
+    Logging/varia/nullappender.h \
+    Logging/varia/stringmatchfilter.h \
+    Logging/wdcappender.h \
+    Logging/writerappender.h \
+    Logging/xmllayout.h \
     Server/sockettorarm.h \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
@@ -180,7 +310,6 @@ HEADERS += \
     Services/startuprunnableservice.h \
     Tray/traymenu.h \
     Tray/traymenuitem.h \
-    User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
     functionswithstrings.h \
@@ -189,15 +318,14 @@ HEADERS += \
     Tray/tray.h
 
 *-g++* {
-  QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt
+  QMAKE_CFLAGS = -Wno-long-long -pedantic -Wall -Wextra -fno-stack-protector -fno-plt
+  QMAKE_LFLAGS *= -fno-stack-protector -fuse-ld=gold
 
   QMAKE_CXXFLAGS_DEBUG *= -fsanitize=address,undefined
   QMAKE_LFLAGS_DEBUG *= -fsanitize=address,undefined
 
   QMAKE_CFLAGS_RELEASE *= -Ofast -DNDEBUG NS_BLOCK_ASSERTIONS
-  QMAKE_CXXFLAGS_RELEASE *= -Ofast -DNDEBUG -fno-stack-protector -fno-plt
-
-  QMAKE_LFLAGS *= -fno-stack-protector -fuse-ld=gold
+  QMAKE_CXXFLAGS_RELEASE *= -Ofast -DNDEBUG -fno-stack-protector -fno-plt -Wnon-virtual-dtor -Wundef -Wcast-align -Wchar-subscripts -Wpointer-arith -Wwrite-strings -Wpacked -Wformat-security -Wmissing-format-attribute -Woverloaded-virtual
 }
 
 DISTFILES += \

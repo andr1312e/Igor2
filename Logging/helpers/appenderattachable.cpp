@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "helpers/appenderattachable.h"
-#include "varia/listappender.h"
-#include "appender.h"
+#include "Logging/helpers/appenderattachable.h"
+#include "Logging/varia/listappender.h"
+#include "Logging/appender.h"
 
 namespace Log4Qt
 {
@@ -38,6 +38,12 @@ QList<AppenderSharedPtr> AppenderAttachable::appenders() const
 {
     QReadLocker locker(&mAppenderGuard);
     return mAppenders;
+}
+
+bool AppenderAttachable::HasAppenders() const
+{
+    QReadLocker locker(&mAppenderGuard);
+    return mAppenders.isEmpty();
 }
 
 AppenderSharedPtr AppenderAttachable::appender(const QString &name) const

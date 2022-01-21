@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "helpers/properties.h"
+#include "Logging/helpers/properties.h"
 
-#include "logger.h"
+#include "Logging/logger.h"
 
 #include <QIODevice>
 #include <QSettings>

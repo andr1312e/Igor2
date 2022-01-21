@@ -22,10 +22,10 @@
  *
  ******************************************************************************/
 
-#include "varia/nullappender.h"
+#include "Logging/varia/nullappender.h"
 
-#include "layout.h"
-#include "loggingevent.h"
+#include "Logging/layout.h"
+#include "Logging/loggingevent.h"
 
 
 

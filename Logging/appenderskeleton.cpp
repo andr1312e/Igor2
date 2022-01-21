@@ -52,7 +52,7 @@ private:
 
 inline RecursionGuardLocker::RecursionGuardLocker(bool *guard)
 {
-    Q_ASSERT_X(guard != nullptr, "RecursionGuardLocker::RecursionGuardLocker()", "Pointer to guard bool must not be null");
+    Q_ASSERT_X(guard != Q_NULLPTR, "RecursionGuardLocker::RecursionGuardLocker()", "Pointer to guard bool must not be null");
 
     mGuard = guard;
     *mGuard = true;

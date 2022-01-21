@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-#include "varia/listappender.h"
+#include "Logging/varia/listappender.h"
 
 namespace Log4Qt
 {

@@ -22,10 +22,10 @@
  *
  ******************************************************************************/
 
-#include "varia/debugappender.h"
+#include "Logging/varia/debugappender.h"
 
-#include "layout.h"
-#include "loggingevent.h"
+#include "Logging/layout.h"
+#include "Logging/loggingevent.h"
 
 #if defined(Q_OS_WIN)
 #include <windows.h>

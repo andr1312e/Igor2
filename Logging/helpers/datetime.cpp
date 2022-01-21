@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "helpers/datetime.h"
+#include "Logging/helpers/datetime.h"
 
-#include "helpers/initialisationhelper.h"
+#include "Logging/helpers/initialisationhelper.h"
 
 namespace Log4Qt
 {

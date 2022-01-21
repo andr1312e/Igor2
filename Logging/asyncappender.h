@@ -51,7 +51,7 @@ class LOG4QT_EXPORT  AsyncAppender : public AppenderSkeleton, public AppenderAtt
     Q_OBJECT
 
 public:
-    AsyncAppender(QObject *parent = nullptr);
+    AsyncAppender(QObject *parent = Q_NULLPTR);
     ~AsyncAppender() override;
 
     bool requiresLayout() const override;

@@ -13,13 +13,13 @@ public:
     ~StartupPanelPresenter();
 
 public:
-    void CheckStartupTable(const quint8 &roleId);
+    void CheckStartupTable(const int &roleId);
     QSqlQueryModel *GetRoleStartupsModel();
     int GetMaxStartupCount();
     bool HasDuplicateStartup(QStringView startupName);
-    void GetAllStartupsIntoModel(const quint8 &roleId);
+    void GetAllStartupsIntoModel(const int &roleId);
     QString DeleteStartup(const int &roleId, const int &selectedItem);
-    void AppendStartup(const quint8 &roleId, const QString &startupPath);
+    void AppendStartup(const int &roleId, const QString &startupPath);
 
 private:
     QString TryToCopyFile(const QString &startupPath);

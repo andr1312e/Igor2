@@ -11,6 +11,8 @@
 #include <QMessageBox>
 
 #include <QWidget>
+
+#include "Logging/logger.h"
 #include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
 class StartupDialogWidget : public QWidget

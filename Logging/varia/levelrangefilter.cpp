@@ -23,9 +23,9 @@
  ******************************************************************************/
 
 
-#include "varia/levelrangefilter.h"
+#include "Logging/varia/levelrangefilter.h"
 
-#include "loggingevent.h"
+#include "Logging/loggingevent.h"
 
 namespace Log4Qt
 {

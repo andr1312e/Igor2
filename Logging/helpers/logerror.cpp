@@ -22,8 +22,8 @@
  *
  ******************************************************************************/
 
-#include "helpers/logerror.h"
-#include "helpers/initialisationhelper.h"
+#include "Logging/helpers/logerror.h"
+#include "Logging/helpers/initialisationhelper.h"
 
 #include <QBuffer>
 #include <QByteArray>

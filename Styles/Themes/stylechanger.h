@@ -6,6 +6,8 @@
 #include <QPalette>
 #include <QPair>
 
+#include "Logging/logger.h"
+
 #include "Styles/Themes/themecolors.h"
 #include "Styles/Themes/theme.h"
 
@@ -13,7 +15,7 @@ class StyleChanger: public QObject
 {
    Q_OBJECT
 public:
-   StyleChanger(QApplication *app);
+   StyleChanger(bool isBlacked, QApplication *app);
    ~StyleChanger();
 
 Q_SIGNALS:
@@ -23,13 +25,12 @@ public Q_SLOTS:
    void OnChangeTheme(bool isDarkTheme);
 
 private:
-   bool currentThemeIsWhite;
-
-   Theme *m_darkTheme;
-   Theme *m_whiteTheme;
+   QApplication* const m_myApp;
+   const Theme* const m_darkTheme;
+   const Theme* const m_whiteTheme;
 
    QString m_styleSheet;
-   QApplication* const m_myApp;
+
 };
 
 #endif // STYLES_THEMES_STYLECHANGER_H

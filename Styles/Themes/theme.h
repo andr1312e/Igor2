@@ -9,7 +9,7 @@ class Theme
 public:
    Theme(const std::array<QPair<QPalette::ColorRole, QColor>, 15> &colors, const std::array<QPair<QPalette::ColorRole, QColor>, 5> &disabledColor);
    ~Theme();
-   void ApplyTheme(QApplication *app);
+   void ApplyTheme(QApplication *app) const;
 private:
    QPalette *const m_palette;
 };

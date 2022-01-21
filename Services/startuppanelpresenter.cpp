@@ -12,7 +12,7 @@ StartupPanelPresenter::~StartupPanelPresenter()
 
 }
 
-void StartupPanelPresenter::CheckStartupTable(const quint8 &roleId)
+void StartupPanelPresenter::CheckStartupTable(const int &roleId)
 {
     m_sqlDatabaseService->CreateStartupsTableIfNotExists(roleId);
 }
@@ -22,7 +22,7 @@ QSqlQueryModel *StartupPanelPresenter::GetRoleStartupsModel()
     return m_sqlDatabaseService->GetRoleStartupsModel();
 }
 
-void StartupPanelPresenter::GetAllStartupsIntoModel(const quint8 &roleId)
+void StartupPanelPresenter::GetAllStartupsIntoModel(const int &roleId)
 {
     m_sqlDatabaseService->GetAllRoleStartupsIntoModel(roleId);
 }
@@ -38,7 +38,7 @@ QString StartupPanelPresenter::DeleteStartup(const int &roleId, const int &selec
     return currentStartupName;
 }
 
-void StartupPanelPresenter::AppendStartup(const quint8 &roleId, const QString &startupPath)
+void StartupPanelPresenter::AppendStartup(const int &roleId, const QString &startupPath)
 {
     const QString startupFileName=TryToCopyFile(startupPath);
     m_sqlDatabaseService->AppendStartupIntoRole(roleId, startupFileName);

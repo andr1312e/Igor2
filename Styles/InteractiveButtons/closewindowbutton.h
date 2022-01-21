@@ -21,8 +21,8 @@ protected:
 
 private:
     int m_radius;
-    QPen* const m_pen;
-    QSize* const m_buttonSize;
+    const QPen* const m_pen;
+    const QSize* const m_buttonSize;
 
 private:
     void InitGeometry();

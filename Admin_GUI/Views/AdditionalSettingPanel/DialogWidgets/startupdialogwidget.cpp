@@ -66,16 +66,16 @@ void StartupDialogWidget::InsertWidgetsIntoLayouts()
 void StartupDialogWidget::InitUI()
 {
     m_titleLabel->setAlignment(Qt::AlignCenter);
-    m_execTextField->setLabel("Путь к исполняемому файлу: (Обязательно)");
-    m_execTextField->setText("Выбрать файл");
+    m_execTextField->setLabel(QStringLiteral("Путь к исполняемому файлу: (Обязательно)"));
+    m_execTextField->setText(QStringLiteral("Выбрать файл"));
 
-    m_saveDialogButton->setText("Применить");
-    m_closeDialogButton->setText("Выйти без сохранения");
+    m_saveDialogButton->setText(QStringLiteral("Применить"));
+    m_closeDialogButton->setText(QStringLiteral("Выйти без сохранения"));
 
-    m_saveDialogButton->setObjectName("add");
+    m_saveDialogButton->setObjectName(QStringLiteral("add"));
 
     m_errorMessagBox->setIcon(QMessageBox::Critical);
-    m_errorMessagBox->setWindowTitle("Внимание!");
+    m_errorMessagBox->setWindowTitle(QStringLiteral("Внимание!"));
 }
 
 void StartupDialogWidget::ConnectObjects()
@@ -98,7 +98,7 @@ void StartupDialogWidget::OnHideAndClearDialog()
 
 void StartupDialogWidget::OnAddEcexPath()
 {
-    QString loadPath = QFileDialog::getOpenFileName(this, "Выберите исполняемый файл", m_desktopPath);
+    const QString loadPath = QFileDialog::getOpenFileName(this, QStringLiteral("Выберите исполняемый файл"), m_desktopPath);
     m_execTextField->setText(loadPath);
 }
 
@@ -106,19 +106,23 @@ void StartupDialogWidget::OnCheckExec()
 {
     if (m_execTextField->text().isEmpty())
     {
-        m_errorMessagBox->setText("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно");
+        m_errorMessagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно"));
         m_errorMessagBox->exec();
     }
     else
     {
         if (QFile::exists(m_execTextField->text()))
         {
+            if(Log4Qt::Logger::rootLogger()->HasAppenders())
+            {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили исполняемый файл: ") + m_execTextField->text().simplified());
+            }
             Q_EMIT ToAddExecPathToFile(m_execTextField->text().simplified());
             OnHideAndClearDialog();
         }
         else
         {
-            m_errorMessagBox->setText("Вы ввели путь к файлу, которого не существует, возможно у вашего пользователя недостаточно прав конфиденциальности для просмотра файла, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\" или изменить уровень конфиденциальности пользователя");
+            m_errorMessagBox->setText(QStringLiteral("Вы ввели путь к файлу, которого не существует, возможно у вашего пользователя недостаточно прав конфиденциальности для просмотра файла, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\" или изменить уровень конфиденциальности пользователя"));
             m_errorMessagBox->exec();
         }
     }

@@ -43,7 +43,7 @@ private Q_SLOTS:
    void OnProgramSelect(const QModelIndex &index);
 
 public:
-   void SetRoleId(const quint8 &roleId);
+   void SetRoleId(const int &roleId);
 
 private:
    void GetAllStartups();

@@ -2,7 +2,7 @@
 
 StartupPanel::StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
     : QWidget(parent)
-    , m_roleId(0)
+    , m_currentRoleId(0)
     , m_selectedItemIndex(-1)
 {
     CreateServices(sqlDatabaseService);
@@ -38,16 +38,16 @@ void StartupPanel::CreateUI()
 {
     m_mainLayout=new QVBoxLayout();
 
-    m_titleLabel=new QLabel("Список процессов которые будут перезапущены:");
+    m_titleLabel=new QLabel(QStringLiteral("Список процессов которые будут перезапущены:"));
 
     m_allProgramsListView=new QListView();
     m_allProgramsListView->setModel(m_startupRepositoryPresenter->GetRoleStartupsModel());
     m_allProgramsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     m_bottomLayout=new QHBoxLayout();
-    m_addProgramButton=new QPushButton("Добавить программу");
+    m_addProgramButton=new QPushButton(QStringLiteral("Добавить программу"));
     m_addProgramButton->setEnabled(false);
-    m_deleteProgramButton=new QPushButton("Удалить выбранную программу");
+    m_deleteProgramButton=new QPushButton(QStringLiteral("Удалить выбранную программу"));
     m_deleteProgramButton->setEnabled(false);
 
     m_dialog=new QtMaterialDialog(this);
@@ -102,11 +102,15 @@ void StartupPanel::OnDeleteProgram()
 {
     if (m_selectedItemIndex>-1 && m_selectedItemIndex<m_startupRepositoryPresenter->GetMaxStartupCount())
     {
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим удалить программу роль :") + QString::number(m_currentRoleId) + QStringLiteral(" индекс :") + QString::number(m_selectedItemIndex) );
+        }
         m_deleteProgramButton->setDisabled(true);
-        const QString currentStartupNameToDelete=m_startupRepositoryPresenter->DeleteStartup(m_roleId, m_selectedItemIndex);
-        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ")  + currentStartupNameToDelete + QStringLiteral(" удалена"),QToast::LENGTH_LONG, this);
+        const QString currentStartupNameToDelete=m_startupRepositoryPresenter->DeleteStartup(m_currentRoleId, m_selectedItemIndex);
+        QToast*  const pToast=QToast::CreateToast(QStringLiteral("Программа ")  + currentStartupNameToDelete + QStringLiteral(" удалена"),QToast::LENGTH_LONG, this);
         pToast->show();
-        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
+        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_currentRoleId);
     }
 }
 
@@ -116,15 +120,15 @@ void StartupPanel::OnAddProgram(const QString &startupPath)
     const QString startupName=startupPath.mid(indexOfName+1);
     if (m_startupRepositoryPresenter->HasDuplicateStartup(startupName))
     {
-        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" уже в базе есть. Если это другая, удалите старую"), QToast::LENGTH_LONG, this);
+        QToast* const pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" уже в базе есть. Если это другая, удалите старую"), QToast::LENGTH_LONG, this);
         pToast->show();
     }
     else
     {
-        m_startupRepositoryPresenter->AppendStartup(m_roleId, startupPath);
-        QToast* pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" добавлена"),QToast::LENGTH_LONG, this);
+        m_startupRepositoryPresenter->AppendStartup(m_currentRoleId, startupPath);
+        QToast* const pToast=QToast::CreateToast(QStringLiteral("Программа ") + startupName + QStringLiteral(" добавлена"),QToast::LENGTH_LONG, this);
         pToast->show();
-        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
+        m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_currentRoleId);
     }
 }
 
@@ -134,15 +138,15 @@ void StartupPanel::OnProgramSelect(const QModelIndex &index)
     m_deleteProgramButton->setEnabled(true);
 }
 
-void StartupPanel::SetRoleId(const quint8 &roleId)
+void StartupPanel::SetRoleId(const int &roleId)
 {
-    m_roleId=roleId;
+    m_currentRoleId=roleId;
     m_startupRepositoryPresenter->CheckStartupTable(roleId);
     m_addProgramButton->setEnabled(true);
-    GetAllStartups();
+    GetAllStartupsIntoModel();
 }
 
-void StartupPanel::GetAllStartups()
+void StartupPanel::GetAllStartupsIntoModel()
 {
-    m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_roleId);
+    m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_currentRoleId);
 }

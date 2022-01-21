@@ -33,7 +33,7 @@ private:
 protected:
     const QString GetUserDesktopPath(const QString &userName) const;
 
-    QString GetFullAstraDefaultIconImagePath(const QString &iconName);
+    QString GetFullAstraDefaultIconImagePath(QStringView iconName);
     void UpdateModel(const QList<DesktopEntity> &listOfDesktopEntities);
 protected:
     Terminal *const m_terminal;

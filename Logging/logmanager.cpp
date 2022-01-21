@@ -142,17 +142,6 @@ void LogManager::resetConfiguration()
     configureLogLogger();
 }
 
-
-const char *LogManager::version()
-{
-    return LOG4QT_VERSION_STR;
-}
-
-QVersionNumber LogManager::versionNumber()
-{
-    return QVersionNumber(LOG4QT_VERSION_MAJOR, LOG4QT_VERSION_MINOR, LOG4QT_VERSION_PATCH);
-}
-
 void LogManager::shutdown()
 {
     instance()->mLoggerRepository->shutdown();
@@ -345,8 +334,7 @@ void LogManager::doStartup()
 
 void LogManager::welcome()
 {
-    static_logger()->info(QStringLiteral("Initialising Log4Qt %1"),
-                          QStringLiteral(LOG4QT_VERSION_STR));
+    static_logger()->info(QStringLiteral("Initialising Log4Qt %1"));
 
     // Debug: Info
     if (static_logger()->isDebugEnabled())

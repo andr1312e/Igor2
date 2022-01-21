@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "helpers/dispatcher.h"
-#include "loggingevent.h"
-#include "asyncappender.h"
+#include "Logging/helpers/dispatcher.h"
+#include "Logging/loggingevent.h"
+#include "Logging/asyncappender.h"
 
 #include <QCoreApplication>
 

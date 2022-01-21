@@ -10,9 +10,9 @@ class  LOG4QT_EXPORT XMLLayout : public Layout
 {
     Q_OBJECT
 public:
-    explicit XMLLayout(QObject *parent = nullptr);
+    explicit XMLLayout(QObject *parent = Q_NULLPTR);
 
-    QString format(const LoggingEvent &event) override;
+    QString format(const LoggingEvent &event) Q_DECL_OVERRIDE;
 
 private:
     Q_DISABLE_COPY(XMLLayout)

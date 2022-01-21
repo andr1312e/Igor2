@@ -27,12 +27,12 @@
  *
  ******************************************************************************/
 
-#include "helpers/optionconverter.h"
+#include "Logging/helpers/optionconverter.h"
 
-#include "helpers/logerror.h"
-#include "helpers/properties.h"
-#include "logger.h"
-#include "consoleappender.h"
+#include "Logging/helpers/logerror.h"
+#include "Logging/helpers/properties.h"
+#include "Logging/logger.h"
+#include "Logging/consoleappender.h"
 
 namespace Log4Qt
 {

@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "varia/levelmatchfilter.h"
+#include "Logging/varia/levelmatchfilter.h"
 
-#include "loggingevent.h"
+#include "Logging/loggingevent.h"
 
 namespace Log4Qt
 {

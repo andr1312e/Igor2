@@ -15,7 +15,6 @@ UserDelegate::UserDelegate(QFont &font, QObject *parent)
     , m_mouseSelectedPen(new QPen())
     , m_font(font)
     , m_size(new QSize(300, 0))
-    , m_listItemsView(true)
 {
 
 }
@@ -35,19 +34,14 @@ UserDelegate::~UserDelegate()
     delete m_size;
 }
 
-void UserDelegate::OnSetDelegateView(bool state)
-{
-    m_listItemsView=state;
-}
-
 void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     //https://doc.qt.io/qt-5/qstyleditemdelegate.html#paint
     if (index.isValid()) {
         painter->save();
 
-        QVariant data = index.data(Qt::UserRole + 1);
-        User user = data.value<User>();
+        const QVariant data = index.data(Qt::UserRole + 1);
+        const User user = data.value<User>();
         m_globalRect->setX(option.rect.x());
         m_globalRect->setY(option.rect.y());
         m_globalRect->setWidth(option.rect.width());
@@ -102,7 +96,7 @@ void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         painter->setPen(*m_textPen);
         painter->drawText(*m_userNameRect, "Имя пользователя: " + user.name);
         painter->drawText(*m_userFCSRect, "ФИО: " + user.FCS);
-        QString role=(user.role>=0 && user.role < Roles.count()) ? Roles.at(user.role) : " ";
+        const QString role=(user.role>=0 && user.role < Roles.count()) ? Roles.at(user.role) : " ";
         painter->drawText(*m_userRoleRect, "Роль: " + role);
         painter->restore();
 
@@ -113,14 +107,7 @@ QSize UserDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 {
     Q_UNUSED(index)
     Q_UNUSED(option)
-    //    if(m_listItemsView)
-    //    {
-    //        m_size->setWidth(300);
-    //    }
-    //    else
-    //    {
     m_size->setWidth(300);
-    //    }
     m_size->setHeight(m_font.pointSize() * 4 + 50);
     return *m_size;
 }

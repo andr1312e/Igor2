@@ -172,9 +172,8 @@ class LOG4QT_EXPORT MessageLogger
     Q_DISABLE_COPY(MessageLogger)
 
 public:
-    explicit MessageLogger(Logger *logger, Level level) : mLogger(logger), mLevel(level) {}
-    explicit MessageLogger(Logger *logger, Level level, const char *file, int line, const char *function)
-        : mLogger(logger), mLevel(level), mContext(file, line, function) {}
+    explicit MessageLogger(Logger *logger, Level level);
+    explicit MessageLogger(Logger *logger, Level level, const char *file, int line, const char *function);
 
     void log(const QString &message) const;
     template <typename T, typename ...Ts>
@@ -185,9 +184,9 @@ public:
     LogStream log() const;
 
 private:
-    QPointer<const Logger> mLogger;
-    Level mLevel;
-    MessageContext mContext;
+    QPointer<const Logger> m_Logger;
+    Level m_LogLevel;
+    MessageContext m_messageContext;
 };
 
 // Macros to log with location information, teh logger must have the name

@@ -27,8 +27,8 @@
  *
  ******************************************************************************/
 
-#include "logmanager.h"
-#include "helpers/classlogger.h"
+#include "Logging/logmanager.h"
+#include "Logging/helpers/classlogger.h"
 
 namespace Log4Qt
 {

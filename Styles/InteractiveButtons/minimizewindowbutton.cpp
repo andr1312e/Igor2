@@ -2,13 +2,13 @@
 
 MinimizeWindowButton::MinimizeWindowButton(QWidget* parent)
     : InteractiveButtonBase(parent)
+    , m_pen(new QPen(Qt::white))
     , m_left(new QPoint())
     , m_right(new QPoint())
     , m_mid(new QPoint())
     , m_buttonSize(new QSize(40, 40))
 {
     InitGeometry();
-    InitDrawing();
 }
 
 MinimizeWindowButton::~MinimizeWindowButton()
@@ -44,7 +44,7 @@ void MinimizeWindowButton::paintEvent(QPaintEvent* event)
         {
             m_painter->setRenderHint(QPainter::Antialiasing,true);
         }
-//        m_painter->begin(this);
+        //        m_painter->begin(this);
         m_painter->drawPath(path);
         m_painter->end();
     }
@@ -63,9 +63,4 @@ void MinimizeWindowButton::InitGeometry()
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setUnifyGeomerey(true);
-}
-
-void MinimizeWindowButton::InitDrawing()
-{
-    m_pen=new QPen(Qt::white);
 }

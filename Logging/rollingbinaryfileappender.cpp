@@ -219,7 +219,7 @@ void RollingBinaryFileAppender::computeRollOvetime()
         break;
     default:
         Q_ASSERT_X(false, "BinaryFileAppender::computeInterval()", "Invalid datePattern constant");
-        mRollOvetime = QDateTime::fromTime_t(0);
+        mRollOvetime = QDateTime::fromSecsSinceEpoch(0);
         break;
     }
 

@@ -1,7 +1,7 @@
-#include "helpers/binaryclasslogger.h"
+#include "Logging/helpers/binaryclasslogger.h"
 
-#include "logmanager.h"
-#include "binarylogger.h"
+#include "Logging/logmanager.h"
+#include "Logging/binarylogger.h"
 
 #include <QString>
 

@@ -9,6 +9,8 @@
 #include "Services/Terminals/terminal.h"
 #include "Services/Sql/isqlservice.h"
 
+#include "Logging/logger.h"
+
 class StartupRunnableManager: public QObject
 {
     Q_OBJECT

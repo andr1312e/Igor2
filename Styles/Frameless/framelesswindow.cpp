@@ -24,11 +24,11 @@ FramelessWindow::FramelessWindow(QWidget *parent)
     SetObjectNames();
     CreateConnections();
 
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
-    setAttribute(Qt::WA_NoSystemBackground, true);
-    setAttribute(Qt::WA_TranslucentBackground);
+    QWidget::setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint);
+    QWidget::setAttribute(Qt::WA_NoSystemBackground, true);
+    QWidget::setAttribute(Qt::WA_TranslucentBackground);
 
-    setMouseTracking(true);
+    QWidget::setMouseTracking(true);
 
     QApplication::instance()->installEventFilter(this);
 }
@@ -45,12 +45,13 @@ FramelessWindow::~FramelessWindow()
     delete m_zoomButton;
     delete m_icon;
 
+
     delete m_textShadow;
+
     delete m_titleText;
 
     delete m_WindowTitleBar;
     delete m_windowFrame;
-
 }
 
 void FramelessWindow::OnRestoreButtonClicked()
@@ -132,11 +133,11 @@ void FramelessWindow::StyleWindow(bool bActive, bool isMaximized)
                 delete oldShadow;
             }
 
-            QGraphicsDropShadowEffect *windowShadow = new QGraphicsDropShadowEffect;
-            windowShadow->setBlurRadius(9.0);
-            windowShadow->setColor(palette().color(QPalette::Highlight));
-            windowShadow->setOffset(0.0);
-            m_windowFrame->setGraphicsEffect(windowShadow);
+            m_windowShadow = new QGraphicsDropShadowEffect;
+            m_windowShadow->setBlurRadius(9.0);
+            m_windowShadow->setColor(palette().color(QPalette::Highlight));
+            m_windowShadow->setOffset(0.0);
+            m_windowFrame->setGraphicsEffect(m_windowShadow);
         } else {
             layout()->setMargin(0);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
@@ -152,7 +153,7 @@ void FramelessWindow::StyleWindow(bool bActive, bool isMaximized)
                 delete oldShadow;
             }
 
-            m_windowFrame->setGraphicsEffect(nullptr);
+            m_windowFrame->setGraphicsEffect(Q_NULLPTR);
         }
     } else {
         if (isMaximized) {
@@ -170,11 +171,11 @@ void FramelessWindow::StyleWindow(bool bActive, bool isMaximized)
                 delete oldShadow;
             }
 
-            QGraphicsDropShadowEffect *windowShadow = new QGraphicsDropShadowEffect;
-            windowShadow->setBlurRadius(9.0);
-            windowShadow->setColor(palette().color(QPalette::Shadow));
-            windowShadow->setOffset(0.0);
-            m_windowFrame->setGraphicsEffect(windowShadow);
+            m_windowShadow = new QGraphicsDropShadowEffect;
+            m_windowShadow->setBlurRadius(9.0);
+            m_windowShadow->setColor(palette().color(QPalette::Shadow));
+            m_windowShadow->setOffset(0.0);
+            m_windowFrame->setGraphicsEffect(m_windowShadow);
         } else {
             layout()->setMargin(0);
             m_WindowTitleBar->setStyleSheet(QStringLiteral(
@@ -190,7 +191,7 @@ void FramelessWindow::StyleWindow(bool bActive, bool isMaximized)
                 delete oldShadow;
             }
 
-            m_windowFrame->setGraphicsEffect(nullptr);
+            m_windowFrame->setGraphicsEffect(Q_NULLPTR);
         }
     }
 }
@@ -302,7 +303,7 @@ void FramelessWindow::OnWindowDraggerDoubleClicked()
 
 void FramelessWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+//    event->ignore();
 }
 
 void FramelessWindow::checkBorderDragging(QMouseEvent *event)
@@ -311,19 +312,19 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
         return;
     }
 
-    QPoint globalMousePos = event->globalPos();
+    const QPoint globalMousePos = event->globalPos();
 
     if (m_isMousePressed) {
         QScreen *screen = QGuiApplication::primaryScreen();
-        QRect availGeometry = screen->availableGeometry();
-        int h = availGeometry.height();
-        int w = availGeometry.width();
+        const QRect availGeometry = screen->availableGeometry();
+        int heightAvaliable = availGeometry.height();
+        int widthAvaliable = availGeometry.width();
         QList<QScreen *> screenlist = screen->virtualSiblings();
 
         if (screenlist.contains(screen)) {
-            QSize sz = QApplication::desktop()->size();
-            h = sz.height();
-            w = sz.width();
+            const QSize desktopSize = QApplication::desktop()->size();
+            heightAvaliable = desktopSize.height();
+            widthAvaliable = desktopSize.width();
         }
 
         // верх право
@@ -334,7 +335,7 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
             diff = globalMousePos.y() - m_startGeometry.y();
             int newy = m_startGeometry.y() + diff;
 
-            if (neww > 0 && newy > 0 && newy < h - 50) {
+            if (neww > 0 && newy > 0 && newy < heightAvaliable - 50) {
                 QRect newg = m_startGeometry;
                 newg.setWidth(neww);
                 newg.setX(m_startGeometry.x());
@@ -371,27 +372,27 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
                 setGeometry(newg);
             }
         } else if (m_isDragTop) {
-            int diff = globalMousePos.y() - m_startGeometry.y();
-            int newy = m_startGeometry.y() + diff;
+            const int diff = globalMousePos.y() - m_startGeometry.y();
+            const int newy = m_startGeometry.y() + diff;
 
-            if (newy > 0 && newy < h - 50) {
+            if (newy > 0 && newy < heightAvaliable - 50) {
                 QRect newg = m_startGeometry;
                 newg.setY(newy);
                 setGeometry(newg);
             }
         } else if (m_isDragLeft) {
-            int diff = globalMousePos.x() - m_startGeometry.x();
-            int newx = m_startGeometry.x() + diff;
+            const int diff = globalMousePos.x() - m_startGeometry.x();
+            const int newx = m_startGeometry.x() + diff;
 
-            if (newx > 0 && newx < w - 50) {
+            if (newx > 0 && newx < widthAvaliable - 50) {
                 QRect newg = m_startGeometry;
                 newg.setX(newx);
                 setGeometry(newg);
             }
         } else if (m_isDragRight) {
-            int diff =
+            const int diff =
                     globalMousePos.x() - (m_startGeometry.x() + m_startGeometry.width());
-            int neww = m_startGeometry.width() + diff;
+            const int neww = m_startGeometry.width() + diff;
 
             if (neww > 0) {
                 QRect newg = m_startGeometry;
@@ -400,9 +401,9 @@ void FramelessWindow::checkBorderDragging(QMouseEvent *event)
                 setGeometry(newg);
             }
         } else if (m_isDragBottom) {
-            int diff =
+            const int diff =
                     globalMousePos.y() - (m_startGeometry.y() + m_startGeometry.height());
-            int newh = m_startGeometry.height() + diff;
+            const int newh = m_startGeometry.height() + diff;
 
             if (newh > 0) {
                 QRect newg = m_startGeometry;
@@ -445,7 +446,7 @@ bool FramelessWindow::LeftBorderHit(const QPoint &pos)
 {
     const QRect &rect = this->geometry();
 
-    if (pos.x() >= rect.x() && pos.x() <= rect.x() + CONST_DRAG_BORDER_SIZE) {
+    if (pos.x() >= rect.x() && pos.x() <= rect.x() + m_dragBorderSize) {
         return true;
     }
 
@@ -455,9 +456,9 @@ bool FramelessWindow::LeftBorderHit(const QPoint &pos)
 bool FramelessWindow::RightBorderHit(const QPoint &pos)
 {
     const QRect &rect = this->geometry();
-    int tmp = rect.x() + rect.width();
+    const int tmp = rect.x() + rect.width();
 
-    if (pos.x() <= tmp && pos.x() >= (tmp - CONST_DRAG_BORDER_SIZE)) {
+    if (pos.x() <= tmp && pos.x() >= (tmp - m_dragBorderSize)) {
         return true;
     }
 
@@ -468,7 +469,7 @@ bool FramelessWindow::TopBorderHit(const QPoint &pos)
 {
     const QRect &rect = this->geometry();
 
-    if (pos.y() >= rect.y() && pos.y() <= rect.y() + CONST_DRAG_BORDER_SIZE) {
+    if (pos.y() >= rect.y() && pos.y() <= rect.y() + m_dragBorderSize) {
         return true;
     }
 
@@ -478,9 +479,9 @@ bool FramelessWindow::TopBorderHit(const QPoint &pos)
 bool FramelessWindow::BottomBorderHit(const QPoint &pos)
 {
     const QRect &rect = this->geometry();
-    int tmp = rect.y() + rect.height();
+    const int tmp = rect.y() + rect.height();
 
-    if (pos.y() <= tmp && pos.y() >= (tmp - CONST_DRAG_BORDER_SIZE)) {
+    if (pos.y() <= tmp && pos.y() >= (tmp - m_dragBorderSize)) {
         return true;
     }
 
@@ -529,7 +530,7 @@ void FramelessWindow::mousePressEvent(QMouseEvent *event)
 
 void FramelessWindow::mouseReleaseEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+//    event->ignore();
 
     if (isMaximized()) {
         return;
@@ -604,10 +605,10 @@ void FramelessWindow::CreateUI()
 
 void FramelessWindow::InitUI()
 {
-    m_minimizeButton->setToolTip("Свернуть");
-    m_maximizeButton->setToolTip("Развернуть окно программы на весь экран");
-    m_zoomButton->setToolTip("Выйти из полноэкранного режима");
-    m_closeButton->setToolTip("Закрыть");
+    m_minimizeButton->setToolTip(QStringLiteral("Свернуть"));
+    m_maximizeButton->setToolTip(QStringLiteral("Развернуть окно программы на весь экран"));
+    m_zoomButton->setToolTip(QStringLiteral("Выйти из полноэкранного режима"));
+    m_closeButton->setToolTip(QStringLiteral("Закрыть"));
 
 
     m_changeDelegatesView->setCheckable(true);

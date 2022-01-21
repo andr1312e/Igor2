@@ -25,8 +25,8 @@
 #ifndef LOG4QT_OPTIONCONVERTER_H
 #define LOG4QT_OPTIONCONVERTER_H
 
-#include <log4qt/log4qtshared.h>
-#include <log4qt/level.h>
+#include "Logging/log4qtshared.h"
+#include "Logging/level.h"
 
 #include <QString>
 

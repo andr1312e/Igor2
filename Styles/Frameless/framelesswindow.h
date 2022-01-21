@@ -81,9 +81,10 @@ private:
    QLabel *m_titleText;
 
    QGraphicsDropShadowEffect *m_textShadow;
+   QGraphicsDropShadowEffect *m_windowShadow;//сам удаляется
 
    QRect m_startGeometry;
-   const quint8 CONST_DRAG_BORDER_SIZE = 15;
+   const quint8 m_dragBorderSize = 15;
    bool m_isMousePressed;
    bool m_isDragTop;
    bool m_isDragLeft;

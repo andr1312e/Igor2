@@ -42,20 +42,20 @@ class  LOG4QT_EXPORT Hierarchy : public LoggerRepository
 {
 public:
     Hierarchy();
-    ~Hierarchy() override;
+    ~Hierarchy() Q_DECL_OVERRIDE;
 
 public:
-    bool exists(const QString &name) const override;
-    Logger *logger(const QString &name) override;
-    QList<Logger *> loggers() const override;
-    Logger *rootLogger() const override;
-    Level threshold() const override;
-    void setThreshold(Level level) override;
-    void setThreshold(const QString &threshold) override;
+    bool exists(const QString &name) const Q_DECL_OVERRIDE;
+    Logger *logger(const QString &name) Q_DECL_OVERRIDE;
+    QList<Logger *> loggers() const Q_DECL_OVERRIDE;
+    Logger *rootLogger() const Q_DECL_OVERRIDE;
+    Level threshold() const Q_DECL_OVERRIDE;
+    void setThreshold(Level level) Q_DECL_OVERRIDE;
+    void setThreshold(const QString &threshold) Q_DECL_OVERRIDE;
 
-    bool isDisabled(Level level) override;
-    void resetConfiguration() override;
-    void shutdown() override;
+    bool isDisabled(Level level) Q_DECL_OVERRIDE;
+    void resetConfiguration() Q_DECL_OVERRIDE;
+    void shutdown() Q_DECL_OVERRIDE;
 
 private:
     Logger *createLogger(const QString &name);

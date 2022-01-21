@@ -25,8 +25,8 @@
 #ifndef LOG4QT_APPENDERATTACHABLE_H
 #define LOG4QT_APPENDERATTACHABLE_H
 
-#include <log4qt/log4qt.h>
-#include <log4qt/appender.h>
+#include "Logging/log4qt.h"
+#include "Logging/appender.h"
 
 #include <QList>
 #include <QReadWriteLock>
@@ -53,6 +53,10 @@ public:
      * Get all previously added appenders as an Enumeration.
      */
     virtual QList<AppenderSharedPtr> appenders() const;
+    /*!
+     * Has appenders.
+     */
+    virtual bool HasAppenders() const;
 
     /*!
      * Get an appender by name.

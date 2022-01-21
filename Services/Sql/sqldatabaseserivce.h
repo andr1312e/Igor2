@@ -11,6 +11,8 @@
 #include <QStringList>
 #include <QListView>
 
+#include "Logging/logger.h"
+
 #include "Services/Sql/tablecolumnsnames.h"
 
 #include "Services/Sql/isqlservice.h"
@@ -75,12 +77,12 @@ private:
     bool GetBoolFromMessage(QSqlQuery &query);
     void GetStringFromMessage( QString &inputString, const QSqlRecord &record,const int &rowPos);
 private:
-    const QString postgeSqlDatabaseDriverStringKey="QPSQL";
-    QSqlDatabase * m_db;
+    const QString m_postgeSqlDatabaseDriverStringKey;
+    QSqlDatabase m_db;
     QSqlQueryModel* const m_currentRoleModel;
-    const QString usersTablePrefix="rlstiusers";
-    const QString startupTablePrefix="rlstistartups";
-    const QString desktopTablePrefix="rlstidesktops";
+    const QString m_usersTablePrefix;
+    const QString m_startupTablePrefix;
+    const QString m_desktopTablePrefix;
 };
 
 #endif // SQLDATABASESERIVCE_H

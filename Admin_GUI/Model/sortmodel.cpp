@@ -15,6 +15,10 @@ void SortModel::UpdateSeachTextAndSeachAttribute(const QString &text, const QStr
 {
     m_searchText=text;
     m_searchAttribute=attribute;
+    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    {
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Обновили фильтр поиска по списку юзеров. Текст: ") + text + QStringLiteral( " аттрибут поиска ") + attribute);
+    }
     invalidateFilter();//https://evileg.com/en/forum/topic/1421/
 }
 
@@ -26,10 +30,10 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
     }
     else
     {
-        QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-        QVariant data=index.data(Qt::UserRole+1);
-        User user=data.value<User>();
-        if (comboBoxSearchAttributes.at(0)==m_searchAttribute)
+        const QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+        const QVariant data=index.data(Qt::UserRole+1);
+        const User user=data.value<User>();
+        if (comboBoxSearchAttributes.front()==m_searchAttribute)
         {
             if (user.FCS.contains(m_searchText))
             {
@@ -42,18 +46,7 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
         }
         else
         {
-            if (comboBoxSearchAttributes.at(1)==m_searchAttribute)
-            {
-                if (user.userId.contains(m_searchText))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
+            if (comboBoxSearchAttributes.last()==m_searchAttribute)
             {
                 if (user.name.contains(m_searchText))
                 {
@@ -64,6 +57,18 @@ bool SortModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent)
                     return false;
                 }
             }
+            else
+            {
+                if (user.userId.contains(m_searchText))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
         }
     }
 }

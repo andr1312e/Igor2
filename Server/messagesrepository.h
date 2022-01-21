@@ -9,7 +9,8 @@ class MessagesRepository
 public:
     MessagesRepository();
     ~MessagesRepository();
-
+private:
+    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
 public:
     const quint8 m_trackSettingMessageId = MESSAGES_ID::RMO_VOI_TRACK_SETTING_MESSAGE;
     const quint8 m_trackSettingsMesageSize = m_messageIdSize + sizeof(RMOTrackSetting);
@@ -54,7 +55,7 @@ private:
     std::list<RMOTargetPositionMessage> m_targetPositionsList;
     RMODriveToPositionMessage m_driveToPositionMessage;
     std::list<RMOBioDefenceSectorMessage> m_defenceSectorMessageList;
-    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
+
 };
 
 #endif // SERVER_MESSAGESREPOSITORY_H

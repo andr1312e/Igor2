@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-#include "helpers/configuratorhelper.h"
+#include "Logging/helpers/configuratorhelper.h"
 
-#include "helpers/initialisationhelper.h"
+#include "Logging/helpers/initialisationhelper.h"
 
 #include <QFileSystemWatcher>
 #include <QFileInfo>

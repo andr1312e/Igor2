@@ -2,39 +2,46 @@
 
 SqlDatabaseSerivce::SqlDatabaseSerivce(QObject *parent)
     : QObject(parent)
+    , m_postgeSqlDatabaseDriverStringKey(QStringLiteral("QPSQL"))
     , m_currentRoleModel(new QSqlQueryModel(this))
+    , m_usersTablePrefix(QStringLiteral("rlstiusers"))
+    , m_startupTablePrefix(QStringLiteral("rlstistartups"))
+    , m_desktopTablePrefix(QStringLiteral("rlstidesktops"))
 
 {
-    qDebug()<< "DbDrivers" << QSqlDatabase::drivers();
-
+    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO+ QStringLiteral(" Создаем сервис для работы с бд. Драйвера баз данных в системе: ")+QSqlDatabase::drivers().join(' '));
 }
 
 SqlDatabaseSerivce::~SqlDatabaseSerivce()
 {
-    if(m_db->isOpen())
+    if(m_db.isOpen())
     {
-        m_db->close();
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Закрываем бд: "));
+        m_db.close();
     }
-    delete m_db;
+    else
+    {
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Бд не была открыта "));
+    }
     delete m_currentRoleModel;
 }
 
 bool SqlDatabaseSerivce::ConnectToDataBase(const QString &hostName, const quint16 &port, const QString &databaseName, const QString &userName, const QString &dbPassword)
 {
-    m_db=new QSqlDatabase(QSqlDatabase::addDatabase(postgeSqlDatabaseDriverStringKey));
-    m_db->setHostName(hostName);
-    m_db->setPort(port);
-    m_db->setDatabaseName(databaseName);
-    m_db->setUserName(userName);
-    m_db->setPassword(dbPassword);
-    bool isDbCreated= m_db->open(userName, dbPassword);
-    if (isDbCreated)
+    m_db=QSqlDatabase::addDatabase(m_postgeSqlDatabaseDriverStringKey);
+    m_db.setHostName(hostName);
+    m_db.setPort(port);
+    m_db.setDatabaseName(databaseName);
+    m_db.setUserName(userName);
+    m_db.setPassword(dbPassword);
+    if (m_db.open(userName, dbPassword))
     {
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO+ QStringLiteral(" Подключились к базе данных"));
         return true;
     }
     else
     {
-        qDebug()<< "Error" << "Database connection error" + m_db->lastError().text();
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO+ QStringLiteral(" Ошибка в подключении к базе данных. Ошибка: ") + m_db.lastError().text());
         return false;
     }
 }
@@ -42,7 +49,7 @@ bool SqlDatabaseSerivce::ConnectToDataBase(const QString &hostName, const quint1
 void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
 {
     QSqlQuery query;
-    if (query.exec("CREATE TABLE IF NOT EXISTS " + usersTablePrefix +
+    if (query.exec("CREATE TABLE IF NOT EXISTS " + m_usersTablePrefix +
                    " (id        SERIAL    PRIMARY KEY, "+
                    userIdCN  +" VARCHAR(100) NOT NULL, "+
                    userNameCN+" VARCHAR(100) NOT NULL, "+
@@ -54,33 +61,30 @@ void SqlDatabaseSerivce::CreateUsersTableIfNotExists()
     }
     else
     {
-        qDebug()<< QStringLiteral("Database error") + m_db->lastError().text();
-        qDebug()<< QStringLiteral("Query error") << query.lastError().text();
-        qFatal("Не удалось создать бд с исполняемыми файлами");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось создать бд с пользователями. Ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::CreateStartupsTableIfNotExists(int roleId)
 {
     QSqlQuery query;
-    QString request="CREATE TABLE IF NOT EXISTS " + startupTablePrefix +QString::number(roleId)+
+    const QString request="CREATE TABLE IF NOT EXISTS " + m_startupTablePrefix +QString::number(roleId)+
             " (id             SERIAL   PRIMARY KEY, "+
             startupPathCN + " VARCHAR(100) NOT NULL)";
-    if (query.exec(request.toUtf8()))
+    if (query.exec(request))
     {
         return;
     }
     else
     {
-        qDebug()<< QString("Не удалось создать бд с исполняемыми файлами" + query.lastError().text());
-        qFatal("msg");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось создать бд с файлами перезапуска стола. Роль: ") + QString::number(roleId)+ QStringLiteral(" Ошибка: ")+ query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::CreateDesktopRolesIfNotExists(int roleId)
 {
     QSqlQuery query;
-    if(query.exec("CREATE TABLE IF NOT EXISTS " + desktopTablePrefix +QString::number(roleId)+
+    if(query.exec("CREATE TABLE IF NOT EXISTS " + m_desktopTablePrefix +QString::number(roleId)+
                   " (id             SERIAL    PRIMARY KEY, "+
                   desktopNameCN + " VARCHAR(100) NOT NULL, "+
                   desktopTypeCN +"  VARCHAR(100) NOT NULL, "+
@@ -91,73 +95,77 @@ void SqlDatabaseSerivce::CreateDesktopRolesIfNotExists(int roleId)
     }
     else
     {
-        qFatal("Не удалось создать бд с ярлыками");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось создать бд с файлами рабочего стола. Роль: ") + QString::number(roleId)+ QStringLiteral(" Ошибка: ")+ query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 QStringList SqlDatabaseSerivce::GetAdminsRoleUserName()
 {
+    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получаем список имен администратора: "));
     QStringList adminsUserNameList;
     QSqlQuery query;
-    query.prepare("SELECT "+ userNameCN + " FROM " + usersTablePrefix+
+    query.prepare("SELECT "+ userNameCN + " FROM " + m_usersTablePrefix+
                   " WHERE " + rankCN + " = '" + Roles.at(Roles.count()-1) + "'"
                   );
     if(query.exec())
     {
         while(query.next())
         {
-            if(query.value(0).type()==QVariant::String)
+            if(QVariant::String==query.value(0).type())
             {
                 adminsUserNameList.append(query.value(0).toString());
             }
             else
             {
-                qFatal("Unvalid type");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не преобразовать имя пользователя в строку. Настоящий тип данных ") + QString::number(query.value(0).type())).toUtf8().constData());
             }
         }
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Администраторы : ") + adminsUserNameList.join(' '));
         return  adminsUserNameList;
     }
     else
     {
-        qFatal("Cant get list of admins in db");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем получить список имен администратора, запрос не выполнен. Ошибка: ") + query.lastError().text().toUtf8().constData()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 QString SqlDatabaseSerivce::GetUserFCS(const QString &currentUserName)
 {
+    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получаем ФИО пользователя: имя пользователя ") + currentUserName);
     QSqlQuery query;
-    query.prepare("SELECT " + fcsCN+ " FROM "+ usersTablePrefix+
+    query.prepare("SELECT " + fcsCN+ " FROM "+ m_usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName.simplified());
     if(query.exec())
     {
         if(query.next())
         {
-            if(query.value(0).type()==QVariant::String)
+            if(QVariant::String==query.value(0).type())
             {
-                QString fcs=query.value(0).toString();
+                const QString fcs=query.value(0).toString();
                 return fcs;
             }
             else
             {
-                qFatal("Name type is incorrect");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не преобразовать ФИО пользователя в строку. Настоящий тип данных ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName ).toUtf8().constData());
             }
         }
         else
         {
-            return "";
+            return QString();
         }
     }
     else
     {
-        qFatal("Cant delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не можем получить ФИО пользователя, запрос не выполнен. Ошибка: ")+ query.lastError().text().toUtf8().constData() + QStringLiteral(" имя пользователя ") + currentUserName).toUtf8().constData());
     }
 }
 
 QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
 {
+    Log4Qt::Logger::rootLogger()->info(QStringLiteral(" Получаем ранг пользователя: ")+Q_FUNC_INFO + QStringLiteral(" имя пользователя ") + currentUserName);
     QSqlQuery query;
-    query.prepare("SELECT " + rankCN+ " FROM "+ usersTablePrefix+
+    query.prepare("SELECT " + rankCN+ " FROM "+ m_usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName);
     if(query.exec())
@@ -171,7 +179,7 @@ QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
             }
             else
             {
-                qFatal("Name type is incorrect");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не преобразовать ранг пользователя в строку. Настоящий тип данных: ") + QString::number(query.value(0).type()) + QStringLiteral(" Имя пользователя: ") + currentUserName ).toUtf8().constData());
             }
         }
         else
@@ -181,14 +189,14 @@ QString SqlDatabaseSerivce::GetUserRank(const QString &currentUserName)
     }
     else
     {
-        qFatal("Cant delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не можем получить ранг пользователя, запрос не выполнен. Ошибка: ")+ query.lastError().text().toUtf8().constData() + QStringLiteral(" Имя пользователя: ") + currentUserName).toUtf8().constData());
     }
 }
 
 int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
 {
     QSqlQuery query;
-    query.prepare("SELECT " + roleCN+ " FROM "+ usersTablePrefix+
+    query.prepare("SELECT " + roleCN+ " FROM "+ m_usersTablePrefix+
                   " WHERE "+ userNameCN +"=?");
     query.bindValue(0, currentUserName);
     if(query.exec())
@@ -205,12 +213,12 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
                 }
                 else
                 {
-                    qFatal("Can't convert to int string value");
+                    qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не можем конвертировать в число. Число ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
                 }
             }
             else
             {
-                qFatal("Name type is incorrect");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем преобразовать роль пользователя в число. Hастоящий тип данных: ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
             }
         }
         else
@@ -220,59 +228,27 @@ int SqlDatabaseSerivce::GetUserRole(const QString &currentUserName)
     }
     else
     {
-        qFatal("Can't delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем получить роль пользователя, запрос не выполнен. Ошибка: ") + query.lastError().text().toUtf8().constData() + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 QString SqlDatabaseSerivce::GetUserFCS(QStringView currentUserName)
 {
     QSqlQuery query;
-    const QString request="SELECT " + fcsCN+ " FROM "+ usersTablePrefix+
+    const QString request="SELECT " + fcsCN+ " FROM "+ m_usersTablePrefix+
             " WHERE "+ userNameCN +"=\'" + currentUserName+ "\'";
     query.prepare(request);
     if(query.exec())
     {
         if(query.next())
         {
-            if(query.value(0).type()==QVariant::String)
+            if(QVariant::String==query.value(0).type())
             {
-                QString fcs=query.value(0).toString();
-                return fcs;
+                return query.value(0).toString();
             }
             else
             {
-                qFatal("Name type is incorrect");
-            }
-        }
-        else
-        {
-            return "";
-        }
-    }
-    else
-    {
-        qFatal("Cant delete from database exec");
-    }
-}
-
-QString SqlDatabaseSerivce::GetUserRank(QStringView currentUserName)
-{
-    QSqlQuery query;
-    const QString request="SELECT " + rankCN+ " FROM "+ usersTablePrefix+
-            " WHERE "+ userNameCN +"=\'" + currentUserName + "\'";
-    query.prepare(request);
-    if(query.exec())
-    {
-        if(query.next())
-        {
-            if(query.value(0).type()==QVariant::String)
-            {
-                QString rank=query.value(0).toString();
-                return rank;
-            }
-            else
-            {
-                qFatal("Name type is incorrect");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не преобразовать фио пользователя в строку : ") +  QStringLiteral( " настоящий тип данных ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
             }
         }
         else
@@ -282,21 +258,52 @@ QString SqlDatabaseSerivce::GetUserRank(QStringView currentUserName)
     }
     else
     {
-        qFatal("Cant delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не можем получить фио пользователя, запрос не выполнен. Ошибка: ")+ query.lastError().text().toUtf8().constData() + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
+    }
+}
+
+QString SqlDatabaseSerivce::GetUserRank(QStringView currentUserName)
+{
+    QSqlQuery query;
+    const QString request="SELECT " + rankCN+ " FROM "+ m_usersTablePrefix+
+            " WHERE "+ userNameCN +"=\'" + currentUserName + "\'";
+    query.prepare(request);
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            if(QVariant::String ==query.value(0).type())
+            {
+                QString rank=query.value(0).toString();
+                return rank;
+            }
+            else
+            {
+                qFatal("%s", QString(Q_FUNC_INFO+QStringLiteral(" Не преобразовать ранг пользователя в строку. Настоящий тип данных: ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
+            }
+        }
+        else
+        {
+            return QString();
+        }
+    }
+    else
+    {
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не можем получить ранг пользователя, запрос не выполнен. Ошибка: ")+ query.lastError().text().toUtf8().constData() + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 int SqlDatabaseSerivce::GetUserRole(QStringView currentUserName)
 {
     QSqlQuery query;
-    const QString request="SELECT " + roleCN+ " FROM "+ usersTablePrefix+
+    const QString request="SELECT " + roleCN+ " FROM "+ m_usersTablePrefix+
             " WHERE "+ userNameCN +"=\'" + currentUserName +"\'";
     query.prepare(request);
     if(query.exec())
     {
         if(query.next())
         {
-            if(query.value(0).type()==QVariant::Int)
+            if(QVariant::Int==query.value(0).type())
             {
                 bool ok;
                 int role=query.value(0).toInt(&ok);
@@ -306,12 +313,12 @@ int SqlDatabaseSerivce::GetUserRole(QStringView currentUserName)
                 }
                 else
                 {
-                    qFatal("Can't convert to int string value");
+                    qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем конвертировать в число : ") +  QStringLiteral( " тип ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName ).toUtf8().constData());
                 }
             }
             else
             {
-                qFatal("Name type is incorrect");
+                qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем преобразовать роль пользователя в число : ")+  QStringLiteral( " настоящий тип данных ") + QString::number(query.value(0).type()) + QStringLiteral(" имя пользователя ") + currentUserName ).toUtf8().constData());
             }
         }
         else
@@ -321,14 +328,14 @@ int SqlDatabaseSerivce::GetUserRole(QStringView currentUserName)
     }
     else
     {
-        qFatal("Can't delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не можем получить роль пользователя, запрос не выполнен. Ошибка: ")+ query.lastError().text().toUtf8().constData() + QStringLiteral(" имя пользователя ") + currentUserName + QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData() );
     }
 }
 
 void SqlDatabaseSerivce::ClearTable(QString tableName)
 {
-    QSqlQuery query(*m_db);
-    QString request=QStringLiteral(" DELETE FROM ")+tableName;
+    QSqlQuery query(m_db);
+    const QString request=QStringLiteral(" DELETE FROM ")+tableName;
     query.prepare(request);
     if(query.exec())
     {
@@ -336,38 +343,38 @@ void SqlDatabaseSerivce::ClearTable(QString tableName)
     }
     else
     {
-        qFatal("Can't clear database");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral("Не получается отчистить таблицу. Ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::ClearUsersTable()
 {
-    ClearTable(usersTablePrefix);
+    ClearTable(m_usersTablePrefix);
 }
 
 void SqlDatabaseSerivce::ClearStartupsTable(int roleId)
 {
-    QSqlQuery query(*m_db);
-    ClearTable(startupTablePrefix+QString::number(roleId));
+    QSqlQuery query(m_db);
+    ClearTable(m_startupTablePrefix+QString::number(roleId));
 }
 
 void SqlDatabaseSerivce::ClearDesktopTable(int roleId)
 {
-    QSqlQuery query(*m_db);
-    ClearTable(desktopTablePrefix+QString::number(roleId));
+    QSqlQuery query(m_db);
+    ClearTable(m_desktopTablePrefix+QString::number(roleId));
 }
 
 bool SqlDatabaseSerivce::CheckUsersTable()
 {
-    QSqlQuery query(*m_db);
-    query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + usersTablePrefix+ "')");
+    QSqlQuery query(m_db);
+    query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + m_usersTablePrefix+ "')");
     if(query.exec())
     {
         return  GetBoolFromMessage(query);
     }
     else
     {
-        qFatal("Cant execute check user table query");
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Не получается проверить наличилие таблицы с пользователями. Ошибка: ")+ query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -375,8 +382,8 @@ bool SqlDatabaseSerivce::CheckStartupTables()
 {
     for (int i=0; i<Roles.count(); ++i)
     {
-        QSqlQuery query(*m_db);
-        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + startupTablePrefix +QString::number(i)+ "')");
+        QSqlQuery query(m_db);
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + m_startupTablePrefix +QString::number(i)+ "')");
         if(query.exec())
         {
             if(false==GetBoolFromMessage(query))
@@ -386,7 +393,7 @@ bool SqlDatabaseSerivce::CheckStartupTables()
         }
         else
         {
-            qFatal("Cant execute check user table query");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается проверить наличилие таблицы с путями на автозагрузку программ. Ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     return  true;
@@ -396,15 +403,15 @@ bool SqlDatabaseSerivce::CheckStartupTables(int roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
-        QSqlQuery query(*m_db);
-        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + startupTablePrefix +QString::number(roleId)+ "')");
+        QSqlQuery query(m_db);
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + m_startupTablePrefix +QString::number(roleId)+ "')");
         if(query.exec())
         {
             return GetBoolFromMessage(query);
         }
         else
         {
-            qFatal("Cant execute check user table query");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается проверить наличилие таблицы с путями на автозагрузку программ. Роль ") +QString::number(roleId)+ QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
@@ -417,8 +424,8 @@ bool SqlDatabaseSerivce::CheckDesktopTables()
 {
     for (int i=0; i<Roles.count(); ++i)
     {
-        QSqlQuery query(*m_db);
-        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + desktopTablePrefix +QString::number(i)+ "')");
+        QSqlQuery query(m_db);
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + m_desktopTablePrefix +QString::number(i)+ "')");
         if(query.exec())
         {
             if(false==GetBoolFromMessage(query))
@@ -428,7 +435,7 @@ bool SqlDatabaseSerivce::CheckDesktopTables()
         }
         else
         {
-            qFatal("Cant execute check user table query");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается проверить наличилие таблицы с ярлыками программ. Ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     return  true;
@@ -438,15 +445,15 @@ bool SqlDatabaseSerivce::CheckDesktopTables(int roleId)
 {
     if(roleId>=0 && roleId<Roles.count())
     {
-        QSqlQuery query(*m_db);
-        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + desktopTablePrefix +QString::number(roleId)+ "')");
+        QSqlQuery query(m_db);
+        query.prepare(" SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = '" + m_desktopTablePrefix +QString::number(roleId)+ "')");
         if(query.exec())
         {
             return GetBoolFromMessage(query);
         }
         else
         {
-            qFatal("Cant execute check user table query");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается проверить наличилие таблицы с ярлыками программ. Роль: ") +QString::number(roleId)+ QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
@@ -457,12 +464,12 @@ bool SqlDatabaseSerivce::CheckDesktopTables(int roleId)
 
 void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 {
-    QSqlQuery query(*m_db);
-    QString request=
-            "DO $$ BEGIN IF EXISTS(SELECT * FROM " + usersTablePrefix+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
-            "UPDATE " + usersTablePrefix+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
+    QSqlQuery query(m_db);
+    const QString request=
+            "DO $$ BEGIN IF EXISTS(SELECT * FROM " + m_usersTablePrefix+ " WHERE " +userIdCN + "= '" +user.userId +"' AND " +userNameCN + " = '" + user.name + "') THEN " +
+            "UPDATE " + m_usersTablePrefix+ " SET "+ fcsCN + " = '"+user.FCS+"' , "+ rankCN + " = '"+ user.rank+ "', "+ roleCN + " = "+ QString::number(user.role)+ " WHERE "+ userIdCN + " = '" +user.userId +"' AND "+ userNameCN + " = '" +user.name +"'; "+
             "ELSE "
-            "INSERT INTO " + usersTablePrefix+ " (" +userIdCN + ", " +userNameCN + ", "+ fcsCN + ", "+ rankCN + ", "+ roleCN + ") "+
+            "INSERT INTO " + m_usersTablePrefix+ " (" +userIdCN + ", " +userNameCN + ", "+ fcsCN + ", "+ rankCN + ", "+ roleCN + ") "+
             "VALUES ('"+ user.userId+ "',  '"+ user.name+ "', '"+ user.FCS+ "', '"+ user.rank+ "',  "+ QString::number(user.role)+ ");  "
                                                                                                                                    "END IF; "
                                                                                                                                    "END $$; ";
@@ -472,18 +479,16 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
     }
     else
     {
-        qDebug()<< query.executedQuery();
-        qDebug()<< query.lastQuery();
-        qDebug()<< query.lastError().text();
-        qFatal("Cant write user to database");
+        qFatal("%s", QString(Q_FUNC_INFO +  QStringLiteral(" Не получается добавить пользователя в таблицу. Запрос ")+query.lastQuery()+ QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 
 void SqlDatabaseSerivce::RemoveUserIntoTable(int roleId,const User &user)
 {
-    QSqlQuery query(*m_db);
-    const QString request="DELETE FROM " + startupTablePrefix + QString::number(roleId) +
+    //БРЕД????
+    QSqlQuery query(m_db);
+    const QString request="DELETE FROM " + m_startupTablePrefix + QString::number(roleId) +
             " WHERE" + userIdCN +"=\'"+ user.userId +"\'";
     query.prepare(request);
     if(query.exec())
@@ -492,8 +497,7 @@ void SqlDatabaseSerivce::RemoveUserIntoTable(int roleId,const User &user)
     }
     else
     {
-        qDebug()<< query.lastError();
-        qFatal("%s", QStringLiteral("Не возможно удалить пользователя с бд").toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается удалить из в таблицы пользователя. Запрос ") +query.lastQuery()+ QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -501,13 +505,13 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
 {
     QSqlQueryModel sqlQueryModel(this);
     QList<User> userList;
-    QSqlQuery query(*m_db);
-    QString request="SELECT "+ userIdCN +" , "+ userNameCN +" , "+ fcsCN +" , "+ rankCN +" , "+ roleCN +" FROM "+usersTablePrefix;
+    QSqlQuery query(m_db);
+    const QString request="SELECT "+ userIdCN +" , "+ userNameCN +" , "+ fcsCN +" , "+ rankCN +" , "+ roleCN +" FROM "+m_usersTablePrefix;
     query.prepare(request);
 
     if(query.exec()){
         sqlQueryModel.setQuery(query);
-        if(sqlQueryModel.columnCount()==5)
+        if(5==sqlQueryModel.columnCount())
         {
             for(int i = 0; i < sqlQueryModel.rowCount(); i++)
             {
@@ -517,25 +521,25 @@ QList<User> SqlDatabaseSerivce::GetAllUsers()
                 GetStringFromMessage(user.FCS, sqlQueryModel.record(i), 2);
                 GetStringFromMessage(user.rank, sqlQueryModel.record(i), 3);
                 user.role=sqlQueryModel.record(i).value(4).toInt();
-                userList.push_back(user);
+                userList.append(user);
             }
         }
         else
         {
-            qFatal("Column count != 5");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается получить из в таблицы всех пользователей, в таблице должно быть 5 колонок ") +  QStringLiteral( " а в реальности их ") +QString::number(sqlQueryModel.columnCount())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
     {
-        qFatal("can't execute");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не получается получить из в таблицы всех пользователей ") +  QStringLiteral( " запрос ") +query.lastQuery()+ QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
     return userList;
 }
 
 void SqlDatabaseSerivce::AppendStartupIntoRole(int roleId, const QString &exec)
 {
-    QSqlQuery query(*m_db);
-    QString request="INSERT INTO "+ startupTablePrefix+QString::number(roleId)+
+    QSqlQuery query(m_db);
+    const QString request="INSERT INTO "+ m_startupTablePrefix+QString::number(roleId)+
             " ( "+ startupPathCN + " ) VALUES (?)";
     query.prepare(request);
     query.bindValue(0, exec);
@@ -545,8 +549,7 @@ void SqlDatabaseSerivce::AppendStartupIntoRole(int roleId, const QString &exec)
     }
     else
     {
-        const QString errorMessage=QString("Не удалось записать  путь к программе: %1 для роли: %2").arg(exec).arg(roleId);
-        qFatal("%s", errorMessage.toUtf8().data());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось записать  путь к программе для роли - ")  +  QStringLiteral( " программа: ") +exec +  QStringLiteral( " роль: ") + QString::number(roleId)  + QStringLiteral( " ошибка: ") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -555,14 +558,14 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(int roleId)
 
     QSqlQueryModel sqlQueryModel(this);
     QStringList listOfStartups;
-    QSqlQuery query(*m_db);
-    query.prepare("SELECT " + startupPathCN + " FROM "+ startupTablePrefix +QString::number(roleId));
+    QSqlQuery query(m_db);
+    query.prepare("SELECT " + startupPathCN + " FROM "+ m_startupTablePrefix +QString::number(roleId));
     if(query.exec())
     {
         sqlQueryModel.setQuery(query);
         qDebug()<<sqlQueryModel.columnCount();
         qDebug()<<sqlQueryModel.rowCount();
-        if(sqlQueryModel.columnCount()==1)
+        if(1==sqlQueryModel.columnCount())
         {
             for(int i = 0; i < sqlQueryModel.rowCount(); i++)
             {
@@ -573,36 +576,33 @@ QStringList SqlDatabaseSerivce::GetAllRoleStartups(int roleId)
         }
         else
         {
-            qFatal("Wrong column count");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Колличество колонок не равно одному : ")  +  QStringLiteral( " колличество записей: ") + QString::number(sqlQueryModel.columnCount())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
     {
-        const QString errorMessage=QString("Не удалось получить  все исполняемые файлы  для роли: " ).arg(roleId);
-        qFatal("%s", errorMessage.toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось получить  все исполняемые файлы : ")  +  QStringLiteral( " роль: ") + QString::number(roleId)  +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
     return listOfStartups;
 }
 
 void SqlDatabaseSerivce::GetAllRoleStartupsIntoModel(int roleId)
 {
-    QStringList listOfStartups;
-    QSqlQuery query(*m_db);
-    query.prepare("SELECT " + startupPathCN + " FROM "+ startupTablePrefix +QString::number(roleId));
+    QSqlQuery query(m_db);
+    query.prepare("SELECT " + startupPathCN + " FROM "+ m_startupTablePrefix +QString::number(roleId));
     if(query.exec())
     {
         m_currentRoleModel->setQuery(query);
         qDebug()<<m_currentRoleModel->columnCount();
         qDebug()<<m_currentRoleModel->rowCount();
-        if(m_currentRoleModel->columnCount()!=1)
+        if(1!=m_currentRoleModel->columnCount())
         {
-            qFatal("Wrong column count");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Колличество колонок не равно одному : ")  +  QStringLiteral( " колличество записей: ") + QString::number(m_currentRoleModel->columnCount())).toUtf8().constData());
         }
     }
     else
     {
-        const QString errorMessage=QString("Не удалось получить  все исполняемые файлы  для роли: " ).arg(roleId);
-        qFatal("%s", errorMessage.toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось получить  все пути для перезапускаемых программ: ")  +  QStringLiteral( " роль: ") + QString::number(roleId)  +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -614,7 +614,7 @@ QSqlQueryModel *SqlDatabaseSerivce::GetRoleStartupsModel()
 void SqlDatabaseSerivce::RemoveStartupIntoRole(int roleId, const QString &startupPath)
 {
     QSqlQuery query;
-    const QString request="DELETE FROM "+ startupTablePrefix + QString::number(roleId) +
+    const QString request="DELETE FROM "+ m_startupTablePrefix + QString::number(roleId) +
             " WHERE "+ startupPathCN +"=\'"+ startupPath+ "\'";
     query.prepare(request);
     if(query.exec())
@@ -623,14 +623,14 @@ void SqlDatabaseSerivce::RemoveStartupIntoRole(int roleId, const QString &startu
     }
     else
     {
-        qFatal("Cant delete from database exec");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось записать путь для перезапускаемой программы: ")  +  QStringLiteral( " роль: ") + QString::number(roleId) +  QStringLiteral( " путь : ") + startupPath  +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::AppendDesktopIntoRole(int roleId,const DesktopEntity &entity)
 {
-    QSqlQuery query(*m_db);
-    QString request="INSERT INTO "+ desktopTablePrefix+QString::number(roleId)+
+    QSqlQuery query(m_db);
+    const QString request="INSERT INTO "+ m_desktopTablePrefix+QString::number(roleId)+
             " ( " + desktopNameCN + " , "+ desktopTypeCN + " , "+ execPathCN + " , "+ iconPathCN+" ) "+
             "VALUES ( ? , ? , ? , ? )";
     query.prepare(request);
@@ -644,17 +644,15 @@ void SqlDatabaseSerivce::AppendDesktopIntoRole(int roleId,const DesktopEntity &e
     }
     else
     {
-        qDebug()<< query.lastError();
-        const QString stringError=QString("Не удалось записать  ярлык: %1 для роли: %2").arg(entity.name).arg(roleId);
-        qFatal("%s", stringError.toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось записать файлы рабочего стола для роли: ")  +  QStringLiteral( " роль: ") + QString::number(roleId) +  QStringLiteral( " имя : ") + entity.name  +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
 void SqlDatabaseSerivce::RemoveDesktopIntoRole(int roleId, const QString &entityName)
 {
-    QSqlQuery query(*m_db);
+    QSqlQuery query(m_db);
 
-    QString request="DELETE FROM "+desktopTablePrefix +QString::number(roleId) +
+    const QString request="DELETE FROM "+m_desktopTablePrefix +QString::number(roleId) +
             " WHERE "+ desktopNameCN +"=\'" + entityName + "\'";
     query.prepare(request);
     if(query.exec())
@@ -663,8 +661,7 @@ void SqlDatabaseSerivce::RemoveDesktopIntoRole(int roleId, const QString &entity
     }
     else
     {
-        qDebug()<< query.lastError();
-        qFatal("Cant delete desktop from table");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось удалить  файлы рабочего стола для роли: ")  +  QStringLiteral( " роль: ") + QString::number(roleId) +  QStringLiteral( " имя : ") + entityName  +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -672,14 +669,12 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(int roleId)
 {
     QList<DesktopEntity> listOfExecs;
     QSqlQueryModel sqlQueryModel(this);
-    QSqlQuery query(*m_db);
-    query.prepare("SELECT " + desktopNameCN + " , "+ desktopTypeCN + " , "+ execPathCN + " , "+ iconPathCN + " FROM "+ desktopTablePrefix +QString::number(roleId));
+    QSqlQuery query(m_db);
+    query.prepare("SELECT " + desktopNameCN + " , "+ desktopTypeCN + " , "+ execPathCN + " , "+ iconPathCN + " FROM "+ m_desktopTablePrefix +QString::number(roleId));
     if(query.exec())
     {
         sqlQueryModel.setQuery(query);
-        qDebug()<<sqlQueryModel.columnCount();
-        qDebug()<<sqlQueryModel.rowCount();
-        if(sqlQueryModel.columnCount()==4)
+        if(4==sqlQueryModel.columnCount())
         {
             for(int i = 0; i < sqlQueryModel.rowCount(); ++i)
             {
@@ -693,13 +688,12 @@ QList<DesktopEntity> SqlDatabaseSerivce::GetAllRoleDesktops(int roleId)
         }
         else
         {
-            qFatal("Wrong column count");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Колличество колонок не равно четырем : ")  +  QStringLiteral( " колличество записей: ") + QString::number(sqlQueryModel.columnCount())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
     {
-        const QString errorMessage=QString("Не удалось получить  все ярлыки файлы  для роли: %1").arg(roleId);
-        qFatal("%s", errorMessage.toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось получить  все файлы рабочего стола для роли: ")  +  QStringLiteral( " роль: ") + QString::number(roleId) +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
     return listOfExecs;
 }
@@ -709,14 +703,14 @@ QStringList SqlDatabaseSerivce::GetAllUsersWithRoleId(int roleId)
     Q_ASSERT(roleId>=0 && roleId<Roles.count());
     QSqlQueryModel sqlQueryModel(this);
     QStringList usersNamesWithRoleId;
-    QSqlQuery query(*m_db);
-    query.prepare("SELECT " + userNameCN + " FROM "+ usersTablePrefix + " WHERE " + roleCN + " = " +QString::number(roleId));
+    QSqlQuery query(m_db);
+    query.prepare("SELECT " + userNameCN + " FROM "+ m_usersTablePrefix + " WHERE " + roleCN + " = " +QString::number(roleId));
     if(query.exec())
     {
         sqlQueryModel.setQuery(query);
         qDebug()<<sqlQueryModel.columnCount();
         qDebug()<<sqlQueryModel.rowCount();
-        if(sqlQueryModel.columnCount()==1)
+        if(1==sqlQueryModel.columnCount())
         {
             for(int i = 0; i < sqlQueryModel.rowCount(); ++i)
             {
@@ -727,13 +721,12 @@ QStringList SqlDatabaseSerivce::GetAllUsersWithRoleId(int roleId)
         }
         else
         {
-            qFatal("Wrong column count");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Колличество колонок не равно одному : ")  +  QStringLiteral( " колличество записей: ") + QString::number(sqlQueryModel.columnCount())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
     {
-        const QString errorMessage=QString("Не удалось получить  всех пользователей для роли: " ).arg(roleId);
-        qFatal("%s", errorMessage.toUtf8().constData());
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Не удалось получить  всех пользователей для роли: ")  +  QStringLiteral( " роль: ") + QString::number(roleId) +  QStringLiteral(" ошибка") + query.lastError().text()+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
     return usersNamesWithRoleId;
 }
@@ -743,18 +736,18 @@ bool SqlDatabaseSerivce::GetBoolFromMessage(QSqlQuery &query)
     if (1==query.size())
     {
         query.next();
-        if(query.value(0).type()==QVariant::Bool)
+        if(QVariant::Bool==query.value(0).type())
         {
             return query.value(0).toBool();
         }
         else
         {
-            qFatal("Value must be bool, but it is not bool");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Тип текущей записи не булевый, а должен быть булевый")  +  QStringLiteral( " тип записи: ") + QString::number(query.value(0).type())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
         }
     }
     else
     {
-        qFatal("Wrong message size");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Колличество записей в запросе не равно одному")  +  QStringLiteral( " колличество записей: ") + QString::number(query.size())+ QStringLiteral( " запрос: ") + query.lastQuery()).toUtf8().constData());
     }
 }
 
@@ -762,18 +755,18 @@ void SqlDatabaseSerivce::GetStringFromMessage(QString &inputString, const QSqlRe
 {
     if(record.count()>rowPos)
     {
-        if(record.value(rowPos).type()==QVariant::String)
+        if(QVariant::String==record.value(rowPos).type())
         {
             inputString= record.value(rowPos).toString();
         }
         else
         {
-            qFatal("Wrong message type");
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Тип текущей записи не строка, а должен быть строкой")  +  QStringLiteral( " тип записи: ") + QString::number(record.value(rowPos).type())).toUtf8().constData());
         }
     }
     else
     {
-        qFatal("Wrong message size");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral("Колличество записей в запросе больше чем колличество строк")  +  QStringLiteral( " колличество строк: ") + QString::number(rowPos) +  QStringLiteral( " колличество записей в запросе: ") + QString::number(record.count())).toUtf8().constData());
     }
 }
 

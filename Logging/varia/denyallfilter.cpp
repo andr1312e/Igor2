@@ -23,7 +23,7 @@
  ******************************************************************************/
 
 
-#include "varia/denyallfilter.h"
+#include "Logging/varia/denyallfilter.h"
 
 namespace Log4Qt
 {

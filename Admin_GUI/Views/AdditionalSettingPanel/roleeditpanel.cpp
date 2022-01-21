@@ -1,10 +1,3 @@
-#include <QFrame>
-#include <QWidget>
-#include <QLabel>
-#include <QListView>
-#include <QVBoxLayout>
-#include <QPushButton>
-
 #include "roleeditpanel.h"
 
 RoleEditPanel::RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService * roleDesktopService,  QWidget *parent)
@@ -13,7 +6,6 @@ RoleEditPanel::RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDeskto
     CreateUI(sqlDatabaseService, roleDesktopService);
     InsertWidgetsIntoLayout();
     FillUI();
-    ConnectObjects();
 }
 
 RoleEditPanel::~RoleEditPanel()
@@ -31,16 +23,18 @@ RoleEditPanel::~RoleEditPanel()
 
 void RoleEditPanel::OnRoleToViewChanged(const int &roleId)
 {
+    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    {
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим установить роль :") + QString::number(roleId));
+    }
     if(roleId>=0 && roleId<Roles.count())
     {
-        QString m_role=Roles.at(roleId);
-        quint8 roleIdVal=(quint8)roleId;
-        m_currentRoleLabel->setText(QStringLiteral("Выбранная роль: ")+ m_role);
-        m_roleDesktopPanel->SetRoleId(roleIdVal);
-        m_roleRunningApplicationPanel->SetRoleId(roleIdVal);
+        const QString currentRoleName=Roles.at(roleId);
+        m_currentRoleLabel->setText(QStringLiteral("Выбранная роль: ")+ currentRoleName);
+        m_roleDesktopPanel->SetRoleId(roleId);
+        m_roleRunningApplicationPanel->SetRoleId(roleId);
     }
 }
-
 
 void RoleEditPanel::CreateUI(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService)
 {
@@ -69,14 +63,9 @@ void RoleEditPanel::InsertWidgetsIntoLayout()
 
 void RoleEditPanel::FillUI()
 {
-    m_titleLabel->setText("Панель изменения ролей");
-    m_currentRoleLabel->setText("Выберите роль для просмотра настроек");
-    m_descriptionLabel->setText("Изменения применятся ко всем пользователям с этой ролью");
-    m_descriptionLabel->setStyleSheet("font-weight: bold;");
+    m_titleLabel->setText(QStringLiteral("Панель изменения ролей"));
+    m_currentRoleLabel->setText(QStringLiteral("Выберите роль для просмотра настроек"));
+    m_descriptionLabel->setText(QStringLiteral("Изменения применятся ко всем пользователям с этой ролью"));
+    m_descriptionLabel->setStyleSheet(QStringLiteral("font-weight: bold;"));
     m_descriptionLabel->setAlignment(Qt::AlignHCenter);
-}
-
-void RoleEditPanel::ConnectObjects()
-{
-//    connect(m_roleRunningApplicationPanel, &StartupPanel::ToRoleStartupChanges, this, &RoleEditPanel::ToRoleDesktopChanges);
 }

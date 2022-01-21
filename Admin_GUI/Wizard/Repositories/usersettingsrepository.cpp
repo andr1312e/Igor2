@@ -1,11 +1,11 @@
 #include "usersettingsrepository.h"
 
-UsersDataWizardRepository::UsersDataWizardRepository(LinuxUserService *service)
+UsersDataWizardRepository::UsersDataWizardRepository(const QString &currentUserName, const QString &currentUserId, LinuxUserService *service)
     : m_service(service)
-    , m_curerntUserName(m_service->GetCurrentUserName())
-    , m_curerntUserId(m_service->GetCurrentUserId())
-    , m_currentUserFCS("")
-    , m_currenUserRank("")
+    , m_curerntUserName(currentUserName)
+    , m_curerntUserId(currentUserId)
+    , m_currentUserFCS()
+    , m_currenUserRank()
 {
 
 }
@@ -113,8 +113,7 @@ int UsersDataWizardRepository::GetKorrektUserRole(const QDomElement &userDomElem
 
 void UsersDataWizardRepository::JuxtaposeUserIdAndUserNameWithSystemsData()
 {
-
-    const QList<QPair<QString, QString>> nameIdList=m_service->GetSystemUsersNamesWithIdsList();
+    auto nameIdList(m_service->GetSystemUsersNamesWithIdsList());
     for (int i=m_usersList.count()-1; i>=0; i--)
     {
         const QString userName=m_usersList.at(i).name;
