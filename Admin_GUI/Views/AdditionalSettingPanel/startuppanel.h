@@ -43,16 +43,15 @@ private Q_SLOTS:
    void OnProgramSelect(const QModelIndex &index);
 
 public:
-   void SetRoleId(const quint8 &roleId);
+   void SetRoleId(const int &roleId);
 
 private:
-   void GetAllStartups();
+   void GetAllStartupsIntoModel();
 
 private:
-   int m_roleId;
+   int m_currentRoleId;
    int m_selectedItemIndex;
    StartupPanelPresenter *m_startupRepositoryPresenter;
-
 
 private:
 

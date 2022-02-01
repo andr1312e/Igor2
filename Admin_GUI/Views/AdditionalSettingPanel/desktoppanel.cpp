@@ -72,9 +72,16 @@ void DesktopPanel::FillUI()
 
     m_addProgramButton->setDisabled(true);
     m_deleteProgramButton->setDisabled(true);
-
-    setMinimumHeight(255);
-    setMinimumWidth(420);
+    if(IsUserData())
+    {
+        m_dialogWidget->SetTitleText(QStringLiteral("Ярлык для пользователя:"));
+    }
+    else
+    {
+        m_dialogWidget->SetTitleText(QStringLiteral("Ярлык для роли:"));
+    }
+    QWidget::setMinimumHeight(255);
+    QWidget::setMinimumWidth(420);
 }
 
 void DesktopPanel::SetBackgroundColor()
@@ -82,8 +89,8 @@ void DesktopPanel::SetBackgroundColor()
     m_addProgramButton->setObjectName(QStringLiteral("add"));
     m_deleteProgramButton->setObjectName(QStringLiteral("remove"));
 
-    setBackgroundRole(QPalette::Window);
-    setAutoFillBackground(true);
+    QWidget::setBackgroundRole(QPalette::Window);
+    QWidget::setAutoFillBackground(true);
 
     m_dialogWidget->setBackgroundRole(QPalette::AlternateBase);
     m_dialogWidget->setAutoFillBackground(true);
@@ -115,29 +122,6 @@ void DesktopPanel::ConnectObjects()
     connect(m_dialogWidget, &DesktopUploadDialogWidget::ToAddFileToUserDesktop, this, &DesktopPanel::OnAddProgram);
 }
 
-void DesktopPanel::OnSetDefaultRoleApps(const quint8 &roleId)
-{
-    if (IsUserData())
-    {
-        m_roleDesktopService->SetDefaultIconsToUserOnUserRoleUpdate(m_roleId, roleId, m_userName);
-        m_roleId=roleId;
-    }
-    else
-    {
-
-        qDebug()<<QStringLiteral("невозможно установить для роли иконки по умолчанию").toUtf8();
-        qFatal(Q_FUNC_INFO);
-    }
-}
-
-void DesktopPanel::OnRoleDesktopChanges(const quint8 &roleId)
-{
-    if (roleId==m_roleId)
-    {
-        update();
-    }
-}
-
 void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName)
 {
     DesktopEntity entity;
@@ -147,11 +131,19 @@ void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, co
     entity.type=QStringLiteral("Application");
     if(IsUserData())
     {
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим добавить юзеру программу: ") + entity.exec + QStringLiteral(" у пользователя: ") + m_userName);
+        }
         m_userDesktopService->AddIconToUser(m_userName, entity);
     }
     else
     {
-        m_roleDesktopService->AddIconToRole(m_roleId, entity);
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим добавить роли программу: ") + entity.exec + QStringLiteral(" у роли: ") + QString::number(m_currentRoleId));
+        }
+        m_roleDesktopService->AddIconToRole(m_currentRoleId, entity);
     }
 }
 
@@ -159,11 +151,19 @@ void DesktopPanel::OnDeleteProgram()
 {
     if(IsUserData())
     {
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим удалить юзеру программу: ") + m_selectedItemName + QStringLiteral(" у пользователя: ") + m_userName);
+        }
         m_userDesktopService->DeleteIconToUser(m_userName, m_selectedItemName);
     }
     else
     {
-        m_roleDesktopService->DeleteIconToRole(m_roleId, m_selectedItemName);
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим удалить роли программу: ") + m_selectedItemName + QStringLiteral(" у роли: ") + QString::number(m_currentRoleId));
+        }
+        m_roleDesktopService->DeleteIconToRole(m_currentRoleId, m_selectedItemName);
     }
     m_deleteProgramButton->setDisabled(true);
 }
@@ -175,12 +175,20 @@ void DesktopPanel::OnProgramSelect(const QModelIndex &index)
     m_selectedItemName=entity.name;
     m_deleteProgramButton->setText(QStringLiteral("Удалить с рабочего стола"));
     m_deleteProgramButton->setEnabled(true);
+    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    {
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Была выбрана программа ") + entity.name);
+    }
 }
 
 void DesktopPanel::SetUser(const User &user)
 {
     if(IsUserData())
     {
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Устанавливаем для просмотра пользователя: ") + user.name);
+        }
         m_userName=user.name;
         m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для пользователя: %1").arg(m_userName));
         m_addProgramButton->setEnabled(true);
@@ -189,22 +197,24 @@ void DesktopPanel::SetUser(const User &user)
     }
     else
     {
-        qDebug()<< QStringLiteral("Невозможно для виджета роли получить данные пользователя, так как это виджет роли а не рабочего стола");
-        qFatal(Q_FUNC_INFO);
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно для виджета роли получить данные пользователя, так как это виджет роли а не рабочего стола ")).toUtf8().constData());
     }
 }
 
-void DesktopPanel::SetRoleId(const quint8 &roleId)
+void DesktopPanel::SetRoleId(int roleId)
 {
     if(IsUserData())
     {
-        qDebug()<< QStringLiteral("Невозможно для виджета рабочего стола получить ярлыки для роли, это другой виджет").toUtf8();
-        qFatal(Q_FUNC_INFO);
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно для виджета рабочего стола получить ярлыки для роли, это другой виджет ")).toUtf8().constData());
     }
     else
     {
-        m_roleId=roleId;
-        m_programsToRun->setText("Ярлыки на рабочий стол для роли: "+ Roles.at(roleId));
+        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        {
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Устанавливаем для просмотра роль: ") + QString::number(roleId));
+        }
+        m_currentRoleId=roleId;
+        m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для роли: ")+ Roles.at(roleId));
         m_addProgramButton->setEnabled(true);
         m_deleteProgramButton->setDisabled(true);
         m_roleDesktopService->GetAllRoleDesktops(roleId);

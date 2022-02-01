@@ -9,6 +9,8 @@
 #include "Services/Terminals/terminal.h"
 #include "Services/Sql/isqlservice.h"
 
+#include "Logging/logger.h"
+
 class StartupRunnableManager: public QObject
 {
     Q_OBJECT
@@ -25,28 +27,31 @@ private Q_SLOTS:
     void OnRestartProcess();
 public Q_SLOTS:
     void OnCurrentUserRoleChanged();
-public:
-    bool RunStartups();
+    void OnPauseStartupRunnableManager();
+    void OnStopStartupRunnableManager();
+    void OnRestartStartupRunnableManager();
+    bool OnRunStartupRunnableManager();
 
 protected:
     virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    QProcess * CreateReRestartApp(const QString &startup);
+    QProcess * CreateReRestartAppProcess(QStringView appNameInFolder);
     QStringList ReadUserStartupFile();
     bool IsAllStartupValid(const QStringList &startupsList);
-    void InitStartupProcessList(const QStringList &startupsList);
+    void InitStartupProcessList(const QStringList &currentUserStartupsList);
 
 private:
-    void StringsThatAreContainedAndNot(const QStringList &sourceList, const QStringList &otherList, QStringList &contained, QStringList &notContained);
+    void GetRunnedProcessesAndProcecessesForListen(const QStringList &listOfAllRunningProcessesName, const QStringList &currentUserStartupsList, QStringList &listAlreadyRunningsApps, QStringList &notRunnedAppsList);
 
 private:
     const QString m_currentUserName;
     const QStringView m_rlsTiFolderPath;
-    ISqlDatabaseService *m_sqlService;
-    Terminal *m_terminal;
+    ISqlDatabaseService* const m_sqlService;
+    Terminal* const m_terminal;
     QList<QProcess*> m_runnableProcess;
     QStringList m_listAlreadyRunningsApps;
+    int m_currentTimerId;
 };
 
 #endif // SERVICES_STARTUPRUNNABLESERVICE_H

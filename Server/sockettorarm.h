@@ -6,6 +6,7 @@
 #include <QDataStream>
 #include <QDebug>
 
+#include "Logging/logger.h"
 #include "Server/messagesrepository.h"
 
 class SocketToRarm : public QObject
@@ -44,7 +45,7 @@ private:
     const QString m_rarmAdress;
     const quint16 m_rarmPort;
 
-    const std::array<quint8, 8> m_messagesWantedToGetFromRarm;
+    const QVarLengthArray<quint8, 8> m_messagesWantedToGetFromRarm;
     const int VoiRmoWorksBitsMask = 0x06; //0000 0000 0000 0000 0000 0000 0000 0110 Little Endian
 
     MessagesRepository *m_repository;

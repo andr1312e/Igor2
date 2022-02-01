@@ -68,7 +68,6 @@ void RoleDesktopService::SetDefaultIconsToUserOnUserRoleUpdate(const quint8 &old
 void RoleDesktopService::DeleteOldIconsFromUser(const quint8 &roleId, const QString &userDesktopPath)
 {
     const QList<DesktopEntity> listOfDesktopsToDelete= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
-
     for (const DesktopEntity &entityToDelete: listOfDesktopsToDelete)
     {
         DeleteIcon(userDesktopPath, entityToDelete.name);

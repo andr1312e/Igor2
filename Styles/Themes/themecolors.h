@@ -1,9 +1,10 @@
 #ifndef STYLES_THEMES_THEMECOLORS_H
 #define STYLES_THEMES_THEMECOLORS_H
 
+#include <QVarLengthArray>
 #include <QPalette>
 
-const std::array<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(53, 53, 53)),
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, Qt::white),
    QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(42, 42, 42)),
@@ -21,7 +22,7 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::gray),
 };
 
-const std::array<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::Text, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText, QColor(127, 127, 127)),
@@ -29,7 +30,7 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor =
    QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, QColor(127, 127, 127)),
 };
 
-const std::array<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(255, 255, 255)), // цвет фона приложения
    QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(214, 214, 214)), //цвет фона листвиджетов и линеедитов
    QPair<QPalette::ColorRole, QColor>(QPalette::AlternateBase, QColor(146, 146, 146)),//цвет скролла
@@ -47,7 +48,7 @@ const std::array<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::Link, QColor(255, 255, 255)), //тайтл у листов
 };
 
-const std::array<QPair<QPalette::ColorRole, QColor>, 5> astraThemeDisabledColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> astraThemeDisabledColor = {
    QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::Text, QColor(127, 127, 127)),
    QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText, QColor(127, 127, 127)),

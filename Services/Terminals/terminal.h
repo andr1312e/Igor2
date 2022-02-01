@@ -101,7 +101,11 @@ private:
 
    QProcess* const m_process;
 
-   QStringList* const m_consoleCommand;
+   QStringList m_consoleCommand;
+
+   const QString m_terminalCommand;
+
+   const int m_commandMilliesecondsTimeOut=10000;
 
 };
 

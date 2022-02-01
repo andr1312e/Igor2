@@ -21,10 +21,10 @@ private:
 private:
     QPen *m_pen;
     QPainter *m_painter;
-    QSize *m_buttonSize;
+    const QSize m_buttonSize;
     QRect *m_br;
     QPoint *m_topLeft, *m_topRight, *m_bottomLeft , *m_bottomRight;
-    std::array<QPoint, 5> *m_points;
+    QVarLengthArray<QPoint, 5> *m_points;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_RESTOREWINDOWBUTTON_H

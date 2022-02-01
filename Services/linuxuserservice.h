@@ -1,8 +1,7 @@
 #ifndef SERVICES_LINUXUSERSERVICE_H
 #define SERVICES_LINUXUSERSERVICE_H
 
-#include <QProcess>
-#include <QStandardItemModel>
+#include "Logging/logger.h"
 
 #include "Services/Terminals/terminal.h"
 #include "Structs/userstruct.h"
@@ -18,7 +17,7 @@ public:
 public:
     const QString GetCurrentUserName();
     const QString GetCurrentUserId();
-    bool HasCurrentUserAdminPrivileges();
+    bool HasUserAdminPrivileges(const QString &userName);
 
 private:
 
@@ -28,13 +27,13 @@ private:
 
     void RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
 
-    static bool IsUserSystem(const int &userIdNumber);
+    bool IsUserSystem(const int &userIdNumber) const;
 
 private:
 
     Terminal * const m_terminal;
 
-    QList<QPair<QString, QString>> m_users;
+    QList<QPair<QString,QString>> m_users;
 
 };
 

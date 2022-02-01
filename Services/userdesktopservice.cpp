@@ -3,7 +3,7 @@
 
 UserDesktopService::UserDesktopService(ISqlDatabaseService *sqlDatabaseService)
     : DesktopService(sqlDatabaseService)
-    , m_desktopFileType(".desktop")
+    , m_desktopFileType(QStringLiteral(".desktop"))
 {
 
 }
@@ -70,7 +70,7 @@ void UserDesktopService::UpdateIconsListFromUserDesktop(const QString &userDeskt
         }
 
         if (IsIcon(entity)) {
-            QString entityInfo = m_terminal->GetFileText(
+            const QString entityInfo = m_terminal->GetFileText(
                         userDesktopPath + entity, Q_FUNC_INFO);
             ParseAndAppendIconInfoToList(entity, entityInfo);
         } else {
@@ -99,18 +99,18 @@ void UserDesktopService::ParseAndAppendIconInfoToList(const QString &programName
     QStringList iconDataList = iconInfo.split('\n');
     iconDataList.removeLast();
 
-    for (const QString parametr : iconDataList) {
+    for (const QString parametr : qAsConst(iconDataList)) {
 
         if (parametr.startsWith(QStringLiteral("Exec"))) {
-            int index = parametr.indexOf("=");
+            int index = parametr.indexOf('=');
             Q_ASSERT(index>0);
             program.exec = parametr.mid(index + 1);
         } else {
             if (parametr.startsWith(QStringLiteral("Icon"))) {
-                int index = parametr.indexOf("=");
+                int index = parametr.indexOf('=');
                 Q_ASSERT(index>0);
                 QString iconPath = parametr.mid(index + 1);
-                if (!iconPath.contains("/"))
+                if (!iconPath.contains('/'))
                 {
                     iconPath=GetFullAstraDefaultIconImagePath(iconPath);
                 }
@@ -127,7 +127,7 @@ void UserDesktopService::ParseAndAppendFileInfoToList(const QString &fileName)
     DesktopEntity file;
     file.name = fileName;
     file.icon = m_fileIconPath;
-    file.exec = m_path + "/" + fileName;
+    file.exec = m_path + '/' + fileName;
     file.type = QStringLiteral("Файл");
     m_filesList.push_back(file);
 }

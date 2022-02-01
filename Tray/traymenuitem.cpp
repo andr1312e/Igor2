@@ -2,29 +2,34 @@
 
 #include <QPainterPath>
 
-TrayMenuItem::TrayMenuItem(QWidget *parent) : InteractiveButtonBase(parent)
+TrayMenuItem::TrayMenuItem(QWidget *parent)
+    : InteractiveButtonBase(parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QString t, QWidget *parent) : InteractiveButtonBase(t, parent)
+TrayMenuItem::TrayMenuItem(const QString& text, QWidget *parent)
+    : InteractiveButtonBase(text, parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QIcon i, QWidget *parent) : InteractiveButtonBase(i, parent)
+TrayMenuItem::TrayMenuItem(const QIcon& pixmap, QWidget *parent)
+    : InteractiveButtonBase(pixmap, parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QIcon i, QString t, QWidget *parent) : InteractiveButtonBase(i, t, parent)
+TrayMenuItem::TrayMenuItem(const QIcon& pixmap, const QString& text, QWidget *parent)
+    : InteractiveButtonBase(pixmap, text, parent)
 {
 
 }
 
-TrayMenuItem::TrayMenuItem(QPixmap p, QString t, QWidget *parent) : InteractiveButtonBase(p, t, parent)
+void TrayMenuItem::SetIconPath(const QString &imagePath)
 {
-
+    m_pixmapPath=imagePath;
+    setIcon(QIcon(imagePath));
 }
 
 TrayMenuItem *TrayMenuItem::setEnabled(bool e)
@@ -33,111 +38,30 @@ TrayMenuItem *TrayMenuItem::setEnabled(bool e)
     return this;
 }
 
-TrayMenuItem *TrayMenuItem::setCheckable(bool c)
+void TrayMenuItem::SetCheckable(bool c)
 {
-    checkable = c;
-    if (c && model != IconText && InteractiveButtonBase::icon.isNull())
-        model = IconText;
-    update();
-    return this;
+    m_isCheckable = c;
+    m_isCheckedState=false;
 }
 
-bool TrayMenuItem::isCheckable() const
+bool TrayMenuItem::IsCheckable() const
 {
-    return checkable;
+    return m_isCheckable;
 }
 
-TrayMenuItem *TrayMenuItem::setChecked(bool c)
+void TrayMenuItem::SetChecked(bool c)
 {
-    _state = c;
-    if (InteractiveButtonBase::icon.isNull())
-        model = IconText; // 强制显示check空白部分
-    setCheckable(true);
-    return this;
+    m_isCheckedState = c;
 }
 
-bool TrayMenuItem::isChecked()
+bool TrayMenuItem::IsChecked()
 {
     return getState();
 }
 
-TrayMenuItem *TrayMenuItem::setKey(Qt::Key key)
+void TrayMenuItem::SetTooltipText(const QString &tooltipText)
 {
-    this->key = key;
-    return this;
-}
-
-bool TrayMenuItem::isKey(Qt::Key key) const
-{
-    return key == this->key;
-}
-
-TrayMenuItem *TrayMenuItem::setSubMenu(TrayMenu *menu)
-{
-    sub_menu = menu;
-    return this;
-}
-
-bool TrayMenuItem::isSubMenu() const
-{
-    return sub_menu != nullptr;
-}
-
-bool TrayMenuItem::isLinger() const
-{
-    return trigger_linger;
-}
-
-TrayMenuItem *TrayMenuItem::setData(QVariant data)
-{
-    this->data = data;
-    return this;
-}
-
-QVariant TrayMenuItem::getData()
-{
-    return data;
-}
-
-TrayMenuItem *TrayMenuItem::tip(QString sc)
-{
-    shortcut_tip = sc;
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tip(bool exp, QString sc)
-{
-    if (exp)
-        tip(sc);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tooltip(QString tt)
-{
-    setToolTip(tt);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::tooltip(bool exp, QString tt)
-{
-    if (exp)
-        tooltip(tt);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::triggered(FuncType func)
-{
-    connect(this, &InteractiveButtonBase::clicked, this, [=]{
-        func();
-    });
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::triggered(bool exp, FuncType func)
-{
-    if (!exp)
-        triggered(func);
-    return this;
+    QWidget::setToolTip(tooltipText);
 }
 
 TrayMenuItem *TrayMenuItem::disable(bool exp)
@@ -172,22 +96,9 @@ TrayMenuItem *TrayMenuItem::visible(bool exp)
     return this;
 }
 
-TrayMenuItem *TrayMenuItem::check(bool exp)
+void TrayMenuItem::Check(bool exp)
 {
-    setCheckable(true);
-    if (exp)
-        setChecked(true);
-    else if (InteractiveButtonBase::icon.isNull())
-        model = IconText; // 强制显示check空白部分
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::uncheck(bool exp)
-{
-    setCheckable(true);
-    if (exp)
-        setChecked(false);
-    return this;
+    SetChecked(exp);
 }
 
 /**
@@ -199,9 +110,9 @@ TrayMenuItem *TrayMenuItem::toggle(bool exp)
 {
     if (!exp)
         return this;
-    if (isCheckable())
+    if (IsCheckable())
     {
-        setChecked(!isChecked());
+        SetChecked(!IsChecked());
     }
     // 以后什么功能想到再加
     return this;
@@ -249,7 +160,7 @@ TrayMenuItem *TrayMenuItem::text(bool exp, QString tru, QString fal)
 
 TrayMenuItem *TrayMenuItem::fgColor(QColor color)
 {
-    setTextColor(color);
+    SetTextColor(color);
     return this;
 }
 
@@ -273,69 +184,6 @@ TrayMenuItem *TrayMenuItem::bgColor(bool exp, QColor color)
     return this;
 }
 
-/**
- * 满足条件时，text添加前缀
- */
-TrayMenuItem *TrayMenuItem::prefix(bool exp, QString pfix)
-{
-    if (exp)
-        prefix(pfix);
-    return this;
-}
-
-/**
- * 满足条件时，text添加后缀
- * @param inLeftParenthesis 支持 text(xxx) 形式，会在左括号前添加后缀
- */
-TrayMenuItem *TrayMenuItem::suffix(bool exp, QString sfix, bool inLeftParenthesis)
-{
-    if (exp)
-    {
-        suffix(sfix, inLeftParenthesis);
-    }
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::prefix(QString pfix)
-{
-    setText(pfix + getText());
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::suffix(QString sfix, bool inLeftParenthesis)
-{
-    if (!inLeftParenthesis)
-    {
-        setText(getText() + sfix);
-    }
-    else
-    {
-        QString text = getText();
-        int index = -1;
-        if ((index = text.lastIndexOf("(")) > -1)
-        {
-            while (index > 0 && text.mid(index-1, 1) == " ")
-                index--;
-        }
-        if (index <= 0) // 没有左括号或者以空格开头，直接加到最后面
-        {
-            setText(getText() + sfix);
-        }
-        else
-        {
-            setText(text.left(index) + sfix + text.right(text.length()-index));
-        }
-    }
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::icon(bool exp, QIcon ico)
-{
-    if (exp)
-        setIcon(ico);
-    return this;
-}
-
 TrayMenuItem *TrayMenuItem::borderR(int radius, QColor co)
 {
     setRadius(radius);
@@ -343,21 +191,6 @@ TrayMenuItem *TrayMenuItem::borderR(int radius, QColor co)
         setBorderColor(co);
     else
         setBorderColor(press_bg);
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::linger()
-{
-    trigger_linger = true;
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::lingerText(QString textAfterClick)
-{
-    this->linger();
-    connect(this, &TrayMenuItem::clicked, this, [=]{
-        setText(textAfterClick);
-    });
     return this;
 }
 
@@ -381,29 +214,8 @@ TrayMenuItem *TrayMenuItem::bind(bool &val)
  */
 TrayMenuItem *TrayMenuItem::longPress(FuncType func)
 {
-    connect(this, &InteractiveButtonBase::signalMousePressLater, this, [=](QMouseEvent*){
+    connect(this, &InteractiveButtonBase::ToMousePressLater, this, [=](QMouseEvent*){
         func();
-    });
-    return this;
-}
-
-/**
- * 点击菜单后的新文本
- * 一般用于点击后不隐藏 或者 重新显示的菜单
- * 不然没必要设置，点击后就没了
- */
-TrayMenuItem *TrayMenuItem::textAfterClick(QString newText)
-{
-    connect(this, &TrayMenuItem::clicked, this, [=]{
-        setText(newText);
-    });
-    return this;
-}
-
-TrayMenuItem *TrayMenuItem::textAfterClick(FuncStringStringType func)
-{
-    connect(this, &TrayMenuItem::clicked, this, [=]{
-        setText(func(this->InteractiveButtonBase::text));
     });
     return this;
 }
@@ -550,81 +362,6 @@ TrayMenuItem *TrayMenuItem::defaulter()
     if (switch_matched) // 已经有 caser 匹配了
         return createTempItem(); // 返回无效临时实例
     return this; // 能用，返回自己
-}
-
-/**
- * 返回自己的子菜单对象
- */
-TrayMenu *TrayMenuItem::subMenu()
-{
-    return sub_menu;
-}
-
-void TrayMenuItem::paintEvent(QPaintEvent *event)
-{
-    InteractiveButtonBase::paintEvent(event);
-
-    int right = width()- 8;
-
-    QPainter painter(this);
-    if (isSubMenu())
-    {
-        right -= icon_text_size;
-        // 画右边箭头的图标
-        QRect rect(right, fore_paddings.top, icon_text_size, icon_text_size);
-        painter.drawPixmap(rect, QPixmap(":/icons/sub_menu_arrow"));
-    }
-
-    right -= icon_text_padding;
-    if (!shortcut_tip.isEmpty())
-    {
-        // 画右边的文字
-        QFontMetrics fm(this->font());
-        int width = fm.horizontalAdvance(shortcut_tip);
-        painter.save();
-        auto c = painter.pen().color();
-        c.setAlpha(c.alpha() / 2);
-        painter.setPen(c);
-        painter.drawText(QRect(right-width, fore_paddings.top, width, height()-fore_paddings.top-fore_paddings.bottom),
-                         Qt::AlignRight, shortcut_tip);
-        painter.restore();
-    }
-}
-
-void TrayMenuItem::drawIconBeforeText(QPainter &painter, QRect icon_rect)
-{
-    // 选中
-    if (checkable)
-    {
-        QPainterPath path;
-        QRect expand_rect = icon_rect;
-        expand_rect.adjust(-2, -2, 2, 2);
-        path.addRoundedRect(expand_rect, 3, 3);
-        if (InteractiveButtonBase::icon.isNull())
-        {
-            // 绘制√
-            if (isChecked())
-                painter.drawText(icon_rect, "√");
-        }
-        else // 有图标，使用
-        {
-            if (getState())
-            {
-                // 绘制选中样式： 圆角矩形
-                painter.fillPath(path, press_bg);
-            }
-            else
-            {
-                // 绘制未选中样式：空白边框
-                painter.save();
-                painter.setPen(QPen(press_bg, 1));
-                painter.drawPath(path);
-                painter.restore();
-            }
-        }
-    }
-
-    InteractiveButtonBase::drawIconBeforeText(painter, icon_rect);
 }
 
 TrayMenuItem *TrayMenuItem::createTempItem(bool thisIsParent)

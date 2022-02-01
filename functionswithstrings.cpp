@@ -1,44 +1,48 @@
 #include "functionswithstrings.h"
 
-static const QStringList badCharecters = {
-   "\\",
-   "/",
-   "`",
-   ":",
-   "&",
-   "*",
-   "?",
-   "\"",
-   "<",
-   ">",
-   "`",
-   "(",
-   ")",
-   ":",
-   ";",
-   "\'",
+static const QVarLengthArray<QChar, 16> badCharecterList = {
+    '\\',
+    '/',
+    '`',
+    ':',
+    '&',
+    '*',
+    '?',
+    '\'',
+    '<',
+    '>',
+    '`',
+    '(',
+    ')',
+    ':',
+    ';',
+    '\'',
 };
 
 bool FunctionsWithStrings::StringContainsBadCharecters(const QString &fileName)
 {
-   for (QStringList::const_iterator it = badCharecters.cbegin(); it != badCharecters.cend(); ++it) {
-      if (fileName.contains(*it)) {
-         return true;
-      }
-   }
-
-   return false;
+    for (const QChar &charecter:badCharecterList)
+    {
+        for(const QChar &fileNameCharecter: fileName)
+        {
+            if (charecter==fileNameCharecter)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
-QStringList FunctionsWithStrings::GetListofSubFoldersFromPath(const QString &path, QString calledFunc)
+QStringList FunctionsWithStrings::GetListofSubFoldersFromPath(const QString &path,const char* calledFunc)
 {
-   QStringList listofSubFoldersToPath = path.split('/');
-   listofSubFoldersToPath.removeAll("");
+    QStringList listofSubFoldersToPath = path.split(QChar('/'));
+    listofSubFoldersToPath.removeAll("");
 
-   if (listofSubFoldersToPath.isEmpty()) {
-      qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc.toLatin1().constData(), path.toLatin1().constData());
-   } else {
-      return listofSubFoldersToPath;
-   }
+    if (listofSubFoldersToPath.isEmpty()) {
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Работа невозможна метод: ") + calledFunc + QStringLiteral(" выдал пустой путь ") + path ).toUtf8().constData());
+    } else {
+        return listofSubFoldersToPath;
+    }
 }
 

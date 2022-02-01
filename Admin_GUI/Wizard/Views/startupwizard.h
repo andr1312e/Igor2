@@ -26,10 +26,10 @@ class StartupWizard : public QWizard
 {
    Q_OBJECT
 public:
-   StartupWizard(const QString &applicationName, const QString &rlsTiFolder,const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
+   StartupWizard(const QString &currentUserName, const QString &currentUserId, const QString &applicationName, const QString &rlsTiFolder,const LoadingState &loadedDbAdnRolesState, LinuxUserService *linuxUserService, ISqlDatabaseService *iSqlDataBaseService, QWidget *parent);
    ~StartupWizard();
 private:
-   void CreateServices(const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService * const linuxUserService, ISqlDatabaseService * const iSqlDataBaseService);
+   void CreateServices(const QString &currentUserName, const QString &currentUserId,const QString &applicationName, const QString &rlsTiFolder, const LoadingState &loadedDbAdnRolesState, LinuxUserService * const linuxUserService, ISqlDatabaseService * const iSqlDataBaseService);
    void CreateUI(const LoadingState &loadedDbAdnRolesState);
    void InitSizes();
    void InitStyles();

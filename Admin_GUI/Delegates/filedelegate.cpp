@@ -38,8 +38,8 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
    if (index.isValid()) {
       painter->save();
 
-      QVariant data = index.data(Qt::UserRole + 1);
-      DesktopEntity icon = data.value<DesktopEntity>();
+      const QVariant data = index.data(Qt::UserRole + 1);
+      const DesktopEntity icon = data.value<DesktopEntity>();
 
       m_globalRect->setX(option.rect.x());
       m_globalRect->setY(option.rect.y());
@@ -91,8 +91,6 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
       painter->setPen(*m_textPen);
       painter->drawText(*m_pathRect, "Путь: " + icon.exec);
       painter->drawText(*m_typeRect, "Тип: " + icon.type);
-
-
 
       painter->restore();
    }

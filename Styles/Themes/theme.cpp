@@ -1,6 +1,6 @@
 #include "theme.h"
 
-Theme::Theme(const std::array<QPair<QPalette::ColorRole, QColor>, 15> &colors, const std::array<QPair<QPalette::ColorRole, QColor>, 5> &disabledColor)
+Theme::Theme(const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> &colors, const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> &disabledColor)
    : m_palette(new QPalette())
 {
    for (const QPair<QPalette::ColorRole, QColor> &roleAndColor : colors) {
@@ -17,7 +17,7 @@ Theme::~Theme()
    delete m_palette;
 }
 
-void Theme::ApplyTheme(QApplication *app)
+void Theme::ApplyTheme(QApplication *app) const
 {
    app->setPalette(*m_palette);
 }

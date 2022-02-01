@@ -11,18 +11,18 @@ public:
     CloseWindowButton(QWidget* parent);
     ~CloseWindowButton();
 
-    void setTopRightRadius(int radius);
+    void SetTopRightRadius(int radius);
 
 protected:
     virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
     virtual QPainterPath GetBackGroundPainterPath() Q_DECL_OVERRIDE;
-    virtual QPainterPath getWaterPainterPath(Water water) Q_DECL_OVERRIDE;
+    virtual QPainterPath GetWaterPainterPath(Water water) Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
     int m_radius;
-    QPen *m_pen;
-    QSize *m_buttonSize;
+    const QPen* const m_pen;
+    const QSize* const m_buttonSize;
 
 private:
     void InitGeometry();

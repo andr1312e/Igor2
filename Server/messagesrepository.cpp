@@ -15,7 +15,7 @@ void MessagesRepository::AppendTrack(RMOTrackSetting newSettings)
 
 void MessagesRepository::DeleteTrack(const int myAimID)
 {
-    for (std::list<RMOTrackSetting>::iterator it = m_trackSettingList.end(); it != m_trackSettingList.begin();) {
+    for (QList<RMOTrackSetting>::iterator it = m_trackSettingList.end(); it != m_trackSettingList.begin();) {
         --it;
         if (it->aimID == myAimID) {
             m_trackSettingList.erase(it);
@@ -28,7 +28,7 @@ void MessagesRepository::ClearAllTraks()
     m_trackSettingList.clear();
 }
 
-const std::list<RMOTrackSetting> &MessagesRepository::GetTrackList()
+const QList<RMOTrackSetting> &MessagesRepository::GetTrackList()
 {
     return m_trackSettingList;
 }
@@ -74,7 +74,7 @@ void MessagesRepository::AppendTargetPosition(RMOTargetPositionMessage newPositi
 
 void MessagesRepository::DeleteTargetPosition(quint8 id)
 {
-    for (std::list<RMOTargetPositionMessage>::iterator it = m_targetPositionsList.end(); it != m_targetPositionsList.begin();) {
+    for (QList<RMOTargetPositionMessage>::iterator it = m_targetPositionsList.end(); it != m_targetPositionsList.begin();) {
         --it;
         if (it->id == id) {
             m_targetPositionsList.erase(it);
@@ -87,7 +87,7 @@ void MessagesRepository::ClearAllTargetPositions()
     m_targetPositionsList.clear();
 }
 
-const std::list<RMOTargetPositionMessage> &MessagesRepository::GetAllTargetPositionsList()
+const QList<RMOTargetPositionMessage> &MessagesRepository::GetAllTargetPositionsList()
 {
     return m_targetPositionsList;
 }
@@ -108,7 +108,7 @@ const RMODriveToPositionMessage &MessagesRepository::GetRMODriveToPositionMessag
 void MessagesRepository::EditBioDefenceSectorList(RMOBioDefenceSectorMessage newSettings)
 {
     if (newSettings.method == 1) { //удаление
-        for (std::list<RMOBioDefenceSectorMessage>::iterator it = m_defenceSectorMessageList.end(); it != m_defenceSectorMessageList.begin(); ) {
+        for (QList<RMOBioDefenceSectorMessage>::iterator it = m_defenceSectorMessageList.end(); it != m_defenceSectorMessageList.begin(); ) {
             --it;
             m_defenceSectorMessageList.erase(it);
             return;
@@ -131,7 +131,7 @@ void MessagesRepository::ClearAllBioDefence()
     m_defenceSectorMessageList.clear();
 }
 
-const std::list<RMOBioDefenceSectorMessage> &MessagesRepository::GetRMOBioDefenceSectorList()
+const QList<RMOBioDefenceSectorMessage> &MessagesRepository::GetRMOBioDefenceSectorList()
 {
     return m_defenceSectorMessageList;
 }

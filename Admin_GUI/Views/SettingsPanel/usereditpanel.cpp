@@ -95,7 +95,7 @@ void UserEditPanel::InsertWidgetsIntoLayout()
     m_mainLayout->addLayout(m_actionLayout);
     m_mainLayout->addLayout(m_kioskLayout);
 
-    setLayout(m_mainLayout);
+    QWidget::setLayout(m_mainLayout);
 }
 
 void UserEditPanel::FillUI()

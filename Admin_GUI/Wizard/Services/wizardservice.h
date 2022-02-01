@@ -21,7 +21,7 @@ class WizardService : public QObject
 {
     Q_OBJECT
 public:
-    explicit WizardService(const QString &rlsTiFolder,const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent);
+    explicit WizardService(const QString &currentUserName, const QString &currentUserId, const QString &rlsTiFolder, const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent);
     ~WizardService();
 public Q_SLOTS:
     void SetActionWithUserRepository(const QString &actionWithUserRepository);

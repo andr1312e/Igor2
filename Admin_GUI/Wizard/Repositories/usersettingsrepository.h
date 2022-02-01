@@ -15,7 +15,7 @@ class UsersDataWizardRepository
 
 public:
 
-   explicit UsersDataWizardRepository(LinuxUserService *service);
+   explicit UsersDataWizardRepository(const QString &currentUserName, const QString &currentUserId, LinuxUserService *service);
 
    ~UsersDataWizardRepository();
 

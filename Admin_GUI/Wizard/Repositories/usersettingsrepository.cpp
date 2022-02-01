@@ -1,11 +1,11 @@
 #include "usersettingsrepository.h"
 
-UsersDataWizardRepository::UsersDataWizardRepository(LinuxUserService *service)
+UsersDataWizardRepository::UsersDataWizardRepository(const QString &currentUserName, const QString &currentUserId, LinuxUserService *service)
     : m_service(service)
-    , m_curerntUserName(m_service->GetCurrentUserName())
-    , m_curerntUserId(m_service->GetCurrentUserId())
-    , m_currentUserFCS("")
-    , m_currenUserRank("")
+    , m_curerntUserName(currentUserName)
+    , m_curerntUserId(currentUserId)
+    , m_currentUserFCS()
+    , m_currenUserRank()
 {
 
 }
@@ -55,14 +55,14 @@ void UsersDataWizardRepository::SetUsersFromBackup(const QDomElement &usersNode)
 {
     m_usersList.clear();
 
-    if (usersNode.tagName() == "USERS") {
+    if (usersNode.tagName() == QStringLiteral("USERS")) {
         const QDomNodeList usersTags = usersNode.childNodes();
         int usersCount = usersTags.count();
 
         for (int i = 0; i < usersCount; ++i) {
             const QDomElement userElement = usersTags.at(i).toElement();
 
-            if (userElement.attribute("name") == m_curerntUserName) {
+            if (userElement.attribute(QStringLiteral("name")) == m_curerntUserName) {
                 m_currentUserFCS = userElement.attribute("FCS");
                 m_currenUserRank = userElement.attribute("rank");
             }
@@ -113,8 +113,7 @@ int UsersDataWizardRepository::GetKorrektUserRole(const QDomElement &userDomElem
 
 void UsersDataWizardRepository::JuxtaposeUserIdAndUserNameWithSystemsData()
 {
-
-    const QList<QPair<QString, QString>> nameIdList=m_service->GetSystemUsersNamesWithIdsList();
+    auto nameIdList(m_service->GetSystemUsersNamesWithIdsList());
     for (int i=m_usersList.count()-1; i>=0; i--)
     {
         const QString userName=m_usersList.at(i).name;
@@ -185,9 +184,9 @@ void UsersDataWizardRepository::WriteAdminToDatabase(ISqlDatabaseService *m_iSql
 
 void UsersDataWizardRepository::CheckCurrentUserFcsAndRank()
 {
-    if(m_currentUserFCS.simplified()=="")
+    if(m_currentUserFCS.simplified().isEmpty())
     {
-        m_currentUserFCS="Администратор";
+        m_currentUserFCS=QStringLiteral("Администратор");
     }
     if(m_currenUserRank.isEmpty())
     {

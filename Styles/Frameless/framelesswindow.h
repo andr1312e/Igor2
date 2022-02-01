@@ -18,7 +18,7 @@ class FramelessWindow : public QWidget
 public:
 
    explicit FramelessWindow(QWidget *parent);
-   virtual ~FramelessWindow();
+   ~FramelessWindow();
 
 private:
    void CreateUI();
@@ -40,7 +40,7 @@ public Q_SLOTS:
    void OnSetWindowIcon(const QIcon &icon);
 
 private Q_SLOTS:
-   void OnApplicationStateChanged(Qt::ApplicationState state);
+   void OnApplicationStateChanged(const Qt::ApplicationState state);
    void OnChangeThemeButtonClicked(bool state);
    void OnChangeAdditionalSettingsButtonClicked(bool state);
    void OnChangeDelegatesViewButtonClicked(bool state);
@@ -53,17 +53,17 @@ private:
    bool RightBorderHit(const QPoint &pos);
    bool TopBorderHit(const QPoint &pos);
    bool BottomBorderHit(const QPoint &pos);
-   void StyleWindow(bool bActive, bool isMaximized);
+   void StyleWindow(bool isActive, bool isMaximized);
+   void CheckBorderDragging(QMouseEvent *event);
 protected:
    virtual void changeEvent(QEvent *event) Q_DECL_OVERRIDE;
-   virtual void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-   virtual void checkBorderDragging(QMouseEvent *event);
    virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
    virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
    virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 public:
    void SetMainWidget(QWidget *widget);
 private:
+   const QSize m_buttonSize=QSize(20, 20);
    WindowTitleBar *m_WindowTitleBar;
    QWidget *m_windowFrame;
    QVBoxLayout *m_mainLayout;
@@ -81,9 +81,10 @@ private:
    QLabel *m_titleText;
 
    QGraphicsDropShadowEffect *m_textShadow;
+   QGraphicsDropShadowEffect *m_windowShadow;//сам удаляется
 
    QRect m_startGeometry;
-   const quint8 CONST_DRAG_BORDER_SIZE = 15;
+   const quint8 m_dragBorderSize = 15;
    bool m_isMousePressed;
    bool m_isDragTop;
    bool m_isDragLeft;

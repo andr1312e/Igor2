@@ -110,8 +110,8 @@ void IconMaker::AddIconToCurrentUserDesktop()
 
 void IconMaker::AddIconToAllUserDesktops()
 {
-    const QList<QPair<QString, QString>> userNameAndIdList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
-    for (const QPair<QString, QString> &nameAndId : userNameAndIdList)
+    const QList< QPair< QString, QString>> userNameAndIdList=m_linuxUserService->GetSystemUsersNamesWithIdsList();
+    for (const QPair< const QString,const QString> &nameAndId : userNameAndIdList)
     {
         const QString userName=nameAndId.first;
         const QString userDesktopFolderPath="/home/"+userName+"/Desktop/";

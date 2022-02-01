@@ -93,13 +93,13 @@ void SocketToRarm::OnGetMessage()
         switch (messageId) {
         case RMO_VOI_TRACK_SETTING_MESSAGE: { //1 Сообщение о проритетности трассы
             if (m_repository->m_trackSettingsMesageSize != (messageSize - 1)) {
-                qDebug() << "RMO_VOI_TRACK_SETTING_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_trackSettingsMesageSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_VOI_TRACK_SETTING_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_trackSettingsMesageSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_VOI_TRACK_SETTING_MESSAGE"));
                 RMOTrackSetting settings;
                 in.readRawData((char *) &settings, messageSize - 1);
                 m_repository->AppendTrack(settings);
-                qDebug() << "получили RMO_VOI_TRACK_SETTING_MESSAGE";
             }
 
             break;
@@ -107,13 +107,13 @@ void SocketToRarm::OnGetMessage()
 
         case VOI_RMO_TRACK_DELETE_MESSAGE: { //106 Сообщение об удалении трассы от вторички
             if (m_repository->m_trackSettingsDeleteSize != (messageSize - 1)) {
-                qDebug() << "VOI_RMO_TRACK_DELETE_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_trackSettingsDeleteSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" VOI_RMO_TRACK_DELETE_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_trackSettingsDeleteSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили VOI_RMO_TRACK_DELETE_MESSAGE"));
                 DeleteTrackMessage deleteTrack;
                 in.readRawData((char *) &deleteTrack, messageSize - 1);
                 m_repository->DeleteTrack(deleteTrack.aimID);
-                qDebug() << "получили VOI_RMO_TRACK_DELETE_MESSAGE";
             }
 
             break;
@@ -121,13 +121,13 @@ void SocketToRarm::OnGetMessage()
 
         case RMO_VOI_TARGET_POSITION_MESSAGE: { //3 Сообщение с параметрами ЦУ
             if (m_repository->m_targetPositionMessageSize != (messageSize - 1)) {
-                qDebug() << "RMO_VOI_TARGET_POSITION_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_targetPositionMessageSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_VOI_TARGET_POSITION_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_targetPositionMessageSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_VOI_TARGET_POSITION_MESSAGE"));
                 RMOTargetPositionMessage targetPosition;
                 in.readRawData((char *) &targetPosition, messageSize - 1);
                 m_repository->AppendTargetPosition(targetPosition);
-                qDebug() << "получили RMO_VOI_TARGET_POSITION_MESSAGE";
             }
 
             break;
@@ -135,13 +135,13 @@ void SocketToRarm::OnGetMessage()
 
         case RMO_VOI_TARGET_DELETE_MESSAGE: { //4 Сообщение с удалением ЦУ
             if (m_repository->m_targetPositionDeleteSize != (messageSize - 1)) {
-                qDebug() << "RMO_VOI_TARGET_DELETE_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  sizeof(RMO_VOI_TARGET_POSITION_MESSAGE);
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_VOI_TARGET_DELETE_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_targetPositionDeleteSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_VOI_TARGET_DELETE_MESSAGE"));
                 RMOTargetDeleteMessage targetDelete;
                 in.readRawData((char *) &targetDelete, messageSize - 1);
                 m_repository->DeleteTargetPosition(targetDelete.id);
-                qDebug() << "получили RMO_VOI_TARGET_DELETE_MESSAGE";
             }
 
             break;
@@ -149,14 +149,14 @@ void SocketToRarm::OnGetMessage()
 
         case RMO_VOI_DRIVE_TO_ROSITION_MESSAGE: { //6 Cообщение с данными куда смотреть антенне
             if (m_repository->m_driveToPositionMessageSize != (messageSize - 1)) {
-                qDebug() << "RMO_VOI_DRIVE_TO_ROSITION_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_driveToPositionMessageSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_VOI_DRIVE_TO_ROSITION_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_driveToPositionMessageSize));
                 in.skipRawData(messageSize - 1);
             } else  {
-                m_dataCollected = true;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_VOI_DRIVE_TO_ROSITION_MESSAGE"));
+                m_dataCollected = true;//Боченев: считать что если оно есть, то данные полные
                 RMODriveToPositionMessage message;
                 in.readRawData((char *) &message, messageSize - 1);
                 m_repository->SetDriveToPosition(message);
-                qDebug() << "получили RMO_VOI_DRIVE_TO_ROSITION_MESSAGE";
             }
 
             break;
@@ -164,13 +164,13 @@ void SocketToRarm::OnGetMessage()
 
         case RMO_VOI_BIO_DEFENCE_SECTORS_MESSAGE: { //9 Cообщение с сектором биологической защиты для ВОИ
             if (m_repository->m_defenceSectorMessageSize != (messageSize - 1)) {
-                qDebug() << "RMO_VOI_BIO_DEFENCE_SECTORS_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_defenceSectorMessageSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_VOI_BIO_DEFENCE_SECTORS_MESSAGE Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_defenceSectorMessageSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_VOI_BIO_DEFENCE_SECTORS_MESSAGE"));
                 RMOBioDefenceSectorMessage message;
                 in.readRawData((char *) &message, messageSize - 1);
                 m_repository->EditBioDefenceSectorList(message);
-                qDebug() << "получили RMO_VOI_BIO_DEFENCE_SECTORS_MESSAGE";
             }
 
             break;
@@ -178,12 +178,12 @@ void SocketToRarm::OnGetMessage()
 
         case RMO_OTHER_FORGET_ALL_DATA: { //14 отчистка всех сообщений
             if (m_repository->m_deleteMessageSize != (messageSize - 1)) {
-                qDebug() << "RMO_OTHER_FORGET_ALL_DATA размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_deleteMessageSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RMO_OTHER_FORGET_ALL_DATA Размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_deleteMessageSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RMO_OTHER_FORGET_ALL_DATA"));
                 m_dataCollected = false;
                 m_repository->ClearAllArrays();
-                qDebug() << "получили RMO_OTHER_FORGET_ALL_DATA";
             }
 
             break;
@@ -191,34 +191,32 @@ void SocketToRarm::OnGetMessage()
 
         case RARM_SYSTEM_CONTROL_MESSAGE: { // 255 Сообщение с состоянием подсистем
             if (m_repository->m_rarmSystemControlSize != (messageSize - 1)) {
-                qDebug() << "RARM_SYSTEM_CONTROL_MESSAGE размеры не соотвествующие:получили " << messageSize << " и должно быть " <<  m_repository->m_rarmSystemControlSize;
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" RARM_SYSTEM_CONTROL_MESSAGE размеры не соотвествующие:получили ") + QString::number(messageSize) + QStringLiteral(" и должно быть ")+ QString::number(m_repository->m_rarmSystemControlSize));
                 in.skipRawData(messageSize - 1);
             } else  {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили RARM_SYSTEM_CONTROL_MESSAGE"));
                 RARMSysControlMessage message;
                 in.readRawData((char *) &message, messageSize - 1);
                 CheckRmoAndVoiStates(message.sysControl);
-                qDebug() << "получили RARM_SYSTEM_CONTROL_MESSAGE";
             }
-
             break;
         }
 
         default: {
-            qDebug() << "Получено сообщение " << messageId << "  не обрабатываем! Убери из списка или напиши обработку";
-
+            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получено сообщение ") + QString::number(messageId) + QStringLiteral("  не обрабатываем! Убери из списка или напиши обработку"));
             if (!IsRarmConnected()) {
-                qDebug() << "Рарм не подключен";
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Рарм не подключен"));
                 m_gettingMessageArray.clear();
                 return;
             }
 
             if ((messageSize - 1) > (m_gettingMessageArray.size() - in.device()->pos())) {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Отчищаем буфер сообщений"));
                 m_gettingMessageArray.clear();
-                qDebug() << "Отчищаем буфер сообщений";
                 return;
             } else {
                 in.skipRawData(messageSize - 1);
-                qDebug() << "Пропустили " << messageSize << " байт";
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Пропустили") + QString::number(messageSize) + QStringLiteral(" байт"));
             }
 
             break;
@@ -248,24 +246,23 @@ void SocketToRarm::OnConnectionError(QAbstractSocket::SocketError socketError)
             socketError ==  QAbstractSocket::HostNotFoundError ||
             socketError ==  QAbstractSocket::SocketTimeoutError ||
             socketError ==  QAbstractSocket::NetworkError) {
-        qDebug() << QStringLiteral("Пробуем получить соединение снова...") << socketError;
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Пробуем получить соединение снова... ") + m_pTcpSocketToRarm->errorString());
         ReconnectToRarm();
     } else {
-        qDebug() << QStringLiteral("Ошибка: ") << socketError;
+        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Ошибка: ") + m_pTcpSocketToRarm->errorString());
     }
 }
 
 void SocketToRarm::OnDisconnected()
 {
-    qDebug() << QStringLiteral("Отсоединились от РАРМ...");
+    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral("Отсоединились от РАРМ..."));
     disconnect(m_pTcpSocketToRarm, &QTcpSocket::readyRead, this, &SocketToRarm::OnGetMessage);
 }
 
 void SocketToRarm::OnConnectToRarm()
 {
     m_gettingMessageArray.clear();
-
-    qDebug() << "IncomingDataHandler::slotConnected Подкючаемся к рарму";
+    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral("Подкючаемся к рарму..."));
     QByteArray message;
 
     QDataStream dataStream(&message, QIODevice::WriteOnly);
@@ -288,12 +285,12 @@ void SocketToRarm::OnConnectToRarm()
 
 void SocketToRarm::OnCheckConnection()
 {
-    qDebug() << "Время проверить поключение";
+    //    qDebug() << "Время проверить поключение";
 
-    if (!IsRarmConnected()) {
-        ReconnectToRarm();
-        qDebug() << "Переподключаемся";
-    }
+    //    if (!IsRarmConnected()) {
+    //        ReconnectToRarm();
+    //        qDebug() << "Переподключаемся";
+    //    }
 }
 
 void SocketToRarm::StopRarmConnect()
@@ -326,38 +323,38 @@ QByteArray SocketToRarm::CreateSyncMessage()
 {
     QByteArray syncMessage;
     QDataStream out(&syncMessage, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_3);
+    out.setVersion(QDataStream::Qt_5_11);
     out.setByteOrder(QDataStream::LittleEndian);
     out.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
     out << qint16(0);
     out << quint8(150);//id сообщения которое я отправляю
 
-    const std::list<RMOTrackSetting> trackSettingList = m_repository->GetTrackList(); //1
+    const QList<RMOTrackSetting> trackSettingList = m_repository->GetTrackList(); //1
 
     for (const RMOTrackSetting &trackSetting: trackSettingList) {
-        out << m_repository->m_trackSettingsMesageSize;
-        out << m_repository->m_trackSettingMessageId;//ид подсообщениий
+        out << (quint8)m_repository->m_trackSettingsMesageSize;
+        out << (quint8)m_repository->m_trackSettingMessageId;//ид подсообщениий
         out.writeRawData(reinterpret_cast<const char *>(&(trackSetting)), m_repository->m_trackSettingsMesageSize);
     }
 
-    const std::list<RMOTargetPositionMessage> targetPositionList = m_repository->GetAllTargetPositionsList();
+    const QList<RMOTargetPositionMessage> targetPositionList = m_repository->GetAllTargetPositionsList();
 
     for (const RMOTargetPositionMessage &targetPosition: targetPositionList) {
-        out << m_repository->m_targetPositionMessageSize;
-        out << m_repository->m_targetPositionMessageId;
+        out << (quint16)m_repository->m_targetPositionMessageSize;
+        out << (quint8)m_repository->m_targetPositionMessageId;
         out.writeRawData(reinterpret_cast<const char *>(&(targetPosition)), m_repository->m_targetPositionMessageSize);
     }
 
-    out << m_repository->m_driveToPositionMessageSize;
-    out << m_repository->m_driveToPositionMessageId;
+    out << (quint16)m_repository->m_driveToPositionMessageSize;
+    out << (quint8)m_repository->m_driveToPositionMessageId;
     out.writeRawData(reinterpret_cast<const char *>(&m_repository->GetRMODriveToPositionMessage()), m_repository->m_driveToPositionMessageSize);
 
-    std::list<RMOBioDefenceSectorMessage> rmoBioDefenceSectorList = m_repository->GetRMOBioDefenceSectorList();
+    const QList<RMOBioDefenceSectorMessage> rmoBioDefenceSectorList = m_repository->GetRMOBioDefenceSectorList();
 
     for (const RMOBioDefenceSectorMessage &bioDefenceSector: rmoBioDefenceSectorList) {
-        out << m_repository->m_defenceSectorMessageSize;
-        out << m_repository->m_defenceSectorMessageId;
+        out << (quint16)m_repository->m_defenceSectorMessageSize;
+        out << (quint8)m_repository->m_defenceSectorMessageId;
         out.writeRawData(reinterpret_cast<const char *>(&(bioDefenceSector)), m_repository->m_defenceSectorMessageSize);
     }
 

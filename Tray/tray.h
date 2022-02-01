@@ -26,6 +26,10 @@ Q_SIGNALS:
     void ToShowApp();
     void ToCloseApp();
     void ToUpdateViewColors();
+    void ToPauseUserControl();
+    void ToStopUserControl();
+    void ToRestartUserControl();
+    void ToResumeUserControl();
 public Q_SLOTS:
     void OnShowMessage(const QString &message);
 private Q_SLOTS:
@@ -42,9 +46,10 @@ private:
     QAction *m_minimizeAction;
     QAction *m_restoreAction;
 
+    QAction *m_pauseRunnableServiceButton;
     QAction *m_slopRunnableServiceButton;
     QAction *m_restartAllAppsRunnableServiceButton;
-    QAction *m_startRunnableServiceButton;
+    QAction *m_resumeRunnableServiceButton;
 
     QAction *m_activateLogs;
     QAction *m_disactivateLogs;
@@ -59,6 +64,7 @@ private:
 
     QMovie *m_trayMenuIconMovie;
     const int m_spacing=5;
+public:
 
 };
 

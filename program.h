@@ -8,6 +8,9 @@
 #include <QInputDialog>
 #include <QSharedMemory>
 
+#include "Logging/logger.h"
+#include "Logging/hierarchy.h"
+
 #include "Services/Sql/sqldatabaseserivce.h"
 #include "Services/Terminals/terminal.h"
 #include "Services/startuprunnableservice.h"
@@ -17,8 +20,6 @@
 #include "Tray/tray.h"
 #include "Admin_GUI/Views/admingui.h"
 #include "Admin_GUI/Wizard/Views/startupwizard.h"
-
-#include "User_GUI/User_GUI.h"
 
 #include "Styles/Frameless/framelesswindow.h"
 #include "Styles/Themes/stylechanger.h"
@@ -33,6 +34,7 @@ public:
    void CreateAndRunApp();
 
 private:
+   void CreateBasicServicesAndTray();
    void ConnectToDatabase();
    void GetCurrentUserNameIdAndAdminPriviliges();
 
@@ -45,6 +47,7 @@ private:
 
 private:
    void UserLoading();
+   void ShutDownRootLogger();
 
 private Q_SLOTS:
    void OnFullLoading();
@@ -60,17 +63,18 @@ public:
 private:
    bool CanGetAdminAccess();
 private:
+
    const QString m_rlstiFolder;
    QSharedMemory* const m_sharedMemory;
    Terminal* const m_terminal;
-   LinuxUserService* const m_linuxUserService;
-   const QString m_currentUserName;
-   const QString m_currentUserId;
+   LinuxUserService* m_linuxUserService;
+   QString m_currentUserName;
+   QString m_currentUserId;
 
-   SqlDatabaseSerivce* const m_sqlDatabaseService;
-   StartupRunnableManager *m_startupRunnableService;
+   SqlDatabaseSerivce* m_sqlDatabaseService;
+   StartupRunnableManager* m_startupRunnableService;
 
-   Tray* const m_tray;
+   Tray* m_tray;
 
    StartupWizard *m_startupWizard;
    SocketToRarm *m_socketToRarm;
@@ -78,5 +82,6 @@ private:
    FramelessWindow *m_framelessWindow;
 
    StyleChanger *m_styleChanger;
+   QSettings m_settings;
 };
 #endif // PROGRAM_H

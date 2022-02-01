@@ -9,7 +9,8 @@ class MessagesRepository
 public:
     MessagesRepository();
     ~MessagesRepository();
-
+private:
+    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
 public:
     const quint8 m_trackSettingMessageId = MESSAGES_ID::RMO_VOI_TRACK_SETTING_MESSAGE;
     const quint8 m_trackSettingsMesageSize = m_messageIdSize + sizeof(RMOTrackSetting);
@@ -18,7 +19,7 @@ public:
     const quint16 m_trackSettingsDeleteSize = m_messageIdSize + sizeof(DeleteTrackMessage);
     void DeleteTrack(const int myAimID);//106 Сообщение об удалении трассы от вторички
     void ClearAllTraks();
-    const std::list<RMOTrackSetting> &GetTrackList();
+    const QList<RMOTrackSetting> &GetTrackList();
 
 public:
     const quint16 m_targetPositionMessageSize = m_messageIdSize + sizeof(RMOTargetPositionMessage);
@@ -28,7 +29,7 @@ public:
     const quint16 m_targetPositionDeleteSize = sizeof(RMOTargetDeleteMessage);
     void DeleteTargetPosition(quint8 id);//4 Удаление ЦУ
     void ClearAllTargetPositions();
-    const std::list<RMOTargetPositionMessage> &GetAllTargetPositionsList();
+    const QList<RMOTargetPositionMessage> &GetAllTargetPositionsList();
 
 public:
     const quint16 m_driveToPositionMessageSize = m_messageIdSize + sizeof(RMODriveToPositionMessage);
@@ -43,18 +44,18 @@ public:
 
     void EditBioDefenceSectorList(RMOBioDefenceSectorMessage newSettings);//9 Сообщение с сектором биологической защиты
     void ClearAllBioDefence();
-    const std::list<RMOBioDefenceSectorMessage> &GetRMOBioDefenceSectorList();
+    const QList<RMOBioDefenceSectorMessage> &GetRMOBioDefenceSectorList();
 
 public:
     const quint16 m_rarmSystemControlSize = m_messageIdSize + sizeof(RARMSysControlMessage);
     const quint16 m_deleteMessageSize = m_messageIdSize + sizeof (RMOForgetAllDataMessage);
     void ClearAllArrays();
 private:
-    std::list<RMOTrackSetting> m_trackSettingList;
-    std::list<RMOTargetPositionMessage> m_targetPositionsList;
+    QList<RMOTrackSetting> m_trackSettingList;
+    QList<RMOTargetPositionMessage> m_targetPositionsList;
     RMODriveToPositionMessage m_driveToPositionMessage;
-    std::list<RMOBioDefenceSectorMessage> m_defenceSectorMessageList;
-    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
+    QList<RMOBioDefenceSectorMessage> m_defenceSectorMessageList;
+
 };
 
 #endif // SERVER_MESSAGESREPOSITORY_H

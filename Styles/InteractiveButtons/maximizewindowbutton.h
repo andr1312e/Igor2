@@ -17,7 +17,7 @@ private:
     void InitGeometry();
 
 private:
-    QPen *m_pen;
+    const QPen* const m_pen;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_MAXIMIZEWINDOWBUTTON_H

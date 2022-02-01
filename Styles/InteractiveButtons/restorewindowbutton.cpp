@@ -3,13 +3,13 @@
 RestoreWindowButton::RestoreWindowButton(QWidget* parent)
     : InteractiveButtonBase(parent)
     , m_pen(new QPen(Qt::white))
-    , m_buttonSize(new QSize(40, 40))
+    , m_buttonSize(40, 40)
     , m_br(new QRect())
     , m_topLeft(new QPoint())
     , m_topRight(new QPoint())
     , m_bottomLeft(new QPoint())
     , m_bottomRight(new QPoint())
-    , m_points(new std::array<QPoint, 5>())
+    , m_points(new QVarLengthArray<QPoint, 5>())
 {
 
     InitGeometry();
@@ -20,7 +20,6 @@ RestoreWindowButton::~RestoreWindowButton()
 {
     delete m_pen;
     delete m_painter;
-    delete m_buttonSize;
     delete m_br;
     delete m_topLeft;
     delete m_topRight;
@@ -33,7 +32,7 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
 
-    if (!isShowForeground) return ;
+    if (!m_isShowForeground) return ;
 
     int width = _w, h = _h;
     int dx = offset_pos.x(), dy = offset_pos.y();
@@ -60,51 +59,51 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
 
     if (m_br->topLeft() == *m_topLeft)
     {
-        m_points->operator[](0)=*m_topLeft;
-        m_points->operator[](1)=*m_topRight;
-        m_points->operator[](2)=*m_bottomRight;
-        m_points->operator[](3)=*m_bottomLeft;
-        m_points->operator[](4)=*m_topLeft;
+        m_points->insert(0, *m_topLeft);
+        m_points->insert(1, *m_topRight);
+        m_points->insert(2, *m_bottomRight);
+        m_points->insert(3, *m_bottomLeft);
+        m_points->insert(4, *m_topLeft);
     }
     else if (m_br->contains(*m_topLeft))
     {
-        m_points->operator[](0)=QPoint(m_br->right()+1, t);
-        m_points->operator[](1)=*m_topRight;
-        m_points->operator[](2)=*m_bottomRight;
-        m_points->operator[](3)=*m_bottomLeft;
-        m_points->operator[](4)=QPoint(l, m_br->bottom()+1);
+        m_points->insert(0, QPoint(m_br->right()+1, t));
+        m_points->insert(1, *m_topRight);
+        m_points->insert(2, *m_bottomRight);
+        m_points->insert(3, *m_bottomLeft);
+        m_points->insert(4, QPoint(l, m_br->bottom()+1));
     }
     else if (m_br->contains(*m_topRight))
     {
-        m_points->operator[](0)=QPoint(r, m_br->bottom()+1);
-        m_points->operator[](1)=*m_bottomRight;
-        m_points->operator[](2)=*m_bottomLeft;
-        m_points->operator[](3)=*m_topLeft;
-        m_points->operator[](4)=QPoint(m_br->left(), t);
+        m_points->insert(0, QPoint(r, m_br->bottom()+1));
+        m_points->insert(1, *m_bottomRight);
+        m_points->insert(2, *m_bottomLeft);
+        m_points->insert(3, *m_topLeft);
+        m_points->insert(4, QPoint(m_br->left(), t));
     }
     else if (m_br->contains(*m_bottomLeft))
     {
-        m_points->operator[](0)=QPoint(l, m_br->top());
-        m_points->operator[](1)=*m_topLeft;
-        m_points->operator[](2)=*m_topRight;
-        m_points->operator[](3)=*m_bottomRight;
-        m_points->operator[](4)=QPoint(m_br->right()+1, b);
+        m_points->insert(0, QPoint(l, m_br->top()));
+        m_points->insert(1, *m_topLeft);
+        m_points->insert(2, *m_topRight);
+        m_points->insert(3, *m_bottomRight);
+        m_points->insert(4, QPoint(m_br->right()+1, b));
     }
     else if (m_br->contains(*m_bottomRight))
     {
-        m_points->operator[](0)=QPoint(m_br->left(), b);
-        m_points->operator[](1)=*m_bottomLeft;
-        m_points->operator[](2)=*m_topLeft;
-        m_points->operator[](3)=*m_topRight;
-        m_points->operator[](4)=QPoint(r, m_br->top());
+        m_points->insert(0, QPoint(m_br->left(), b));
+        m_points->insert(1, *m_bottomLeft);
+        m_points->insert(2, *m_topLeft);
+        m_points->insert(3, *m_topRight);
+        m_points->insert(4, QPoint(r, m_br->top()));
     }
     else
     {
-        m_points->operator[](0)=*m_topLeft;
-        m_points->operator[](1)=*m_topRight;
-        m_points->operator[](2)=*m_bottomRight;
-        m_points->operator[](3)=*m_bottomLeft;
-        m_points->operator[](4)=*m_topLeft;
+        m_points->insert(0, *m_topLeft);
+        m_points->insert(1, *m_topRight);
+        m_points->insert(2, *m_bottomRight);
+        m_points->insert(3, *m_bottomLeft);
+        m_points->insert(4, *m_topLeft);
     }
 
     QPainterPath path;
@@ -120,7 +119,7 @@ void RestoreWindowButton::paintEvent(QPaintEvent* event)
 
 QSize RestoreWindowButton::sizeHint() const
 {
-    return *m_buttonSize;
+    return m_buttonSize;
 }
 
 void RestoreWindowButton::InitGeometry()

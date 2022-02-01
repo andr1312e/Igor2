@@ -144,17 +144,17 @@ void DesktopService::UpdateModel(const QList<DesktopEntity> &listOfDesktopEntiti
     }
 }
 
-QString DesktopService::GetFullAstraDefaultIconImagePath(const QString &iconName)
+QString DesktopService::GetFullAstraDefaultIconImagePath(QStringView iconName)
 {
-    QDir astraIconsDirs(m_astraIconPath);
+    const QDir astraIconsDirs(m_astraIconPath);
     const QStringList dirList = astraIconsDirs.entryList(QDir::Dirs| QDir::NoDot| QDir::NoDotDot);
     for (const QString &dir : dirList)
     {
-        QDir subIconsDir(m_astraIconPath+dir);
+        const QDir subIconsDir(m_astraIconPath+dir);
         const QStringList  pngsList = subIconsDir.entryList(QStringList() << "*.png", QDir::Files);
         for (const QString &png : pngsList)
         {
-            if (png.left(png.length()-4)==iconName)
+            if (png.leftRef(png.length()-4)==iconName)
             {
                 return m_astraIconPath+dir+"/"+png;
             }

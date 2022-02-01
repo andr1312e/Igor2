@@ -13,8 +13,8 @@ RolesAndStartupsWizardRepository::~RolesAndStartupsWizardRepository()
 
 bool RolesAndStartupsWizardRepository::HasData(quint8 roleId)
 {
-    bool isNotEmptyStartups = !GetStatupsByIndex(roleId).isEmpty();
-    bool isNotEmptyDesktops= !GetDesktopsByIndex(roleId).isEmpty();
+    const bool isNotEmptyStartups = !GetStatupsByIndex(roleId).isEmpty();
+    const bool isNotEmptyDesktops= !GetDesktopsByIndex(roleId).isEmpty();
     return (isNotEmptyStartups || isNotEmptyDesktops);
 }
 
@@ -97,23 +97,23 @@ QStringList RolesAndStartupsWizardRepository::GetAllUniqueDesktopExecsAndStarups
 
 void RolesAndStartupsWizardRepository::SetRoleDesktopFromXml(const int roleIndex,const QDomElement &desktops, const QString &backupFolder)
 {
-    if (desktops.tagName() == "desktops") {
+    if (desktops.tagName() == QStringLiteral("desktops")) {
         QDomNodeList desktopsList = desktops.childNodes();
 
         for (int i = 0; i < desktopsList.count(); i++) {
             QDomElement elem = desktopsList.at(i).toElement();
 
-            if (elem.tagName() != "desktopApp") {
+            if (elem.tagName() != QStringLiteral("desktopApp")) {
                 break;
             } else {
                 DesktopEntity desktopEntity;
-                desktopEntity.exec = elem.attribute("exec");
-                desktopEntity.name = elem.attribute("name");
-                desktopEntity.icon = elem.attribute("icon");
-                desktopEntity.type = elem.attribute("type");
-                if (m_terminal->IsDirExists(backupFolder, "RolesAndStartupsWizardRepository::SetRoleDesktopFromXml", true))
+                desktopEntity.exec = elem.attribute(QStringLiteral("exec"));
+                desktopEntity.name = elem.attribute(QStringLiteral("name"));
+                desktopEntity.icon = elem.attribute(QStringLiteral("icon"));
+                desktopEntity.type = elem.attribute(QStringLiteral("type"));
+                if (m_terminal->IsDirExists(backupFolder, Q_FUNC_INFO, true))
                 {
-                    if (m_terminal->IsFileExists(backupFolder+desktopEntity.exec, "RolesAndStartupsWizardRepository::SetRoleDesktopFromXml", true))
+                    if (m_terminal->IsFileExists(backupFolder+desktopEntity.exec, Q_FUNC_INFO, true))
                     {
                         AppendEnittyToRoleDesktops(roleIndex, desktopEntity);
                     }
@@ -144,9 +144,9 @@ void RolesAndStartupsWizardRepository::SetRoleStartupsFromXml(const int roleInde
             if (startup.tagName() != "startupApp") {
                 break;
             } else {
-                if (m_terminal->IsDirExists(backupFolder, "RolesAndStartupsWizardRepository::SetRoleDesktopFromXml", true))
+                if (m_terminal->IsDirExists(backupFolder, Q_FUNC_INFO, true))
                 {
-                    if (m_terminal->IsFileExists(backupFolder+startup.attribute("exec"), "RolesAndStartupsWizardRepository::SetRoleDesktopFromXml", true))
+                    if (m_terminal->IsFileExists(backupFolder+startup.attribute("exec"), Q_FUNC_INFO, true))
                     {
                         startupList.append(startup.attribute("exec"));
                     }

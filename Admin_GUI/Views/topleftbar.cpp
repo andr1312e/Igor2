@@ -4,7 +4,6 @@
 TopLeftBar::TopLeftBar(QWidget *parent)
     : QWidget(parent)
 {
-
     CreateUI();
     InsertWidgetsIntoLayouts();
     InitUI();
@@ -12,8 +11,6 @@ TopLeftBar::TopLeftBar(QWidget *parent)
 
 TopLeftBar::~TopLeftBar()
 {
-    delete m_titleFont;
-
     delete m_mainLayout;
 
     delete m_currentUserNameLabel;
@@ -22,8 +19,8 @@ TopLeftBar::~TopLeftBar()
 
 void TopLeftBar::SetData(const QString &rank, const QString &FCS,const int &role)
 {
-    m_currentUserNameLabel->setText("Добро пожаловать товарищ:  " + rank + " " + FCS);
-    m_currentUseRoleLabel->setText("Ваша роль:  " + Roles.at(role));
+    m_currentUserNameLabel->setText(QStringLiteral("Добро пожаловать товарищ:  ") + rank + " " + FCS);
+    m_currentUseRoleLabel->setText(QStringLiteral("Ваша роль:  ") + Roles.at(role));
 }
 
 void TopLeftBar::CreateUI()
@@ -46,9 +43,9 @@ void TopLeftBar::InsertWidgetsIntoLayouts()
 void TopLeftBar::InitUI()
 {
     m_oldFontSize=IsNeedToUpdateFontSize(this->width());
-    m_titleFont = new QFont(m_currentUserNameLabel->font());
-    m_currentUserNameLabel->setFont(*m_titleFont);
-    m_currentUseRoleLabel->setFont(*m_titleFont);
+    m_titleFont= QFont(m_currentUserNameLabel->font());
+    m_currentUserNameLabel->setFont(m_titleFont);
+    m_currentUseRoleLabel->setFont(m_titleFont);
 }
 
 
@@ -126,19 +123,14 @@ bool TopLeftBar::IsNeedToUpdateFontSize(int width)
 
 void TopLeftBar::UpdateFontSize()
 {
-    m_titleFont->setPointSize(m_oldFontSize);
-    m_currentUserNameLabel->setFont(*m_titleFont);
-    m_currentUseRoleLabel->setFont(*m_titleFont);
-}
-
-void TopLeftBar::ChangeWidgetLayout()
-{
-
+    m_titleFont.setPointSize(m_oldFontSize);
+    m_currentUserNameLabel->setFont(m_titleFont);
+    m_currentUseRoleLabel->setFont(m_titleFont);
 }
 
 void TopLeftBar::resizeEvent(QResizeEvent *event)
 {
-    qDebug() << "topBarSize" << event->size().width() << " fontSize " << m_oldFontSize;
+//    qDebug() << "topBarSize" << event->size().width() << " fontSize " << m_oldFontSize;
 
     if (IsNeedToUpdateFontSize(event->size().width())) {
         UpdateFontSize();

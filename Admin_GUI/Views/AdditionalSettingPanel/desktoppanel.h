@@ -39,10 +39,6 @@ private:
    void InsertWidgetsIntoLayout();
    void ConnectObjects();
 
-public Q_SLOTS:
-   void OnSetDefaultRoleApps(const quint8 &roleId);
-   void OnRoleDesktopChanges(const quint8 &roleId);
-
 private Q_SLOTS:
    void OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName);
    void OnDeleteProgram();
@@ -50,19 +46,17 @@ private Q_SLOTS:
 
 public:
    void SetUser(const User &user);
-   void SetRoleId(const quint8 &roleId);//userName || role
+   void SetRoleId(int roleId);
 private:
    bool IsUserData() const;
 private:
 
-   quint8 m_roleId;
+   int m_currentRoleId;
 
    const ICONS_PANEL_TYPE m_type;
 
    UserDesktopService* const m_userDesktopService;
    RoleDesktopService* const m_roleDesktopService;
-
-   QStringList *m_usersList;
 
    QStandardItemModel *m_model;
 

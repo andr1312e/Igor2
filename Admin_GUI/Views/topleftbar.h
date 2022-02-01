@@ -30,10 +30,9 @@ protected:
 private:
     bool IsNeedToUpdateFontSize(int width);
     void UpdateFontSize();
-    void ChangeWidgetLayout();
 
 private:
-    QFont *m_titleFont;
+    QFont m_titleFont;
     int m_oldFontSize;
 
 private:

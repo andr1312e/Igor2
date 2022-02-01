@@ -1,14 +1,14 @@
 #include "wizardservice.h"
 
-WizardService::WizardService(const QString &rlsTiFolder, const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent)
+WizardService::WizardService(const QString &currentUserName, const QString &currentUserId, const QString &rlsTiFolder, const LoadingState &state, LinuxUserService *service, ISqlDatabaseService *iSqlDataBaseService, QObject *parent)
     : QObject(parent)
     , m_terminal(Terminal::GetTerminal())
     , m_dependenciesService(QSharedPointer<DependenciesService>(new DependenciesService()))
     , m_rlsTiFolder(rlsTiFolder)
     , m_actionWithUserRepository(userWizardPageComboBoxNoDataActions.front())
     , m_actionWithRolesRepository(QStringList({m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front(), m_rolesWizardPageComboBoxNoDataActions.front()}))
-    , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(service))
-    , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(service))
+    , m_oldDataCurrentUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, service))
+    , m_backupDataUserWizardRepositry(new UsersDataWizardRepository(currentUserName, currentUserId, service))
     , m_oldDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(m_terminal))
     , m_backupDataRolesAndStartupsWizardRepository(new RolesAndStartupsWizardRepository(m_terminal))
     , m_iSqlDatabaseService(iSqlDataBaseService)
