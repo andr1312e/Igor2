@@ -3,27 +3,24 @@
 
 #include <QSortFilterProxyModel>
 
+#include "Logging/logger.h"
 #include "Structs/userstruct.h"
 
 class SortModel: public QSortFilterProxyModel
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
-    SortModel(QObject *parent);
-
+   SortModel(QObject *parent);
+    ~SortModel();
 public:
-
-    void UpdateSeachWordAndSeachAttribute(const QString &text, const QString &attribute);
+   void UpdateSeachTextAndSeachAttribute(const QString &text, const QString &attribute);
 
 protected:
-
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const Q_DECL_OVERRIDE;
 
 private:
-
-    QString m_searchText;
-
-    QString m_searchAttribute;
+   QString m_searchText;
+   QString m_searchAttribute;
 };
 
 #endif // ADMIN_GUI_MODEL_SORTMODEL_H

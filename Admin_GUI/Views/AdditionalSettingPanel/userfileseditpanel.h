@@ -10,48 +10,50 @@
 class UserFilesEditPanel : public QWidget
 {
 
-    Q_OBJECT
+   Q_OBJECT
 
 public:
 
-    UserFilesEditPanel(Terminal *terminal, QWidget *parent);
+   UserFilesEditPanel(Terminal *terminal, QWidget *parent);
 
-    ~UserFilesEditPanel();
+   ~UserFilesEditPanel();
 
-    void setUserNameAndRole(const QString &userName, const QString &role);
+Q_SIGNALS:
 
-signals:
+   void ToSetDefaultRoleApps(const QString &role);
+   void ToRoleToViewChanged(const QString &role);
 
-    void setDefaultRoleApps(const QString &role);
-    void roleToViewChanged(const QString &role);
+public:
 
-private:
-
-    void initUI(Terminal *terminal);
-
-    void insertWidgetsIntoLayout();
-
-    void createConnections();
+   void SetUserNameAndRole(const QString &userName, const QString &role);
 
 private:
 
-    QVBoxLayout *m_mainLayout;
+   void CreateUI(Terminal *terminal);
 
-    QHBoxLayout *m_topUserNameLayout;
+   void InsertWidgetsIntoLayout();
 
-    QHBoxLayout *m_topRoleLayout;
+   void ConnectObjects();
 
-    QLabel *m_userNameLabel;
+private:
 
-    QLabel *m_userNameValue;
+   QVBoxLayout *m_mainLayout;
 
-    QLabel *m_userRoleLabel;
+   QHBoxLayout *m_topUserNameLayout;
 
-    QLabel *m_userRoleValue;
+   QHBoxLayout *m_topRoleLayout;
 
-    DesktopPanel *m_userDesktopPanel;
+   QLabel *m_userNameLabel;
 
-    StartupPanel *m_userRunnubleApplicationPanel;
+   QLabel *m_userNameValue;
+
+   QLabel *m_userRoleLabel;
+
+   QLabel *m_userRoleValue;
+
+   DesktopPanel *m_userDesktopPanel;
+
+   StartupPanel *m_userRunnubleApplicationPanel;
 };
 
 #endif // ADMIN_GUI_VIEWS_USERFILESEDITPANEL_H

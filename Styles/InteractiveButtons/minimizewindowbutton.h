@@ -7,32 +7,23 @@ class MinimizeWindowButton : public InteractiveButtonBase
 {
     Q_OBJECT
 public:
-
-    MinimizeWindowButton(QWidget* parent);
-
+    explicit MinimizeWindowButton(QWidget* parent);
     ~MinimizeWindowButton();
 
-    void paintEvent(QPaintEvent* event) override;
-
-    QSize sizeHint() const override;
+private:
+    virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
+    void InitGeometry();
+    void InitDrawing();
 
-    void initGeometry();
-
-    void initDrawing();
-
-    QPen *m_pen;
-
-    QPainter *m_painter;
-
+private:
+    QPen m_pen;
     QPoint *m_left;
-
     QPoint *m_right;
-
     QPoint *m_mid;
-
-    QSize *m_buttonSize;
+    QSize m_buttonSize;
 
 };
 

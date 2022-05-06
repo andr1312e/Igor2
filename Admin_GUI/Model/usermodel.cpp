@@ -1,125 +1,135 @@
 #include "usermodel.h"
 
-UserModel::UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent)
-    : QObject(parent)
-    , m_model(new QStandardItemModel())
+UserModel::UserModel(ISqlDatabaseService *databaseService, LinuxUserService *userService)
+    : m_model(new QStandardItemModel())
     , m_databaseService(databaseService)
-    , m_linuxUserService(linuxUserService)
-    , m_currentRoleUsers(new QStringList())
+    , m_linuxUserService(userService)
 {
-    dataChanged();
+    DataChanged();
 }
 
 UserModel::~UserModel()
 {
-    m_databaseService->writeToFile(m_users);
     delete m_model;
-    delete m_currentRoleUsers;
 }
 
-void UserModel::addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role)
+int UserModel::GetRoleIdByUserId(const QString &userId) const
 {
-    for(QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
+    for (const User &user : qAsConst(m_users))
     {
-        if (it->userId==userId)
+        if (userId==user.userId)
         {
-            it->FCS=FCS;
-            it->rank=rank;
-            it->role=role;
-            it->hasData=true;
-            setUserImage(*it);
+            return user.role;
+        }
+    }
+    return -1;
+}
+
+void UserModel::AddUserToModel(const QString &userId, const QString &userName, const QString &FCS, int role)
+{
+    for (User &user  : m_users)
+    {
+        if (userId==user.userId && userName==user.name)
+        {
+            user.FCS = FCS;
+            user.role = role;
+            m_databaseService->AppendUserIntoTable(user);
+            SetImageToUser(user.role, user.userImage);
             FillModelByList();
             return;
         }
     }
-    qFatal("нет юзера");
+    qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Неудачная попытка добавить пользователя. Ид пользователя: ") + userId + QStringLiteral(" имя пользователя: ") + userName + QStringLiteral(" не увенчалась успехом ")).toUtf8().constData());
 }
 
-void UserModel::deleteUserFromModel(const QString &userId)
+void UserModel::DeleteUser(const QString &userId)
 {
-    for(QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
+    for (User &user  : m_users)
     {
-        if (it->userId==userId)
+        if (user.userId == userId)
         {
-            it->FCS.clear();
-            it->rank.clear();
-            it->role.clear();
-            it->hasData=false;
-            setUserImage(*it);
+            m_databaseService->RemoveUserIntoTable(user.role, user);
+            user.FCS.clear();
+            user.role=-1;
+            SetImageToUser(user.role, user.userImage);
             FillModelByList();
             return;
         }
     }
-    qFatal("нет юзера");
+    qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Неудачная попытка удалить пользователя. Ид пользователя: ") + userId + QStringLiteral(" , его и не было ")).toUtf8().constData());
 }
 
-void UserModel::dataChanged()
+QStandardItemModel *UserModel::GetModel() const
 {
-    FillListByLinuxUserService();
-    FillListByDatabaseService();
+    return m_model;
+}
+
+void UserModel::DataChanged()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Заполняем юзеров инфой из бд в соответствии с ид и именем в системе"));
+    const QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIds();
+    m_users=FillListByUserService(namesAndIdsList);
+    const QList<User> databaseUsers=FillListByDatabaseService();
+    for (User &user : m_users)
+    {
+        for (const User &databaseUser: databaseUsers)
+        {
+            if(user.userId==databaseUser.userId && user.name==databaseUser.name)
+            {
+                user.FCS=databaseUser.FCS;
+                user.role=databaseUser.role;
+                SetImageToUser(user.role, user.userImage);
+            }
+        }
+    }
     FillModelByList();
 }
 
-QStringList* UserModel::getUsersNamesByRole(const QString &role)
+QList<User> UserModel::FillListByUserService(const QList<QPair<QString, QString>> &namesAndIdsList) const
 {
-    m_currentRoleUsers->clear();
-    for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Заполняем юзеров системной инфой "));
+    QList<User> usersInSystem;
+    for (const QPair<QString, QString> &userNameAndId : namesAndIdsList)
     {
-        if (it->role==role)
-        {
-            m_currentRoleUsers->append(it->name);
-        }
+        User user;
+        user.name=userNameAndId.first;
+        user.userId=userNameAndId.second;
+        user.userImage=QStringLiteral(":/images/0.jpg");
+        user.role=-1;
+        usersInSystem.append(user);
     }
-    return m_currentRoleUsers;
+    return  usersInSystem;
 }
 
-void UserModel::FillListByLinuxUserService()
+QList<User> UserModel::FillListByDatabaseService()
 {
-    m_users=m_linuxUserService->getUsersList();
-}
-
-void UserModel::FillListByDatabaseService()
-{
-    for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
-    {
-        m_databaseService->readUserFromFile(*it);
-        setUserImage(*it);
-    }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запрашиваем юзеров из базы данных "));
+    return m_databaseService->GetAllUsers();
 }
 
 void UserModel::FillModelByList()
 {
     m_model->clear();
-    for (QList<User>::iterator it=m_users->begin(); it!=m_users->end(); ++it)
-    {
-        QStandardItem *item=new QStandardItem();
-        User user=*it;
-        item->setData(QVariant::fromValue(user), Qt::UserRole+1);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Заполняем модель из листа "));
+    for (const User & user :qAsConst(m_users)) {
+        QStandardItem * const item = new QStandardItem();
+        item->setData(QVariant::fromValue(user), Qt::UserRole + 1);
         m_model->appendRow(item);
     }
 }
 
-void UserModel::setUserImage(User &user)
+void UserModel::SetImageToUser(const int &userRole, QString &userImage)
 {
-    if (user.role==Roles.at(0))
-    {
-        user.m_image=":/images/0.jpg";
-    }
-    else
-    {
-        if (user.role==Roles.at(1))
-        {
-            user.m_image=":/images/1.jpg";
-        }
-        else
-        {
-            if (user.role==Roles.at(2))
-            {
-                user.m_image=":/images/2.jpg";
-            }
-            else
-            {
-                user.m_image=":/images/3.jpg";
+    if (0 == userRole) {
+        userImage = QStringLiteral(":/images/0.jpg");
+    } else {
+        if (1==userRole) {
+            userImage = QStringLiteral(":/images/1.jpg");
+        } else {
+            if (2==userRole) {
+                userImage = QStringLiteral(":/images/2.jpg");
+            } else {
+                userImage = QStringLiteral(":/images/3.jpg");
             }
         }
     }

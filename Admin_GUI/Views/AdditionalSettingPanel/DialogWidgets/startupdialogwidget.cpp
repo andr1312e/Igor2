@@ -2,10 +2,12 @@
 
 StartupDialogWidget::StartupDialogWidget(QWidget *parent)
     : QWidget(parent)
+    , m_desktopPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
 {
-    initUI();
-    insertWidgetsIntoLayouts();
-    createConnections();
+    CreateUI();
+    InsertWidgetsIntoLayouts();
+    InitUI();
+    ConnectObjects();
 }
 
 StartupDialogWidget::~StartupDialogWidget()
@@ -15,47 +17,31 @@ StartupDialogWidget::~StartupDialogWidget()
     delete m_mainLayout;
 
     delete m_titleLabel;
-    delete m_exec;
+    delete m_execTextField;
     delete m_execButton;
     delete m_saveDialogButton;
     delete m_closeDialogButton;
     delete m_errorMessagBox;
 }
 
-void StartupDialogWidget::setTitleLabel(QString &userName)
-{
-    m_titleLabel->setText("Добавить контроль над закрытием программы для пользователя: " + userName);
-}
-
-void StartupDialogWidget::initUI()
+void StartupDialogWidget::CreateUI()
 {
     m_mainLayout= new QVBoxLayout;
-
     m_titleLabel=new QLabel();
-    m_titleLabel->setAlignment(Qt::AlignCenter);
-
     m_execPathLayout=new QHBoxLayout();
-
-    m_exec=new QtMaterialTextField();
-    m_exec->setLabel("Путь к исполняемому файлу: (Обязательно)");
-
-    m_execButton=new QPushButton("Выбрать файл");
-
+    m_execTextField=new QtMaterialTextField();
+    m_execButton=new QPushButton();
     m_bottomButtonsLayout=new QHBoxLayout();
-    m_saveDialogButton = new QPushButton("Применить");
-    m_saveDialogButton->setObjectName("add");
-    m_closeDialogButton = new QPushButton("Выйти без сохранения");
-
+    m_saveDialogButton = new QPushButton();
+    m_closeDialogButton = new QPushButton();
     m_errorMessagBox=new QMessageBox();
-    m_errorMessagBox->setIcon(QMessageBox::Critical);
-    m_errorMessagBox->setWindowTitle("Внимание!");
 }
 
-void StartupDialogWidget::insertWidgetsIntoLayouts()
+void StartupDialogWidget::InsertWidgetsIntoLayouts()
 {
     m_mainLayout->addWidget(m_titleLabel);
 
-    m_execPathLayout->addWidget(m_exec);
+    m_execPathLayout->addWidget(m_execTextField);
     m_execPathLayout->addWidget(m_execButton);
 
     m_mainLayout->addLayout(m_execPathLayout);
@@ -69,49 +55,66 @@ void StartupDialogWidget::insertWidgetsIntoLayouts()
     setLayout(m_mainLayout);
 }
 
-void StartupDialogWidget::createConnections()
+void StartupDialogWidget::InitUI()
 {
-    connect(m_closeDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::hideAndClearDialog);
-    connect(m_execButton, &QPushButton::clicked, this, &StartupDialogWidget::addEcexPath);
-    connect(m_saveDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::checkExec);
+    m_titleLabel->setAlignment(Qt::AlignCenter);
+    m_execTextField->setLabel(QStringLiteral("Путь к исполняемому файлу: (Обязательно)"));
+    m_execTextField->setText(QStringLiteral("Выбрать файл"));
 
+    m_saveDialogButton->setText(QStringLiteral("Применить"));
+    m_closeDialogButton->setText(QStringLiteral("Выйти без сохранения"));
+
+    m_saveDialogButton->setObjectName(QStringLiteral("add"));
+
+    m_errorMessagBox->setIcon(QMessageBox::Critical);
+    m_errorMessagBox->setWindowTitle(QStringLiteral("Внимание!"));
 }
 
-void StartupDialogWidget::clearAllTextFiels()
+void StartupDialogWidget::ConnectObjects()
 {
-    m_exec->clear();
+    connect(m_closeDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnHideAndClearDialog);
+    connect(m_execButton, &QPushButton::clicked, this, &StartupDialogWidget::OnAddEcexPath);
+    connect(m_saveDialogButton, &QPushButton::clicked, this, &StartupDialogWidget::OnCheckExec);
 }
 
-void StartupDialogWidget::hideAndClearDialog()
+void StartupDialogWidget::CearAllTextFiels()
 {
-    clearAllTextFiels();
-    emit hideDialog();
+    m_execTextField->clear();
 }
 
-void StartupDialogWidget::addEcexPath()
+void StartupDialogWidget::OnHideAndClearDialog()
 {
-    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
-    m_exec->setText(loadPath);
+    CearAllTextFiels();
+    Q_EMIT ToHideDialog();
 }
 
-void StartupDialogWidget::checkExec()
+void StartupDialogWidget::OnAddEcexPath()
 {
-    if (m_exec->text()=="")
+    QString loadPath = QFileDialog::getOpenFileName(this, "Выберите исполняемый файл", m_desktopPath);
+    m_execTextField->setText(loadPath);
+}
+
+void StartupDialogWidget::OnCheckExec()
+{
+    if (m_execTextField->text().isEmpty())
     {
-        m_errorMessagBox->setText("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно");
+        m_errorMessagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно"));
         m_errorMessagBox->exec();
     }
     else
     {
-        if (QFile::exists(m_exec->text()))
+        if (QFile::exists(m_execTextField->text()))
         {
-            emit addExecPathToFile(m_exec->text());
-            hideAndClearDialog();
+            if(Log4Qt::Logger::rootLogger()->HasAppenders())
+            {
+                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили исполняемый файл: ") + m_execTextField->text().simplified());
+            }
+            Q_EMIT ToAddExecPathToFile(m_execTextField->text().simplified());
+            OnHideAndClearDialog();
         }
         else
         {
-            m_errorMessagBox->setText("Вы ввели путь к файлу, которого не существует, возможно у вашего пользователя недостаточно прав конфиденциальности для просмотра файла, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\" или изменить уровень конфиденциальности пользователя");
+            m_errorMessagBox->setText(QStringLiteral("Вы ввели путь к файлу, которого не существует, возможно у вашего пользователя недостаточно прав конфиденциальности для просмотра файла, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\" или изменить уровень конфиденциальности пользователя"));
             m_errorMessagBox->exec();
         }
     }

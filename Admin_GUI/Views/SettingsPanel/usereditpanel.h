@@ -22,44 +22,52 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(const QString &userName, UserModel *model, Terminal *terminal, QWidget *parent);
+    UserEditPanel(QStringView currentUserName, QWidget *parent);
     ~UserEditPanel();
-    void setUser(User &user);
-    void setFontSize(int fontSize);
-    void setButtonSize(int size);
 
 private:
+    void InitServicesAndModel();
+    void CreateUI();
+    void InsertWidgetsIntoLayout();
+    void FillUI();
+    void SetObjectNames();
+    void ConnectObjects();
 
-    void initServicesAndModel(UserModel *model, Terminal *terminal);
-    void initUI();
-    void applyStyle();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+Q_SIGNALS:
+    void ToDeleteUser(const QString &userId, const QString &userName);
+    void ToRoleToViewChanged(int roleId);
+    void ToSaveUser(const QString&userId, const QString&m_userName, const QString &FCS, const int &oldRoleIndex, const int &newRoleIndex);
 
-signals:
+private Q_SLOTS:
+    void OnSaveUser();
+    void OnDeleteUser();
+    void OnSetKioskMode(bool kioskModeState);
 
-    void setDefaultRoleApps(const QString &role);
-    void roleToViewChanged(const QString &role);
-    void fillUserAdditionalInfo(const QString &FCS, const QString &rank, const QString &role);
-    void clearUserAdditionalInfo();
+public:
+    void SetUser(const User &user);
+    void SetFontSize(int fontSize);
+    void SetButtonSize(int size);
 
 private:
+    void GetUserKioskState(const QString &userName);
+    void InsertUserData(const User &user);
+    void ShowSaveUserToast(const QString &userName);
 
-    QFont *m_editPanelFont;
+private:
+    const QStringView m_currentUserName;
 
-    UserModel *m_model;
+    QFont m_editPanelFont;
+
     KioskService *m_kioskService;
 
     QString m_userName;
-    QString m_currentUserName;
     QString m_userId;
+    int m_oldRoleIndex;
 
     QVBoxLayout *m_mainLayout;
     QLabel *m_editFieldsLabel;
     QLabel *m_FCSFieldsLabel;
     QLineEdit *m_FCSLineEdit;
-    QLabel *m_rankEditLabel;
-    QComboBox *m_rankComboBox;
     QLabel *m_roleEditLabel;
     QComboBox *m_roleComboBox;
 
@@ -70,23 +78,9 @@ private:
     QHBoxLayout *m_kioskLayout;
     QLabel *m_kioskModeIsEnabledLabel;
     QLabel *m_kioskModeIsDisabledLabel;
-    QtMaterialToggle *m_kiosModeState;
+    QtMaterialToggle *m_kioskModeState;
 
     QMessageBox *m_messagBox;
-
-private:
-
-    void setKioskMode(bool kioskModeState);
-    void checkUserKiosk(QString &userName);
-    void insertUserData(User &user);
-    void showToast(QString &userName);
-
-
-
-private slots:
-
-    void saveUser();
-    void deleteUser();
 };
 
 #endif // ADMIN_GUI_VIEWS_USEREDITPANEL_H

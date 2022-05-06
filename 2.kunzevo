@@ -1,27 +1,43 @@
 <!--SYNC-MODULE-SETTINGS-->
 <settings>
-<USERS>
- <user userId="1000" rank="Рядовой" name="user" role="Оператор" FCS="Боченев"/>
- <user userId="1001" rank="Сержант" name="user1" role="Администратор" FCS="Ермолаев В.Ю."/>
- <user userId="1002" rank="Полковник" name="user2" role="Специалист" FCS="Микеров Игорь"/>
+<USERS lastUpdate="10.10.2021">
+    <user userId="1000" rank="Старшина" name="user" role="Оператор" FCS="Боченев"/>
+    <user userId="1001" rank="Сержант" name="user1" role="Администратор" FCS="Ермолаев В.Ю."/>
+    <user userId="1002" rank="Полковник" name="user2" role="Специалист" FCS="Микеров Игорь"/>
 </USERS>
 <FIRSTROLE roleName="Пользователь">
-    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
-    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
-    <runnableApp exec="/home/user/application2"></runnableApp>
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application2"></startupApp>
+    </startups>
 </FIRSTROLE>
 <SECONDROLE roleName="Оператор">
-    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
-    <runnableApp exec="/home/user/application"></runnableApp>
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application"></startupApp>
+    </startups>
 </SECONDROLE>
-<THIRDROME roleName="Специалист">
-    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
-    <runnableApp exec="/home/user/application2"></runnableApp>
-</THIRDROME>
+<THIRDROLE roleName="Специалист">
+    <desktops>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application2"></startupApp>
+    </startups>
+</THIRDROLE>
 <FOURTHROLE roleName="Администратор">
-    <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
-    <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
-    <runnableApp exec="/home/user/application2"></runnableApp>
-    <runnableApp exec="/home/user/application"></runnableApp>
+    <desktops>
+        <desktopApp name="app1" exec="/home/user/application" type="Application" icon=""></desktopApp>
+        <desktopApp name="app2" exec="/home/user/application2" type="Application" icon=""></desktopApp>
+    </desktops>
+    <startups>
+        <startupApp exec="/home/user/application"></startupApp>
+        <startupApp exec="/home/user/application2"></startupApp>
+    </startups>
 </FOURTHROLE>
 </settings>

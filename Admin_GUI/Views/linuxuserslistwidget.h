@@ -19,62 +19,58 @@
 
 class LinuxUsersListWidget : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 public:
 
-    LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
-    ~LinuxUsersListWidget();
-
-signals:
-
-    void onUserClick(User &user);
-    void search(const QString &text, const QString &attribute);
+   LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
+   ~LinuxUsersListWidget();
 
 private:
+   void SetModel(UserModel *userModel);
+   void CreateProxyModel();
+   void CreateUI();
+   void InsertWidgetsIntoLayout();
+   void SetModelToListView();
+   void CreateConnections();
 
-    void createProxyModel(UserModel *userModel);
-    void initUI();
-    void insertWidgetsIntoLayout();
-    void setModelToView();
-    void createConnections();
+Q_SIGNALS:
 
-private:
+   void ToUserClick(const User &user);
+   void ToSearch(const QString &text, const QString &attribute);
+   void ToSetDelegateView(bool state);
 
-    QFont *m_font;
-
-    int m_oldFontSize;
-
-    QVBoxLayout *m_mainLayout;
-
-    QLabel *m_linuxUsersLabel;
-
-    QHBoxLayout *m_searchLayout;
-
-    QLineEdit *m_searchLineEdit;
-
-    QComboBox *m_searchTypeComboBox;
-
-    QListView *m_allUsersListView;
-
-    UserDelegate *m_userDelegate;
-
-    QStandardItemModel *m_model;
-
-    SortModel *m_sortModel;
+private Q_SLOTS:
+   void OnLineEditChange(const QString &text);
+   void OnComboBoxChange(const QString &attribute);
+   void GetUserData(const QModelIndex &index);
 
 private:
-
-    void updateFontSize();
-
-private slots:
-
-    void onLineEditChange(const QString &text);
-    void onComboBoxChange(const QString &attribute);
-    void getUserData(const QModelIndex &index);
+   void UpdateFontSize();
 
 protected:
+   virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 
-    void resizeEvent(QResizeEvent *event) override;
+private:
+   QFont m_font;
+   int m_oldFontSize;
+
+private:
+
+   const UserModel *m_userModel;
+   SortModel *m_sortModel;
+
+private:
+
+   QVBoxLayout *m_mainLayout;
+   QLabel *m_linuxUsersLabel;
+
+   QHBoxLayout *m_searchLayout;
+   QLineEdit *m_searchLineEdit;
+   QComboBox *m_searchTypeComboBox;
+
+   QListView *m_allUsersListView;
+   UserDelegate *m_userDelegate;
+   QStandardItemModel *m_model;
 
 };
 

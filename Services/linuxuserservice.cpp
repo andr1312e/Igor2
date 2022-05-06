@@ -1,38 +1,51 @@
 #include "Services/linuxuserservice.h"
+
 #include <QDebug>
 
-LinuxUserService::LinuxUserService(Terminal *terminal)
-    : m_terminal(terminal)
-    , m_users(nullptr)
+LinuxUserService::LinuxUserService()
+    : m_terminal(Terminal::GetTerminal())
 {
 
 }
 
 LinuxUserService::~LinuxUserService()
 {
-    if (m_users!=nullptr)
-        delete m_users;
+
 }
 
-void LinuxUserService::getAllUsersInSystem()
+void LinuxUserService::GetAllUsersWithIdInSystem()
 {
-    //All users -> remove System Users -> PushUserToList
-    QString allUsers=m_terminal->getFileText("/etc/passwd", "LinuxUserService::GetUsers");
-    QStringList usersList=allUsers.split('\n');
-    removeSystemUsersFromAllUsersList(usersList);
+    const QStringList allUsersList=m_terminal->GetAllUsersList(Q_FUNC_INFO);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем список всех пользователей: ")+ allUsersList.join(' '));
+    RemoveSystemUsersFromAllUsersList(allUsersList);
 }
 
-const QString LinuxUserService::getCurrentUserName()
+const QString LinuxUserService::GetCurrentUserName()
 {
-    const QString getAllCurrentUserNameCommand="whoami";
-    QString userName=m_terminal->runConsoleCommand(getAllCurrentUserNameCommand, "LinuxUserService::GetCurrentUserName").remove('\n');
-    return userName;
+    if(m_currentUserName.isEmpty())
+    {
+        const QString getCurrentUserNameCommand(QStringLiteral("id -u -n"));
+        m_currentUserName=m_terminal->RunConsoleCommandSync(getCurrentUserNameCommand, Q_FUNC_INFO).remove('\n');
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем имя пользователя: ")+m_currentUserName);
+    }
+    return m_currentUserName;
 }
 
-bool LinuxUserService::hasCurrentUserAdminPrivileges()
+const QString LinuxUserService::GetCurrentUserId()
 {
-    QStringList listOfCurrentUserGroups=getUserGroups(getCurrentUserName());
-    if (listOfCurrentUserGroups.contains("astra-admin"))
+    if(m_currentUserId.isEmpty())
+    {
+        const QString getCurrentUserIdCommand(QStringLiteral("id -u"));
+        m_currentUserId=m_terminal->RunConsoleCommandSync(getCurrentUserIdCommand, Q_FUNC_INFO).remove('\n');
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем ид пользователя: ")+ m_currentUserId);
+    }
+    return m_currentUserId;
+}
+
+bool LinuxUserService::HasCurrentUserAdminPrivileges()
+{
+    const QStringList listOfCurrentUserGroups=GetUserGroups(GetCurrentUserName());
+    if (listOfCurrentUserGroups.contains(QStringLiteral("astra-admin")) || listOfCurrentUserGroups.contains(QStringLiteral("root")))
     {
         return true;
     }
@@ -42,76 +55,57 @@ bool LinuxUserService::hasCurrentUserAdminPrivileges()
     }
 }
 
-QStringList LinuxUserService::getUserGroups(const QString &userName)
+QStringList LinuxUserService::GetUserGroups(const QString &userName)
 {
-    const QString getAllCurrentUserGroupCommand="id -Gn "+userName;
-    QString userGroups=m_terminal->runConsoleCommand(getAllCurrentUserGroupCommand, "LinuxUserService::getUserGroups");
+    const QString getAllCurrentUserGroupCommand=QStringLiteral("id -Gn ")+userName;
+    QString userGroups=m_terminal->RunConsoleCommandSync(getAllCurrentUserGroupCommand, Q_FUNC_INFO);
     userGroups.remove('\n');
-    QStringList list=userGroups.split(' ');
+    const QStringList list=userGroups.split(' ');
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем список групп пользователя: ")+ userName + QStringLiteral(" список групп:  ")+ userGroups);
     return list;
 }
 
-void LinuxUserService::removeSystemUsersFromAllUsersList(QStringList &allUsers)
+void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allUsers)
 {
-    m_users=new QList<User>;
     QStringList nonSystemUsers;
-    bool convertOk=false;
     int index=0;
-    for (QStringList::iterator it=allUsers.begin(); it!=allUsers.end(); ++it) {
-        QString user=*it;
-        int indexOfFirstDots=user.indexOf(':');
-        if (indexOfFirstDots!=-1)
+    for (const QString &user :allUsers)
+    {
+        const int indexOfFirstDots=user.indexOf(':');
+        if (-1==indexOfFirstDots)
         {
-            int indexOfSecondDots=user.indexOf(':', indexOfFirstDots+1);
-            if (indexOfSecondDots!=-1)
+            qFatal("%s", QString(Q_FUNC_INFO+QStringLiteral("RemoveSystemUsers не смог получить позицию вторых : строка имеет неверный параметр")).toUtf8().constData());
+        }
+        else
+        {
+            const QString userName=user.left(indexOfFirstDots);
+            const QString userId=user.mid(indexOfFirstDots+1);
+            bool convertOk=false;
+            const int userIdNumber=userId.toInt(&convertOk, 10);
+            if (convertOk)
             {
-                int indexOfThirdDots=user.indexOf(':', indexOfSecondDots+1);
-                if (indexOfThirdDots!=-1)
+                if (IsUserSystem(userIdNumber))
                 {
-                    QString userName=user.left(indexOfFirstDots);
-                    QString userId=user.mid(indexOfSecondDots+1, indexOfThirdDots-indexOfSecondDots-1);
-                    int userIdNumber=userId.toInt(&convertOk, 10);
-                    if (convertOk)
-                    {
-                        if (isUserSystem(userIdNumber))
-                        {
-                            pushUserToList(userName, userId);
-                            index++;
-                        }
-                    }
-                    else
-                    {
-                        qFatal("RemoveSystemUsers не смог получить userId");
-                    }
-                }
-                else
-                {
-                    qFatal("RemoveSystemUsers не смог получить позицию третьих : строка имеет неверный параметр");
+                    PushUserToNameIdList(userName, userId);
+                    index++;
                 }
             }
             else
             {
-                qFatal("RemoveSystemUsers не смог получить позицию вторых : строка имеет неверный параметр");
+                qFatal("%s", QString(Q_FUNC_INFO+QStringLiteral("RemoveSystemUsers не смог получить userId")).toUtf8().constData());
             }
-        }
-        else
-        {
-
         }
     }
 }
 
-void LinuxUserService::pushUserToList(const QString &name, const QString &userId)
+void LinuxUserService::PushUserToNameIdList(const QString &name, const QString &userId)
 {
-    User user;
-    user.name=name;
-    user.userId=userId;
-    m_users->append(user);
+    m_users.append(qMakePair(name, userId));
 }
 
-bool LinuxUserService::isUserSystem(int &userIdNumber)
+bool LinuxUserService::IsUserSystem(const int &userIdNumber) const
 {
-    if (userIdNumber>999&userIdNumber<29991)
+    if (userIdNumber>999&&userIdNumber<29991)
     {
         return true;
     }

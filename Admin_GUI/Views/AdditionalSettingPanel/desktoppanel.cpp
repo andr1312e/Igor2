@@ -1,20 +1,23 @@
 #include "desktoppanel.h"
 
-DesktopPanel::DesktopPanel(Terminal *terminal, ICONS_PANEL_TYPE type, QWidget *parent)
+#include <QMimeData>
+
+DesktopPanel::DesktopPanel(const ICONS_PANEL_TYPE type, UserDesktopService * userDesktopService, RoleDesktopService * roleDesktopService, QWidget *parent)
     : QWidget(parent)
     , m_type(type)
+    , m_userDesktopService(userDesktopService)
+    , m_roleDesktopService(roleDesktopService)
 {
-    initServices(terminal);
-    initModel();
-    initUI();
-    setBackGroundColor();
-    insertWidgetsIntoLayout();
-    createConnections();
+    SetPresenterModelToView();
+    CreateUI();
+    SetBackgroundColor();
+    InsertWidgetsIntoLayout();
+    FillUI();
+    ConnectObjects();
 }
 
 DesktopPanel::~DesktopPanel()
 {
-    delete m_rootFileService;
     delete m_fileDelegate;
 
     delete m_bottomLayout;
@@ -30,78 +33,72 @@ DesktopPanel::~DesktopPanel()
     delete m_dialog;
 }
 
-void DesktopPanel::setParam(const QString &param, QStringList *users)
+void DesktopPanel::SetPresenterModelToView()
 {
-    QString rootFolder="/home/";
-    QString titleText="Добавить ярлык";
-    if (m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
+    if(IsUserData())
     {
-        rootFolder=rootFolder+param+"/Desktop/";
-        titleText=titleText+" на рабочий стол для пользователя " + param;
+        m_model=m_userDesktopService->GetModel();
     }
     else
     {
-        rootFolder=rootFolder+"user/RLS_TI/"+param+"/";
-        titleText=titleText+" на рабочий стол для пользователей с ролью: " + param;
-    }
-    m_pararm=param;
-    m_usersList=users;
-    m_dialogWidget->setTitleText(titleText);
-    m_rootFileService->setPath(rootFolder);
-    m_addProgramButton->setEnabled(true);
-    m_deleteProgramButton->setDisabled(true);
-}
-
-void DesktopPanel::setDefaultRoleApps(const QString &role)
-{
-    if (m_type==ICONS_PANEL_TYPE::USER_DESKTOP)
-    {
-        m_rootFileService->setDefaultIcons(role);
-    }
-    else
-    {
-        qFatal("DesktopPanel::setDefaultApps невозможно установить для роли иконки по умолчанию");
+        m_model=m_roleDesktopService->GetModel();
     }
 }
 
-void DesktopPanel::initServices(Terminal *terminal)
+void DesktopPanel::CreateUI()
 {
-    m_rootFileService=new FileExplorer(terminal);
-}
-
-void DesktopPanel::initUI()
-{
-
     m_mainLayout=new QVBoxLayout();
 
-    m_programsToRun=new QLabel("Ярлыки на рабочем столе:");
+    m_programsToRun=new QLabel();
 
     m_fileDelegate=new FileDelegate(this);
-
     m_allProgramsListView=new QListView(this);
-    m_allProgramsListView->setModel(m_model);
-    m_allProgramsListView->setItemDelegate(m_fileDelegate);
+
 
     m_bottomLayout=new QHBoxLayout();
 
-    m_addProgramButton=new QPushButton("Добавить программу");
-    m_deleteProgramButton=new QPushButton("Удалить выбранную программу");
-
-    m_addProgramButton->setDisabled(true);
-    m_deleteProgramButton->setDisabled(true);
+    m_addProgramButton=new QPushButton(QStringLiteral("Добавить программу"));
+    m_deleteProgramButton=new QPushButton(QStringLiteral("Удалить программу"));
 
     m_dialogLayout = new QVBoxLayout();
     m_dialog=new QtMaterialDialog(this);
 
-    m_dialogWidget = new FileDialogWidget(this);
-    setMinimumHeight(255);
-    setMinimumWidth(420);
+    m_dialogWidget = new DesktopUploadDialogWidget(this);
 }
 
-void DesktopPanel::setBackGroundColor()
+void DesktopPanel::FillUI()
 {
-    m_addProgramButton->setObjectName("add");
-    m_deleteProgramButton->setObjectName("remove");
+    m_allProgramsListView->setModel(m_model);
+    m_allProgramsListView->setItemDelegate(m_fileDelegate);
+    if(ICONS_PANEL_TYPE::ROLE_ICONS==m_type)
+    {
+        m_allProgramsListView->setDragDropMode(QAbstractItemView::DragOnly);
+    }
+    else
+    {
+        setAcceptDrops(true);
+    }
+    m_allProgramsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_addProgramButton->setDisabled(true);
+    m_deleteProgramButton->setDisabled(true);
+    if(IsUserData())
+    {
+        m_dialogWidget->SetTitleText(QStringLiteral("Ярлык для пользователя:"));
+        m_programsToRun->setText(QStringLiteral("Выберите пользователя"));
+    }
+    else
+    {
+        m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для роли"));
+        m_dialogWidget->SetTitleText(QStringLiteral("Выберите роль"));
+    }
+    QWidget::setMinimumHeight(255);
+    QWidget::setMinimumWidth(420);
+}
+
+void DesktopPanel::SetBackgroundColor()
+{
+    m_addProgramButton->setObjectName(QStringLiteral("add"));
+    m_deleteProgramButton->setObjectName(QStringLiteral("remove"));
 
     setBackgroundRole(QPalette::Window);
     setAutoFillBackground(true);
@@ -110,12 +107,8 @@ void DesktopPanel::setBackGroundColor()
     m_dialogWidget->setAutoFillBackground(true);
 }
 
-void DesktopPanel::initModel()
-{
-    m_model=m_rootFileService->getModel();
-}
 
-void DesktopPanel::insertWidgetsIntoLayout()
+void DesktopPanel::InsertWidgetsIntoLayout()
 {
     m_mainLayout->addWidget(m_programsToRun);
     m_mainLayout->addWidget(m_allProgramsListView);
@@ -131,44 +124,145 @@ void DesktopPanel::insertWidgetsIntoLayout()
     setLayout(m_mainLayout);
 }
 
-void DesktopPanel::createConnections()
+void DesktopPanel::ConnectObjects()
 {
-    connect(m_allProgramsListView, &QListView::clicked, this, &DesktopPanel::onProgramSelect);
-    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::showDialog);
-    connect(m_deleteProgramButton, &QPushButton::clicked, this, &DesktopPanel::deleteProgram);
-    connect(m_dialogWidget, &FileDialogWidget::hideDialogSignal, m_dialog, &QtMaterialDialog::hideDialog);
-    connect(m_dialogWidget, &FileDialogWidget::addFileToUserDesktop, this, &DesktopPanel::addProgram);
+    connect(m_allProgramsListView, &QListView::clicked, this, &DesktopPanel::OnProgramSelect);
+    connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::OnShowDialog);
+    connect(m_deleteProgramButton, &QPushButton::clicked, this, &DesktopPanel::OnDeleteProgram);
+    connect(m_dialogWidget, &DesktopUploadDialogWidget::ToDialogSignalHide, m_dialog, &QtMaterialDialog::OnHideDialog);
+    connect(m_dialogWidget, &DesktopUploadDialogWidget::ToAddFileToUserDesktop, this, &DesktopPanel::OnAddProgram);
 }
 
-void DesktopPanel::updateAllUsersWithCurrentRole()
+void DesktopPanel::OnAddProgram(const QString &exec, const QString &iconPath, const QString &iconName)
 {
-    if (m_type==ICONS_PANEL_TYPE::ROLE_DESKTOP)
+    DesktopEntity entity;
+    entity.exec=exec;
+    entity.icon=iconPath;
+    entity.name=iconName;
+    entity.type=QStringLiteral("Application");
+    if(IsUserData())
     {
-        for (QStringList::Iterator it=m_usersList->begin(); it!=m_usersList->end(); ++it)
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Хотим добавить юзеру программу: ") + entity.exec + QStringLiteral(" у пользователя: ") + m_userName);
+        m_userDesktopService->AddIconToUser(m_userName, entity);
+    }
+    else
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Хотим добавить роли программу: ") + entity.exec + QStringLiteral(" у роли: ") + QString::number(m_currentRoleId));
+        m_roleDesktopService->AddIconToRole(m_currentRoleId, entity);
+    }
+}
+
+void DesktopPanel::OnDeleteProgram()
+{
+    const QModelIndex index=m_allProgramsListView->currentIndex();
+    if(index.isValid())
+    {
+        const QVariant indexData=index.data(Qt::UserRole+1);
+        const DesktopEntity entity=indexData.value<DesktopEntity>();
+        const QString programName=entity.name;
+        if(IsUserData())
         {
-            m_rootFileService->setDefaultIconsToUser(m_pararm, *it);
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Хотим удалить юзеру программу: ") + programName + QStringLiteral(" у пользователя: ") + m_userName);
+            m_userDesktopService->DeleteIconToUser(m_userName, programName);
+        }
+        else
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Хотим удалить роли программу: ") + programName + QStringLiteral(" у роли: ") + QString::number(m_currentRoleId));
+            m_roleDesktopService->DeleteIconToRole(m_currentRoleId, programName);
+        }
+        m_deleteProgramButton->setDisabled(true);
+    }
+}
+
+void DesktopPanel::OnProgramSelect(const QModelIndex &index)
+{
+    Q_UNUSED(index)
+    m_deleteProgramButton->setEnabled(true);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Была сделан клик по меню "));
+}
+
+void DesktopPanel::SetUser(const User &user)
+{
+    if(IsUserData())
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Устанавливаем для просмотра пользователя: ") + user.name);
+        m_userName=user.name;
+        m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для пользователя: %1").arg(m_userName));
+        m_addProgramButton->setEnabled(true);
+        m_deleteProgramButton->setDisabled(true);
+        m_userDesktopService->GetAllUserDesktops(m_userName);
+    }
+    else
+    {
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно для виджета роли получить данные пользователя, так как это виджет роли а не рабочего стола ")).toUtf8().constData());
+    }
+}
+
+void DesktopPanel::SetRoleId(int roleId)
+{
+    if(IsUserData())
+    {
+        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно для виджета рабочего стола получить ярлыки для роли, это другой виджет ")).toUtf8().constData());
+    }
+    else
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Устанавливаем для просмотра роль: ") + QString::number(roleId));
+        m_currentRoleId=roleId;
+        m_programsToRun->setText(QStringLiteral("Ярлыки на рабочий стол для роли: ")+ Roles.at(roleId));
+        m_addProgramButton->setEnabled(true);
+        m_deleteProgramButton->setDisabled(true);
+        m_roleDesktopService->GetAllRoleDesktops(roleId);
+    }
+}
+
+void DesktopPanel::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void DesktopPanel::dropEvent(QDropEvent *event)
+{
+    const QListView *sourceListView=static_cast<QListView*>(event->source());
+    if(Q_NULLPTR==sourceListView)
+    {
+        qFatal("");
+    }
+    else
+    {
+        const QModelIndex index=sourceListView->currentIndex();
+        if(index.isValid())
+        {
+            const QVariant indexData(index.data(Qt::UserRole+1));
+            const DesktopEntity entity=indexData.value<DesktopEntity>();
+            qInfo()<< "entity.name " << entity.name;
+            InsertDragItem(entity);
+        }
+        else
+        {
+            qFatal("fd");
         }
     }
 }
 
-void DesktopPanel::addProgram(const QString &exec, const QString &iconPath, const QString &iconName)
+void DesktopPanel::keyPressEvent(QKeyEvent *event)
 {
-    m_rootFileService->addIcon(exec, iconPath, iconName);
-    updateAllUsersWithCurrentRole();
+    if(Qt::Key_Delete==event->key())
+    {
+        OnDeleteProgram();
+        return;
+    }
+    if(Qt::Key_N==event->key() && (event->modifiers()&Qt::ControlModifier))
+    {
+        m_dialog->OnShowDialog();
+    }
 }
 
-void DesktopPanel::deleteProgram()
+void DesktopPanel::InsertDragItem(const DesktopEntity &entity)
 {
-    m_rootFileService->deleteIcon(m_selectedItemName);
-    m_deleteProgramButton->setDisabled(true);
-    updateAllUsersWithCurrentRole();
+    m_userDesktopService->AddIconToUser(m_userName, entity);
 }
 
-void DesktopPanel::onProgramSelect(const QModelIndex &index)
+bool DesktopPanel::IsUserData() const
 {
-    QVariant indexData=index.data(Qt::UserRole+1);
-    DesktopEntity entity=indexData.value<DesktopEntity>();
-    m_selectedItemName=entity.name;
-    m_deleteProgramButton->setText("Удалить ярлык с рабочего стола");
-    m_deleteProgramButton->setEnabled(true);
+    return ICONS_PANEL_TYPE::USER_ICONS==m_type;
 }

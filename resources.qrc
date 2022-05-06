@@ -25,36 +25,50 @@
         <file>images/ico.png</file>
         <file>images/settingsBlack.ico</file>
         <file>images/settingsWhite.ico</file>
-        <file>images/widgets-icons/icon_branch_closed.png</file>
-        <file>images/widgets-icons/icon_branch_end.png</file>
-        <file>images/widgets-icons/icon_branch_more.png</file>
-        <file>images/widgets-icons/icon_branch_open.png</file>
-        <file>images/widgets-icons/icon_checkbox_checked_disabled.png</file>
-        <file>images/widgets-icons/icon_checkbox_checked_pressed.png</file>
-        <file>images/widgets-icons/icon_checkbox_checked.png</file>
-        <file>images/widgets-icons/icon_checkbox_indeterminate_disabled.png</file>
-        <file>images/widgets-icons/icon_checkbox_indeterminate_pressed.png</file>
-        <file>images/widgets-icons/icon_checkbox_indeterminate.png</file>
-        <file>images/widgets-icons/icon_checkbox_unchecked_disabled.png</file>
-        <file>images/widgets-icons/icon_checkbox_unchecked_pressed.png</file>
-        <file>images/widgets-icons/icon_checkbox_unchecked.png</file>
-        <file>images/widgets-icons/icon_close.png</file>
-        <file>images/widgets-icons/icon_radiobutton_checked_disabled.png</file>
-        <file>images/widgets-icons/icon_radiobutton_checked_pressed.png</file>
-        <file>images/widgets-icons/icon_radiobutton_checked.png</file>
-        <file>images/widgets-icons/icon_radiobutton_unchecked_disabled.png</file>
-        <file>images/widgets-icons/icon_radiobutton_unchecked_pressed.png</file>
-        <file>images/widgets-icons/icon_radiobutton_unchecked.png</file>
-        <file>images/widgets-icons/icon_restore.png</file>
-        <file>images/widgets-icons/icon_undock.png</file>
-        <file>images/widgets-icons/icon_vline.png</file>
-        <file>images/widgets-icons/icon_window_close.png</file>
-        <file>images/widgets-icons/icon_window_maximize.png</file>
-        <file>images/widgets-icons/icon_window_minimize.png</file>
-        <file>images/widgets-icons/icon_window_restore.png</file>
         <file>images/sun.ico</file>
         <file>images/moon.ico</file>
         <file>Styles/Themes/style.qss</file>
-        <file>images/folderBlack.ico</file>
+        <file>images/myapptray.gif</file>
+        <file>images/horizontalDelegateBlack.ico</file>
+        <file>images/horizontalDelegateWhite.ico</file>
+        <file>images/iconDelegateBlack.ico</file>
+        <file>images/iconDelegateWhite.ico</file>
+        <file>images/data-cleaning-blacked.ico</file>
+        <file>images/data-clearing_white.ico</file>
+        <file>images/themes/themes_blacked.png</file>
+        <file>images/themes/themes_blue.png</file>
+        <file>images/themes/themes_red.png</file>
+        <file>images/wizard/kbkRed.png</file>
+        <file>images/wizard/kbkBlack.png</file>
+        <file>images/wizard/folderBlack.png</file>
+        <file>images/wizard/folderBlue.png</file>
+        <file>images/wizard/folderRed.png</file>
+        <file>images/wizard/kbkBlue.png</file>
+        <file>images/wizard/clearBackupRed.png</file>
+        <file>images/wizard/clearBackupBlue.png</file>
+        <file>images/wizard/clearBackupBlack.png</file>
+        <file>images/tray/close_black_checked.png</file>
+        <file>images/tray/close_black_notchecked.png</file>
+        <file>images/tray/noConsoleLog-blacked.png</file>
+        <file>images/tray/noConsoleLog-white.png</file>
+        <file>images/tray/noFileLog-blacked.png</file>
+        <file>images/tray/noFileLog-white.png</file>
+        <file>images/tray/ok_black_checked.png</file>
+        <file>images/tray/ok_black_notchecked.png</file>
+        <file>images/tray/pause_black_checked.png</file>
+        <file>images/tray/pause_black_notchecked.png</file>
+        <file>images/tray/play_black_checked.png</file>
+        <file>images/tray/play_black_notchecked.png</file>
+        <file>images/tray/refresh_black_checked.png</file>
+        <file>images/tray/refresh_black_notchecked.png</file>
+        <file>images/tray/stop_black_checked.png</file>
+        <file>images/tray/stop_black_notchecked.png</file>
+        <file>images/tray/toConsoleLog_black_Checked.png</file>
+        <file>images/tray/toConsoleLog_black_notChecked.png</file>
+        <file>images/tray/toFileLog_black_Checked.png</file>
+        <file>images/tray/toFileLog_black_notChecked.png</file>
+        <file>images/tray/trayIcon0.png</file>
+        <file>images/tray/trayIcon1.png</file>
+        <file>images/tray/trayIcon2.png</file>
     </qresource>
 </RCC>

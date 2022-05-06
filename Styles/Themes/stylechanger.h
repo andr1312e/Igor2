@@ -2,65 +2,32 @@
 #define STYLES_THEMES_STYLECHANGER_H
 
 #include <QFile>
-#include <QFont>
-#include <QPalette>
-#include <QProxyStyle>
 #include <QApplication>
-#include <QStyleFactory>
 #include <QPalette>
 #include <QPair>
-#include <array>
-#include <QPixmapCache>
 
-#include "themecolors.h"
-
-struct Theme
-{
-private:
-    QPalette palette;
-public:
-    Theme(const std::array<QPair<QPalette::ColorRole, QColor>, 15> &colors,const std::array<QPair<QPalette::ColorRole, QColor>, 5> disabledColor)
-    {
-        for (std::array<QPair<QPalette::ColorRole, QColor>, 15>::const_iterator it=colors.cbegin(); it!=colors.cend(); ++it)
-        {
-            palette.setColor(it->first, it->second);
-        }
-        for (std::array<QPair<QPalette::ColorRole, QColor>, 5>::const_iterator it=disabledColor.cbegin(); it!=disabledColor.cend(); ++it)
-        {
-            palette.setColor(QPalette::Disabled, it->first, it->second);
-        }
-
-    }
-    ~Theme()
-    {
-
-    }
-
-    void ApplyTheme(QApplication *app)
-    {
-        app->setPalette(palette);
-    }
-};
+#include "Styles/Themes/themecolors.h"
 
 class StyleChanger: public QObject
 {
     Q_OBJECT
 public:
-    StyleChanger(QApplication *app);
+    StyleChanger();
     ~StyleChanger();
 
-public slots:
+Q_SIGNALS:
+    void ToUpdateViewColors();
 
-    void changeTheme(bool state);
-
+public Q_SLOTS:
+    void OnChangeTheme(ThemesNames currentThemeName);
+public:
+    ThemesNames GetThemeName() const {return m_currentThemeName;}
 private:
-    bool currentThemeIsWhite;
-
-    Theme *m_darkTheme;
-    Theme *m_astraTheme;
-
+    void FillPalette(ThemesNames themeName);
+private:
+    QPalette m_palette;
     QString m_styleSheet;
-    QApplication *m_myApp;
+    ThemesNames m_currentThemeName;
 };
 
 #endif // STYLES_THEMES_STYLECHANGER_H

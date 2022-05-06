@@ -6,29 +6,25 @@
 class RestoreWindowButton : public InteractiveButtonBase
 {
 public:
-    RestoreWindowButton(QWidget* parent);
+    explicit RestoreWindowButton(QWidget* parent);
 
     ~RestoreWindowButton();
 
-    void paintEvent(QPaintEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
 
-    QSize sizeHint() const override;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
 
-    void initGeometry();
+    void InitGeometry();
 
-    QPen *m_pen;
-
+private:
+    const QPen m_pen;
     QPainter *m_painter;
-
-    QSize *m_buttonSize;
-
+    const QSize m_buttonSize;
     QRect *m_br;
-
     QPoint *m_topLeft, *m_topRight, *m_bottomLeft , *m_bottomRight;
-
-    std::array<QPoint, 5> *m_points;
+    std::array<QPoint, 5> m_points;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_RESTOREWINDOWBUTTON_H

@@ -1,5 +1,5 @@
-#ifndef ADMIN_GUI_VIEWS_FILEDIALOGWIDGET_H
-#define ADMIN_GUI_VIEWS_FILEDIALOGWIDGET_H
+#ifndef ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_FILEDIALOGWIDGET_H
+#define ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_FILEDIALOGWIDGET_H
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -10,82 +10,62 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 
-#include "globalfunctions.h"
+#include "functionswithstrings.h"
+#include "Logging/logger.h"
 #include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
-class FileDialogWidget:public QWidget
+class DesktopUploadDialogWidget: public QWidget
 {
     Q_OBJECT
 public:
-
-    FileDialogWidget(QWidget *parent);
-
-    ~FileDialogWidget();
-
-    void setTitleText(QString &text);
-
-signals:
-
-    void hideDialogSignal();
-
-    void addFileToUserDesktop(const QString &exec, const QString &iconPath, const QString &iconName);
+    DesktopUploadDialogWidget(QWidget *parent);
+    ~DesktopUploadDialogWidget();
 
 private:
+    void CreateUI();
+    void InsertWidgetsIntoLayout();
+    void FillUI();
+    void ConnectObject();
 
-    void initUI();
+Q_SIGNALS:
+    void ToDialogSignalHide();
+    void ToAddFileToUserDesktop(const QString &exec, const QString &iconPath, const QString &iconName);
 
-    void insertWidgetsIntoLayout();
+private Q_SLOTS:
+    void OnHideDialog();
+    void OnAddingEcexutePath();
+    void OnAddIconPath();
+    void OnAddIconToUserDesktop();
 
-    void createConnections();
-
-private:
-
-    void clearAllTextFiels();
-
-private slots:
-
-    void hideDialog();
-
-    void addEcexPath();
-
-    void addIconPath();
-
-    void addIconToUserDesktop();
+public:
+    void SetTitleText(const QString &text);
 
 private:
+    void ClearAllTextFiels();
 
-    QString m_userName;
+private:
 
     QVBoxLayout *m_mainLayout;
-
-
     QLabel *m_titleLabel;
 
-
     QHBoxLayout *m_execPathLayout;
-
     QtMaterialTextField *m_exec;
-
     QPushButton *m_execButton;
 
 
     QHBoxLayout *m_iconPathLayout;
-
     QtMaterialTextField *m_iconPath;
-
     QPushButton *m_iconPathButton;
 
 
     QtMaterialTextField *m_iconName;
-
-
     QHBoxLayout *m_dialogWidgetButtonsLayout;
-
     QPushButton *m_saveDialogButton;
-
     QPushButton *m_closeDialogButton;
 
     QMessageBox *m_messagBox;
+
+    const QString m_desktopPath;
 };
 
-#endif // FILEDIALOGWIDGET_H
+#endif // ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_FILEDIALOGWIDGET_H

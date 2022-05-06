@@ -6,27 +6,18 @@
 class KioskService
 {
 public:
-
-    KioskService(Terminal *terminal);
-
+    explicit KioskService();
     ~KioskService();
 
-    void lockUser(QString &userName);
-
-    void unLockUser(QString &userName);
-
-    bool isUserInKiosk(QString &userName);
-
-    Terminal* getTerminal() {return m_terminal;}
+public:
+    void LockUser(const QString &userName);
+    void UnLockUser(const QString &userName);
+    bool IsUserInKiosk(const QString &userName);
+private:
+    void SetPrivacyLevelZero(const QString &userName);// нужен режим приватности для киоска 0
 
 private:
-
-    Terminal *m_terminal;
-
-private:
-
-    void setPrivacyLevelZero(QString &userName);// нужен режим приватности для киоска 0
-
+    Terminal * const m_terminal;
 };
 
 #endif // SERVICES_KIOSKSERVICE_H

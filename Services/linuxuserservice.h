@@ -1,8 +1,7 @@
 #ifndef SERVICES_LINUXUSERSERVICE_H
 #define SERVICES_LINUXUSERSERVICE_H
 
-#include <QProcess>
-#include <QStandardItemModel>
+#include "Logging/logger.h"
 
 #include "Services/Terminals/terminal.h"
 #include "Structs/userstruct.h"
@@ -10,39 +9,27 @@
 class LinuxUserService
 {
 public:
-
-    LinuxUserService(Terminal *terminal);
-
+    explicit LinuxUserService();
     ~LinuxUserService();
-
-    void getAllUsersInSystem();
-
-    QList<User>* getUsersList(){ return m_users;}
-
-    Terminal* getTerminal() {return m_terminal;}
+    void GetAllUsersWithIdInSystem();
+    const QList<QPair<QString, QString>>& GetSystemUsersNamesWithIds(){ return m_users;}
 
 public:
-
-    const QString getCurrentUserName();
-
-    bool hasCurrentUserAdminPrivileges();
-
-private:
-
-    QStringList getUserGroups(const QString &userName);
-
-    void pushUserToList(const QString &name, const QString &userId);
-
-    void removeSystemUsersFromAllUsersList(QStringList &allUsers);
-
-    static bool isUserSystem(int &userIdNumber);
+    const QString GetCurrentUserName();
+    const QString GetCurrentUserId();
+    bool HasCurrentUserAdminPrivileges();
 
 private:
+    QStringList GetUserGroups(const QString &userName);
+    void PushUserToNameIdList(const QString &name, const QString &userId);
+    void RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
+    bool IsUserSystem(const int &userIdNumber) const;
 
-    Terminal *m_terminal;
-
-    QList<User> *m_users;
-
+private:
+    Terminal * const m_terminal;
+    QString m_currentUserName;
+    QString m_currentUserId;
+    QList<QPair<QString, QString>> m_users;
 };
 
 

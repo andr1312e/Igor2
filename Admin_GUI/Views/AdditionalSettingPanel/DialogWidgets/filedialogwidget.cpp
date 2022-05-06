@@ -1,14 +1,16 @@
 #include "filedialogwidget.h"
 
-FileDialogWidget::FileDialogWidget(QWidget *parent)
+DesktopUploadDialogWidget::DesktopUploadDialogWidget(QWidget *parent)
     : QWidget(parent)
+    , m_desktopPath(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation))
 {
-    initUI();
-    insertWidgetsIntoLayout();
-    createConnections();
+    CreateUI();
+    InsertWidgetsIntoLayout();
+    FillUI();
+    ConnectObject();
 }
 
-FileDialogWidget::~FileDialogWidget()
+DesktopUploadDialogWidget::~DesktopUploadDialogWidget()
 {
     delete m_dialogWidgetButtonsLayout;
     delete m_iconPathLayout;
@@ -26,44 +28,25 @@ FileDialogWidget::~FileDialogWidget()
     delete m_messagBox;
 }
 
-void FileDialogWidget::setTitleText(QString &text)
+
+void DesktopUploadDialogWidget::CreateUI()
 {
-    m_titleLabel->setText(text);
+    m_mainLayout = new QVBoxLayout;
+    m_titleLabel = new QLabel();
+    m_execPathLayout = new QHBoxLayout();
+    m_exec = new QtMaterialTextField();
+    m_execButton = new QPushButton();
+    m_iconPathLayout = new QHBoxLayout();
+    m_iconPath = new QtMaterialTextField();
+    m_iconPathButton = new QPushButton();
+    m_iconName = new QtMaterialTextField();
+    m_dialogWidgetButtonsLayout = new QHBoxLayout();
+    m_saveDialogButton = new QPushButton();
+    m_closeDialogButton = new QPushButton();
+    m_messagBox = new QMessageBox();
 }
 
-void FileDialogWidget::initUI()
-{
-    m_mainLayout= new QVBoxLayout;
-
-    m_titleLabel=new QLabel();
-    m_titleLabel->setAlignment(Qt::AlignCenter);
-
-    m_execPathLayout=new QHBoxLayout();
-
-    m_exec=new QtMaterialTextField();
-    m_exec->setLabel("Путь к исполняемому файлу: (Обязательно)");
-
-    m_execButton=new QPushButton("Выбрать файл");
-
-    m_iconPathLayout=new QHBoxLayout();
-    m_iconPath=new QtMaterialTextField();
-    m_iconPath->setLabel("Путь к иконке: (если отдельно от приложения)");
-
-    m_iconPathButton=new QPushButton("Выбрать файл");
-
-    m_iconName=new QtMaterialTextField();
-    m_iconName->setLabel("Название на рабочем столе: (Обязательно)");
-
-    m_dialogWidgetButtonsLayout=new QHBoxLayout();
-    m_saveDialogButton = new QPushButton("Применить");
-    m_closeDialogButton = new QPushButton("Выйти без сохранения");
-
-    m_messagBox=new QMessageBox();
-    m_messagBox->setWindowTitle("Внимание!");
-
-}
-
-void FileDialogWidget::insertWidgetsIntoLayout()
+void DesktopUploadDialogWidget::InsertWidgetsIntoLayout()
 {
     m_mainLayout->addWidget(m_titleLabel);
 
@@ -87,72 +70,81 @@ void FileDialogWidget::insertWidgetsIntoLayout()
     setLayout(m_mainLayout);
 }
 
-void FileDialogWidget::createConnections()
+void DesktopUploadDialogWidget::FillUI()
 {
-    connect(m_closeDialogButton, &QPushButton::clicked, this, &FileDialogWidget::hideDialog);
-    connect(m_execButton, &QPushButton::clicked, this, &FileDialogWidget::addEcexPath);
-    connect(m_iconPathButton, &QPushButton::clicked, this, &FileDialogWidget::addIconPath);
-    connect(m_saveDialogButton, &QPushButton::clicked, this, &FileDialogWidget::addIconToUserDesktop);
+    m_iconPath->setLabel(QStringLiteral("Путь к иконке: (необязательно)"));
+    m_iconPathButton->setText(QStringLiteral("Выбрать файл"));
+    m_iconName->setLabel(QStringLiteral("Название на рабочем столе: (Обязательно)"));
+    m_titleLabel->setAlignment(Qt::AlignCenter);
+    m_execButton->setText(QStringLiteral("Выбрать файл"));
+    m_exec->setLabel(QStringLiteral("Путь к исполняемому файлу: (Обязательно)"));
+    m_saveDialogButton->setText(QStringLiteral("Применить"));
+    m_closeDialogButton->setText(QStringLiteral("Выйти без сохранения"));
+    m_messagBox->setWindowTitle(QStringLiteral("Внимание!"));
 }
 
-void FileDialogWidget::clearAllTextFiels()
+void DesktopUploadDialogWidget::ConnectObject()
+{
+    connect(m_closeDialogButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnHideDialog);
+    connect(m_execButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddingEcexutePath);
+    connect(m_iconPathButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddIconPath);
+    connect(m_saveDialogButton, &QPushButton::clicked, this, &DesktopUploadDialogWidget::OnAddIconToUserDesktop);
+}
+
+void DesktopUploadDialogWidget::SetTitleText(const QString &text)
+{
+    m_titleLabel->setText(text);
+}
+
+
+void DesktopUploadDialogWidget::ClearAllTextFiels()
 {
     m_exec->clear();
     m_iconPath->clear();
     m_iconName->clear();
 }
 
-void FileDialogWidget::hideDialog()
+void DesktopUploadDialogWidget::OnHideDialog()
 {
-    clearAllTextFiels();
-    emit hideDialogSignal();
+    ClearAllTextFiels();
+    Q_EMIT ToDialogSignalHide();
 }
 
-void FileDialogWidget::addEcexPath()
+void DesktopUploadDialogWidget::OnAddingEcexutePath()
 {
-    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
+    const QString loadPath = QFileDialog::getOpenFileName(this, QStringLiteral("Выберите исполняемый файл"), m_desktopPath);
     m_exec->setText(loadPath);
 }
 
-void FileDialogWidget::addIconPath()
+void DesktopUploadDialogWidget::OnAddIconPath()
 {
-    QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString loadPath = QFileDialog::getOpenFileName(nullptr, "Выберите исполняемый файл", strDesktop);
+    const QString loadPath = QFileDialog::getOpenFileName(this, QStringLiteral("Выберите исполняемый файл"), m_desktopPath);
     m_iconPath->setText(loadPath);
 }
 
-void FileDialogWidget::addIconToUserDesktop()
+void DesktopUploadDialogWidget::OnAddIconToUserDesktop()
 {
-    if (m_exec->text()=="")
-    {
-        m_messagBox->setText("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно");
+    if (m_exec->text().isEmpty()) {
+        m_messagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно"));
         m_messagBox->exec();
-    }
-    else
-    {
-        if (m_iconName->text()=="")
-        {
-            m_messagBox->setText("Вы не ввели текст в поле \"Название на рабочем столе\". Данное поле обязательно");
+    } else {
+        if (m_iconName->text().isEmpty()) {
+            m_messagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Название на рабочем столе\". Данное поле обязательно"));
             m_messagBox->exec();
-        }
-        else
-        {
-            if(GlobalFunctions::stringContainsBadCharecters(m_iconName->text()))
-            {
-                m_messagBox->setText("Текст в поле \"Название на рабочем столе\" не может содержать символы \ / ` : & * ? \" \' < > | () : ;");
+        } else {
+            if (FunctionsWithStrings::StringContainsBadCharecters(m_iconName->text())) {
+                m_messagBox->setText(QStringLiteral("Текст в поле \"Название на рабочем столе\" не может содержать символы \\ / ` : & * ? \" \' < > | () : ;"));
                 m_messagBox->exec();
-            }
-            else
-            {
-                if (QFile::exists(m_exec->text()))
-                {
-                    emit addFileToUserDesktop(m_exec->text(), m_iconPath->text(), m_iconName->text());
-                    hideDialog();
-                }
-                else
-                {
-                    m_messagBox->setText("Вы ввели путь к файлу, которого не существует, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\"");
+            } else {
+                if (QFile::exists(m_exec->text())) {
+                    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+                    {
+                        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили ярлыка файл: ") + m_exec->text() + QStringLiteral(" имя файла: ") + m_iconName->text()+ QStringLiteral(" иконка файла: ") + m_iconPath->text());
+                    }
+                    Q_EMIT ToAddFileToUserDesktop(m_exec->text(), m_iconPath->text(), m_iconName->text());
+                    OnHideDialog();
+                } else {
+                    m_messagBox->setText(QStringLiteral("Вы ввели путь к файлу, которого не существует, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\""));
                     m_messagBox->exec();
                 }
             }

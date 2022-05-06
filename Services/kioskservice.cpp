@@ -1,8 +1,7 @@
 #include "kioskservice.h"
-#include <QDebug>
 
-KioskService::KioskService(Terminal *terminal)
-    : m_terminal(terminal)
+KioskService::KioskService()
+    : m_terminal(Terminal::GetTerminal())
 {
 }
 
@@ -11,32 +10,35 @@ KioskService::~KioskService()
 
 }
 
-
-void KioskService::lockUser(QString &userName)
+void KioskService::LockUser(const QString &userName)
 {
-    setPrivacyLevelZero(userName);
-    const QString activateKioskMode ="sudo fly-kiosk -a lock -u "+userName;
-    m_terminal->runConsoleCommand(activateKioskMode, "KioskLockUnLockService::LockUser");
+    SetPrivacyLevelZero(userName);
+    const QString activateKioskMode(QStringLiteral("sudo fly-kiosk -a lock -u ")+userName);
+    m_terminal->RunConsoleCommandSync(activateKioskMode, Q_FUNC_INFO);
 }
 
-void KioskService::unLockUser(QString &userName)
+void KioskService::UnLockUser(const QString &userName)
 {
-    const QString deactivateKioskMode="sudo fly-kiosk -a unlock -u "+userName;
-    m_terminal->runConsoleCommand(deactivateKioskMode, "KioskLockUnLockService::UnLockUser");
+    const QString deactivateKioskMode(QStringLiteral("sudo fly-kiosk -a unlock -u ")+userName);
+    m_terminal->RunConsoleCommandSync(deactivateKioskMode, Q_FUNC_INFO);
 }
 
-bool KioskService::isUserInKiosk(QString &userName)
+bool KioskService::IsUserInKiosk(const QString &userName)
 {
-    const QString checkKioskMode="sudo fly-kiosk -s -u "+userName;
-    QString userState=m_terminal->runConsoleCommand(checkKioskMode, "KioskLockUnLockService::isUserInKiosk");
-    if (userState.contains("not locked"))
+    const QString checkKioskMode(QStringLiteral("sudo fly-kiosk -s -u ")+userName);
+    const QString userState=m_terminal->RunConsoleCommandSync(checkKioskMode, Q_FUNC_INFO);
+    if (userState.contains(QStringLiteral("not locked")))
+    {
         return false;
+    }
     else
+    {
         return true;
+    }
 }
 
-void KioskService::setPrivacyLevelZero(QString &userName)
+void KioskService::SetPrivacyLevelZero(const QString &userName)
 {
-    const QString setPrivacyLevelToZero="sudo pdpl-user -l 0:0 "+userName;
-    m_terminal->runConsoleCommand(setPrivacyLevelToZero, "KioskLockUnLockService::setPrivacyLevelZero");
+    const QString setPrivacyLevelToZero(QStringLiteral("sudo pdpl-user -l 0:0 ")+userName);
+    m_terminal->RunConsoleCommandSync(setPrivacyLevelToZero, Q_FUNC_INFO);
 }

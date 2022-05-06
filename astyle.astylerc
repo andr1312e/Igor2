@@ -1,0 +1,6 @@
+break-blocks
+pad-oper
+pad-header
+align-pointer=name
+add-brackets
+convert-tabs

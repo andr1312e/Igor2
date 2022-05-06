@@ -2,54 +2,56 @@
 #define SERVICES_STARTUPRUNNABLESERVICE_H
 
 #include <QProcess>
-#include <QVector>
-#include <QPair>
 #include <QStringList>
 #include <QObject>
-#include <QMetaMethod>
+#include <QTimerEvent>
+
+#include "Logging/logger.h"
 
 #include "Services/Terminals/terminal.h"
+#include "Services/Sql/isqlservice.h"
 
-
-class StartupRunnableService: public QObject
+class StartupRunnableManager: public QObject
 {
-
     Q_OBJECT
 
 public:
+    explicit StartupRunnableManager(const QString &currentUserName, QStringView rlstiFolderPath, ISqlDatabaseService *sqlService, QObject *parent);
+    ~StartupRunnableManager();
 
-    StartupRunnableService(Terminal *terminal, QObject *parent);
+Q_SIGNALS:
+    void ToStartupApplicationNotExsists(const QString &execPath);
+    void ToProgramFall();
 
-    ~StartupRunnableService();
+private Q_SLOTS:
+    void OnRestartProcess();
+public Q_SLOTS:
+    void OnCurrentUserRoleChanged();
+    void OnPauseStartupRunnableManager();
+    void OnStopStartupRunnableManager();
+    void OnRestartStartupRunnableManager();
+    bool OnRunStartupRunnableManager();
 
-    bool run(const QString &userName);
-
-signals:
-
-    void noExecApplication(const QString &execPath);
-
-    void programFall();
+protected:
+    virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
 private:
+    QProcess * CreateReRestartApp(const QString &startup);
+    QStringList ReadUserStartupFile();
+    bool IsAllStartupValid(const QStringList &startupsList);
+    void InitStartupProcessList(const QStringList &startupsList);
 
+private:
+    void GetRunnedProcessesAndProcecessesForListen(const QStringList &listOfAllRunningProcessesName, const QStringList &currentUserStartupsList, QStringList &listAlreadyRunningsApps, QStringList &notRunnedAppsList);
+
+private:
+    const QString m_currentUserName;
+    const QStringView m_rlsTiFolderPath;
+    ISqlDatabaseService *m_sqlService;
     Terminal *m_terminal;
-
-    QVector<QProcess*> *m_runnableProcess;
-
-    QStringList *m_processParams;
-
-private:
-
-    QStringList readUserExecFile(const QString &userName);
-
-    bool isAllExecsValid(QStringList &execsList);
-
-    void initProcessStruct(QStringList execsList);
-
-private slots:
-
-    void restartProcess();
-
+    QList<QProcess*> m_runnableProcess;
+    QStringList m_listAlreadyRunningsApps;
+    int m_currentTimerId;
 };
 
 #endif // SERVICES_STARTUPRUNNABLESERVICE_H

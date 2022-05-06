@@ -15,25 +15,10 @@
 #include <QBitmap>
 #include <QtMath>
 
-#define PI 3.1415926
 #define GOLDEN_RATIO 0.618
 
-#define DOUBLE_PRESS_INTERVAL 300 // /* 300 */松开和按下的间隔。相等为双击
-#define SINGLE_PRESS_INTERVAL 200 // /* 150 */按下时间超过这个数就是单击。相等为单击
-
-/**
- * Copyright (c) 2019 命燃芯乂 All rights reserved.
- ×
- * 邮箱：wxy@iwxyi.com
- * QQ号：482582886
- * 时间：2020.12.28
- *
- * 说明：灵性的自定义按钮，简单又有趣
- * 源码：https://github.com/MRXY001/Interactive-Windows-Buttons
- *
- * 本代码为本人编写方便自己使用，现在无私送给大家免费使用。
- * 程序版权归作者所有，只可使用不能出售，违反者本人有权追究责任。
- */
+#define DOUBLE_PRESS_INTERVAL 300
+#define SINGLE_PRESS_INTERVAL 200
 
 class InteractiveButtonBase : public QPushButton
 {
@@ -45,10 +30,10 @@ class InteractiveButtonBase : public QPushButton
     Q_PROPERTY(QString icon_path READ getIconPath WRITE setIconPath)                            // 前景图标
     Q_PROPERTY(QString pixmap_path READ getPixmapPath WRITE setPixmapPath)                      // 前景图标
     Q_PROPERTY(QColor icon_color READ getIconColor WRITE setIconColor)                          // 前景图标帅色
-    Q_PROPERTY(QColor text_color READ getTextColor WRITE setTextColor)                          // 前景文字颜色
-    Q_PROPERTY(QColor background_color READ getNormalColor WRITE setNormalColor)                // 背景颜色
-    Q_PROPERTY(QColor border_color READ getBorderColor WRITE setBorderColor)                    // 边界颜色
-    Q_PROPERTY(QColor hover_color READ getHoverColor WRITE setHoverColor)                       // 鼠标悬浮背景颜色
+    Q_PROPERTY(QColor text_color READ getTextColor WRITE SetTextColor)                          // 前景文字颜色
+    Q_PROPERTY(QColor background_color READ getNormalColor WRITE SetNormalColor)                // 背景颜色
+    Q_PROPERTY(QColor border_color READ getBorderColor WRITE SetBorderColor)                    // 边界颜色
+    Q_PROPERTY(QColor hover_color READ getHoverColor WRITE SetHoverColor)                       // 鼠标悬浮背景颜色
     Q_PROPERTY(QColor press_color READ getPressColor WRITE setPressColor)                       // 鼠标按下背景颜色
     Q_PROPERTY(int hover_duration READ getHoverAniDuration WRITE setHoverAniDuration)           // 鼠标悬浮动画周期
     Q_PROPERTY(int press_duration READ getPressAniDuration WRITE setPressAniDuration)           // 鼠标按下动画周期
@@ -59,9 +44,9 @@ class InteractiveButtonBase : public QPushButton
     Q_PROPERTY(bool fixed_fore_pos READ getFixedTextPos WRITE setFixedTextPos)                  // 是否固定前景位置（false）
     Q_PROPERTY(bool text_dynamic_size READ getTextDynamicSize WRITE setTextDynamicSize)         // 修改字体大小时调整按钮最小尺寸（false）
     Q_PROPERTY(bool leave_after_clicked READ getLeaveAfterClick WRITE setLeaveAfterClick)       // 鼠标单击松开后取消悬浮效果（针对菜单、弹窗）
-    Q_PROPERTY(bool show_animation READ getShowAni WRITE setShowAni)                            // 是否启用出现动画（鼠标移开则消失）（false）
-    Q_PROPERTY(bool water_animation READ getWaterRipple WRITE setWaterRipple)                   // 是否启用点击水波纹动画（否则使用渐变）（true）
-    Q_PROPERTY(int font_size READ getFontSizeT WRITE setFontSizeT)                              // 动：按钮字体动画效果（自动，不应该设置）
+    Q_PROPERTY(bool isShowAnimation READ getShowAni WRITE setShowAni)                            // 是否启用出现动画（鼠标移开则消失）（false）
+    Q_PROPERTY(bool waterAnimation READ getWaterRipple WRITE setWaterRipple)                   // 是否启用点击水波纹动画（否则使用渐变）（true）
+    Q_PROPERTY(int fontSize READ getFontSizeT WRITE setFontSizeT)                              // 动：按钮字体动画效果（自动，不应该设置）
 public:
     InteractiveButtonBase(QWidget *parent = nullptr);
     InteractiveButtonBase(QString text, QWidget *parent = nullptr);
@@ -168,12 +153,12 @@ public:
     void setUnifyGeomerey(bool enable = true);
     void setBgColor(QColor bg);
     void setBgColor(QColor hover, QColor press);
-    void setNormalColor(QColor color);
-    void setBorderColor(QColor color);
-    void setHoverColor(QColor color);
+    void SetNormalColor(QColor color);
+    void SetBorderColor(QColor color);
+    void SetHoverColor(QColor color);
     void setPressColor(QColor color);
     void setIconColor(QColor color = QColor(0, 0, 0));
-    void setTextColor(QColor color = QColor(0, 0, 0));
+    void SetTextColor(QColor color = QColor(0, 0, 0));
     void setFocusBg(QColor color);
     void setFocusBorder(QColor color);
     void setFontSize(int f);
@@ -235,30 +220,25 @@ public:
     bool getFixedTextPos() { return fixed_fore_pos; }
     bool getTextDynamicSize() { return text_dynamic_size; }
     bool getLeaveAfterClick() { return leave_after_clicked; }
-    bool getShowAni() { return show_animation; }
-    bool getWaterRipple() { return water_animation; }
-
-#if QT_DEPRECATED_SINCE(5, 11)
-    QT_DEPRECATED_X("Use InteractiveButtonBase::setFixedForePos(bool fixed = true)")
-    void setFixedTextPos(bool f = true);
-#endif
+    bool getShowAni() { return isShowAnimation; }
+    bool getWaterRipple() { return waterAnimation; }
 
     virtual bool inArea(QPoint point);
     virtual bool inArea(QPointF point);
 
 protected:
-    void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
-    void focusInEvent(QFocusEvent *event) override;
-    void focusOutEvent(QFocusEvent *event) override;
-    void changeEvent(QEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
+    virtual void enterEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void leaveEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    virtual void focusInEvent(QFocusEvent *event) Q_DECL_OVERRIDE;
+    virtual void focusOutEvent(QFocusEvent *event) Q_DECL_OVERRIDE;
+    virtual void changeEvent(QEvent *event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
-    virtual QPainterPath getBgPainterPath();
+    virtual QPainterPath GetBackGroundPainterPath();
     virtual QPainterPath getWaterPainterPath(Water water);
     virtual void drawIconBeforeText(QPainter &painter, QRect icon_rect);
 
@@ -282,30 +262,30 @@ protected:
     double getNolinearProg(int p, NolinearType type);
     QIcon::Mode getIconMode();
 
-signals:
-    void showAniFinished();
-    void hideAniFinished();
-    void pressAppearAniFinished();
-    void pressDisappearAniFinished();
-    void jitterAniFinished();
-    void doubleClicked();
-    void rightClicked();
-    void signalFocusIn();
-    void signalFocusOut();
+Q_SIGNALS:
+    void ToShowAnimationFinished();
+    void ToHideAnimationFinished();
+    void ToPressAppearAnimationFinished();
+    void ToPressDisappearAnimationFinished();
+    void ToJitterAnimationFinished();
+    void ToDoubleClicked();
+    void ToRightClicked();
+    void ToFocusIn();
+    void ToFocusOut();
 
-    void signalMouseEnter();
-    void signalMouseEnterLater(); // 进入后延迟信号（以渐变动画完成为准，相当于可手动设置）
-    void signalMouseLeave();
-    void signalMouseLeaveLater(); // 离开后延迟的信号（直至渐变动画完成（要是划过一下子离开，这个也会变快））
-    void signalMousePress(QMouseEvent *event);
-    void signalMousePressLater(QMouseEvent *event);
-    void signalMouseRelease(QMouseEvent *event);
-    void signalMouseReleaseLater(QMouseEvent *event);
+    void ToMouseEnter();
+    void ToMouseEnterLater(); // 进入后延迟信号（以渐变动画完成为准，相当于可手动设置）
+    void ToMouseLeave();
+    void ToMouseLeaveLater(); // 离开后延迟的信号（直至渐变动画完成（要是划过一下子离开，这个也会变快））
+    void ToMousePress(QMouseEvent *event);
+    void ToMousePressLater(QMouseEvent *event);
+    void ToMouseRelease(QMouseEvent *event);
+    void ToMouseReleaseLater(QMouseEvent *event);
 
-public slots:
-    virtual void anchorTimeOut();
-    virtual void slotClicked();
-    void slotCloseState();
+public Q_SLOTS:
+    virtual void OnAnchorTimeOut();
+    virtual void OnClicked();
+    void OnCloseState();
 
 protected:
     PaintModel model;
@@ -316,11 +296,11 @@ protected:
     EdgeVal fore_paddings;
 
 protected:
-    // 总体开关
+
     bool self_enabled, parent_enabled, fore_enabled; // 是否启用子类、启动父类、绘制子类前景
 
     // 出现前景的动画
-    bool show_animation, show_foreground;
+    bool isShowAnimation, isShowForeground;
     bool show_ani_appearing, show_ani_disappearing;
     int show_duration;
     qint64 show_timestamp, hide_timestamp;
@@ -350,7 +330,7 @@ protected:
     int icon_text_padding, icon_text_size;           // 图标+文字模式共存时，两者间隔、图标大小
     int border_width;
     int radius_x, radius_y;
-    int font_size;
+    int fontSize;
     bool fixed_fore_pos;    // 鼠标进入时是否固定文字位置
     bool fixed_fore_size;   // 鼠标进入/点击时是否固定前景大小
     bool text_dynamic_size; // 设置字体时自动调整最小宽高
@@ -373,7 +353,7 @@ protected:
     int jitter_duration; // 抖动一次，多次效果叠加
 
     // 鼠标按下水波纹动画效果
-    bool water_animation; // 是否开启水波纹动画
+    bool waterAnimation; // 是否开启水波纹动画
     QList<Water> waters;
     int water_press_duration, water_release_duration, water_finish_duration;
     int water_radius;

@@ -132,7 +132,7 @@ void QtMaterialDialog::setWindowLayout(QLayout *layout)
     d->dialogWindow->setLayout(layout);
 }
 
-void QtMaterialDialog::showDialog()
+void QtMaterialDialog::OnShowDialog()
 {
     Q_D(QtMaterialDialog);
 
@@ -141,7 +141,7 @@ void QtMaterialDialog::showDialog()
     raise();
 }
 
-void QtMaterialDialog::hideDialog()
+void QtMaterialDialog::OnHideDialog()
 {
     Q_D(QtMaterialDialog);
     d->stateMachine->postEvent(new QtMaterialStateTransitionEvent(DialogHideTransition));

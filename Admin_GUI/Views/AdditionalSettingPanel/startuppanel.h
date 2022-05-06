@@ -7,97 +7,59 @@
 #include <QStringListModel>
 #include <QWidget>
 #include <QListView>
+#include <QSqlQueryModel>
 #include <QPushButton>
 
-#include "Services/startuprepositoryservice.h"
+#include "Services/startuppanelpresenter.h"
+#include "Services/Sql/isqlservice.h"
 
 #include "Admin_GUI/Views/qtoast.h"
 
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h"
 
-enum STARTUP_PANEL_TYPE{
-    USER_APPS,
-    ROLE_APPS,
-};
-
 class StartupPanel : public QWidget
 {
-    Q_OBJECT
+   Q_OBJECT
 
 public:
-
-    StartupPanel(Terminal *terminal,const STARTUP_PANEL_TYPE type, QWidget *parent);
-
-    ~StartupPanel();
-
-    void setParam(const QString &param, QStringList *users);
-
-public slots:
-
-    void setDefaultRoleApps(const QString &role);
-
-signals:
-
-    void roleStartupFileChanged();
+   StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
+   ~StartupPanel();
 
 private:
+   void CreateServices(ISqlDatabaseService *sqlDatabaseService);
+   void SetBackGroundColor();
+   void CreateUI();
+   void InsertWidgetsIntoLayout();
+   void FillUI();
+   void ConnectObjects();
 
-    void initServices(Terminal *terminal);
-    void setBackGroundColor();
-    void initUI();
-    void initModel();
-    void insertWidgetsIntoLayout();
-    void createConnections();
+private Q_SLOTS:
+   void OnDeleteProgram();
+   void OnAddProgram(const QString &startupPath);
+   void OnClicked();
 
-private:
-
-    const STARTUP_PANEL_TYPE m_type;
-
-    QStringList *m_usersList;
-
-    StartupRepositoryService *m_startupRepositoryService;
-
-    QString m_startupFilePath;
-
-    QStringListModel *m_appsList;
-
-    int m_selectedItemIndex;
-
-    QVBoxLayout *m_mainLayout;
-
-    QLabel *m_titleLabel;
-
-    QListView *m_allProgramsListView;
-
-    QHBoxLayout *m_bottomLayout;
-
-    QPushButton *m_addProgramButton;
-
-    QPushButton *m_deleteProgramButton;
-
-    QtMaterialDialog *m_dialog;
-
-    QVBoxLayout *m_dialogLayout;
-
-    StartupDialogWidget *m_dialogWidget;
-
-private slots:
-
-    void deleteProgram();
-
-    void addProgram(const QString &exec);
-
-    void onProgramSelect(const QModelIndex &index);
+public:
+   void SetRoleId(int roleId);
 
 private:
+   void GetAllStartups();
 
-    void updateAllUsersWithCurrentRole(QStringList &appsList);
+private:
+   int m_currentRoleId;
+   StartupPanelPresenter *m_startupRepositoryPresenter;
 
-    void updateModel();
+private:
+   QVBoxLayout *m_mainLayout;
 
-    void writeAppListToAllUsersWithRole(QStringList &appsList);
-
+   QLabel *m_titleLabel;
+   QListView *m_allProgramsListView;
+   QHBoxLayout *m_bottomLayout;
+   QPushButton *m_addProgramButton;
+   QPushButton *m_deleteProgramButton;
+   QtMaterialDialog *m_dialog;
+   QVBoxLayout *m_dialogLayout;
+   StartupDialogWidget *m_dialogWidget;
 };
 
 #endif // ADMIN_GUI_VIEWS_STARTUPPANEL_H

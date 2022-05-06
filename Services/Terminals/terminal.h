@@ -1,71 +1,124 @@
-#ifndef SERVICES_TERMINAL_H
-#define SERVICES_TERMINAL_H
+#ifndef SERVICES_TERMINALS_TERMINAL_H
+#define SERVICES_TERMINALS_TERMINAL_H
 #include <QProcess>
-#include <QFile>
-#include <QDir>
+#include <QString>
+#include <QDebug>
+
+#include "functionswithstrings.h"
 
 class Terminal
 {
 public:
-    
-    Terminal();
-    
-    ~Terminal();
+    static Terminal* GetTerminal();
+     ~Terminal();
+private:
+   Terminal();
 
-    QString runConsoleCommand(const QString &command, QString calledFulc);
+public:
+   QString RunConsoleCommandSync(const QString &command, const char *calledFunc);
 
-    void checkAndCreateFolder(const QString folderPath, const QString calledFulc, bool hasRoot=true);
+   void RunConsoleCommandWithWarnings(const QString &command, const char *calledFunc);
 
-    void checkAndCreateFile(const QString filePath, const QString calledFunc, bool hasRoot=true);
+   void RunConsoleCommandSync(const QString &command, QString &outputInfo, QString &errorInfo, const char *calledFunc);
 
-    void createFile(const QString filePath, const QString calledFunc, bool hasRoot=true);
+   QStringList GetAllUsersList(const char *calledFunc);
 
-    void createFolder(const QString &folderPath, const QString callerFunc, bool hasRoot=true);
+   bool IsDirExists(const QString folderPath, const char *calledFunc, bool hasRoot = true);
 
-    QStringList getFileList(const QString &folderPath, QString calledFulc, bool hasRoot=true);
+   bool IsDirNotExists(const QString folderPath, const char *calledFunc, bool hasRoot = true);
 
-    QStringList getFolderList(const QString &folderPath, QString calledFulc, bool hasRoot=true);
+   bool IsFileExists(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-    QString getFileText(const QString filePath, const QString calledFulc, bool hasRoot=true);
+   bool IsFileNotExists(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-    void writeTextToFileSudo(const QString &text, const QString filePath,const QString calledFunc);
+   void CheckAndCreatePathToElement(const QString &path, const char *calledFunc, bool hasRoot);
 
-    void deleteFileSudo(const QString filePath, const QString calledFulc);
+   void CreateFolder(const QString &folderPath, const char *callerFunc, bool hasRoot = true);
 
-    void clearFileSudo(const QString &filePath, const QString calledFunc);
+   void CreateFile(const QString filePath, const char *calledFunc, bool hasRoot = true);
 
-    void clearFolderSudo(const QString &folderPath, const QString calledFunc);
+   QStringList GetFolderList(const QString &folderPath, const char *calledFulc, bool hasRoot = true);
 
-    void copyFileSudo(const QString source, const QString &destination, const QString calledFunc);
+   QStringList GetFileList(const QString &folderPath, const char *calledFulc, bool hasRoot = true);
+
+   QString GetFileText(const QString filePath, const char *calledFunc, bool hasRoot = true);
+
+   void AppendTextToFileSudo(const QString &text, const QString &filePath, const char* calledFunc);
+
+   void WriteTextToFileSudo(const QString &text, const QString &filePath, const char* calledFunc);
+
+   void DeleteFileSudo(const QString filePath, const char *calledFunc);
+
+   void ClearFolderSudo(const QString &folderPath, const char *calledFunc);
+
+   void ClearFileSudo(const QString &filePath, const char *calledFunc);
+
+   void CopyFileSudo(const QString source, const QString &destination, const char *calledFunc);
+
+   void CopyFolderSudo(const QString &source, const QString &destination, const char *calledFunc);
+
+   QStringList GetAllProcessList(const char *calledFunc);
+
+   void KillProcess(const QString &processName, const char *calledFunc);
+
+   QStringList GetAllInstalledPackageNames(const char *calledFunc);
+
+   QStringList GetAllNotInstalledPackageNames(const char *calledFunc);
+
+   void InstallPackageSudo(const QString &packageName, const char *calledFunc);
 
 private:
 
-    QString createCreateFolderCommand(const QString &folderPath, bool hasRoot=true);
+   const QString CreateGetAllUsersCommand() const;
 
-    QString createCreateFileCommand(const QString &filePath, bool hasRoot=true);
+   QString CreateCreateFolderCommand(const QString &folderPath, bool hasRoot = true) const;
 
-    QString createGetFolderListCommand(const QString &folderPath, bool hasRoot=true);
+   QString CreateCreateFileCommand(const QString &filePath, bool hasRoot = true) const;
 
-    QString createGetFileListCommand(const QString &folderPath, bool hasRoot=true);
+   QString CreateGetFolderListCommand(const QString &folderPath, bool hasRoot = true) const;
 
-    QString createGetFileTextCommand(const QString &filePath, bool hasRoot=true);
+   QString CreateGetFileListCommand(const QString &folderPath, bool hasRoot = true) const;
 
-    QString createWriteTextToFileCommandSudo(const QString &filePath, const QString &text);
+   QString CreateGetFileTextCommand(const QString &filePath, bool hasRoot = true) const;
 
-    QString createDeleteFileCommandSudo(const QString &filePath);
+   QString CreateAppendTextToFileCommandSudo(const QString &text, const QString &filePath) const;
 
-    QString createClearFileCommandSudo(const QString &filePath);
+   QString CreateWriteTextToFileCommandSudo(const QString &text, const QString &filePath) const;
 
-    QString createClearFolderCommandSudo(const QString &folderPath);
+   QString CreateDeleteFileCommandSudo(const QString &filePath) const;
 
-    QString createCopyFileCommandSudo(const QString &source, const QString &destination);
+   QString CreateClearFileCommandSudo(const QString &filePath) const;
+
+   QString CreateClearFolderCommandSudo(const QString &folderPath) const;
+
+   QString CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) const;
+
+   QString CreateCopyFileCommandSudo(const QString &source, const QString &destination) const;
+
+   QString CreateCopyFolderCommandSudo(const QString &source, const QString &destination) const;
+
+   QString CreateGettAllProcessListCommand() const;
+
+   QString CreateKillProcessCommandSudo(const QString &processName) const;
+
+   QString CreateKillProcessCommandSudo(const QString &code, const QString &processId) const;
+
+   QString CreateGettingAllInstalledPackagesNamesListCommandSudo() const;
+
+   QString CreateGettingAllNotInstalledPackageNamesListCommandSudo() const;
+
+   QString CreateInstallPackageCommandSudo(const QString &packageName) const;
 
 private:
 
-    QProcess *m_process;
+   static Terminal* m_terminal;
 
-    QStringList *m_consoleCommand;
+   QProcess* const m_process;
+
+   QStringList m_consoleCommand;
+
+   const QString m_terminalCommand;
 
 };
 
-#endif // SERVICES_TERMINAL_H
+#endif // SERVICES_TERMINALS_TERMINAL_H

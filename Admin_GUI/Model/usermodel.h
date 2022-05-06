@@ -1,54 +1,40 @@
 #ifndef ADMIN_GUI_MODEL_USERMODEL_H
 #define ADMIN_GUI_MODEL_USERMODEL_H
 #include <QList>
+#include <QStandardItemModel>
 
 #include "Structs/userstruct.h"
-
+#include "Logging/logger.h"
+#include "Services/Sql/isqlservice.h"
 #include "Services/linuxuserservice.h"
-#include "Services/databaseservice.h"
 
-class UserModel : public QObject
+
+class UserModel
 {
-    Q_OBJECT
+
 public:
 
-    UserModel(LinuxUserService *linuxUserService, DatabaseService *databaseService, QObject *parent);
+   UserModel(ISqlDatabaseService *databaseService, LinuxUserService *userService);
+   ~UserModel();
 
-    ~UserModel();
-
-    void addUserToModel(const QString &userId, const QString &FCS, const QString &rank, const QString &role);
-
-    void deleteUserFromModel(const QString &userId);
-
-    QStandardItemModel* getModel(){return m_model;}
-
-    QStringList* getUsersNamesByRole(const QString &role);
-
-public slots:
-
-    void dataChanged();
+public:
+   int GetRoleIdByUserId(const QString &userId) const;
+   void AddUserToModel(const QString &userId, const QString &userName, const QString &FCS, int role);
+   void DeleteUser(const QString &userId);
+   QStandardItemModel *GetModel() const;
 
 private:
-
-    QStandardItemModel *m_model;
-
-    DatabaseService *m_databaseService;
-
-    LinuxUserService *m_linuxUserService;
-
-    QList<User> *m_users;
-
-    QStringList *m_currentRoleUsers;
+   void DataChanged();
+   QList<User> FillListByUserService(const QList<QPair<QString, QString> > &namesAndIdsList) const;
+   QList<User> FillListByDatabaseService();
+   void FillModelByList();
+   void SetImageToUser(const int &userRole, QString &userImage);
 
 private:
-
-    void FillListByLinuxUserService();
-
-    void FillListByDatabaseService();
-
-    void FillModelByList();
-
-    void setUserImage(User &user);
+   QStandardItemModel * const m_model;
+   ISqlDatabaseService * const m_databaseService;
+   LinuxUserService * const m_linuxUserService;
+   QList<User> m_users;
 
 };
 

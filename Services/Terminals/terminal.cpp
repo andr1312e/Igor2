@@ -1,226 +1,438 @@
 #include "terminal.h"
-#include <QDebug>
+
+Terminal* Terminal::m_terminal = Q_NULLPTR;
+
+Terminal *Terminal::GetTerminal()
+{
+    if(m_terminal==Q_NULLPTR)
+    {
+        m_terminal=new Terminal();
+    }
+    return m_terminal;
+}
 
 Terminal::Terminal()
-    : m_process(new QProcess())
-    , m_consoleCommand(new QStringList())
+   : m_process(new QProcess(Q_NULLPTR))
+   , m_terminalCommand(QStringLiteral("/bin/sh"))
 {
-    m_consoleCommand->append("-c");
-    m_consoleCommand->append("-c");
+   m_consoleCommand.append(QStringLiteral("-c"));
+   m_consoleCommand.append(QString());
 }
 
 Terminal::~Terminal()
 {
-    delete m_consoleCommand;
-    delete m_process;
+   delete m_process;
 }
 
-QString Terminal::runConsoleCommand(const QString &command, const QString calledFulc)
+QString Terminal::RunConsoleCommandSync(const QString &command, const char *calledFunc)
 {
-    m_consoleCommand->last()=command;
-    m_process->start("/bin/sh", *m_consoleCommand);
+   m_consoleCommand.last() = command;
+   m_process->start(m_terminalCommand, m_consoleCommand);
+   m_process->waitForFinished(-1);
+   const QString processError(m_process->readAllStandardError());
+   const QString processOutput(m_process->readAllStandardOutput());
+   if (processError.isEmpty())
+   {
+       m_process->close();
+       return processOutput;
+   }
+   else
+   {
+      const QString errorString(QString("Работа невозможна метод: %1 выдал ошибку при комманде %2 . Cообщение об ошибке %3").arg(calledFunc).arg(command).arg(processError));
+      qFatal("%s", errorString.toUtf8().constData());
+   }
+}
+
+void Terminal::RunConsoleCommandWithWarnings(const QString &command, const char *calledFunc)
+{
+    m_consoleCommand.last() = command;
+    m_process->start(m_terminalCommand, m_consoleCommand);
     m_process->waitForFinished(-1);
-    QString processError=m_process->readAllStandardError();
-    QString processOutput=m_process->readAllStandardOutput();
-    if (processError!="")
-    {
-        qInfo()<< processError;
-        qFatal("Работа невозможна метод: " + calledFulc.toLocal8Bit() + " выдал ошибку при комманде " + command.toLocal8Bit() + " . Cообщение об ошибке " +processError.toLocal8Bit());
-    }
-    m_process->close();
-    return processOutput;
 }
 
-void Terminal::checkAndCreateFolder(const QString folderPath, const QString calledFulc, bool hasRoot)
+void Terminal::RunConsoleCommandSync(const QString &command, QString &outputInfo, QString &errorInfo, const char *calledFunc)
 {
-    QStringList listToPath=folderPath.split('/');
-    if (listToPath.isEmpty())
-    {
-        qFatal("Работа невозможна метод: " + calledFulc.toLocal8Bit() + " выдал пуcтой путь. Путь " + folderPath.toLocal8Bit() );
+    m_consoleCommand.last() = command;
+    m_process->start(m_terminalCommand, m_consoleCommand);
+    m_process->waitForFinished(-1);
+    outputInfo = m_process->readAllStandardOutput();
+    errorInfo = m_process->readAllStandardError();
+    m_process->close();
+}
+
+QStringList Terminal::GetAllUsersList(const char* calledFunc)
+{
+    const QString getAllUsersTextCommand = CreateGetAllUsersCommand();
+    const QString allUsers=RunConsoleCommandSync(getAllUsersTextCommand, calledFunc);
+    QStringList usersList=allUsers.split('\n');
+    usersList.removeLast();
+    return usersList;
+}
+
+bool Terminal::IsDirExists(const QString folderPath, const char* calledFunc, bool hasRoot)
+{
+    QStringList listofSubFoldersToPath = folderPath.split('/');
+
+    listofSubFoldersToPath.removeAll(QString());
+    if (listofSubFoldersToPath.isEmpty()) {
+       qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc, folderPath.toUtf8().constData());
+    } else {
+       QString currentPath('/');
+
+       for (const QString &pathPart: qAsConst(listofSubFoldersToPath)) {
+          if (QStringLiteral("Desktop")==pathPart) {
+             const QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
+             const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+             if (!(files.contains((pathPart) + '@')) && !(folders.contains((pathPart) + '/'))) {
+                return false;
+             }
+          } else {
+             const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+             if (!folders.contains((pathPart) + '/')) {
+                return false;
+             }
+          }
+
+          currentPath = currentPath + pathPart + '/';
+       }
+
+       return true;
     }
-    else
+}
+
+bool Terminal::IsDirNotExists(const QString folderPath, const char* calledFunc, bool hasRoot)
+{
+   QStringList listofSubFoldersToPath = folderPath.split('/');
+
+   if (listofSubFoldersToPath.isEmpty()) {
+      qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc, folderPath.toUtf8().constData());
+   } else {
+      listofSubFoldersToPath.removeAll(QString());
+      QString currentPath('/');
+
+      for (const QString &subFolderPath:qAsConst(listofSubFoldersToPath)) {
+         if (QStringLiteral("Desktop")==subFolderPath) {
+            const QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
+            const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+            if (!(files.contains((subFolderPath) + '@')) && !(folders.contains((subFolderPath) + '/'))) {
+               return true;
+            }
+         } else {
+            const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+            if (!folders.contains((subFolderPath) + '/')) {
+               return true;
+            }
+         }
+
+         currentPath = currentPath + subFolderPath + '/';
+      }
+
+      return false;
+   }
+}
+
+bool Terminal::IsFileExists(const QString filePath, const char* calledFunc, bool hasRoot)
+{
+   const int backSlashPos = filePath.lastIndexOf('/', filePath.count() - 2);
+   QString folderPath = filePath.left(backSlashPos);
+   const QString fileName = filePath.mid(backSlashPos + 1);
+   QStringList files = GetFileList(folderPath, calledFunc, hasRoot);
+   while(files.count()==1 && files.first().endsWith('@') && !folderPath.endsWith('/'))
+   {
+      folderPath.push_back('/');
+      files = GetFileList(folderPath, calledFunc, hasRoot);
+   }
+   if (files.contains(fileName) || files.contains(fileName+'*')) {
+      return true;
+   } else {
+      return false;
+   }
+}
+
+bool Terminal::IsFileNotExists(const QString filePath, const char* calledFunc, bool hasRoot)
+{
+   const int backSlashPos = filePath.lastIndexOf('/', filePath.count() - 2);
+   const QString folderPath = filePath.left(backSlashPos);
+   const QString fileName = filePath.mid(backSlashPos + 1);
+   const QStringList files = GetFileList(folderPath, calledFunc, hasRoot);
+
+   if (files.contains(fileName)) {
+      return false;
+   } else {
+      return true;
+   }
+}
+
+void Terminal::CheckAndCreatePathToElement(const QString &path, const char* calledFunc, bool hasRoot)
+{
+   QStringList listofSubFoldersToPath = FunctionsWithStrings::GetListofSubFoldersFromPath(path, Q_FUNC_INFO);
+   QString currentPath('/');
+   listofSubFoldersToPath.removeLast();
+
+   for (const QString pathPart:qAsConst(listofSubFoldersToPath)) {
+      if (QStringLiteral("Desktop") == pathPart) {
+         const QStringList files = GetFileList(currentPath, calledFunc, hasRoot);
+         const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+         if (!(files.contains((pathPart) + '@')) && !(folders.contains((pathPart) + '/'))) {
+            CreateFolder(currentPath + pathPart + '/', calledFunc, hasRoot);
+         }
+      } else {
+         const QStringList folders = GetFolderList(currentPath, calledFunc, hasRoot);
+
+         if (!folders.contains((pathPart) + '/')) {
+            CreateFolder(currentPath + pathPart + '/', calledFunc, hasRoot);
+         }
+      }
+
+      currentPath = currentPath + pathPart + '/';
+   }
+}
+
+
+void Terminal::CreateFolder(const QString &folderPath, const char* callerFunc, bool hasRoot)
+{
+   const QString createFolderCommand = CreateCreateFolderCommand(folderPath, hasRoot);
+   RunConsoleCommandSync(createFolderCommand, callerFunc);
+}
+
+void Terminal::CreateFile(const QString filePath, const char* calledFunc, bool hasRoot)
+{
+   const QString createIconCommand = CreateCreateFileCommand(filePath, hasRoot);
+   RunConsoleCommandSync(createIconCommand, calledFunc);
+}
+
+QStringList Terminal::GetFolderList(const QString &folderPath, const char* calledFunc, bool hasRoot)
+{
+   const QString getFoldersListCommand = CreateGetFolderListCommand(folderPath, hasRoot);
+   const QString folders = RunConsoleCommandSync(getFoldersListCommand, calledFunc);
+   return folders.split('\n');
+}
+
+QStringList Terminal::GetFileList(const QString &folderPath, const char* calledFunc, bool hasRoot)
+{
+   const QString getFileListCommand = CreateGetFileListCommand(folderPath, hasRoot);
+   const QString files = RunConsoleCommandSync(getFileListCommand, calledFunc);
+   QStringList filesList = files.split('\n');
+   filesList.removeLast();
+   return filesList;
+}
+
+QString Terminal::GetFileText(const QString filePath, const char *calledFunc, bool hasRoot)
+{
+   const  QString getFileTextCommand = CreateGetFileTextCommand(filePath, hasRoot);
+   return RunConsoleCommandSync(getFileTextCommand, calledFunc);
+}
+
+void Terminal::AppendTextToFileSudo(const QString &text, const QString &filePath, const char *calledFunc)
+{
+    const QString appendTextToFileCommand=CreateAppendTextToFileCommandSudo(text, filePath);
+    RunConsoleCommandSync(appendTextToFileCommand, calledFunc);
+}
+
+void Terminal::WriteTextToFileSudo(const QString &text, const QString &filePath, const char* calledFunc)
+{
+   const QString writeTextToFileCommand = CreateWriteTextToFileCommandSudo(text, filePath);
+   RunConsoleCommandSync(writeTextToFileCommand, calledFunc);
+}
+
+void Terminal::DeleteFileSudo(const QString filePath, const char* calledFunc)
+{
+   const  QString deleteFileCommand = CreateDeleteFileCommandSudo(filePath);
+   RunConsoleCommandSync(deleteFileCommand, calledFunc);
+}
+
+void Terminal::ClearFolderSudo(const QString &folderPath, const char* calledFunc)
+{
+   const QString deleteAllFilesCommand = CreateClearFolderCommandSudo(folderPath);
+   RunConsoleCommandSync(deleteAllFilesCommand, calledFunc);
+}
+
+void Terminal::ClearFileSudo(const QString &filePath, const char* calledFunc)
+{
+   const QString clearFileCommand = CreateClearFileCommandSudo(filePath);
+   RunConsoleCommandSync(clearFileCommand, calledFunc);
+}
+
+void Terminal::CopyFileSudo(const QString source, const QString &destination, const char* calledFunc)
+{
+   const QString copyFileCommand = CreateCopyFileCommandSudo(source, destination);
+   RunConsoleCommandSync(copyFileCommand, calledFunc);
+}
+
+void Terminal::CopyFolderSudo(const QString &source, const QString &destination, const char *calledFunc)
+{
+    const QString copyFolderCommand= CreateCopyFolderCommandSudo(source, destination);
+    RunConsoleCommandSync(copyFolderCommand, calledFunc);
+}
+
+QStringList Terminal::GetAllProcessList(const char* calledFunc)
+{
+    const QString processListCommand=CreateGettAllProcessListCommand();
+    const QString processes=RunConsoleCommandSync(processListCommand, calledFunc);
+    QStringList processList=processes.split('\n');
+    processList.removeLast();
+    for (QString &process: processList)
     {
-        listToPath.removeAll("");
-        QString startPath="/";
-        for (QStringList::iterator it=listToPath.begin(); it!=listToPath.end(); ++it)
+        int index=process.indexOf('/');
+        if(index >0)
         {
-            if (*it=="Desktop")
-            {
-                QStringList files=getFileList(startPath, calledFulc, hasRoot);
-                QStringList folders=getFolderList(startPath, calledFulc, hasRoot);
-                if (!(files.contains((*it)+"@")) && !(folders.contains((*it)+"/")))
-                {
-                    createFolder(startPath+*it+"/", calledFulc, hasRoot);
-                }
-            }
-            else
-            {
-                QStringList folders=getFolderList(startPath, calledFulc, hasRoot);
-                if (!folders.contains((*it)+"/"))
-                {
-                    createFolder(startPath+*it+"/", calledFulc, hasRoot);
-                }
-            }
-            startPath=startPath+*it+"/";
+            process.truncate(index);
         }
     }
+    return processList;
 }
 
-void Terminal::checkAndCreateFile(const QString filePath, const QString calledFunc, bool hasRoot)
+void Terminal::KillProcess(const QString &processName, const char* calledFunc)
 {
-    int backSlashPos=filePath.lastIndexOf('/', filePath.count()-2);
-    QString folderPath=filePath.left(backSlashPos);
-    QString fileName=filePath.mid(backSlashPos+1);
-    QStringList files=getFileList(folderPath, calledFunc, hasRoot);
-    if (!files.contains(fileName))
-    {
-        createFile(filePath, calledFunc, hasRoot);
-    }
+    const QString killProcessCommand=CreateKillProcessCommandSudo(processName);
+    RunConsoleCommandSync(killProcessCommand, calledFunc);
 }
 
-void Terminal::createFile(const QString filePath, const QString calledFunc, bool hasRoot)
+QStringList Terminal::GetAllInstalledPackageNames(const char* calledFunc)
 {
-    QString createIconCommand=createCreateFileCommand(filePath, hasRoot);
-    runConsoleCommand(createIconCommand, calledFunc);
+    const QString allInstalledPackagesNamesCommand=CreateGettingAllInstalledPackagesNamesListCommandSudo();
+    const QString packagesInstalled=RunConsoleCommandSync(allInstalledPackagesNamesCommand, calledFunc);
+    QStringList packageInstalledList=packagesInstalled.split('\n');
+    packageInstalledList.removeLast();
+    return packageInstalledList;
 }
 
-void Terminal::createFolder(const QString &folderPath,const QString callerFunc, bool hasRoot)
+QStringList Terminal::GetAllNotInstalledPackageNames(const char* calledFunc)
 {
-    QString createFolderCommand=createCreateFolderCommand(folderPath, hasRoot);
-    runConsoleCommand(createFolderCommand, callerFunc);
+    const QString allNotInstalledPackagesNamesCommand=CreateGettingAllNotInstalledPackageNamesListCommandSudo();
+    const QString packagesNotInstalled=RunConsoleCommandSync(allNotInstalledPackagesNamesCommand, calledFunc);
+    QStringList packageNotInstalledList=packagesNotInstalled.split('\n');
+    packageNotInstalledList.removeLast();
+    return packageNotInstalledList;
 }
 
-QStringList Terminal::getFileList(const QString &folderPath, QString calledFulc, bool hasRoot)
+void Terminal::InstallPackageSudo(const QString &packageName, const char* calledFunc)
 {
-    QString getFileListCommand=createGetFileListCommand(folderPath, hasRoot);
-    QString files = runConsoleCommand(getFileListCommand, calledFulc);
-    return files.split('\n');
+    const QString installCommand=CreateInstallPackageCommandSudo(packageName);
+    RunConsoleCommandWithWarnings(installCommand, calledFunc);//это костыль астра кидает ворнинги (из за каких то системных либ)
 }
 
-QStringList Terminal::getFolderList(const QString &folderPath, QString calledFulc, bool hasRoot)
+const QString Terminal::CreateGetAllUsersCommand() const
 {
-    QString getFoldersListCommand=createGetFolderListCommand(folderPath, hasRoot);
-    QString folders = runConsoleCommand(getFoldersListCommand, calledFulc);
-    return folders.split('\n');
+    return QStringLiteral("awk -F: '{print $1 \":\" $3}' /etc/passwd");
 }
 
-QString Terminal::getFileText(const QString filePath, const QString calledFulc, bool hasRoot)
+QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasRoot) const
 {
-    QString getFileTextCommand=createGetFileTextCommand(filePath, hasRoot);
-    return runConsoleCommand(getFileTextCommand, calledFulc);
+   if (hasRoot) {
+      return QStringLiteral("sudo mkdir '") + folderPath + '\'';
+   } else {
+      return QStringLiteral("mkdir '") + folderPath + '\'';
+   }
 }
 
-void Terminal::writeTextToFileSudo(const QString &text, const QString filePath, const QString calledFunc)
+QString Terminal::CreateCreateFileCommand(const QString &filePath, bool hasRoot) const
 {
-    QString writeTextToFileCommand=createWriteTextToFileCommandSudo(filePath, text);
-    runConsoleCommand(writeTextToFileCommand, calledFunc);
+   if (hasRoot) {
+      return QStringLiteral("sudo touch '") + filePath + '\'';
+   } else {
+      return QStringLiteral("touch '") + filePath + '\'';
+   }
 }
 
-void Terminal::deleteFileSudo(const QString filePath, const QString calledFulc)
+QString Terminal::CreateGetFolderListCommand(const QString &folderPath, bool hasRoot) const
 {
-    QString deleteFileCommand=createDeleteFileCommandSudo(filePath);
-    runConsoleCommand(deleteFileCommand, calledFulc);
+   if (hasRoot) {
+      return QStringLiteral("sudo ls '") + folderPath + QStringLiteral("' -F -1 | grep /$ -");
+   } else {
+      return QStringLiteral("ls '") + folderPath + QStringLiteral("' -F -1 | grep /$ -");
+   }
 }
 
-void Terminal::clearFileSudo(const QString &filePath, const QString calledFunc)
+QString Terminal::CreateGetFileListCommand(const QString &folderPath, bool hasRoot) const
 {
-    QString clearFileCommand=createClearFileCommandSudo(filePath);
-    runConsoleCommand(clearFileCommand, calledFunc);
+   if (hasRoot) {
+      return QStringLiteral("sudo ls '") + folderPath + QStringLiteral("' -F -1 | grep /$ -v");
+   } else {
+      return QStringLiteral("ls '") + folderPath + QStringLiteral("' -F -1 | grep /$ -v");
+   }
 }
 
-void Terminal::clearFolderSudo(const QString &folderPath, const QString calledFunc)
+QString Terminal::CreateGetFileTextCommand(const QString &filePath, bool hasRoot) const
 {
-    QString deleteAllFilesCommand=createClearFolderCommandSudo(folderPath);
-    runConsoleCommand(deleteAllFilesCommand, calledFunc);
+   if (hasRoot) {
+      return QStringLiteral("sudo cat '") + filePath + '\'';
+   } else {
+      return QStringLiteral("cat '") + filePath + '\'';
+   }
 }
 
-void Terminal::copyFileSudo(const QString source, const QString &destination, const QString calledFunc)
+QString Terminal::CreateAppendTextToFileCommandSudo(const QString &text, const QString &filePath) const
 {
-    QString copyFileCommand=createCopyFileCommandSudo(source, destination);
-    runConsoleCommand(copyFileCommand, calledFunc);
+    return QStringLiteral("sudo sh -c \"echo -e \"'")+ text +QStringLiteral("'\" >> '")+filePath+QStringLiteral("'\"");
 }
 
-QString Terminal::createCreateFolderCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateWriteTextToFileCommandSudo(const QString &text, const QString &filePath) const
 {
-    if (hasRoot)
-    {
-        return "sudo mkdir '" + folderPath + "'";
-    }
-    else
-    {
-        return "mkdir '" + folderPath + "'";
-    }
+    return QStringLiteral("sudo sh -c 'echo \"") + text + QStringLiteral("\" >> ") + filePath + '\'';
 }
 
-QString Terminal::createCreateFileCommand(const QString &filePath, bool hasRoot)
+QString Terminal::CreateDeleteFileCommandSudo(const QString &filePath) const
 {
-    if (hasRoot)
-    {
-        return "sudo touch '" + filePath + "'";
-    }
-    else
-    {
-        return "touch '" + filePath + "'";
-    }
+   return QStringLiteral("sudo rm '") + filePath + '\'';
 }
 
-QString Terminal::createGetFolderListCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateClearFileCommandSudo(const QString &filePath) const
 {
-    if (hasRoot)
-    {
-        return "sudo ls '" + folderPath + "' -F -1 | grep /$ -";
-    }
-    else
-    {
-        return "ls '" + folderPath + "' -F -1 | grep /$ -";
-    }
+   return QStringLiteral("sudo truncate -s 0 '") + filePath + '\'';
 }
 
-QString Terminal::createGetFileListCommand(const QString &folderPath, bool hasRoot)
+QString Terminal::CreateClearFolderCommandSudo(const QString &folderPath) const
 {
-    if (hasRoot)
-    {
-        return "sudo ls '" + folderPath + "' -F -1 | grep /$ -v";
-    }
-    else
-    {
-        return "ls '" + folderPath + "' -F -1 | grep /$ -v";
-    }
+   return QStringLiteral("sudo rm -rf ") + folderPath + '*';
 }
 
-QString Terminal::createGetFileTextCommand(const QString &filePath, bool hasRoot)
+QString Terminal::CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) const
 {
-    if (hasRoot)
-    {
-        return "sudo cat '" + filePath+ "'";
-    }
-    else
-    {
-        return "cat '" + filePath+ "'";
-    }
+   return QStringLiteral("sudo rmdir -p ") + folderPath;
 }
 
-QString Terminal::createWriteTextToFileCommandSudo(const QString &filePath, const QString &text)
+QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString &destination) const
 {
-    return "sudo sh -c 'echo \"" + text + "\" >> " +filePath +"'";
+    return QStringLiteral("sudo cp '") + source + QStringLiteral("' '") + destination + '\'';
 }
 
-QString Terminal::createDeleteFileCommandSudo(const QString &filePath)
+QString Terminal::CreateCopyFolderCommandSudo(const QString &source, const QString &destination) const
 {
-    return "sudo rm '" + filePath +"'";
+    return QStringLiteral("sudo cp -R ")+ source + QStringLiteral("' '") + destination + '\'';
 }
 
-QString Terminal::createClearFileCommandSudo(const QString &filePath)
+QString Terminal::CreateGettAllProcessListCommand() const
 {
-    return "sudo truncate -s 0 '" +filePath+"'";
+    return QStringLiteral("ps -eo comm");
 }
 
-QString Terminal::createClearFolderCommandSudo(const QString &folderPath)
+QString Terminal::CreateKillProcessCommandSudo(const QString &processName) const
 {
-    return "sudo rm -rf " + folderPath + "*";
+    return QStringLiteral("sudo killall ") +processName;
 }
 
-QString Terminal::createCopyFileCommandSudo(const QString &source, const QString &destination)
+QString Terminal::CreateKillProcessCommandSudo(const QString &code, const QString &processId) const
 {
-    return "sudo cp '" +source + "' '" + destination + "'";
+    return QStringLiteral("sudo kill ")+code+' '+processId;
+}
+
+QString Terminal::CreateGettingAllInstalledPackagesNamesListCommandSudo() const
+{
+    return QStringLiteral("apt-mark showmanual");
+}
+
+QString Terminal::CreateGettingAllNotInstalledPackageNamesListCommandSudo() const
+{
+    return  QStringLiteral("aptitude -F %p search '!~i'");
+}
+
+QString Terminal::CreateInstallPackageCommandSudo(const QString &packageName) const
+{
+    return QStringLiteral("sudo apt-get -qq install -y --install-suggests ")+packageName;
 }

@@ -8,29 +8,25 @@
 class CloseWindowButton : public InteractiveButtonBase
 {
 public:
-    CloseWindowButton(QWidget* parent);
-
+    explicit CloseWindowButton(QWidget* parent);
     ~CloseWindowButton();
 
-    void setTopRightRadius(int r);
+private:
+    void InitGeometry();
+
+public:
+    void setTopRightRadius(int radius);
 
 protected:
-    void paintEvent(QPaintEvent*event);
-
-    QPainterPath getBgPainterPath();
-    QPainterPath getWaterPainterPath(Water water);
-
-    QSize sizeHint() const override;
+    virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
+    virtual QPainterPath GetBackGroundPainterPath() Q_DECL_OVERRIDE;
+    virtual QPainterPath getWaterPainterPath(Water water) Q_DECL_OVERRIDE;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:
-    int tr_radius;
-    QPen *m_pen;
-    QPainter *m_painter;
-    QSize *m_buttonSize;
-
-private:
-    void initGeometry();
-    void initDrawing();
+    int m_radius;
+    const QPen m_pen;
+    const QSize m_buttonSize;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_CLOSEWINDOWBUTTON_H

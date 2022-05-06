@@ -1,90 +1,186 @@
 #include "startuprunnableservice.h"
 #include <QDebug>
+#include <QFile>
 
-StartupRunnableService::StartupRunnableService(Terminal *terminal, QObject *parent)
+StartupRunnableManager::StartupRunnableManager(const QString &currentUserName, QStringView rlstiFolderPath, ISqlDatabaseService *sqlService, QObject *parent)
     : QObject(parent)
-    , m_terminal(terminal)
-    , m_runnableProcess(new QVector<QProcess*>)
-    , m_processParams(new QStringList())
+    , m_currentUserName(currentUserName)
+    , m_rlsTiFolderPath(rlstiFolderPath)
+    , m_sqlService(sqlService)
+    , m_terminal(Terminal::GetTerminal())
 {
 
 }
 
-StartupRunnableService::~StartupRunnableService()
+StartupRunnableManager::~StartupRunnableManager()
 {
-    if (!(m_runnableProcess->isEmpty()))
+
+}
+
+void StartupRunnableManager::OnRestartProcess()
+{
+    QProcess *process = qobject_cast<QProcess *>(sender());
+    if(process->exitCode()==0)
     {
-        for (QVector<QProcess*>::reverse_iterator iter=m_runnableProcess->rbegin(); iter!=m_runnableProcess->rend(); iter++)
-        {
-            delete *iter;
-        }
+        process->start();
+        Q_EMIT ToProgramFall();
     }
-    delete m_runnableProcess;
-    delete m_processParams;
 }
 
-bool StartupRunnableService::run(const QString &userName)
+void StartupRunnableManager::OnCurrentUserRoleChanged()
 {
-    QStringList execs=readUserExecFile(userName);
-    if(isAllExecsValid(execs))
+    m_listAlreadyRunningsApps.clear();
+    for (QProcess *process:m_runnableProcess)
     {
-        initProcessStruct(execs);
+        disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+        process->kill();
+    }
+    m_runnableProcess.clear();
+    OnRunStartupRunnableManager();
+}
+
+void StartupRunnableManager::OnPauseStartupRunnableManager()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пользователь поставил на паузу перезапуск программ "));
+    for (QProcess* const process :qAsConst(m_runnableProcess))
+    {
+        disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+    }
+    if(m_currentTimerId!=-1)
+    {
+        QObject::killTimer(m_currentTimerId);
+        m_currentTimerId=-1;
+    }
+}
+
+void StartupRunnableManager::OnStopStartupRunnableManager()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пользователь остановил перезапуск программ "));
+    for (QProcess* const process :qAsConst(m_runnableProcess))
+    {
+        disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+        process->terminate();
+    }
+    m_runnableProcess.clear();
+    m_listAlreadyRunningsApps.clear();
+    if(m_currentTimerId!=-1)
+    {
+        QObject::killTimer(m_currentTimerId);
+        m_currentTimerId=-1;
+    }
+}
+
+void StartupRunnableManager::OnRestartStartupRunnableManager()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пользователь перезапустил перезапуск программ "));
+    OnStopStartupRunnableManager();
+    OnRunStartupRunnableManager();
+}
+
+bool StartupRunnableManager::OnRunStartupRunnableManager()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" начинаем запуск приложений для роли "));
+    const QStringList starups = ReadUserStartupFile();
+
+    if (IsAllStartupValid(starups)) {
+        InitStartupProcessList(starups);
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запуск приложений для роли успешен."));
         return true;
-    }
-    else
-    {
+    } else {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запуск приложений для роли не успешен."));
         return false;
     }
 }
 
-QStringList StartupRunnableService::readUserExecFile(const QString &userName)
+void StartupRunnableManager::timerEvent(QTimerEvent *event)
 {
-    QString m_startupFile="/home/"+userName+"/RLS_TI/Startup";
-    m_terminal->checkAndCreateFolder("/home/"+userName+"/RLS_TI", "StartupRunnableService::readUserExecFile", false);
-    m_terminal->checkAndCreateFile("/home/"+userName+"/RLS_TI/Startup", "StartupRunnableService::readUserExecFile", false);
-    QString ecexs=m_terminal->getFileText(m_startupFile, "StartupManagerService::getAllEcexFromStartupFile", false);
-    QStringList execsList=ecexs.split('\n');
-    execsList.removeAll("");
-    return execsList;
+    if(m_listAlreadyRunningsApps.isEmpty())
+    {
+        killTimer(event->timerId());
+    }
+    else
+    {
+        QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList(Q_FUNC_INFO);
+        for (const QString &alreadyRunningApp:qAsConst(m_listAlreadyRunningsApps))
+        {
+            if(!listOfAlreadyRunningProcessName.contains(alreadyRunningApp))
+            {
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Программа на подписке упала."));
+                m_runnableProcess.append(CreateReRestartApp(alreadyRunningApp));
+            }
+        }
+    }
 }
 
-bool StartupRunnableService::isAllExecsValid(QStringList &execsList)
+QProcess *StartupRunnableManager::CreateReRestartApp(const QString &startup)
 {
-    for (QStringList::const_iterator it=execsList.cbegin(); it!=execsList.cend(); ++it)
+    QProcess *process=new QProcess();
+    process->setObjectName(m_rlsTiFolderPath+startup);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем процесс. Путь для исполняемого файла: " )+ process->objectName());
+    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+    process->start(m_rlsTiFolderPath+startup);
+    return process;
+}
+
+QStringList StartupRunnableManager::ReadUserStartupFile()
+{
+    QStringList startupsList;
+    const int userRole=m_sqlService->GetUserRole(m_currentUserName);
+    if (!(-1==userRole))
     {
-        if (!QFile::exists(*it))
-        {
-            emit noExecApplication(*it);
+        startupsList=m_sqlService->GetAllRoleStartups(userRole);
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получили список перезапускаемых приложений. Роль пользователя: ")+ QString::number(userRole));
+    }
+    return startupsList;
+}
+
+bool StartupRunnableManager::IsAllStartupValid(const QStringList &startupsList)
+{
+    for (const QString &startup:startupsList) {
+        if (!QFile::exists(m_rlsTiFolderPath+startup)) {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Отсутсвует файл:")+ startup);
+            Q_EMIT ToStartupApplicationNotExsists(m_rlsTiFolderPath+startup);
             return false;
         }
     }
     return true;
 }
 
-void StartupRunnableService::initProcessStruct(QStringList execsList)
+void StartupRunnableManager::InitStartupProcessList(const QStringList &startupsList)
 {
-    m_runnableProcess->resize(execsList.size());
-    if (m_runnableProcess->isEmpty())
+    if (startupsList.empty())
     {
-        return;
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Список программ для перезапуска пуст "));
     }
     else
     {
-        QVector<QProcess*>::iterator processIter=m_runnableProcess->begin();
-        for (QList<QString>::ConstIterator programPath=execsList.cbegin(); programPath!=execsList.cend(); ++programPath)
+        const QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList(Q_FUNC_INFO);
+        QStringList notRunnedApps;
+        GetRunnedProcessesAndProcecessesForListen(listOfAlreadyRunningProcessName, startupsList, m_listAlreadyRunningsApps, notRunnedApps);
+        for (const QString &startup : qAsConst(notRunnedApps))
         {
-            (*processIter)=new QProcess();
-            (*processIter)->setObjectName(*programPath);
-            connect(*processIter , QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableService::restartProcess);
-            if(!((*processIter)->state() == QProcess::Running))
-                (*processIter)->start(*programPath, QStringList());
+            m_runnableProcess.push_back(CreateReRestartApp(startup));
+        }
+        if(!m_listAlreadyRunningsApps.isEmpty())
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Есть программы с таким же именем, что были запущены до этой, контроль над ними будет осуществляться с помощью таймера. Их колличество : ")+ QString::number(m_listAlreadyRunningsApps.count()));
+            m_currentTimerId=QObject::startTimer(1000, Qt::VeryCoarseTimer);
         }
     }
 }
 
-void StartupRunnableService::restartProcess()
+void StartupRunnableManager::GetRunnedProcessesAndProcecessesForListen(const QStringList &listOfAllRunningProcessesName, const QStringList &currentUserStartupsList, QStringList &listAlreadyRunningsApps, QStringList &notRunnedAppsList)
 {
-    QProcess* process=static_cast<QProcess*>(sender());
-    process->start();
-    emit programFall();
+    for (const QString & startup :currentUserStartupsList)
+    {
+        if(listOfAllRunningProcessesName.contains(startup))
+        {
+            listAlreadyRunningsApps.push_back(startup);
+        }
+        else
+        {
+            notRunnedAppsList.push_back(startup);
+        }
+    }
 }
+

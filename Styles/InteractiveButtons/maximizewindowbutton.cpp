@@ -2,49 +2,40 @@
 
 MaximizeWindowButton::MaximizeWindowButton(QWidget *parent)
     : InteractiveButtonBase (parent)
-    , m_pen(new QPen(Qt::white))
-    , m_painter(new QPainter(this))
+    , m_pen(Qt::white)
+    , m_buttonSize(40, 40)
 {
-    initGeometry();
-    initDrawing();
+    InitGeometry();
 }
 
 MaximizeWindowButton::~MaximizeWindowButton()
 {
-    delete m_pen;
-    delete m_painter;
+
 }
 
 void MaximizeWindowButton::paintEvent(QPaintEvent *event)
 {
     InteractiveButtonBase::paintEvent(event);
+    QPainter painter(this);
+    painter.setPen(m_pen);
+    if (!isShowForeground)
+    {
+        return ;
+    }
+    const int w = _w, h = _h;
+    const int dx = offset_pos.x(), dy = offset_pos.y();
+    const QRect r(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
 
-    if (!show_foreground) return ; // 不显示前景
-
-    int w = _w, h = _h;
-    int dx = offset_pos.x(), dy = offset_pos.y();
-    QRect r;
-
-    r = QRect(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
-
-
-    m_painter->begin(this);
-    m_painter->drawRect(r);
-    m_painter->end();
+    painter.drawRect(r);
 }
 
 QSize MaximizeWindowButton::sizeHint() const
 {
-    return  QSize(40, 40);
+    return m_buttonSize;
 }
 
-void MaximizeWindowButton::initGeometry()
+void MaximizeWindowButton::InitGeometry()
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setUnifyGeomerey(true);
-}
-
-void MaximizeWindowButton::initDrawing()
-{
-    m_painter->setPen(*m_pen);
 }

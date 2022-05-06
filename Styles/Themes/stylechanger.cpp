@@ -1,41 +1,45 @@
 #include "stylechanger.h"
-
-#include <QWidget>
 #include <QDebug>
 
-StyleChanger::StyleChanger(QApplication *app)
-    : m_myApp(app)
+StyleChanger::StyleChanger()
+    :m_currentThemeName(ThemesNames::BlackTheme)
 {
-    m_darkTheme=new Theme(darkThemeColor, darkThemeDisabledColor);
-    m_astraTheme=new Theme(astraThemeColor, astraThemeDisabledColor);
-    m_darkTheme->ApplyTheme(app);
-    QFile styleSheetFile(":/Styles/Themes/style.qss");
-    if (styleSheetFile.open(QIODevice::ReadOnly| QIODevice::Text))
+    qApp->setStyle(QStringLiteral("Fusion"));
+    QFile styleSheetFile(QStringLiteral(":/Styles/Themes/style.qss"));
+    if (styleSheetFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        m_styleSheet=QString(styleSheetFile.readAll());
+        m_styleSheet = QString(styleSheetFile.readAll());
         styleSheetFile.close();
     }
     else
     {
-        qFatal("styleSheet не найден");
+        qFatal("Каскадная таблица стилей не найден");
     }
 }
 
 StyleChanger::~StyleChanger()
 {
-    delete m_darkTheme;
-    delete m_astraTheme;
+
 }
 
-void StyleChanger::changeTheme(bool state)
+void StyleChanger::OnChangeTheme(ThemesNames currentThemeName)
 {
-    if (state)
-    {
-        m_astraTheme->ApplyTheme(m_myApp);
+    FillPalette(currentThemeName);
+    qApp->setPalette(m_palette);
+    qApp->setStyleSheet(m_styleSheet);
+    m_currentThemeName=currentThemeName;
+    Q_EMIT ToUpdateViewColors();
+}
+
+void StyleChanger::FillPalette(ThemesNames themeName)
+{
+    const QPair<QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15>, QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5>> pair=themesList.value(themeName);
+    const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> colors=pair.first;
+    for (const QPair<QPalette::ColorRole, QColor> &roleAndColor : colors) {
+        m_palette.setColor(roleAndColor.first, roleAndColor.second);
     }
-    else
-    {
-        m_darkTheme->ApplyTheme(m_myApp);
+    const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> disabledColor=pair.second;
+    for (const QPair<QPalette::ColorRole, QColor> &roleAndColor : disabledColor) {
+        m_palette.setColor(QPalette::Disabled, roleAndColor.first, roleAndColor.second);
     }
-    m_myApp->setStyleSheet(m_styleSheet);
 }

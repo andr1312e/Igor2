@@ -29,7 +29,7 @@ void QToast::InitUI()
 {
     setWindowFlags(Qt::FramelessWindowHint|Qt::ToolTip);
     setAttribute(Qt::WA_TranslucentBackground);
-    m_drawFont.setPointSize(20);
+    m_drawFont.setPointSize(15);
     SetToastPos();
 }
 
@@ -78,7 +78,7 @@ void QToast::showEvent(QShowEvent*)
     }
 }
 
-void QToast::timerEvent(QTimerEvent* e)
+void QToast::timerEvent(QTimerEvent* event)
 {
     if(m_nStatus==0x01)
     {
@@ -118,8 +118,8 @@ void QToast::timerEvent(QTimerEvent* e)
     else if(m_nStatus==0x04)
     {
         m_nStatus=0x00;
-        emit signals_finished();
-        killTimer(e->timerId());
+        emit ToFininshed();
+        killTimer(event->timerId());
         if(m_bAutoDelete)
         {
             this->deleteLater();

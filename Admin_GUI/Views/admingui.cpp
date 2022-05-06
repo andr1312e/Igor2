@@ -1,138 +1,147 @@
 #include "admingui.h"
-#include <QDebug>
-#include <QGuiApplication>
-#include <QScreen>
 
-Admin_GUI::Admin_GUI(DatabaseService *databaseService, LinuxUserService *userService, QWidget *parent)
+Admin_GUI::Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QStringView currentAdminId, QStringView currentUserName, QWidget *parent)
     :  QWidget(parent)
-    ,  m_databaseService(databaseService)
+    ,  m_currentAdminId(currentAdminId)
+    ,  m_sqlDatabaseService(databaseService)
     ,  m_linuxUserService(userService)
 {
-    initUI();
-    setWidgetSizes();
-    insertWidgetsIntoLayout();
-    createConnections();
-    setMaximumWidgetSize();
+    CreateModel();
+    CreateServices();
+    CreateUI(currentUserName);
+    InsertWidgetsIntoLayout();
+    InitTopBar(currentUserName);
+    ConnectObjects();
+    SetMaximumWidgetSize();
 }
 
 Admin_GUI::~Admin_GUI()
 {
-    delete m_userModel;
+    delete m_userDesktopService;
+    delete m_roleDesktopService;
 
-    delete m_programLayout;
+    delete m_centerSideLayout;
+    delete m_leftSideLayout;
     delete m_mainLayout;
 
-    delete m_topBar;
-    delete m_linuxUsersListWidget;
-    delete m_settingsPanel;
-    delete m_additionalSettingsPanel;
+    delete m_leftTopBar;
+    delete m_usersListWidget;
+    delete m_userDesktopPanel;
+    delete m_userEditPanel;
+    delete m_roleEditPanel;
 }
 
-void Admin_GUI::initUI()
+void Admin_GUI::CreateModel()
 {
-    m_userModel=new UserModel(m_linuxUserService, m_databaseService, nullptr);
-
-    m_mainLayout=new QVBoxLayout();
-    m_programLayout=new QHBoxLayout();
-
-    initTopBar();
-
-    m_linuxUsersListWidget=new LinuxUsersListWidget(m_userModel, this);
-
-    m_settingsPanel=new SettingsPanel(m_linuxUserService->getCurrentUserName(), m_userModel, m_databaseService->getTerminal(), this);
-
-    m_additionalSettingsPanel=new AdditionalSettingsPanel(m_linuxUserService->getTerminal(), this);
+    m_userModel=new UserModel(m_sqlDatabaseService, m_linuxUserService);
 }
 
-void Admin_GUI::setWidgetSizes()
+void Admin_GUI::CreateServices()
 {
-    m_linuxUsersListWidget->setMaximumWidth(336);
-    m_settingsPanel->setMaximumWidth(450);
+    m_userDesktopService=new UserDesktopService(m_sqlDatabaseService);
+    m_roleDesktopService=new RoleDesktopService(m_sqlDatabaseService);
 }
 
-void Admin_GUI::insertWidgetsIntoLayout()
+void Admin_GUI::CreateUI(QStringView currentUserName)
 {
-    m_mainLayout->addWidget(m_topBar);
+    m_mainLayout = new QHBoxLayout();
 
-    m_programLayout->addWidget(m_linuxUsersListWidget);
-    m_programLayout->addWidget(m_settingsPanel);
-    m_programLayout->addWidget(m_additionalSettingsPanel);
+    m_leftSideLayout = new QVBoxLayout();
+    m_leftTopBar = new TopLeftBar(this);
+    m_usersListWidget = new LinuxUsersListWidget(m_userModel, this);
 
-    m_mainLayout->addLayout(m_programLayout);
+    m_centerSideLayout=new QVBoxLayout();
+    m_userDesktopPanel=new DesktopPanel(ICONS_PANEL_TYPE::USER_ICONS, m_userDesktopService, Q_NULLPTR, this);
+    m_userEditPanel = new UserEditPanel(currentUserName, this);
+
+    m_roleEditPanel = new RoleEditPanel(m_sqlDatabaseService, m_roleDesktopService, this);
+}
+
+void Admin_GUI::InsertWidgetsIntoLayout()
+{
+    m_leftSideLayout->addWidget(m_leftTopBar);
+    m_leftSideLayout->addWidget(m_usersListWidget);
+
+    m_centerSideLayout->addWidget(m_userDesktopPanel);
+    m_centerSideLayout->addWidget(m_userEditPanel);
+
+    m_mainLayout->addLayout(m_leftSideLayout);
+    m_mainLayout->addLayout(m_centerSideLayout);
+    m_mainLayout->addWidget(m_roleEditPanel);
+    m_mainLayout->setContentsMargins(4, 2, 4, 2);
     setLayout(m_mainLayout);
 }
 
-void Admin_GUI::createConnections()
+void Admin_GUI::ConnectObjects()
 {
-    connect(m_linuxUsersListWidget, &LinuxUsersListWidget::onUserClick, this, &Admin_GUI::onLinuxUserClick);
-    connect(m_settingsPanel, &SettingsPanel::setDefaultRoleApps, m_additionalSettingsPanel, &AdditionalSettingsPanel::setDefaultRoleApps);
-    connect(m_settingsPanel, &SettingsPanel::roleToViewChanged, this, &Admin_GUI::roleToViewChanged);
-    connect(m_topBar, &TopBar::hideAdditionalSettings, this, &Admin_GUI::hideAdditionalSettings);
-    connect(m_topBar, &TopBar::setTheme, this, &Admin_GUI::setTheme);
+    connect(m_usersListWidget, &LinuxUsersListWidget::ToUserClick, this, &Admin_GUI::OnUserClick);
+    connect(m_userEditPanel, &UserEditPanel::ToRoleToViewChanged, m_roleEditPanel, &RoleEditPanel::OnRoleToViewChanged);
+    connect(m_userEditPanel, &UserEditPanel::ToDeleteUser, this, &Admin_GUI::OnDeleteUser);
+    connect(m_userEditPanel, &UserEditPanel::ToSaveUser, this, &Admin_GUI::OnSaveUser);
+    connect(this, &Admin_GUI::ToSetDelegateView, m_usersListWidget, &LinuxUsersListWidget::ToSetDelegateView);
 }
 
-void Admin_GUI::setMaximumWidgetSize()
+void Admin_GUI::SetMaximumWidgetSize()
 {
-    m_currentScreen = QGuiApplication::screenAt(mapToGlobal({width()/2,0}));
-    m_maxWidth=m_currentScreen->availableSize().width();
-    m_maxHeight=m_currentScreen->availableSize().height()-30;
-    this->setMaximumWidth(m_maxWidth);
-    this->setMaximumHeight(m_maxHeight);
+    //    QScreen *m_currentScreen = QGuiApplication::screenAt(mapToGlobal({width() / 2, 0}));
+    //    m_maxWidth = m_currentScreen->availableSize().width();
+    //    m_maxHeight = m_currentScreen->availableSize().height() - 30;
+    //    this->setMaximumWidth(m_maxWidth);
+    //    this->setMaximumHeight(m_maxHeight);
 }
 
-void Admin_GUI::initTopBar()
+void Admin_GUI::InitTopBar(QStringView currentUserName)
 {
-    m_topBar=new TopBar(this);
-    QString currentUserLinuxUserName=m_linuxUserService->getCurrentUserName();
-    QString userFCS=m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "FCS");
-    QString userRank=m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "rank");
-    QString userRole=m_databaseService->getUserAttributeByLinuxUserNameToList(currentUserLinuxUserName, "role");
-    m_topBar->setData(userRank, userFCS, userRole);
-}
-
-void Admin_GUI::hideAdditionalSettings(bool state)
-{
-    QScreen* pScreen = QGuiApplication::screenAt(mapToGlobal({width()/2,0}));
-    if (m_currentScreen!=pScreen)
+    const int userRole = m_sqlDatabaseService->GetUserRole(currentUserName);
+    if(userRole!=-1)
     {
-        setMaximumWidgetSize();
+        const QString userFCS = m_sqlDatabaseService->GetUserFCS(currentUserName);
+        m_leftTopBar->SetData(userFCS, userRole);
     }
-    if (state)
-    {
-        m_additionalSettingsPanel->hide();
-        m_linuxUsersListWidget->setMaximumWidth(width()/2);
-        m_settingsPanel->setMaximumWidth(width()/2);
-        this->setMinimumSize(m_linuxUsersListWidget->minimumWidth()+m_settingsPanel->minimumWidth(), 600);
+}
+
+void Admin_GUI::OnHideAdditionalSettings(bool state)
+{
+    if (state) {
+        m_roleEditPanel->hide();
+    } else {
+        m_roleEditPanel->show();
     }
-    else
+}
+
+void Admin_GUI::OnUserClick(const User &user)
+{
+    m_userEditPanel->SetUser(user);
+    m_userDesktopPanel->SetUser(user);
+    if(user.role>0 && user.role<Roles.count())
     {
-        if(m_maxWidth>1713)
+        m_roleEditPanel->OnRoleToViewChanged(user.role);
+    }
+}
+
+void Admin_GUI::OnDeleteUser(const QString &userId, const QString &userName)
+{
+    const int roleId=m_userModel->GetRoleIdByUserId(userId);
+    m_userModel->DeleteUser(userId);
+    if(roleId>=0)
+    {
+         m_userDesktopService->DeleteAllIconsToUser(roleId, userName);
+    }
+    m_userDesktopService->GetAllUserDesktops(userName);
+}
+
+void Admin_GUI::OnSaveUser(const QString &userId, const QString &userName, const QString &FCS, int oldRole, int newRole)
+{
+    m_userModel->AddUserToModel(userId, userName, FCS, newRole);
+    m_roleEditPanel->OnRoleToViewChanged(newRole);
+    m_roleDesktopService->SetDefaultIconsToUserOnUserRoleUpdate(oldRole, newRole, userName);
+    if(userId==m_currentAdminId)
+    {
+        if(oldRole!=newRole)
         {
-            m_linuxUsersListWidget->setFixedWidth(350);
-            m_settingsPanel->setFixedWidth(450);
-            this->setMinimumSize(1700, 600);
+            Q_EMIT ToCurrentUserRoleChanged();
         }
-        else
-        {
-            m_linuxUsersListWidget->setFixedWidth(250);
-            m_settingsPanel->setFixedWidth(350);
-            this->setMinimumSize(500, 600);
-        }
-//        this->setFixedSize(this->size());
-        this->setMaximumSize(m_maxWidth, m_maxHeight);
-        m_additionalSettingsPanel->show();
-
+        m_leftTopBar->SetData(FCS, newRole);
     }
-}
-
-void Admin_GUI::roleToViewChanged(const QString &role)
-{
-    QStringList *users=m_userModel->getUsersNamesByRole(role);
-    m_additionalSettingsPanel->setRoleEditPanelData(role, users);
-}
-
-void Admin_GUI::onLinuxUserClick(User &user)
-{
-    m_settingsPanel->setUser(user);
-    m_additionalSettingsPanel->setUserFilesEditPanelData(user.name, user.role);
+    m_userDesktopService->GetAllUserDesktops(userName);
 }
