@@ -8,18 +8,17 @@
 class StartupPanelPresenter
 {
 public:
-
-    StartupPanelPresenter(ISqlDatabaseService *sqlDatabaseService);
+    explicit StartupPanelPresenter(ISqlDatabaseService *sqlDatabaseService);
     ~StartupPanelPresenter();
 
 public:
-    void CheckStartupTable(const int &roleId);
+    void CheckStartupTable(int roleId);
     QSqlQueryModel *GetRoleStartupsModel();
     int GetMaxStartupCount();
     bool HasDuplicateStartup(QStringView startupName);
-    void GetAllStartupsIntoModel(const int &roleId);
-    QString DeleteStartup(const int &roleId, const int &selectedItem);
-    void AppendStartup(const int &roleId, const QString &startupPath);
+    void GetAllStartupsIntoModel(int roleId);
+    QString DeleteStartup(int roleId, const QModelIndex &selectedItem);
+    void AppendStartup(int roleId, const QString &startupPath);
 
 private:
     QString TryToCopyFile(const QString &startupPath);

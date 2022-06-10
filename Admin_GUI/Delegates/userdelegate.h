@@ -4,15 +4,14 @@
 #include <QPainter>
 #include <QStyledItemDelegate>
 
-#include "Structs/userstruct.h"
+#include "Structs/user.h"
 
 class UserDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    UserDelegate(QFont &font, QObject *parent);
+    explicit UserDelegate(QFont &font, QObject *parent);
     ~UserDelegate();
-
 public:
     virtual void paint(QPainter *painter,
                        const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
@@ -20,18 +19,17 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const Q_DECL_OVERRIDE;
 private:
-    QRect * const m_globalRect;
-    QRect * const m_iconRect;
-    QRect * const m_userIdRect;
-    QRect *const m_userNameRect;
-    QRect *const m_userFCSRect;
-    QRect *const m_userRoleRect;
-    QPen *const m_textPen;
-    QPen *const m_titlePen;
-    QPen *const m_mouseOverPen;
-    QPen *const m_mouseSelectedPen;
-    const QFont m_font;
-    QSize *const  m_size;
+    QRect *m_globalRect;
+    QRect *m_iconRect;
+    QRect *m_userIdRect;
+    QRect *m_userNameRect;
+    QRect *m_userFCSRect;
+    QRect *m_userRoleRect;
+    QPen *m_textPen;
+    QPen *m_titlePen;
+    QPen *m_mouseOverPen;
+    QPen *m_mouseSelectedPen;
+    QFont m_font;
 };
 
 #endif // ADMIN_GUI_DELEGATES_USERDELEGATE_H

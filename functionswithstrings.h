@@ -2,7 +2,7 @@
 #define FUNCTIONSWITHSTRINGS_H
 
 #include <QString>
-#include <QVarLengthArray>
+#include <array>
 #include <QStringList>
 
 class FunctionsWithStrings

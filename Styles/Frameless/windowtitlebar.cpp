@@ -15,12 +15,11 @@ void WindowTitleBar::mousePressEvent(QMouseEvent *event) {
     m_isMousePressed = true;
     m_mousePosition = event->globalPos();
 
-    QWidget *topWidget = parentWidget();
+    QWidget * topWidget = parentWidget();
     if (topWidget)
     {
         topWidget = topWidget->parentWidget();
     }
-
     if (topWidget)
     {
         m_windowPosition = topWidget->pos();

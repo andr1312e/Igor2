@@ -2,24 +2,25 @@
 #define TABLECOLUMNSNAMES_H
 #include <QString>
 
-const QString userIdCN = "userid";
+namespace CN
+{
 
-const QString userNameCN = "username";
+static const QString userId(QStringLiteral("userid"));
 
-const QString fcsCN = "fcs";
+static const QString userName(QStringLiteral("username"));
 
-const QString rankCN = "rank";
+static const QString fcs(QStringLiteral("fcs"));
 
-const QString roleCN = "role";
+static const QString role(QStringLiteral("role"));
 
-const QString startupPathCN = "startuppath";
+static const QString startupPath(QStringLiteral("startuppath"));
 
-const QString desktopNameCN = "desktopname";
+static const QString desktopName(QStringLiteral("desktopname"));
 
-const QString desktopTypeCN = "desktoptype";
+static const QString execPath(QStringLiteral("execpath"));
 
-const QString execPathCN ="execpath";
+static const QString iconPath(QStringLiteral("iconpath"));
 
-const QString iconPathCN= "iconpath";
+}
 
 #endif // TABLECOLUMNSNAMES_H

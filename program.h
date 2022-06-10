@@ -6,12 +6,12 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QInputDialog>
-#include <QSharedMemory>
+#include <QFontDatabase>
 
-#include "Logging/logger.h"
-#include "Logging/hierarchy.h"
-
+#include "Services/singleinstancemaker.h"
 #include "Services/Sql/sqldatabaseserivce.h"
+#include "Services/Sql/sqlproblemsfixer.h"
+
 #include "Services/Terminals/terminal.h"
 #include "Services/startuprunnableservice.h"
 
@@ -19,69 +19,66 @@
 
 #include "Tray/tray.h"
 #include "Admin_GUI/Views/admingui.h"
-#include "Admin_GUI/Wizard/Views/startupwizard.h"
+#include "Admin_GUI/RestoreWizard/Views/startupwizard.h"
 
 #include "Styles/Frameless/framelesswindow.h"
 #include "Styles/Themes/stylechanger.h"
 
 class Program : public QApplication
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   explicit Program(int &argc, char **argv);
-   ~Program();
-   bool HasNoRunningInscance();
-   void CreateAndRunApp();
+    explicit Program(int &argc, char **argv);
+    ~Program();
+    bool HasNoRunningInstance();
+    DbConnectionState CreateAndRunApp();
 
 private:
-   void CreateBasicServicesAndTray();
-   void ConnectToDatabase();
-   void GetCurrentUserNameIdAndAdminPriviliges();
+    void GetCurrentUserNameIdAndAdminPriviliges();
 
-   LoadingState GetProgramState();
+    LoadingStates GetLoadingStates();
 
-   void ProcessDataLoading(const LoadingState &state);
-   void InitStyleChanger();
-   void InitFramelessWindow();
-   void StartSettingsWizard(const LoadingState &state);
+    void ContinueDataLoading(LoadingStates states);
+    ThemesNames GetThemeNameFromSettings() const;
+    void InitStyleChanger(ThemesNames themeName);
+    void InitFramelessWindow(ThemesNames themeName);
+    void StartSettingsWizard(LoadingStates states);
 
 private:
-   void UserLoading();
-   void ShutDownRootLogger();
+    void UserLoading();
 
 private Q_SLOTS:
-   void OnFullLoading();
+    void OnFullLoading();
 
 public:
-   bool AllAppsRunnedWell();
-   void GetAllUsersWithIdInSystem();
-   void InitRarmSocket();
-   void InitAdminUI();
-   void ConnectUserObjects();
-   void ConnectAdminObjects();
+    bool AllAppsRunnedWell();
+    void CollectAllUsersWithIdInSystem();
+    void InitRarmSocket();
+    void InitAdminUI();
+    void ConnectUserObjects();
+    void ConnectAdminObjects();
 
 private:
-   bool CanGetAdminAccess();
+    bool CanGetAdminAccess();
 private:
+    const QString m_rlstiFolder;
+    Terminal *const m_terminal;
+    LinuxUserService *const m_linuxUserService;
+    const QString m_currentUserName;
+    const QString m_currentUserId;
+    SqlDatabaseSerivce *const m_sqlDatabaseService;
 
-   const QString m_rlstiFolder;
-   QSharedMemory* const m_sharedMemory;
-   Terminal* const m_terminal;
-   LinuxUserService* m_linuxUserService;
-   QString m_currentUserName;
-   QString m_currentUserId;
+    SingleInstanceMaker *m_singleInstance;
 
-   SqlDatabaseSerivce* m_sqlDatabaseService;
-   StartupRunnableManager* m_startupRunnableService;
+    StartupRunnableManager *m_startupRunnableService;
 
-   Tray* m_tray;
+    Tray *const m_tray;
 
-   StartupWizard *m_startupWizard;
-   SocketToRarm *m_socketToRarm;
-   Admin_GUI *m_AdminGui;
-   FramelessWindow *m_framelessWindow;
+    StartupWizard *m_startupWizard;
+    SocketToRarm *m_socketToRarm;
+    Admin_GUI *m_AdminGui;
+    FramelessWindow *m_framelessWindow;
 
-   StyleChanger *m_styleChanger;
-   QSettings m_settings;
+    StyleChanger *m_styleChanger;
 };
 #endif // PROGRAM_H

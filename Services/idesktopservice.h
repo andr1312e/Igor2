@@ -1,20 +1,21 @@
-#ifndef IDESKTOPSERVICE_H
-#define IDESKTOPSERVICE_H
-class QStandardItemModel;
+#ifndef SERVICES_DESKTOPSERVICE_H
+#define SERVICES_DESKTOPSERVICE_H
 
+#include <QDir>
+#include <QStandardItemModel>
 #include <QString>
 
 #include "Services/Terminals/terminal.h"
 #include "Services/Sql/isqlservice.h"
 
-class DesktopService {
+class DesktopService
+{
 protected:
-    DesktopService(ISqlDatabaseService *sqlDatabaseService);
+    explicit DesktopService(ISqlDatabaseService *sqlDatabaseService);
     ~DesktopService();
 
 public:
-    QStandardItemModel *GetModel();
-    Terminal *GetTerminal();
+    QStandardItemModel *GetModel() const;
 
 protected:
     DesktopEntity MoveFilesToProgramFolder(const DesktopEntity &entity);
@@ -26,32 +27,28 @@ private:
     QString CopyExecFile(const QString &pathToDesktopExec);
     QString CopyIconFile(const QString &pathToDesktopIcon);
 
-    void CreateIcon(const QString &userDesktopPath, const QString &iconName);
+    void CreateEntity(const QString &userDesktopPath, const QString &iconName);
     const QString CreateIconData(const DesktopEntity &entity) const;
     void WriteIconDataToFile(const QString &userDesktopPath,
                              const QString &iconName, const QString &userName);
 protected:
     const QString GetUserDesktopPath(const QString &userName) const;
 
-    QString GetFullAstraDefaultIconImagePath(QStringView iconName);
+    QString GetFullAstraDefaultIconImagePath(QStringView iconName) const;
     void UpdateModel(const QList<DesktopEntity> &listOfDesktopEntities);
 protected:
     Terminal *const m_terminal;
     ISqlDatabaseService *const m_sqlDatabaseService;
 
-    QList<DesktopEntity> m_filesList;
     QStandardItemModel *const m_fileModel;
 
-    const QString m_destinationFolder="/usr/RLS_TI/";
-
-    QString m_path;
-
-    const QString m_desktopName = "/Desktop/";
-    const QString m_homeFolderPathName = "/home/";
-    const QString m_iconType = ".desktop";
-    const QString m_astraIconPath="/usr/share/icons/fly-astra-flat/192x192/";
-    const QString m_defaulIconPath="apps/utilities-terminal.png";
-    const QString m_fileIconPath="/usr/share/icons/hicolor/128x128/apps/ark.png";
+    const QString m_destinationFolder;
+    const QString m_desktopName;
+    const QString m_homeFolderPathName;
+    const QString m_iconType;
+    const QString m_astraIconPath;
+    const QString m_defaulIconPath = "apps/utilities-terminal.png";
+    const QString m_fileIconPath = "/usr/share/icons/hicolor/128x128/apps/ark.png";
 };
 
-#endif // IDESKTOPSERVICE_H
+#endif // SERVICES_DESKTOPSERVICE_H

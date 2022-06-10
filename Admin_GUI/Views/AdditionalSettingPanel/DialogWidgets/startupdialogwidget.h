@@ -9,7 +9,6 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QMessageBox>
-
 #include <QWidget>
 
 #include "Logging/logger.h"

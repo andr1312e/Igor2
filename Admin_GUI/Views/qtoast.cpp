@@ -78,7 +78,7 @@ void QToast::showEvent(QShowEvent*)
     }
 }
 
-void QToast::timerEvent(QTimerEvent* e)
+void QToast::timerEvent(QTimerEvent* event)
 {
     if(m_nStatus==0x01)
     {
@@ -119,7 +119,7 @@ void QToast::timerEvent(QTimerEvent* e)
     {
         m_nStatus=0x00;
         emit ToFininshed();
-        killTimer(e->timerId());
+        killTimer(event->timerId());
         if(m_bAutoDelete)
         {
             this->deleteLater();

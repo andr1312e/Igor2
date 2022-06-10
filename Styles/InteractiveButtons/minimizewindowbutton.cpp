@@ -1,32 +1,30 @@
 #include "minimizewindowbutton.h"
 
 MinimizeWindowButton::MinimizeWindowButton(QWidget* parent)
-    : InteractiveButtonBase(parent)
-    , m_pen(new QPen(Qt::white))
+    : InteractiveButton(parent)
     , m_left(new QPoint())
     , m_right(new QPoint())
     , m_mid(new QPoint())
-    , m_buttonSize(new QSize(40, 40))
+    , m_buttonSize(40, 40)
 {
     InitGeometry();
+    InitDrawing();
 }
 
 MinimizeWindowButton::~MinimizeWindowButton()
 {
-    delete m_pen;
     delete m_left;
     delete m_mid;
     delete m_right;
-    delete m_buttonSize;
 }
 
 void MinimizeWindowButton::paintEvent(QPaintEvent* event)
 {
-    if (m_isShowForeground)
+    if (isShowForeground)
     {
-        InteractiveButtonBase::paintEvent(event);
+        InteractiveButton::paintEvent(event);
         QPainter *m_painter=new QPainter(this);
-        m_painter->setPen(*m_pen);
+        m_painter->setPen(m_pen);
         int w = _w, h = _h;
         m_left->setX(_l+w/3);
         m_left->setY(_t+h/2);
@@ -44,7 +42,7 @@ void MinimizeWindowButton::paintEvent(QPaintEvent* event)
         {
             m_painter->setRenderHint(QPainter::Antialiasing,true);
         }
-        //        m_painter->begin(this);
+//        m_painter->begin(this);
         m_painter->drawPath(path);
         m_painter->end();
     }
@@ -56,11 +54,16 @@ void MinimizeWindowButton::paintEvent(QPaintEvent* event)
 
 QSize MinimizeWindowButton::sizeHint() const
 {
-    return  *m_buttonSize;
+    return  m_buttonSize;
 }
 
 void MinimizeWindowButton::InitGeometry()
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setUnifyGeomerey(true);
+}
+
+void MinimizeWindowButton::InitDrawing()
+{
+    m_pen=QPen(Qt::white);
 }

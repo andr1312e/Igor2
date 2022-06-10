@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QResizeEvent>
 
-#include "Structs/userstruct.h"
+#include "Structs/user.h"
 
 class TopLeftBar : public QWidget
 {
@@ -22,7 +22,7 @@ private:
     void InitUI();
 
 public:
-    void SetData(const QString &rank, const QString &FCS, const int &role);
+    void SetData(const QString &FCS, int role);
 
 protected:
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
@@ -30,6 +30,7 @@ protected:
 private:
     bool IsNeedToUpdateFontSize(int width);
     void UpdateFontSize();
+    void ChangeWidgetLayout();
 
 private:
     QFont m_titleFont;

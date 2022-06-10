@@ -3,11 +3,11 @@
 
 #include "interactivebuttonbase.h"
 #include <QPainterPath>
-class MinimizeWindowButton : public InteractiveButtonBase
+class MinimizeWindowButton : public InteractiveButton
 {
     Q_OBJECT
 public:
-    MinimizeWindowButton(QWidget* parent);
+    explicit MinimizeWindowButton(QWidget* parent);
     ~MinimizeWindowButton();
 
 private:
@@ -16,13 +16,14 @@ private:
 
 private:
     void InitGeometry();
+    void InitDrawing();
 
 private:
-    const QPen * const m_pen;
-    QPoint * const m_left;
-    QPoint * const m_right;
-    QPoint * const m_mid;
-    const QSize * const m_buttonSize;
+    QPen m_pen;
+    QPoint *m_left;
+    QPoint *m_right;
+    QPoint *m_mid;
+    QSize m_buttonSize;
 
 };
 

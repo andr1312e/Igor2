@@ -81,7 +81,7 @@ public:
     virtual bool requiresLayout() const = 0;
     virtual void setLayout(const LayoutSharedPtr &layout) = 0;
     virtual void setName(const QString &name) = 0;
-
+    virtual void activateOptions() = 0;
     virtual void addFilter(const FilterSharedPtr &filter) = 0;
     virtual void clearFilters() = 0;
     virtual void close() = 0;

@@ -67,7 +67,7 @@ void DesktopUploadDialogWidget::InsertWidgetsIntoLayout()
 
     m_mainLayout->addLayout(m_dialogWidgetButtonsLayout);
 
-    QWidget::setLayout(m_mainLayout);
+    setLayout(m_mainLayout);
 }
 
 void DesktopUploadDialogWidget::FillUI()
@@ -124,26 +124,38 @@ void DesktopUploadDialogWidget::OnAddIconPath()
 
 void DesktopUploadDialogWidget::OnAddIconToUserDesktop()
 {
-    if (m_exec->text().isEmpty()) {
+    if (m_exec->text().isEmpty())
+    {
         m_messagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Путь к исполняемому файлу\". Данное поле обязательно"));
         m_messagBox->exec();
-    } else {
-        if (m_iconName->text().isEmpty()) {
+    }
+    else
+    {
+        if (m_iconName->text().isEmpty())
+        {
             m_messagBox->setText(QStringLiteral("Вы не ввели текст в поле \"Название на рабочем столе\". Данное поле обязательно"));
             m_messagBox->exec();
-        } else {
-            if (FunctionsWithStrings::StringContainsBadCharecters(m_iconName->text())) {
+        }
+        else
+        {
+            if (FunctionsWithStrings::StringContainsBadCharecters(m_iconName->text()))
+            {
                 m_messagBox->setText(QStringLiteral("Текст в поле \"Название на рабочем столе\" не может содержать символы \\ / ` : & * ? \" \' < > | () : ;"));
                 m_messagBox->exec();
-            } else {
-                if (QFile::exists(m_exec->text())) {
-                    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+            }
+            else
+            {
+                if (QFile::exists(m_exec->text()))
+                {
+                    if (Log4Qt::Logger::rootLogger()->HasAppenders())
                     {
-                        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили ярлыка файл: ") + m_exec->text() + QStringLiteral(" имя файла: ") + m_iconName->text()+ QStringLiteral(" иконка файла: ") + m_iconPath->text());
+                        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили ярлыка файл: ") + m_exec->text() + QStringLiteral(" имя файла: ") + m_iconName->text() + QStringLiteral(" иконка файла: ") + m_iconPath->text());
                     }
                     Q_EMIT ToAddFileToUserDesktop(m_exec->text(), m_iconPath->text(), m_iconName->text());
                     OnHideDialog();
-                } else {
+                }
+                else
+                {
                     m_messagBox->setText(QStringLiteral("Вы ввели путь к файлу, которого не существует, попробуйте воспользоваться кнопкой \"Выбрать файл\" справа от поля \"Путь к исполняемому файлу\""));
                     m_messagBox->exec();
                 }

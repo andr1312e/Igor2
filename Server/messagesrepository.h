@@ -1,16 +1,16 @@
 #ifndef SERVER_MESSAGESREPOSITORY_H
 #define SERVER_MESSAGESREPOSITORY_H
-#include <list>
+#include <QLinkedList>
 
 #include "Server/DataMessage.h"
 
 class MessagesRepository
 {
 public:
-    MessagesRepository();
+    explicit MessagesRepository();
     ~MessagesRepository();
 private:
-    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
+    const quint8 m_messageIdSize = (quint8)(sizeof(quint8));
 public:
     const quint8 m_trackSettingMessageId = MESSAGES_ID::RMO_VOI_TRACK_SETTING_MESSAGE;
     const quint8 m_trackSettingsMesageSize = m_messageIdSize + sizeof(RMOTrackSetting);
@@ -19,7 +19,7 @@ public:
     const quint16 m_trackSettingsDeleteSize = m_messageIdSize + sizeof(DeleteTrackMessage);
     void DeleteTrack(const int myAimID);//106 Сообщение об удалении трассы от вторички
     void ClearAllTraks();
-    const QList<RMOTrackSetting> &GetTrackList();
+    const QLinkedList<RMOTrackSetting> &GetTrackList();
 
 public:
     const quint16 m_targetPositionMessageSize = m_messageIdSize + sizeof(RMOTargetPositionMessage);
@@ -29,7 +29,7 @@ public:
     const quint16 m_targetPositionDeleteSize = sizeof(RMOTargetDeleteMessage);
     void DeleteTargetPosition(quint8 id);//4 Удаление ЦУ
     void ClearAllTargetPositions();
-    const QList<RMOTargetPositionMessage> &GetAllTargetPositionsList();
+    const QLinkedList<RMOTargetPositionMessage> &GetAllTargetPositionsList();
 
 public:
     const quint16 m_driveToPositionMessageSize = m_messageIdSize + sizeof(RMODriveToPositionMessage);
@@ -44,17 +44,17 @@ public:
 
     void EditBioDefenceSectorList(RMOBioDefenceSectorMessage newSettings);//9 Сообщение с сектором биологической защиты
     void ClearAllBioDefence();
-    const QList<RMOBioDefenceSectorMessage> &GetRMOBioDefenceSectorList();
+    const QLinkedList<RMOBioDefenceSectorMessage> &GetRMOBioDefenceSectorList();
 
 public:
     const quint16 m_rarmSystemControlSize = m_messageIdSize + sizeof(RARMSysControlMessage);
     const quint16 m_deleteMessageSize = m_messageIdSize + sizeof (RMOForgetAllDataMessage);
     void ClearAllArrays();
 private:
-    QList<RMOTrackSetting> m_trackSettingList;
-    QList<RMOTargetPositionMessage> m_targetPositionsList;
+    QLinkedList<RMOTrackSetting> m_trackSettingList;
+    QLinkedList<RMOTargetPositionMessage> m_targetPositionsList;
     RMODriveToPositionMessage m_driveToPositionMessage;
-    QList<RMOBioDefenceSectorMessage> m_defenceSectorMessageList;
+    QLinkedList<RMOBioDefenceSectorMessage> m_defenceSectorMessageList;
 
 };
 

@@ -4,12 +4,14 @@
 Program::Program(int &argc, char **argv)
     : QApplication(argc, argv)
     , m_rlstiFolder(QStringLiteral("/usr/RLS_TI/"))
-    , m_sharedMemory(new QSharedMemory(QStringLiteral("PROCESS_CONTROLLER"), this))
     , m_terminal(Terminal::GetTerminal())
-    , m_linuxUserService(Q_NULLPTR)
-    , m_sqlDatabaseService(Q_NULLPTR)
-    , m_startupRunnableService(Q_NULLPTR)
-    , m_tray(Q_NULLPTR)
+    , m_linuxUserService(new LinuxUserService())
+    , m_currentUserName(m_linuxUserService->GetCurrentUserName())
+    , m_currentUserId(m_linuxUserService->GetCurrentUserId())
+    , m_sqlDatabaseService(new SqlDatabaseSerivce(this))
+    , m_singleInstance(Q_NULLPTR)
+    , m_startupRunnableService(new StartupRunnableManager(m_currentUserName, m_rlstiFolder, m_sqlDatabaseService, this))
+    , m_tray(new Tray(this))
     , m_startupWizard(Q_NULLPTR)
     , m_socketToRarm(Q_NULLPTR)
     , m_AdminGui(Q_NULLPTR)
@@ -21,251 +23,233 @@ Program::Program(int &argc, char **argv)
 
 Program::~Program()
 {
-    m_sharedMemory->detach();
-    delete m_sharedMemory;
+    delete m_singleInstance;
     delete m_terminal;
     delete m_linuxUserService;
     delete m_sqlDatabaseService;
     delete m_startupRunnableService;
     delete m_tray;
-    if(Q_NULLPTR!=m_startupWizard)
+    if (Q_NULLPTR != m_startupWizard)
     {
         delete m_startupWizard;
     }
-    if(Q_NULLPTR!=m_socketToRarm)
+    if (Q_NULLPTR != m_AdminGui)
+    {
+        delete m_AdminGui;
+        delete m_styleChanger;
+        delete m_framelessWindow;
+    }
+    if (Q_NULLPTR != m_socketToRarm)
     {
         delete m_socketToRarm;
     }
-    if(Q_NULLPTR!=m_AdminGui)
-    {
-        delete m_AdminGui;
-        delete m_framelessWindow;
-        delete m_styleChanger;
-    }
-    ShutDownRootLogger();
 }
 
-bool Program::HasNoRunningInscance()
+/**
+ * log Проверяем на наличие копии программы в зависимости от аргументов командной строки
+ * Если последний аргумент restart то запуск программы разрешается, и происходит присоединение к уже живому процессу
+ * Если такого аргумента нет то запуск считается единичным и происходит проверка в спец классе
+ */
+
+bool Program::HasNoRunningInstance()
 {
-    if (m_sharedMemory->attach(QSharedMemory::ReadOnly)) {
-        m_sharedMemory->detach();
-        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    Log4QtInfo(QStringLiteral("Аргументы командной строки приложения: ") + arguments().join(','));
+    m_singleInstance = new SingleInstanceMaker(applicationName());
+    if (QStringLiteral("restart") == arguments().constLast())
+    {
+        m_singleInstance->ConnectToExsistsApp();
+        return true;
+    }
+    else
+    {
+        //Копий не было
+        if (m_singleInstance->TryToExecute())
         {
-            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы запущен "));
-        }
-        return false;
-    } else {
-        if (m_sharedMemory->create(1, QSharedMemory::ReadWrite)) {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Экземпляров программы не запущено "));
-            }
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы НЕ запущен "));
             return true;
-        } else {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->warn(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы запущен ") + m_sharedMemory->errorString());
-            }
+        }
+        else
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы запущен "));
             return false;
         }
     }
 }
 
-void Program::CreateAndRunApp()//MAIN
-{
-    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Начало создания программы"));
-    CreateBasicServicesAndTray();
-    GetAllUsersWithIdInSystem();
-    ConnectToDatabase();
-    const LoadingState state=GetProgramState();
-    ProcessDataLoading(state);
-}
+/**
+ * log Главная точка программы
+ * Получаем список пользователей и подключаемся к бд
+ * Если бд не установлена или драйверов нет, или лог пасс не тот - фиксим и возращается что надо перезапуститься
+ * Иначе проверям таблицы,и значения готовности state кладем в ProcessDataLoading
+ * @return состояние подключения
+ */
 
-void Program::CreateBasicServicesAndTray()
+DbConnectionState Program::CreateAndRunApp()//MAIN
 {
-    m_linuxUserService=new LinuxUserService();
-    m_currentUserName=m_linuxUserService->GetCurrentUserName();
-    m_currentUserId=m_linuxUserService->GetCurrentUserId();
-    m_sqlDatabaseService=new SqlDatabaseSerivce(this);
-    m_startupRunnableService=new StartupRunnableManager(m_currentUserName, m_rlstiFolder, m_sqlDatabaseService, this);
-    m_tray=new Tray(this);
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Начало создания программы"));
+    CollectAllUsersWithIdInSystem();
+    const DbConnectionState connectionState = m_sqlDatabaseService->ConnectToDataBase();
+    if (DbConnectionState::Connected == connectionState)
     {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создали базовые сервисы и иконку трея. "));
+        const LoadingStates states = GetLoadingStates();
+        ContinueDataLoading(states);
     }
+    else
+    {
+        if (DbConnectionState::NeedRestart == connectionState)
+        {
+            QStringList appArguments = qApp->arguments();
+            if (!appArguments.isEmpty() && QLatin1Literal("restart") == appArguments.constLast())
+            {
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаемся еще раз, что то не то с логикой программы "));
+                return DbConnectionState::FailedConnection;
+            }
+            else
+            {
+                appArguments.append(QLatin1Literal("restart"));
+                QProcess::startDetached(qApp->arguments().front(), appArguments);
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу "));
+            }
+        }
+    }
+    return connectionState;
 }
-
-void Program::GetAllUsersWithIdInSystem()
+/**
+ * Получить у UserService всех пользователей в системе, без системных
+ */
+void Program::CollectAllUsersWithIdInSystem()
 {
     m_linuxUserService->GetAllUsersWithIdInSystem();
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Получили список пользователей в системе "));
-    }
 }
 
-void Program::ConnectToDatabase()
+LoadingStates Program::GetLoadingStates()
 {
-    if (!m_sqlDatabaseService->ConnectToDataBase(QStringLiteral("localhost"), 5432, QStringLiteral("postgres"), QStringLiteral("postgres"), QStringLiteral("user1234")))
-    {
-        if(Log4Qt::Logger::rootLogger()->HasAppenders())
-        {
-            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд: "));
-        }
-        QMessageBox::warning(Q_NULLPTR, QStringLiteral("Подключите базу данных postgres"), QStringLiteral("Подключение к бд не удалось"));
-        this->exit(-1);
-    }
-}
-
-LoadingState Program::GetProgramState()
-{
+    LoadingStates states;
     if (m_sqlDatabaseService->CheckUsersTable())
     {
-        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы пользователей существует"));
+        if (m_sqlDatabaseService->CheckDesktopTables() && m_sqlDatabaseService->CheckStartupTables())
         {
-            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Таблицы пользователей существует"));
-        }
-        if(m_sqlDatabaseService->CheckDesktopTables() && m_sqlDatabaseService->CheckStartupTables())
-        {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей существуют"));
-            }
-            return LoadingState::Fine;
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей существуют"));
+            states = LoadingState::Fine;
         }
         else
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
-            }
-            return LoadingState::NoRoleData;
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
+            states = LoadingState::NoRoleData;
         }
     }
     else
     {
-        if(Log4Qt::Logger::rootLogger()->HasAppenders())
+        if (m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
         {
-            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Таблицы пользователей отсутсвуют"));
-        }
-        if(m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
-        {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO+ QStringLiteral(" Таблицы ролей существуют"));
-            }
-            return LoadingState::NoUserDb;
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей существуют"));
+            states = LoadingState::NoUserDb;
         }
         else
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
-            }
-            return LoadingState::NoFiles;
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
+            states = LoadingState::NoFiles;
         }
     }
-    qFatal("%s", QString("%1 Нереализованное поведение ").arg(Q_FUNC_INFO).toUtf8().constData());
+    if (QStringLiteral("--reset") == qApp->arguments().constLast())
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Вызвано принудительное восстановление..."));
+        states = states  | LoadingState::ForceReset;
+    }
+    return  states;
 }
 
-void Program::ProcessDataLoading(const LoadingState &state)
+void Program::ContinueDataLoading(LoadingStates states)
 {
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Продолжаем загрузку..."));
+    switch (states)
     {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Продолжаем загрузку..."));
-    }
-    switch (state) {
-    case NoFiles:
-    case NoUserDb:
-    case NoRoleData: {
-        if(CanGetAdminAccess())
+    case LoadingState::NoUserDb | LoadingState::ForceReset:
+    case LoadingState::NoRoleData| LoadingState::ForceReset:
+    case LoadingState::NoFiles| LoadingState::ForceReset:
+    case LoadingState::Fine| LoadingState::ForceReset:
+    case LoadingState::NoUserDb :
+    case LoadingState::NoRoleData:
+    case LoadingState::NoFiles:
+    {
+        if (CanGetAdminAccess())
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, но данные не полные, запускаем мастер настройки..."));
-            }
-            InitFramelessWindow();
-            InitStyleChanger();
-            StartSettingsWizard(state);
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, но данные не полные, запускаем мастер настройки..."));
+            const ThemesNames currentThemeName = GetThemeNameFromSettings();
+            InitFramelessWindow(currentThemeName);
+            InitStyleChanger(currentThemeName);
+            StartSettingsWizard(states);
         }
         else
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Права разработчика недоступны и данные не полные, дальнейшая работа невозможна... "));
-            }
-            QMessageBox::critical(Q_NULLPTR, "Приложение не может запуститься", "Права разработчика недоступны, запустите программу от имени администратора и повторите попытку...", QMessageBox::Ok);
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика недоступны и данные не полные, дальнейшая работа невозможна... "));
+            QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запуститься"), QStringLiteral("Права разработчика недоступны, запустите программу от имени администратора и повторите попытку..."), QMessageBox::Ok);
+            quit();
         }
         break;
     }
-
-    case Fine: {
-        if(CanGetAdminAccess())
+    case LoadingState::Fine:
+    {
+        if (CanGetAdminAccess())
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, имеются все данные, запускаем программу администрирования..."));
-            }
-            InitFramelessWindow();
-            InitStyleChanger();
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, имеются все данные, запускаем программу администрирования..."));
+            const ThemesNames currentThemeName = GetThemeNameFromSettings();
+            InitFramelessWindow(currentThemeName);
+            InitStyleChanger(currentThemeName);
             OnFullLoading();
         }
         else
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
-            {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Права разработчика не доступны, но имеются все данные, запускаем программу контроля программ..."));
-            }
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика не доступны, но имеются все данные, запускаем программу контроля программ..."));
             UserLoading();
         }
         break;
     }
-    default:{
-        qFatal("%s", QString("%1 Нереализованное поведение...").arg(Q_FUNC_INFO).toUtf8().constData());
-    }
-    }
-}
-
-void Program::InitFramelessWindow()
-{
-    m_framelessWindow = new FramelessWindow(Q_NULLPTR);
-    installEventFilter(m_framelessWindow);
-    this->setWindowIcon(QIcon(":/images/0.jpg"));
-    m_framelessWindow->setObjectName(QStringLiteral("FramelessWindowObject"));
-    m_framelessWindow->show();
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
+    default:
     {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создали безрамочное окно "));
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Невозможно обработать ошибку так как обработчик не написан")).toUtf8().constData());
+    }
     }
 }
 
-void Program::InitStyleChanger()
+ThemesNames Program::GetThemeNameFromSettings() const
 {
-    this->setStyle(QStringLiteral("Fusion"));
-    m_styleChanger = new StyleChanger(true, this);
-    m_styleChanger->OnChangeTheme(1);//получать тему из сеттингов
+
+    const QSettings settings(organizationName(), applicationName());
+    const ThemesNames themeName = qvariant_cast<ThemesNames>(settings.value(QLatin1Literal("theme")));
+    return themeName;
+}
+
+void Program::InitFramelessWindow(ThemesNames themeName)
+{
+    m_framelessWindow = new FramelessWindow(themeName, Q_NULLPTR);
+    setWindowIcon(QIcon(QLatin1Literal(":/images/programIcon.png")));
+    m_framelessWindow->setObjectName(QLatin1Literal("FramelessWindowObject"));//QSS
+    m_framelessWindow->OnSetWindowTitle(QStringLiteral("Мастер первоначальной настройки"));
+    m_framelessWindow->show();
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали безрамочное окно "));
+}
+
+void Program::InitStyleChanger(ThemesNames themeName)
+{
+    m_styleChanger = new StyleChanger();
+    m_styleChanger->OnChangeTheme(themeName);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
     connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
-    Q_EMIT m_tray->ToUpdateViewColors();
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создали обьект изменения тем "));
-    }
+    Q_EMIT m_tray->ToUpdateViewColors(themeName);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали обьект изменения тем "));
 }
 
-void Program::StartSettingsWizard(const LoadingState &state)
+void Program::StartSettingsWizard(LoadingStates states)
 {
-    m_startupWizard = new StartupWizard(m_currentUserName, m_currentUserId, QCoreApplication::applicationName(), m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, Q_NULLPTR);
-    connect(m_startupWizard, &StartupWizard::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
+    m_startupWizard = new StartupWizard(applicationDirPath(), applicationName(), m_rlstiFolder, states, m_linuxUserService, m_sqlDatabaseService, m_styleChanger->GetThemeName(), Q_NULLPTR);
     connect(m_startupWizard, &QWizard::accepted, this, &Program::OnFullLoading);
     connect(m_startupWizard, &QWizard::rejected, this, &QApplication::quit);
-    m_framelessWindow->OnSetWindowTitle(QStringLiteral("Мастер первоначальной настройки"));
+    connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_startupWizard, &StartupWizard::OnChangeTheme);
     m_framelessWindow->SetMainWidget(m_startupWizard);
     m_framelessWindow->repaint();
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создали мастера первоначальной настройки "));
-    }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали мастера первоначальной настройки "));
 }
 
 void Program::UserLoading()
@@ -277,24 +261,13 @@ void Program::UserLoading()
     }
     else
     {
-        QMessageBox::critical(Q_NULLPTR, "Приложение не может запустить подпрограмму", "При наличии прав администратора измените парметры роли для пользователя: "+ m_currentUserName, QMessageBox::Ok);
+        QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запустить подпрограмму"), QStringLiteral("При наличии прав администратора измените парметры роли для пользователя: ") + m_currentUserName, QMessageBox::Ok);
     }
-}
-
-void Program::ShutDownRootLogger()
-{
-    Log4Qt::Logger* rootLogger = Log4Qt::Logger::rootLogger();
-    rootLogger->info((QStringLiteral("Логи программы управления пользователями. Конец записи из деструктора: ") + QDateTime::currentDateTime().toString(Qt::ISODate)));
-    rootLogger->removeAllAppenders();
-    rootLogger->loggerRepository()->shutdown();
 }
 
 void Program::OnFullLoading()
 {
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Запускаем админскую часть "));
-    }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запускаем админскую часть "));
     UserLoading();
     InitAdminUI();
     ConnectAdminObjects();
@@ -302,32 +275,24 @@ void Program::OnFullLoading()
 
 bool Program::AllAppsRunnedWell()
 {
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Проверяем все ли программы возможно запустить"));
-    }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Проверяем все ли программы возможно запустить"));
     return m_startupRunnableService->OnRunStartupRunnableManager();
 }
 
 void Program::InitRarmSocket()
 {
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создаем сокет к рарму "));
-    }
-    m_socketToRarm = new SocketToRarm(QStringLiteral("127.0.0.1"), 4242, this);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем сокет к рарму "));
+    m_socketToRarm = new SocketToRarm(QLatin1Literal("127.0.0.1"), 4242, this);
 }
 
 void Program::InitAdminUI()
 {
     m_AdminGui = new Admin_GUI(m_sqlDatabaseService, m_linuxUserService, m_currentUserId, m_currentUserName, Q_NULLPTR);
-    m_framelessWindow->OnSetWindowTitle("Панель управления пользователями и модулями РЛС ТИ");
+    m_framelessWindow->OnSetWindowTitle(QStringLiteral("Панель управления пользователями и модулями РЛС ТИ"));
     m_framelessWindow->SetMainWidget(m_AdminGui);
     m_framelessWindow->show();
-    if(Log4Qt::Logger::rootLogger()->HasAppenders())
-    {
-        Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Создали админ вью "));
-    }
+
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали админ вью "));
 }
 
 void Program::ConnectUserObjects()
@@ -336,6 +301,7 @@ void Program::ConnectUserObjects()
     connect(m_tray, &Tray::ToShowApp, m_framelessWindow, &FramelessWindow::show);
     connect(m_tray, &Tray::ToHideApp, m_framelessWindow, &QWidget::hide);
     connect(m_startupRunnableService, &StartupRunnableManager::ToProgramFall, m_socketToRarm, &SocketToRarm::OnProgramFall);
+    connect(m_socketToRarm, &SocketToRarm::ToSendWeather, m_tray, &Tray::OnSendWeather);
     connect(m_tray, &Tray::ToPauseUserControl, m_startupRunnableService, &StartupRunnableManager::OnPauseStartupRunnableManager);
     connect(m_tray, &Tray::ToStopUserControl, m_startupRunnableService, &StartupRunnableManager::OnStopStartupRunnableManager);
     connect(m_tray, &Tray::ToRestartUserControl, m_startupRunnableService, &StartupRunnableManager::OnRestartStartupRunnableManager);
@@ -344,27 +310,19 @@ void Program::ConnectUserObjects()
 
 void Program::ConnectAdminObjects()
 {
-    connect(m_framelessWindow, &FramelessWindow::ToSetDelegateView, m_AdminGui, &Admin_GUI::ToSetDelegateView);
-    connect(m_framelessWindow, &FramelessWindow::ToHideAdditionalSettings, m_AdminGui, &Admin_GUI::OnHideAdditionalSettings);
+    connect(m_tray, &Tray::ToDropDatabase, m_sqlDatabaseService, &SqlDatabaseSerivce::OnDropDatabase);
+    connect(m_tray, &Tray::ToDropDatabase, this, &QApplication::quit, Qt::QueuedConnection);
     connect(m_AdminGui, &Admin_GUI::ToCurrentUserRoleChanged, m_startupRunnableService, &StartupRunnableManager::OnCurrentUserRoleChanged);
 }
 
 bool Program::CanGetAdminAccess()
 {
-    if (m_linuxUserService->HasUserAdminPrivileges(m_currentUserName))
+    if (m_linuxUserService->HasCurrentUserAdminPrivileges())
     {
         if (m_sqlDatabaseService->CheckUsersTable())
         {
-            const QStringList adminsUserName=m_sqlDatabaseService->GetAdminsRoleUserName();
-            if(adminsUserName.empty())
-            {
-                return  true;
-            }
-            else
-            {
-                //            return adminsUserName.contains(m_currentUserName);
-                return  true;
-            }
+            const QStringList adminsUserName = m_sqlDatabaseService->GetAdminsRoleUserName();
+            return  true;
         }
         else
         {

@@ -1,44 +1,52 @@
 #include "stylechanger.h"
+#include <QDebug>
 
-StyleChanger::StyleChanger(bool isBlacked, QApplication *app)
-    : m_myApp(app)
-    , m_darkTheme(new Theme(darkThemeColor, darkThemeDisabledColor))
-    , m_whiteTheme(new Theme(astraThemeColor, astraThemeDisabledColor))
+StyleChanger::StyleChanger()
+    : m_currentThemeName(ThemesNames::BlackTheme)
 {
-    if(isBlacked)
+    qApp->setStyle(QLatin1Literal("Fusion"));
+    QFile styleSheetFile(QLatin1Literal(":/Styles/Themes/style.qss"));
+    if (styleSheetFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        m_darkTheme->ApplyTheme(app);
+        m_styleSheet = QString(styleSheetFile.readAll());
+        styleSheetFile.close();
     }
     else
     {
-        m_whiteTheme->ApplyTheme(app);
-    }
-    QFile styleSheetFile(QStringLiteral(":/Styles/Themes/style.qss"));
-
-    if (styleSheetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        m_styleSheet = styleSheetFile.readAll();
-        styleSheetFile.close();
-    } else {
-        const QByteArray errorMessage=QByteArray(Q_FUNC_INFO)+QByteArray("Каскадная таблица стилей не найдена");
-        qFatal("%s", errorMessage.constData());
+        qFatal("Каскадная таблица стилей не найден");
     }
 }
 
 StyleChanger::~StyleChanger()
 {
-    delete m_darkTheme;
-    delete m_whiteTheme;
+
 }
 
-void StyleChanger::OnChangeTheme(bool isDarkTheme)
+void StyleChanger::OnChangeTheme(ThemesNames currentThemeName)
 {
-    if (isDarkTheme) {
-        m_darkTheme->ApplyTheme(m_myApp);
-    } else {
-        m_whiteTheme->ApplyTheme(m_myApp);
+    FillPalette(currentThemeName);
+    qApp->setPalette(m_palette);
+    qApp->setStyleSheet(m_styleSheet);
+    m_currentThemeName = currentThemeName;
+    Q_EMIT ToUpdateViewColors(currentThemeName);
+}
+
+ThemesNames StyleChanger::GetThemeName() const noexcept
+{
+    return m_currentThemeName;
+}
+
+void StyleChanger::FillPalette(ThemesNames themeName) noexcept
+{
+    const QPair<QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15>, QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5>> pair = themesList.value(themeName);
+    const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> colors = pair.first;
+    for (const QPair<QPalette::ColorRole, QColor> &roleAndColor : colors)
+    {
+        m_palette.setColor(roleAndColor.first, roleAndColor.second);
     }
-    const QString newTheme=isDarkTheme ? QStringLiteral(" Черную ") : QStringLiteral("Белую");
-    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Изменили тему на ") + newTheme);
-    m_myApp->setStyleSheet(m_styleSheet);
-    Q_EMIT ToUpdateViewColors();
+    const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> disabledColor = pair.second;
+    for (const QPair<QPalette::ColorRole, QColor> &roleAndColor : disabledColor)
+    {
+        m_palette.setColor(QPalette::Disabled, roleAndColor.first, roleAndColor.second);
+    }
 }

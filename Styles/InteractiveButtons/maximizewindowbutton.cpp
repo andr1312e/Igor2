@@ -1,38 +1,37 @@
 #include "Styles/InteractiveButtons/maximizewindowbutton.h"
 
 MaximizeWindowButton::MaximizeWindowButton(QWidget *parent)
-    : InteractiveButtonBase (parent)
-    , m_pen(new QPen(Qt::white))
+    : InteractiveButton (parent)
+    , m_pen(Qt::white)
+    , m_buttonSize(40, 40)
 {
     InitGeometry();
 }
 
 MaximizeWindowButton::~MaximizeWindowButton()
 {
-    delete m_pen;
+
 }
 
 void MaximizeWindowButton::paintEvent(QPaintEvent *event)
 {
-    InteractiveButtonBase::paintEvent(event);
+    InteractiveButton::paintEvent(event);
     QPainter painter(this);
-    painter.setPen(*m_pen);
-    if (!m_isShowForeground)
+    painter.setPen(m_pen);
+    if (!isShowForeground)
     {
         return ;
     }
-    int w = _w, h = _h;
-    int dx = offset_pos.x(), dy = offset_pos.y();
-    QRect r;
-
-    r = QRect(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
+    const int w = _w, h = _h;
+    const int dx = offset_pos.x(), dy = offset_pos.y();
+    const QRect r(_l+w/3+dx, _t+h/3+dy, w/3, h/3);
 
     painter.drawRect(r);
 }
 
 QSize MaximizeWindowButton::sizeHint() const
 {
-    return  QSize(40, 40);
+    return m_buttonSize;
 }
 
 void MaximizeWindowButton::InitGeometry()

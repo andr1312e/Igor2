@@ -1,6 +1,7 @@
 #include "functionswithstrings.h"
 
-static const QVarLengthArray<QChar, 16> badCharecterList = {
+static const std::array<char, 16> badCharecters =
+{
     '\\',
     '/',
     '`',
@@ -18,30 +19,34 @@ static const QVarLengthArray<QChar, 16> badCharecterList = {
     ';',
     '\'',
 };
-
+/**
+ * Проверка на наличие плохих символов для консоли
+ */
 bool FunctionsWithStrings::StringContainsBadCharecters(const QString &fileName)
 {
-    for (const QChar &charecter:badCharecterList)
+    for (const char charecter : badCharecters)
     {
-        for(const QChar &fileNameCharecter: fileName)
+        if (fileName.contains(charecter))
         {
-            if (charecter==fileNameCharecter)
-            {
-                return true;
-            }
+            return true;
         }
     }
     return false;
 }
-
-QStringList FunctionsWithStrings::GetListofSubFoldersFromPath(const QString &path,const char* calledFunc)
+/**
+ * Парсим путь папки на лист из имен папок
+ */
+QStringList FunctionsWithStrings::GetListofSubFoldersFromPath(const QString &path, const char *calledFunc)
 {
-    QStringList listofSubFoldersToPath = path.split(QChar('/'));
-    listofSubFoldersToPath.removeAll("");
+    QStringList listofSubFoldersToPath = path.split('/');
+    listofSubFoldersToPath.removeAll(QString());
 
-    if (listofSubFoldersToPath.isEmpty()) {
-        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Работа невозможна метод: ") + calledFunc + QStringLiteral(" выдал пустой путь ") + path ).toUtf8().constData());
-    } else {
+    if (listofSubFoldersToPath.isEmpty())
+    {
+        qFatal("Работа невозможна метод: %s выдал пуcтой путь. Путь %s", calledFunc, path.toUtf8().constData());
+    }
+    else
+    {
         return listofSubFoldersToPath;
     }
 }

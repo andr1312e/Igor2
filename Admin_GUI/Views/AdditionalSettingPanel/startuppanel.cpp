@@ -2,8 +2,7 @@
 
 StartupPanel::StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent)
     : QWidget(parent)
-    , m_currentRoleId(0)
-    , m_selectedItemIndex(-1)
+    , m_currentRoleId(-1)
 {
     CreateServices(sqlDatabaseService);
     CreateUI();
@@ -41,24 +40,17 @@ void StartupPanel::CreateUI()
     m_titleLabel=new QLabel(QStringLiteral("Список процессов которые будут перезапущены:"));
 
     m_allProgramsListView=new QListView();
-    m_allProgramsListView->setModel(m_startupRepositoryPresenter->GetRoleStartupsModel());
-    m_allProgramsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     m_bottomLayout=new QHBoxLayout();
     m_addProgramButton=new QPushButton(QStringLiteral("Добавить программу"));
-    m_addProgramButton->setEnabled(false);
-    m_deleteProgramButton=new QPushButton(QStringLiteral("Удалить выбранную программу"));
-    m_deleteProgramButton->setEnabled(false);
+
+    m_deleteProgramButton=new QPushButton(QStringLiteral("Удалить программу"));
 
     m_dialog=new QtMaterialDialog(this);
-
-    m_dialog->setParent(this);
 
     m_dialogWidget = new StartupDialogWidget(this);
 
     m_dialogLayout = new QVBoxLayout();
-
-    m_dialogWidget->setMaximumHeight(200);
 }
 
 void StartupPanel::SetBackGroundColor()
@@ -82,16 +74,25 @@ void StartupPanel::InsertWidgetsIntoLayout()
     m_bottomLayout->addWidget(m_deleteProgramButton);
 
     m_mainLayout->addLayout(m_bottomLayout);
-
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(m_mainLayout);
 
     m_dialog->setWindowLayout(m_dialogLayout);
     m_dialogLayout->addWidget(m_dialogWidget);
 }
 
+void StartupPanel::FillUI()
+{
+    m_allProgramsListView->setModel(m_startupRepositoryPresenter->GetRoleStartupsModel());
+    m_allProgramsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_addProgramButton->setEnabled(false);
+    m_deleteProgramButton->setEnabled(false);
+    m_dialogWidget->setMaximumHeight(200);
+}
+
 void StartupPanel::ConnectObjects()
 {
-    connect(m_allProgramsListView, &QListView::clicked, this, &StartupPanel::OnProgramSelect);
+    connect(m_allProgramsListView, &QListView::clicked, this, &StartupPanel::OnClicked);
     connect(m_addProgramButton, &QPushButton::clicked, m_dialog, &QtMaterialDialog::OnShowDialog);
     connect(m_deleteProgramButton, &QPushButton::clicked, this, &StartupPanel::OnDeleteProgram);
     connect(m_dialogWidget, &StartupDialogWidget::ToHideDialog, m_dialog, &QtMaterialDialog::OnHideDialog);
@@ -100,14 +101,13 @@ void StartupPanel::ConnectObjects()
 
 void StartupPanel::OnDeleteProgram()
 {
-    if (m_selectedItemIndex>-1 && m_selectedItemIndex<m_startupRepositoryPresenter->GetMaxStartupCount())
+    const QModelIndex index=m_allProgramsListView->currentIndex();
+    if(index.isValid())
     {
-        if(Log4Qt::Logger::rootLogger()->HasAppenders())
-        {
-            Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Хотим удалить программу роль :") + QString::number(m_currentRoleId) + QStringLiteral(" индекс :") + QString::number(m_selectedItemIndex) );
-        }
+        const int row=index.row();
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Хотим удалить программу роль :") + QString::number(m_currentRoleId) + QStringLiteral(" индекс :") + QString::number(row) );
         m_deleteProgramButton->setDisabled(true);
-        const QString currentStartupNameToDelete=m_startupRepositoryPresenter->DeleteStartup(m_currentRoleId, m_selectedItemIndex);
+        const QString currentStartupNameToDelete=m_startupRepositoryPresenter->DeleteStartup(m_currentRoleId, index);
         QToast*  const pToast=QToast::CreateToast(QStringLiteral("Программа ")  + currentStartupNameToDelete + QStringLiteral(" удалена"),QToast::LENGTH_LONG, this);
         pToast->show();
         m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_currentRoleId);
@@ -132,21 +132,21 @@ void StartupPanel::OnAddProgram(const QString &startupPath)
     }
 }
 
-void StartupPanel::OnProgramSelect(const QModelIndex &index)
+void StartupPanel::OnClicked()
 {
-    m_selectedItemIndex=index.row();
     m_deleteProgramButton->setEnabled(true);
 }
 
-void StartupPanel::SetRoleId(const int &roleId)
+void StartupPanel::SetRoleId(int roleId)
 {
     m_currentRoleId=roleId;
     m_startupRepositoryPresenter->CheckStartupTable(roleId);
     m_addProgramButton->setEnabled(true);
-    GetAllStartupsIntoModel();
+    m_deleteProgramButton->setDisabled(true);
+    GetAllStartups();
 }
 
-void StartupPanel::GetAllStartupsIntoModel()
+void StartupPanel::GetAllStartups()
 {
     m_startupRepositoryPresenter->GetAllStartupsIntoModel(m_currentRoleId);
 }

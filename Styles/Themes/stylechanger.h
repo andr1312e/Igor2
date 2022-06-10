@@ -6,31 +6,28 @@
 #include <QPalette>
 #include <QPair>
 
-#include "Logging/logger.h"
-
 #include "Styles/Themes/themecolors.h"
-#include "Styles/Themes/theme.h"
 
 class StyleChanger: public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   StyleChanger(bool isBlacked, QApplication *app);
-   ~StyleChanger();
+    StyleChanger();
+    ~StyleChanger();
 
 Q_SIGNALS:
-   void ToUpdateViewColors();
+    void ToUpdateViewColors(ThemesNames themeName);
 
 public Q_SLOTS:
-   void OnChangeTheme(bool isDarkTheme);
-
+    void OnChangeTheme(ThemesNames currentThemeName);
+public:
+    ThemesNames GetThemeName() const noexcept;
 private:
-   QApplication* const m_myApp;
-   const Theme* const m_darkTheme;
-   const Theme* const m_whiteTheme;
-
-   QByteArray m_styleSheet;
-
+    void FillPalette(ThemesNames themeName) noexcept;
+private:
+    QPalette m_palette;
+    QString m_styleSheet;
+    ThemesNames m_currentThemeName;
 };
 
 #endif // STYLES_THEMES_STYLECHANGER_H

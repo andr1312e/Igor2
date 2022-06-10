@@ -1,10 +1,10 @@
 #include "closewindowbutton.h"
 
 CloseWindowButton::CloseWindowButton(QWidget *parent)
-    : InteractiveButtonBase (parent)
+    : InteractiveButton (parent)
     , m_radius(0)
-    , m_pen(new QPen(Qt::white))
-    , m_buttonSize(new QSize(40, 40))
+    , m_pen(Qt::white)
+    , m_buttonSize(40, 40)
 {
     InitGeometry();
     setUnifyGeomerey(true);
@@ -13,21 +13,20 @@ CloseWindowButton::CloseWindowButton(QWidget *parent)
 
 CloseWindowButton::~CloseWindowButton()
 {
-    delete m_pen;
-    delete m_buttonSize;
+
 }
 
 void CloseWindowButton::paintEvent(QPaintEvent *event)
 {
-    InteractiveButtonBase::paintEvent(event);
+    InteractiveButton::paintEvent(event);
 
-    if (!m_isShowForeground)
+    if (!isShowForeground)
     {
         return ;
     }
     QPainter painter(this);
-    painter.setPen(*m_pen);
-    int w = _w, h = _h;
+    painter.setPen(m_pen);
+    const int w = _w, h = _h;
     int l = _l+w/3, t = _t+h/3, r = w*2/3, b = h*2/3;
     int mx = _l+w/2+offset_pos.x(), my = _t+h/2+offset_pos.y();
 
@@ -50,7 +49,7 @@ void CloseWindowButton::paintEvent(QPaintEvent *event)
     }
 }
 
-void CloseWindowButton::SetTopRightRadius(int radius)
+void CloseWindowButton::setTopRightRadius(int radius)
 {
     m_radius = radius;
 }
@@ -59,9 +58,9 @@ QPainterPath CloseWindowButton::GetBackGroundPainterPath()
 {
     if (!m_radius)
     {
-        return InteractiveButtonBase::GetBackGroundPainterPath();
+        return InteractiveButton::GetBackGroundPainterPath();
     }
-    QPainterPath path = InteractiveButtonBase::GetBackGroundPainterPath();
+    QPainterPath path = InteractiveButton::GetBackGroundPainterPath();
     QPainterPath roundPath;
     roundPath.addEllipse(width() - m_radius - m_radius, 0, m_radius*2, m_radius*2);
     QPainterPath cornerPath;
@@ -71,14 +70,14 @@ QPainterPath CloseWindowButton::GetBackGroundPainterPath()
     return path;
 }
 
-QPainterPath CloseWindowButton::GetWaterPainterPath(Water water)
+QPainterPath CloseWindowButton::getWaterPainterPath(Water water)
 {
-    return InteractiveButtonBase::GetWaterPainterPath(water) & CloseWindowButton::GetBackGroundPainterPath();
+    return InteractiveButton::getWaterPainterPath(water) & CloseWindowButton::GetBackGroundPainterPath();
 }
 
 QSize CloseWindowButton::sizeHint() const
 {
-    return *m_buttonSize;
+    return m_buttonSize;
 }
 
 void CloseWindowButton::InitGeometry()

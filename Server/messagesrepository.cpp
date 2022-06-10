@@ -15,10 +15,17 @@ void MessagesRepository::AppendTrack(RMOTrackSetting newSettings)
 
 void MessagesRepository::DeleteTrack(const int myAimID)
 {
-    for (QList<RMOTrackSetting>::iterator it = m_trackSettingList.end(); it != m_trackSettingList.begin();) {
-        --it;
-        if (it->aimID == myAimID) {
+    QLinkedList<RMOTrackSetting>::iterator it = std::begin(m_trackSettingList);
+
+    while (it != std::end(m_trackSettingList))
+    {
+        if (myAimID == it->aimID)
+        {
             m_trackSettingList.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -28,7 +35,7 @@ void MessagesRepository::ClearAllTraks()
     m_trackSettingList.clear();
 }
 
-const QList<RMOTrackSetting> &MessagesRepository::GetTrackList()
+const QLinkedList<RMOTrackSetting> &MessagesRepository::GetTrackList()
 {
     return m_trackSettingList;
 }
@@ -64,8 +71,8 @@ void MessagesRepository::AppendTargetPosition(RMOTargetPositionMessage newPositi
                 message.answer[8] = newPositionMessage.answer[8];
                 message.answer[9] = newPositionMessage.answer[9];
                 message.look_priority = newPositionMessage.look_priority;
+                return;
             }
-            return;
         }
     } else {
         m_targetPositionsList.push_back(newPositionMessage);
@@ -74,10 +81,17 @@ void MessagesRepository::AppendTargetPosition(RMOTargetPositionMessage newPositi
 
 void MessagesRepository::DeleteTargetPosition(quint8 id)
 {
-    for (QList<RMOTargetPositionMessage>::iterator it = m_targetPositionsList.end(); it != m_targetPositionsList.begin();) {
-        --it;
-        if (it->id == id) {
+    QLinkedList<RMOTargetPositionMessage>::iterator it = std::begin(m_targetPositionsList);
+
+    while (it != std::end(m_targetPositionsList))
+    {
+        if (id == it->id)
+        {
             m_targetPositionsList.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -87,7 +101,7 @@ void MessagesRepository::ClearAllTargetPositions()
     m_targetPositionsList.clear();
 }
 
-const QList<RMOTargetPositionMessage> &MessagesRepository::GetAllTargetPositionsList()
+const QLinkedList<RMOTargetPositionMessage> &MessagesRepository::GetAllTargetPositionsList()
 {
     return m_targetPositionsList;
 }
@@ -107,21 +121,20 @@ const RMODriveToPositionMessage &MessagesRepository::GetRMODriveToPositionMessag
 
 void MessagesRepository::EditBioDefenceSectorList(RMOBioDefenceSectorMessage newSettings)
 {
-    if (newSettings.method == 1) { //удаление
-        for (QList<RMOBioDefenceSectorMessage>::iterator it = m_defenceSectorMessageList.end(); it != m_defenceSectorMessageList.begin(); ) {
-            --it;
-            m_defenceSectorMessageList.erase(it);
-            return;
-        }
-    } else { //добавление или изменение
-        for (RMOBioDefenceSectorMessage &message: m_defenceSectorMessageList) {
+    if (1 == newSettings.method)
+    { //удаление
+        m_defenceSectorMessageList.clear();
+    }
+    else
+    { //добавление или изменение
+        for (RMOBioDefenceSectorMessage &message: m_defenceSectorMessageList)
+        {
             if (message.id == newSettings.id) {
                 message.azimuth[0] = newSettings.azimuth[0];
                 message.azimuth[1] = newSettings.azimuth[1];
                 return;
             }
         }
-
         m_defenceSectorMessageList.push_back(newSettings);
     }
 }
@@ -131,7 +144,7 @@ void MessagesRepository::ClearAllBioDefence()
     m_defenceSectorMessageList.clear();
 }
 
-const QList<RMOBioDefenceSectorMessage> &MessagesRepository::GetRMOBioDefenceSectorList()
+const QLinkedList<RMOBioDefenceSectorMessage> &MessagesRepository::GetRMOBioDefenceSectorList()
 {
     return m_defenceSectorMessageList;
 }

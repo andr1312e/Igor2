@@ -11,13 +11,12 @@
 #include <QPushButton>
 
 #include "Services/startuppanelpresenter.h"
+#include "Services/Sql/isqlservice.h"
 
 #include "Admin_GUI/Views/qtoast.h"
 
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/startupdialogwidget.h"
-
-class ISqlDatabaseService;
 
 class StartupPanel : public QWidget
 {
@@ -32,45 +31,34 @@ private:
    void SetBackGroundColor();
    void CreateUI();
    void InsertWidgetsIntoLayout();
+   void FillUI();
    void ConnectObjects();
-
-Q_SIGNALS:
-   void ToRoleStartupChanges(const quint8 &roleId);
 
 private Q_SLOTS:
    void OnDeleteProgram();
    void OnAddProgram(const QString &startupPath);
-   void OnProgramSelect(const QModelIndex &index);
+   void OnClicked();
 
 public:
-   void SetRoleId(const int &roleId);
+   void SetRoleId(int roleId);
 
 private:
-   void GetAllStartupsIntoModel();
+   void GetAllStartups();
 
 private:
    int m_currentRoleId;
-   int m_selectedItemIndex;
    StartupPanelPresenter *m_startupRepositoryPresenter;
 
 private:
-
    QVBoxLayout *m_mainLayout;
 
    QLabel *m_titleLabel;
-
    QListView *m_allProgramsListView;
-
    QHBoxLayout *m_bottomLayout;
-
    QPushButton *m_addProgramButton;
-
    QPushButton *m_deleteProgramButton;
-
    QtMaterialDialog *m_dialog;
-
    QVBoxLayout *m_dialogLayout;
-
    StartupDialogWidget *m_dialogWidget;
 };
 

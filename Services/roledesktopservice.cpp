@@ -17,22 +17,22 @@ RoleDesktopService::~RoleDesktopService()
 
 }
 
-void RoleDesktopService::CheckRoleDesktopTable(const quint8 &roleId)
+void RoleDesktopService::CheckRoleDesktopTable(int roleId)
 {
     m_sqlDatabaseService->CreateDesktopRolesIfNotExists(roleId);
 }
 
-void RoleDesktopService::GetAllRoleDesktops(const quint8 &roleId)
+void RoleDesktopService::GetAllRoleDesktops(int roleId)
 {
-    const QList<DesktopEntity> listOfDesktops= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
+    const QList<DesktopEntity> listOfDesktops = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     UpdateModel(listOfDesktops);
 }
 
-void RoleDesktopService::AddIconToRole(const quint8 &roleId, const DesktopEntity &entity)
+void RoleDesktopService::AddIconToRole(int roleId, const DesktopEntity &entity)
 {
-    const QStringList userWithThisRoleId=m_sqlDatabaseService->GetAllUsersWithRoleId(roleId);
-    const DesktopEntity newEntity=MoveFilesToProgramFolder(entity);
-    for (const QString &userName: userWithThisRoleId)
+    const QStringList userWithThisRoleId = m_sqlDatabaseService->GetAllUsersWithRoleIndex(roleId);
+    const DesktopEntity newEntity(MoveFilesToProgramFolder(entity));
+    for (const QString &userName : userWithThisRoleId)
     {
         const QString userDesktopPath = GetUserDesktopPath(userName);
         CreateIconWithData(userDesktopPath, newEntity);
@@ -41,10 +41,10 @@ void RoleDesktopService::AddIconToRole(const quint8 &roleId, const DesktopEntity
     GetAllRoleDesktops(roleId);
 }
 
-void RoleDesktopService::DeleteIconToRole(const quint8 &roleId, const QString iconName)
+void RoleDesktopService::DeleteIconToRole(int roleId, const QString &iconName)
 {
-    const QStringList userWithThisRoleId=m_sqlDatabaseService->GetAllUsersWithRoleId(roleId);
-    for (const QString &userName: userWithThisRoleId)
+    const QStringList userWithThisRoleId = m_sqlDatabaseService->GetAllUsersWithRoleIndex(roleId);
+    for (const QString &userName : userWithThisRoleId)
     {
         const QString userDesktopPath = GetUserDesktopPath(userName);
         CheckPath(userDesktopPath);
@@ -54,30 +54,30 @@ void RoleDesktopService::DeleteIconToRole(const quint8 &roleId, const QString ic
     GetAllRoleDesktops(roleId);
 }
 
-void RoleDesktopService::SetDefaultIconsToUserOnUserRoleUpdate(const quint8 &oldRoleId, const quint8 &newRoleId, const QString &currentUserName)
+void RoleDesktopService::SetDefaultIconsToUserOnUserRoleUpdate(int oldRoleId, int newRoleId, const QString &currentUserName)
 {
     const QString userDesktopPath = GetUserDesktopPath(currentUserName);
     CheckPath(userDesktopPath);
-    if(oldRoleId>=0 && oldRoleId<Roles.count())
+    if (User::RoleIsValid(oldRoleId))
     {
         DeleteOldIconsFromUser(oldRoleId, userDesktopPath);
     }
     SetIconsToUser(newRoleId, userDesktopPath);
 }
 
-void RoleDesktopService::DeleteOldIconsFromUser(const quint8 &roleId, const QString &userDesktopPath)
+void RoleDesktopService::DeleteOldIconsFromUser(int roleId, const QString &userDesktopPath)
 {
-    const QList<DesktopEntity> listOfDesktopsToDelete= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
-    for (const DesktopEntity &entityToDelete: listOfDesktopsToDelete)
+    const QList<DesktopEntity> listOfDesktopsToDelete = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
+    for (const DesktopEntity &entityToDelete : listOfDesktopsToDelete)
     {
-        DeleteIcon(userDesktopPath, entityToDelete.name);
+        DeleteIcon(userDesktopPath, entityToDelete.GetName());
     }
 }
 
-void RoleDesktopService::SetIconsToUser(const quint8 &roleId, const QString &userDesktopPath)
+void RoleDesktopService::SetIconsToUser(int roleId, const QString &userDesktopPath)
 {
-    const QList<DesktopEntity> listOfDesktops= m_sqlDatabaseService->GetAllRoleDesktops(roleId);
-    for (const DesktopEntity &entity: listOfDesktops)
+    const QList<DesktopEntity> listOfDesktops = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
+    for (const DesktopEntity &entity : listOfDesktops)
     {
         CreateIconWithData(userDesktopPath, entity);
     }

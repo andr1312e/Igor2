@@ -27,21 +27,13 @@ StartupDialogWidget::~StartupDialogWidget()
 void StartupDialogWidget::CreateUI()
 {
     m_mainLayout= new QVBoxLayout;
-
     m_titleLabel=new QLabel();
-
-
     m_execPathLayout=new QHBoxLayout();
-
     m_execTextField=new QtMaterialTextField();
-
     m_execButton=new QPushButton();
-
     m_bottomButtonsLayout=new QHBoxLayout();
     m_saveDialogButton = new QPushButton();
-
     m_closeDialogButton = new QPushButton();
-
     m_errorMessagBox=new QMessageBox();
 }
 
@@ -98,7 +90,7 @@ void StartupDialogWidget::OnHideAndClearDialog()
 
 void StartupDialogWidget::OnAddEcexPath()
 {
-    const QString loadPath = QFileDialog::getOpenFileName(this, QStringLiteral("Выберите исполняемый файл"), m_desktopPath);
+    QString loadPath = QFileDialog::getOpenFileName(this, "Выберите исполняемый файл", m_desktopPath);
     m_execTextField->setText(loadPath);
 }
 

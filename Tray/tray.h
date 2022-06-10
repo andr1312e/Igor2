@@ -1,5 +1,5 @@
-#ifndef TRAY_H
-#define TRAY_H
+#ifndef TRAY_TRAY_H
+#define TRAY_TRAY_H
 
 #include <QObject>
 #include <QAction>
@@ -8,6 +8,10 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include "Styles/Themes/stylechanger.h"
+#include "Logging/logger.h"
+#include "Logging/logmanager.h"
+#include "Server/DataMessage.h"
 #include "Tray/traymenu.h"
 
 class Tray : public QObject
@@ -20,27 +24,32 @@ private:
     void InitActions();
     void CreateUI();
     void InitUIAndInsertWidgetIntoLayouts();
+    void FillObjects();
+    void StartTimer();
     void ConnectObjects();
 Q_SIGNALS:
     void ToHideApp();
     void ToShowApp();
     void ToCloseApp();
-    void ToUpdateViewColors();
+    void ToUpdateViewColors(ThemesNames themeName);
     void ToPauseUserControl();
     void ToStopUserControl();
     void ToRestartUserControl();
     void ToResumeUserControl();
+    void ToDropDatabase();
 public Q_SLOTS:
-    void OnShowMessage(const QString &message);
+    void OnSendWeather(const DevicesMeteoKitGetMessage &message);
 private Q_SLOTS:
     void OnActivated(QSystemTrayIcon::ActivationReason reason);
-    void OnSetTrayIcon(int frame);
+    void OnDisableLogs();
+    void OnActivateLogs();
 public:
-    void SetUserNameAndRole(const QString &userName, const QString &role);
+    void ShowMessage(const QString &message);
+protected:
+    virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 private:
-    QString m_userName;
-    QString m_userRole;
-
+    QIcon GetNextProgramIcon();
+    QString GetImageBasedOnData(int temperature, int wet);
 private:
 
     QAction *m_minimizeAction;
@@ -54,18 +63,19 @@ private:
     QAction *m_activateLogs;
     QAction *m_disactivateLogs;
 
-    QAction *m_weatherIcon;
-
     QAction *m_dropAllDbAndClose;
     QAction *m_quitAction;
 
     TrayMenu *m_trayMenu;
-    QSystemTrayIcon *m_trayIcon;
 
-    QMovie *m_trayMenuIconMovie;
-    const int m_spacing=5;
-public:
+private:
+    QSystemTrayIcon *m_programIcon;
+    int m_programPixMapIndex = 0;
+    QSystemTrayIcon *m_trayWeatherIcon;
+    float m_lastWeatherTemperature = 0.0f;
+    int index = 1;
 
+    const int m_spacing = 5;
 };
 
-#endif // TRAY_H
+#endif // TRAY_TRAY_H

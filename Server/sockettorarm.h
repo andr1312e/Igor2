@@ -6,7 +6,6 @@
 #include <QDataStream>
 #include <QDebug>
 
-#include "Logging/logger.h"
 #include "Server/messagesrepository.h"
 
 class SocketToRarm : public QObject
@@ -14,7 +13,7 @@ class SocketToRarm : public QObject
     Q_OBJECT
 
 public:
-    SocketToRarm(const QString &rarmAdress, const quint16 rarmPost, QObject *parent);
+    explicit SocketToRarm(const QString &rarmAdress, const quint16 rarmPost, QObject *parent);
     ~SocketToRarm();
 
 private:
@@ -22,7 +21,8 @@ private:
     void InitAdditionalVariables();
     void ConnectObjects();
     void StartCheckConnectionTimer();
-
+Q_SIGNALS:
+    void ToSendWeather(const DevicesMeteoKitGetMessage &message);
 public Q_SLOTS:
     void OnProgramFall();
 
@@ -36,7 +36,7 @@ private Q_SLOTS:
 private:
     void StopRarmConnect();
     void ReconnectToRarm();
-    bool IsRarmConnected() const;
+    bool IsRarmConnected() const noexcept;
     void CheckRmoAndVoiStates(int systemIds);
     QByteArray CreateSyncMessage();
     void SendRarmSyncMessage();
@@ -45,7 +45,7 @@ private:
     const QString m_rarmAdress;
     const quint16 m_rarmPort;
 
-    const QVarLengthArray<quint8, 8> m_messagesWantedToGetFromRarm;
+    const std::array<quint8, 9> m_messagesWantedToGetFromRarm;
     const int VoiRmoWorksBitsMask = 0x06; //0000 0000 0000 0000 0000 0000 0000 0110 Little Endian
 
     MessagesRepository *m_repository;
