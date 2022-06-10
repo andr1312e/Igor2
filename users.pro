@@ -1,22 +1,30 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2021-08-10T14:25:15
+# Project created by QtCreator 2021-10-10T14:25:15
 #
 #-------------------------------------------------
 
 QT += xml network widgets sql concurrent
 
-VERSION = 22.04.22 #YY.MM.DD
-
-DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+VERSION=1.0
+BUILD_DATE = $$system( date "+%d.%m.%Y_%H:%M" )
+#message("Дата сборки= $$BUILD_DATE")
+DEFINES +=APP_VERSION=\\\"$$VERSION\\\"
+DEFINES += BUILD_DATE=\\\"$$BUILD_DATE\\\"
 
 TARGET      = "users"
 TEMPLATE    = app
-DESTDIR     = $$PWD/../syncProgram
+#DESTDIR     = $$PWD/../syncProgram
 RESOURCES += \
     resources.qrc
 
-CONFIG += no_lflags_merge rtti_off warn_off c++latest strict_c++ precompile_header utf8_source file_copies
+qmakeforce.target = dummy
+qmakeforce.commands = rm -f Makefile ##to force delete of qmake
+qmakeforce.depends = FORCE
+PRE_TARGETDEPS += $$qmakeforce.target
+QMAKE_EXTRA_TARGETS += qmakeforce
+
+CONFIG += no_lflags_merge rtti_off c++latest strict_c++ precompile_header utf8_source file_copies
 CONFIG -= cmdline qml_debug no_include_pwd stl
 
 COPIES += iniFiles
@@ -30,24 +38,28 @@ DEFINES +=                 \
   QT_USE_FAST_OPERATOR_PLUS\
   DQT_NO_URL_CAST_FROM_STRING\
   QT_USE_STRING_BUILDER \
+  Q_COMPILER_INITIALIZER_LISTS \
 
 
 SOURCES += \
+    Admin_GUI/RestoreWizard/Services/iconmaker.cpp \
     Admin_GUI/Validator/stringvalidator.cpp \
-    Admin_GUI/Wizard/Views/conclusionwizardpage.cpp \
-    Admin_GUI/Wizard/Views/intropage.cpp \
-    Admin_GUI/Wizard/Views/mywizardpage.cpp \
-    Admin_GUI/Wizard/Views/roleappswizardpage.cpp \
-    Admin_GUI/Wizard/Views/roleappswizardsubwidget.cpp \
-    Admin_GUI/Wizard/Views/userwizardpage.cpp \
-    Admin_GUI/Wizard/Views/userwizardwidget.cpp \
-    Admin_GUI/Wizard/Views/wizardnavigtionbar.cpp \
-    Admin_GUI/Wizard/Services/dependenciesserivce.cpp \
-    Admin_GUI/Wizard/Services/usersprogramiconmakingservice.cpp \
-    Admin_GUI/Wizard/Services/wizardservice.cpp \
-    Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.cpp \
-    Admin_GUI/Wizard/Repositories/usersettingsrepository.cpp \
+    Admin_GUI/RestoreWizard/Views/conclusionwizardpage.cpp \
+    Admin_GUI/RestoreWizard/Views/intropage.cpp \
+    Admin_GUI/RestoreWizard/Views/mywizardpage.cpp \
+    Admin_GUI/RestoreWizard/Views/roleappswizardpage.cpp \
+    Admin_GUI/RestoreWizard/Views/roleappswizardsubwidget.cpp \
+    Admin_GUI/RestoreWizard/Views/userwizardpage.cpp \
+    Admin_GUI/RestoreWizard/Views/userwizardwidget.cpp \
+    Admin_GUI/RestoreWizard/Views/wizardnavigtionbar.cpp \
+    Admin_GUI/RestoreWizard/Services/dependenciesserivce.cpp \
+    Admin_GUI/RestoreWizard/Services/wizardservice.cpp \
+    Admin_GUI/RestoreWizard/Repositories/roleappsandstartupsettingsrepository.cpp \
+    Admin_GUI/RestoreWizard/Repositories/usersettingsrepository.cpp \
+    Admin_GUI/RestoreWizard/Services/filesandfoldersserivce.cpp \
+    Admin_GUI/RestoreWizard/Views/startupwizard.cpp \
     Admin_GUI/Views/topleftbar.cpp \
+    Admin_GUI/Wizard/Updater/View/programupdaterpage.cpp \
     Logging/appender.cpp \
     Logging/appenderskeleton.cpp \
     Logging/asyncappender.cpp \
@@ -113,12 +125,15 @@ SOURCES += \
     Logging/writerappender.cpp \
     Logging/xmllayout.cpp \
     Server/sockettorarm.cpp \
+    Services/Sql/sqlproblemsfixer.cpp \
+    Services/Sql/sqlsettingsrepository.cpp \
     Services/Terminals/terminal.cpp \
     Services/Sql/sqldatabaseserivce.cpp \
     Services/idesktopservice.cpp \
     Services/roledesktopservice.cpp \
     Services/startuppanelpresenter.cpp \
     Services/userdesktopservice.cpp \
+    Structs/programstruct.cpp \
     Styles/Frameless/windowtitlebar.cpp \
     Styles/InteractiveButtons/closewindowbutton.cpp \
     Styles/InteractiveButtons/interactivebuttonbase.cpp \
@@ -130,7 +145,6 @@ SOURCES += \
     Tray/traymenuitem.cpp \
     functionswithstrings.cpp \
     main.cpp \
-    User_GUI/User_GUI.cpp \
     Admin_GUI/Model/usermodel.cpp \
     Admin_GUI/Model/sortmodel.cpp \
     Admin_GUI/Delegates/userdelegate.cpp \
@@ -165,33 +179,35 @@ SOURCES += \
     Styles/Frameless/framelesswindow.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield_internal.cpp \
     Admin_GUI/Widgets/qtmaterialtextfield.cpp \
-    Admin_GUI/Wizard/Views/startupwizard.cpp \
     Tray/tray.cpp \
     Styles/InteractiveButtons/themebutton.cpp \
-    Services/Sql/sqladjuster.cpp \
     Services/singleinstancemaker.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/mylistview.cpp \
-    Admin_GUI/Wizard/Services/filesandfoldersserivce.cpp
+    Structs/user.cpp
+#    Admin_GUI/Wizard/Updater/View/intropage.cpp
 
 HEADERS += \
+    Admin_GUI/RestoreWizard/Services/iconmaker.h \
+    Admin_GUI/RestoreWizard/Views/actionsRestore.h \
     Admin_GUI/Validator/stringvalidator.h \
-    Admin_GUI/Wizard/Views/actions.h \
-    Admin_GUI/Wizard/Views/conclusionwizardpage.h \
-    Admin_GUI/Wizard/Views/intropage.h \
-    Admin_GUI/Wizard/Views/mywizardpage.h \
-    Admin_GUI/Wizard/Views/roleappswizardpage.h \
-    Admin_GUI/Wizard/Views/roleappswizardsubwidget.h \
-    Admin_GUI/Wizard/Views/userwizardpage.h \
-    Admin_GUI/Wizard/Views/userwizardwidget.h \
-    Admin_GUI/Wizard/Views/wizardnavigtionbar.h \
-    Admin_GUI/Wizard/Views/wizardpages.h \
-    Admin_GUI/Wizard/Services/dependenciesserivce.h \
-    Admin_GUI/Wizard/Structs/programfilesstate.h \
-    Admin_GUI/Wizard/Repositories/roleappsandstartupsettingsrepository.h \
-    Admin_GUI/Wizard/Repositories/usersettingsrepository.h \
-    Admin_GUI/Wizard/Services/usersprogramiconmakingservice.h \
-    Admin_GUI/Wizard/Services/wizardservice.h \
+    Admin_GUI/RestoreWizard/Views/conclusionwizardpage.h \
+    Admin_GUI/RestoreWizard/Views/intropage.h \
+    Admin_GUI/RestoreWizard/Views/mywizardpage.h \
+    Admin_GUI/RestoreWizard/Views/roleappswizardpage.h \
+    Admin_GUI/RestoreWizard/Views/roleappswizardsubwidget.h \
+    Admin_GUI/RestoreWizard/Views/userwizardpage.h \
+    Admin_GUI/RestoreWizard/Views/userwizardwidget.h \
+    Admin_GUI/RestoreWizard/Views/wizardnavigtionbar.h \
+    Admin_GUI/RestoreWizard/Views/wizardpages.h \
+    Admin_GUI/RestoreWizard/Services/dependenciesserivce.h \
+    Admin_GUI/RestoreWizard/Structs/programfilesstate.h \
+    Admin_GUI/RestoreWizard/Repositories/roleappsandstartupsettingsrepository.h \
+    Admin_GUI/RestoreWizard/Repositories/usersettingsrepository.h \
+    Admin_GUI/RestoreWizard/Services/wizardservice.h \
+    Admin_GUI/RestoreWizard/Views/startupwizard.h \
+    Admin_GUI/RestoreWizard/Services/filesandfoldersserivce.h \
     Admin_GUI/Views/topleftbar.h \
+    Admin_GUI/Wizard/Updater/View/programupdaterpage.h \
     Logging/appender.h \
     Logging/appenderskeleton.h \
     Logging/asyncappender.h \
@@ -260,6 +276,8 @@ HEADERS += \
     Logging/writerappender.h \
     Logging/xmllayout.h \
     Server/sockettorarm.h \
+    Services/Sql/sqlproblemsfixer.h \
+    Services/Sql/sqlsettingsrepository.h \
     Services/Sql/tablecolumnsnames.h \
     Services/Sql/isqlservice.h \
     Services/Sql/sqldatabaseserivce.h \
@@ -267,7 +285,6 @@ HEADERS += \
     Services/roledesktopservice.h \
     Services/startuppanelpresenter.h \
     Services/userdesktopservice.h \
-    Structs/userstruct.h \
     Structs/programstruct.h \
     Styles/Frameless/windowtitlebar.h \
     Styles/InteractiveButtons/closewindowbutton.h \
@@ -318,19 +335,17 @@ HEADERS += \
     Services/startuprunnableservice.h \
     Tray/traymenu.h \
     Tray/traymenuitem.h \
-    User_GUI/User_GUI.h \
     Server/DataMessage.h \
     Server/messagesrepository.h \
     functionswithstrings.h \
     program.h \
-    Admin_GUI/Wizard/Views/startupwizard.h \
     Tray/tray.h \
     Styles/InteractiveButtons/themebutton.h \
     Structs/themeitem.h \
-    Services/Sql/sqladjuster.h \
     Services/singleinstancemaker.h \
     Admin_GUI/Views/AdditionalSettingPanel/mylistview.h \
-    Admin_GUI/Wizard/Services/filesandfoldersserivce.h
+    Structs/user.h
+#    Admin_GUI/Wizard/Updater/View/intropage.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt
@@ -344,6 +359,8 @@ HEADERS += \
 
   QMAKE_LFLAGS *= -fno-stack-protector -fuse-ld=gold
 }
+
+
 
 DISTFILES += \
     astyle.astylerc

@@ -3,14 +3,14 @@
 
 #include "interactivebuttonbase.h"
 
-class MaximizeWindowButton : public InteractiveButtonBase
+class MaximizeWindowButton : public InteractiveButton
 {
 public:
-    explicit MaximizeWindowButton(QWidget* parent);
+    explicit MaximizeWindowButton(QWidget *parent);
     ~MaximizeWindowButton();
 
 protected:
-    virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 private:

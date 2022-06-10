@@ -14,7 +14,7 @@ MyListView::~MyListView()
 
 void MyListView::dropEvent(QDropEvent *event)
 {
-    const MyListView* source =qobject_cast<MyListView*>(event->source());
+    const MyListView *const source =qobject_cast<MyListView*>(event->source());
     if (Q_NULLPTR!=source)
     {
         const QModelIndex index=source->currentIndex();
@@ -37,7 +37,7 @@ void MyListView::dropEvent(QDropEvent *event)
 
 bool MyListView::IsItemExsists(const DesktopEntity &newEntity) const
 {
-    QStandardItemModel * const myModel=qobject_cast<QStandardItemModel*>(model());
+    const QStandardItemModel * const myModel=qobject_cast<QStandardItemModel*>(model());
     if(Q_NULLPTR==myModel)
     {
          qFatal("");

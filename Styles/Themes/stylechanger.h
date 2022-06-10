@@ -16,14 +16,14 @@ public:
     ~StyleChanger();
 
 Q_SIGNALS:
-    void ToUpdateViewColors();
+    void ToUpdateViewColors(ThemesNames themeName);
 
 public Q_SLOTS:
     void OnChangeTheme(ThemesNames currentThemeName);
 public:
-    ThemesNames GetThemeName() const {return m_currentThemeName;}
+    ThemesNames GetThemeName() const noexcept;
 private:
-    void FillPalette(ThemesNames themeName);
+    void FillPalette(ThemesNames themeName) noexcept;
 private:
     QPalette m_palette;
     QString m_styleSheet;

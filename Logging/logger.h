@@ -98,11 +98,11 @@ namespace Log4Qt
  * \sa \ref Log4Qt::Logger::logger(const char *pName) "Logger::logger(const char *pName)"
  */
 #define LOG4QT_DECLARE_STATIC_LOGGER(FUNCTION, CLASS)                     \
-        static Log4Qt::Logger *FUNCTION()                                 \
-        {                                                                 \
-            static Log4Qt::Logger * p_logger(Log4Qt::Logger::logger(#CLASS )); \
-            return p_logger;                                               \
-        }
+    static Log4Qt::Logger *FUNCTION()                                 \
+    {                                                                 \
+        static Log4Qt::Logger * p_logger(Log4Qt::Logger::logger(#CLASS )); \
+        return p_logger;                                               \
+    }
 
 /*!
  * LOG4QT_DECLARE_QCLASS_LOGGER declares member functions to retrieve
@@ -159,12 +159,12 @@ namespace Log4Qt
  *     \ref Log4Qt::ClassLogger "ClassLogger"
  */
 #define LOG4QT_DECLARE_QCLASS_LOGGER                                      \
-            private:                                                              \
-                    mutable Log4Qt::ClassLogger mLog4QtClassLogger;                   \
-            public:                                                               \
-                    inline Log4Qt::Logger *logger() const                             \
-                    {   return mLog4QtClassLogger.logger(this);    }                  \
-            private:
+    private:                                                              \
+    mutable Log4Qt::ClassLogger mLog4QtClassLogger;                   \
+    public:                                                               \
+    inline Log4Qt::Logger *logger() const                             \
+    {   return mLog4QtClassLogger.logger(this);    }                  \
+    private:
 
 
 class LOG4QT_EXPORT MessageLogger
@@ -245,7 +245,7 @@ class LOG4QT_EXPORT Logger : public QObject, public AppenderAttachable
      * The default is Level::NULL_INT.
      * \sa level(), setLevel()
      */
-    Q_PROPERTY(Log4Qt::Level level READ level WRITE setLevel)
+    Q_PROPERTY(Log4Qt::Level level READ level WRITE setLevel RESET resetLevel)
 
     /*!
      * The property holds the LoggerRepository of the logger.
@@ -286,6 +286,7 @@ public:
 
     void setAdditivity(bool additivity);
     virtual void setLevel(Level level);
+    void resetLevel();
 
     void callAppenders(const LoggingEvent &event) const;
 

@@ -16,6 +16,7 @@ LinuxUsersListWidget::LinuxUsersListWidget(UserModel *userModel, QWidget *parent
 
 LinuxUsersListWidget::~LinuxUsersListWidget()
 {
+    delete m_topLayout;
     delete m_searchLayout;
     delete m_mainLayout;
 
@@ -23,6 +24,7 @@ LinuxUsersListWidget::~LinuxUsersListWidget()
     delete m_userDelegate;
 
     delete m_linuxUsersLabel;
+    delete m_addNewUserOpenPanel;
     delete m_searchLineEdit;
     delete m_searchTypeComboBox;
     delete m_allUsersListView;
@@ -50,9 +52,11 @@ void LinuxUsersListWidget::CreateUI()
 {
     m_mainLayout = new QVBoxLayout();
 
-    m_linuxUsersLabel = new QLabel("Пользователи операционной системы Astra Linux: ");
-
-    m_font =m_linuxUsersLabel->font();
+    m_topLayout = new QHBoxLayout();
+    m_linuxUsersLabel = new QLabel(QStringLiteral("Пользователи операционной системы Astra Linux: "));
+    m_addNewUserOpenPanel = new QPushButton(QStringLiteral("Добавить"));
+    m_addNewUserOpenPanel->setToolTip(QStringLiteral("Добавление новых пользователей выполняется на вкладке пользователи\n с последующим нажатием на иконку + и внесением данных"));
+    m_font = m_linuxUsersLabel->font();
 
     m_userDelegate = new UserDelegate(m_font, this);
 
@@ -72,16 +76,22 @@ void LinuxUsersListWidget::InsertWidgetsIntoLayout()
     m_searchLayout->addWidget(m_searchLineEdit);
     m_searchLayout->addWidget(m_searchTypeComboBox);
 
-    m_mainLayout->addWidget(m_linuxUsersLabel);
+    m_topLayout->addWidget(m_linuxUsersLabel);
+    m_topLayout->addWidget(m_addNewUserOpenPanel);
+
     m_mainLayout->addLayout(m_searchLayout);
+    m_mainLayout->addLayout(m_topLayout);
     m_mainLayout->addWidget(m_allUsersListView);
 
+//    m_mainLayout->setContentsMargins(2, 0, 0, 2);
+    m_mainLayout->setMargin(0);
     setLayout(m_mainLayout);
 }
 
 void LinuxUsersListWidget::CreateConnections()
 {
     connect(m_allUsersListView, &QListView::clicked, this, &LinuxUsersListWidget::GetUserData);
+    connect(m_addNewUserOpenPanel, &QPushButton::clicked, this, &LinuxUsersListWidget::OnAddNewUser);
     connect(m_searchLineEdit, &QLineEdit::textChanged, this, &LinuxUsersListWidget::OnLineEditChange);
     connect(m_searchTypeComboBox, &QComboBox::currentTextChanged, this, &LinuxUsersListWidget::OnComboBoxChange);
     connect(this, &LinuxUsersListWidget::ToSearch, m_sortModel, &SortModel::UpdateSeachTextAndSeachAttribute);
@@ -108,6 +118,11 @@ void LinuxUsersListWidget::OnComboBoxChange(const QString &attribute)
     m_sortModel->UpdateSeachTextAndSeachAttribute(text, attribute);
 }
 
+void LinuxUsersListWidget::OnAddNewUser()
+{
+    m_userModel->OpenFlyAdminSmc();
+}
+
 void LinuxUsersListWidget::GetUserData(const QModelIndex &index)
 {
     const QVariant indexData = index.data(Qt::UserRole + 1);
@@ -117,90 +132,132 @@ void LinuxUsersListWidget::GetUserData(const QModelIndex &index)
 
 void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
 {
-    int width = event->size().width();
+    const int width = event->size().width();
 //    qDebug() << width;
 
-    if (width > 930) {
-        if (m_oldFontSize != 20) {
+    if (width > 930)
+    {
+        if (m_oldFontSize != 20)
+        {
             m_oldFontSize = 20;
             UpdateFontSize();
             m_searchTypeComboBox->setFixedHeight(44);
             m_searchLineEdit->setFixedHeight(44);
         }
-    } else {
-        if (width > 861) {
-            if (m_oldFontSize != 19) {
+    }
+    else
+    {
+        if (width > 861)
+        {
+            if (m_oldFontSize != 19)
+            {
                 m_oldFontSize = 19;
                 UpdateFontSize();
                 m_searchTypeComboBox->setFixedHeight(42);
                 m_searchLineEdit->setFixedHeight(42);
             }
-        } else {
-            if (width > 845) {
-                if (m_oldFontSize != 18) {
+        }
+        else
+        {
+            if (width > 845)
+            {
+                if (m_oldFontSize != 18)
+                {
                     m_oldFontSize = 18;
                     UpdateFontSize();
                     m_searchTypeComboBox->setFixedHeight(40);
                     m_searchLineEdit->setFixedHeight(40);
                 }
-            } else {
-                if (width > 810) {
-                    if (m_oldFontSize != 17) {
+            }
+            else
+            {
+                if (width > 810)
+                {
+                    if (m_oldFontSize != 17)
+                    {
                         m_oldFontSize = 17;
                         UpdateFontSize();
                         m_searchTypeComboBox->setFixedHeight(38);
                         m_searchLineEdit->setFixedHeight(38);
                     }
-                } else {
-                    if (width > 726) {
-                        if (m_oldFontSize != 16) {
+                }
+                else
+                {
+                    if (width > 726)
+                    {
+                        if (m_oldFontSize != 16)
+                        {
                             m_oldFontSize = 16;
                             UpdateFontSize();
                             m_searchTypeComboBox->setFixedHeight(36);
                             m_searchLineEdit->setFixedHeight(36);
                         }
-                    } else {
-                        if (width > 700) {
-                            if (m_oldFontSize != 15) {
+                    }
+                    else
+                    {
+                        if (width > 700)
+                        {
+                            if (m_oldFontSize != 15)
+                            {
                                 m_oldFontSize = 15;
                                 UpdateFontSize();
                                 m_searchTypeComboBox->setFixedHeight(34);
                                 m_searchLineEdit->setFixedHeight(34);
                             }
-                        } else {
-                            if (width > 666) {
-                                if (m_oldFontSize != 14) {
+                        }
+                        else
+                        {
+                            if (width > 666)
+                            {
+                                if (m_oldFontSize != 14)
+                                {
                                     m_oldFontSize = 14;
                                     UpdateFontSize();
                                     m_searchTypeComboBox->setFixedHeight(33);
                                     m_searchLineEdit->setFixedHeight(33);
                                 }
-                            } else {
-                                if (width > 600) {
-                                    if (m_oldFontSize != 13) {
+                            }
+                            else
+                            {
+                                if (width > 600)
+                                {
+                                    if (m_oldFontSize != 13)
+                                    {
                                         m_oldFontSize = 13;
                                         UpdateFontSize();
                                         m_searchTypeComboBox->setFixedHeight(32);
                                         m_searchLineEdit->setFixedHeight(32);
                                     }
-                                } else {
-                                    if (width > 565) {
-                                        if (m_oldFontSize != 12) {
+                                }
+                                else
+                                {
+                                    if (width > 565)
+                                    {
+                                        if (m_oldFontSize != 12)
+                                        {
                                             m_oldFontSize = 12;
                                             UpdateFontSize();
                                             m_searchTypeComboBox->setFixedHeight(31);
                                             m_searchLineEdit->setFixedHeight(31);
                                         }
-                                    } else {
-                                        if (width > 550) {
-                                            if (m_oldFontSize != 11) {
+
+                                    }
+                                    else
+                                    {
+                                        if (width > 550)
+                                        {
+                                            if (m_oldFontSize != 11)
+                                            {
                                                 m_oldFontSize = 11;
                                                 UpdateFontSize();
                                                 m_searchTypeComboBox->setFixedHeight(30);
                                                 m_searchLineEdit->setFixedHeight(30);
                                             }
-                                        } else {
-                                            if (m_oldFontSize != 10) {
+                                        }
+                                        else
+                                        {
+                                            if (m_oldFontSize != 10)
+                                            {
                                                 m_oldFontSize = 10;
                                                 UpdateFontSize();
                                                 m_searchTypeComboBox->setFixedHeight(29);

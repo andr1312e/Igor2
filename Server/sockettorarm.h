@@ -13,7 +13,7 @@ class SocketToRarm : public QObject
     Q_OBJECT
 
 public:
-    SocketToRarm(const QString &rarmAdress, const quint16 rarmPost, QObject *parent);
+    explicit SocketToRarm(const QString &rarmAdress, const quint16 rarmPost, QObject *parent);
     ~SocketToRarm();
 
 private:
@@ -36,7 +36,7 @@ private Q_SLOTS:
 private:
     void StopRarmConnect();
     void ReconnectToRarm();
-    bool IsRarmConnected() const;
+    bool IsRarmConnected() const noexcept;
     void CheckRmoAndVoiStates(int systemIds);
     QByteArray CreateSyncMessage();
     void SendRarmSyncMessage();

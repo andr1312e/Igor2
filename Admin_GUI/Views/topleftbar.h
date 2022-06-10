@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QResizeEvent>
 
-#include "Structs/userstruct.h"
+#include "Structs/user.h"
 
 class TopLeftBar : public QWidget
 {

@@ -74,7 +74,7 @@ void StartupPanel::InsertWidgetsIntoLayout()
     m_bottomLayout->addWidget(m_deleteProgramButton);
 
     m_mainLayout->addLayout(m_bottomLayout);
-
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(m_mainLayout);
 
     m_dialog->setWindowLayout(m_dialogLayout);

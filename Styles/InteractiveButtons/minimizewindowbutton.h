@@ -3,7 +3,7 @@
 
 #include "interactivebuttonbase.h"
 #include <QPainterPath>
-class MinimizeWindowButton : public InteractiveButtonBase
+class MinimizeWindowButton : public InteractiveButton
 {
     Q_OBJECT
 public:

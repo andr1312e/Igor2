@@ -9,14 +9,29 @@
 struct ThemeItem
 {
     explicit ThemeItem()
+        : themeName()
+        , nextThemeToolTip()
+        , themeIcon()
+    {
+
+    }
+    explicit ThemeItem(ThemesNames _themeName, const QString &_nextThemeToolTip, const QString &_themeIcon)
+        : themeName(_themeName)
+        , nextThemeToolTip(_nextThemeToolTip)
+        , themeIcon(_themeIcon)
     {
 
     }
 
-    ThemeItem(ThemesNames _themeName, const QString &_nextThemeToolTip, const QString &_themeIcon)
-        : themeName(_themeName)
-        , nextThemeToolTip(_nextThemeToolTip)
-        , themeIcon(_themeIcon)
+    ThemeItem(const ThemeItem &another)
+        : themeName(another.themeName)
+        , nextThemeToolTip(another.nextThemeToolTip)
+        , themeIcon(another.themeIcon)
+    {
+
+    }
+
+    ~ThemeItem()
     {
 
     }

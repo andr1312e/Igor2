@@ -15,10 +15,17 @@ void MessagesRepository::AppendTrack(RMOTrackSetting newSettings)
 
 void MessagesRepository::DeleteTrack(const int myAimID)
 {
-    for (QLinkedList<RMOTrackSetting>::iterator it = m_trackSettingList.end(); it != m_trackSettingList.begin();) {
-        --it;
-        if (it->aimID == myAimID) {
+    QLinkedList<RMOTrackSetting>::iterator it = std::begin(m_trackSettingList);
+
+    while (it != std::end(m_trackSettingList))
+    {
+        if (myAimID == it->aimID)
+        {
             m_trackSettingList.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -64,8 +71,8 @@ void MessagesRepository::AppendTargetPosition(RMOTargetPositionMessage newPositi
                 message.answer[8] = newPositionMessage.answer[8];
                 message.answer[9] = newPositionMessage.answer[9];
                 message.look_priority = newPositionMessage.look_priority;
+                return;
             }
-            return;
         }
     } else {
         m_targetPositionsList.push_back(newPositionMessage);
@@ -74,10 +81,17 @@ void MessagesRepository::AppendTargetPosition(RMOTargetPositionMessage newPositi
 
 void MessagesRepository::DeleteTargetPosition(quint8 id)
 {
-    for (QLinkedList<RMOTargetPositionMessage>::iterator it = m_targetPositionsList.end(); it != m_targetPositionsList.begin();) {
-        --it;
-        if (it->id == id) {
+    QLinkedList<RMOTargetPositionMessage>::iterator it = std::begin(m_targetPositionsList);
+
+    while (it != std::end(m_targetPositionsList))
+    {
+        if (id == it->id)
+        {
             m_targetPositionsList.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 }
@@ -107,7 +121,7 @@ const RMODriveToPositionMessage &MessagesRepository::GetRMODriveToPositionMessag
 
 void MessagesRepository::EditBioDefenceSectorList(RMOBioDefenceSectorMessage newSettings)
 {
-    if (newSettings.method == 1)
+    if (1 == newSettings.method)
     { //удаление
         m_defenceSectorMessageList.clear();
     }

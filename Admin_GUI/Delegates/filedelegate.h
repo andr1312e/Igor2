@@ -12,15 +12,15 @@ class FileDelegate : public QStyledItemDelegate
 {
 public:
 
-   FileDelegate(QObject *parent);
+    explicit FileDelegate(QObject *parent);
 
-   ~FileDelegate();
+    ~FileDelegate();
 
-   void paint(QPainter *painter,
-              const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter,
+               const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
 
-   QSize sizeHint(const QStyleOptionViewItem &option,
-                  const QModelIndex &index) const Q_DECL_OVERRIDE;
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const Q_DECL_OVERRIDE;
 };
 
 #endif // ADMIN_GUI_DELEGATES_FILEDELEGATE_H

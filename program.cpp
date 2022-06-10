@@ -9,8 +9,7 @@ Program::Program(int &argc, char **argv)
     , m_currentUserName(m_linuxUserService->GetCurrentUserName())
     , m_currentUserId(m_linuxUserService->GetCurrentUserId())
     , m_sqlDatabaseService(new SqlDatabaseSerivce(this))
-    , m_sqlAdjuster(Q_NULLPTR)
-    , m_oldDbState(DbState::DbConnected)
+    , m_singleInstance(Q_NULLPTR)
     , m_startupRunnableService(new StartupRunnableManager(m_currentUserName, m_rlstiFolder, m_sqlDatabaseService, this))
     , m_tray(new Tray(this))
     , m_startupWizard(Q_NULLPTR)
@@ -30,27 +29,33 @@ Program::~Program()
     delete m_sqlDatabaseService;
     delete m_startupRunnableService;
     delete m_tray;
-    if(Q_NULLPTR!=m_startupWizard)
+    if (Q_NULLPTR != m_startupWizard)
     {
         delete m_startupWizard;
     }
-    if(Q_NULLPTR!=m_AdminGui)
+    if (Q_NULLPTR != m_AdminGui)
     {
         delete m_AdminGui;
         delete m_styleChanger;
         delete m_framelessWindow;
     }
-    if(Q_NULLPTR!=m_socketToRarm)
+    if (Q_NULLPTR != m_socketToRarm)
     {
         delete m_socketToRarm;
     }
 }
 
+/**
+ * log Проверяем на наличие копии программы в зависимости от аргументов командной строки
+ * Если последний аргумент restart то запуск программы разрешается, и происходит присоединение к уже живому процессу
+ * Если такого аргумента нет то запуск считается единичным и происходит проверка в спец классе
+ */
+
 bool Program::HasNoRunningInstance()
 {
-    Log4QtInfo(qApp->arguments().join(','));
-    m_singleInstance= new SingleInstanceMaker(applicationName());
-    if(QStringLiteral("restart")==arguments().last())
+    Log4QtInfo(QStringLiteral("Аргументы командной строки приложения: ") + arguments().join(','));
+    m_singleInstance = new SingleInstanceMaker(applicationName());
+    if (QStringLiteral("restart") == arguments().constLast())
     {
         m_singleInstance->ConnectToExsistsApp();
         return true;
@@ -62,178 +67,134 @@ bool Program::HasNoRunningInstance()
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы НЕ запущен "));
             return true;
-        } else {
+        }
+        else
+        {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Экземпляр программы запущен "));
             return false;
         }
     }
 }
 
-bool Program::CreateAndRunApp()//MAIN
+/**
+ * log Главная точка программы
+ * Получаем список пользователей и подключаемся к бд
+ * Если бд не установлена или драйверов нет, или лог пасс не тот - фиксим и возращается что надо перезапуститься
+ * Иначе проверям таблицы,и значения готовности state кладем в ProcessDataLoading
+ * @return состояние подключения
+ */
+
+DbConnectionState Program::CreateAndRunApp()//MAIN
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Начало создания программы"));
-    GetAllUsersWithIdInSystem();
-    const bool needToRestart=ConnectToDatabase();
-    if(needToRestart)
+    CollectAllUsersWithIdInSystem();
+    const DbConnectionState connectionState = m_sqlDatabaseService->ConnectToDataBase();
+    if (DbConnectionState::Connected == connectionState)
     {
-        QStringList appArguments=qApp->arguments();
-        appArguments.append(QStringLiteral("restart"));
-        QProcess::startDetached(qApp->arguments().front(), appArguments);
-        return -1;
+        const LoadingStates states = GetLoadingStates();
+        ContinueDataLoading(states);
     }
     else
     {
-        const LoadingState state=GetProgramState();
-        ProcessDataLoading(state);
-        return 0;
+        if (DbConnectionState::NeedRestart == connectionState)
+        {
+            QStringList appArguments = qApp->arguments();
+            if (!appArguments.isEmpty() && QLatin1Literal("restart") == appArguments.constLast())
+            {
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаемся еще раз, что то не то с логикой программы "));
+                return DbConnectionState::FailedConnection;
+            }
+            else
+            {
+                appArguments.append(QLatin1Literal("restart"));
+                QProcess::startDetached(qApp->arguments().front(), appArguments);
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу "));
+            }
+        }
     }
+    return connectionState;
 }
-
-void Program::GetAllUsersWithIdInSystem()
+/**
+ * Получить у UserService всех пользователей в системе, без системных
+ */
+void Program::CollectAllUsersWithIdInSystem()
 {
     m_linuxUserService->GetAllUsersWithIdInSystem();
 }
 
-bool Program::ConnectToDatabase()
+LoadingStates Program::GetLoadingStates()
 {
-    const bool needToRestart=true;
-    const QString iniFilePath(Program::applicationDirPath()+QStringLiteral("/sql.ini"));
-    QSettings setting(iniFilePath, QSettings::IniFormat, this);
-    const QString host=setting.value(QStringLiteral("host"), QStringLiteral("localhost")).toString();
-    const quint16 port=setting.value(QStringLiteral("port"), 5432).toUInt();
-    const QString dbName=setting.value(QStringLiteral("dbName"), QStringLiteral("postgres")).toString();
-    const QString userName=setting.value(QStringLiteral("userName"), QStringLiteral("user")).toString();
-    const QString userPassword=setting.value(QStringLiteral("userPassword"), QStringLiteral("user1234")).toString();
-    Q_FOREVER
-    {
-        const DbState state=m_sqlDatabaseService->ConnectToDataBase(host, port, dbName, userName, userPassword);
-        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Состояние подключения: ")+ QString::number(state));
-        if(DbState::DbConnected==state)
-        {
-            break;
-        }
-        else
-        {
-            if(state==m_oldDbState)
-            {
-                QString errorReason;
-                switch (state) {
-                case DbNoPostgre:
-                    errorReason=QStringLiteral(" не смогли установить постгрес");
-                    break;
-                case DbNoDriver:
-                    errorReason=QStringLiteral(" не смогли установить драйвер постгре для кути");
-                    break;
-                case DbWrongPassword:
-                    errorReason=QStringLiteral(" не смогли поменять пароль для бд (нет пользователя postgres или смена пароля запрещена)");
-                    break;
-                case DbUnknownError:
-                    errorReason=QStringLiteral(" неизвестная ошибка");
-                    break;
-                default:
-                    errorReason=QStringLiteral(" нереализованное поведение ")+Q_FUNC_INFO;
-                    break;
-                }
-                QMessageBox::warning(Q_NULLPTR, QStringLiteral("Подключите базу данных postgres"), QStringLiteral("Подключение к бд не удалось, причина: ")+errorReason);
-                exit(1);
-            }
-            else
-            {
-                if(Q_NULLPTR==m_sqlAdjuster)
-                {
-                    m_sqlAdjuster=new SqlAdjuster();
-                }
-                switch (state) {
-                case DbNoPostgre:
-                    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд нет пакета постгре установленого"));
-                    m_tray->ShowMessage(QStringLiteral("Устанавливаем базу данных Postgre SQL. Пожалуйста подождите..."));
-                    m_sqlAdjuster->InstallPostgreSqlAndDriver();
-                    return needToRestart;
-                case DbNoDriver:
-                    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд нет драйвера установленного"));
-                    m_tray->ShowMessage(QStringLiteral("Устанавливаем драйвер базы данных Postgre SQL. Пожалуйста подождите... "));
-                    m_sqlAdjuster->InstallSqlDriverForQt5();
-                    return needToRestart;
-                case DbWrongPassword:
-                    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд неверный пароль и/или имя пользователя"));
-                    m_tray->ShowMessage(QStringLiteral("Postgre SQL создаем пользователя ")+ userName + ':'+userPassword);
-                    m_sqlAdjuster->ResetPostgreUserPassword(userName, userPassword);
-                    break;
-                case DbUnknownError:
-                    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Невозможно запустить приложение, ошибка в процессе подключения к бд. Ошибка не известная. Проверьте пользоватлей, пакет драйвера к бд, и установлен ли пакет постгре. Переустановите их если ошибка не убирается"));
-                    QMessageBox::warning(Q_NULLPTR, QStringLiteral("Неизвестная ошибка"), QStringLiteral("смотрите ошибку в файле логов"));
-                    exit(1);
-                default:
-                    qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно обработать ошибку так как обработчик не написан")).toUtf8().constData());
-                    break;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-LoadingState Program::GetProgramState()
-{
+    LoadingStates states;
     if (m_sqlDatabaseService->CheckUsersTable())
     {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы пользователей существует"));
-        if(m_sqlDatabaseService->CheckDesktopTables() && m_sqlDatabaseService->CheckStartupTables())
+        if (m_sqlDatabaseService->CheckDesktopTables() && m_sqlDatabaseService->CheckStartupTables())
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей существуют"));
-            return LoadingState::Fine;
+            states = LoadingState::Fine;
         }
         else
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
-            return LoadingState::NoRoleData;
+            states = LoadingState::NoRoleData;
         }
     }
     else
     {
-        if(m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
+        if (m_sqlDatabaseService->CheckStartupTables() && m_sqlDatabaseService->CheckStartupTables())
         {
-            Log4QtInfo(Q_FUNC_INFO+ QStringLiteral(" Таблицы ролей существуют"));
-            return LoadingState::NoUserDb;
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей существуют"));
+            states = LoadingState::NoUserDb;
         }
         else
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Таблицы ролей отсутсвуют"));
-            return LoadingState::NoFiles;
+            states = LoadingState::NoFiles;
         }
     }
-    qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Нереализованное поведение")).toUtf8().constData());
+    if (QStringLiteral("--reset") == qApp->arguments().constLast())
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Вызвано принудительное восстановление..."));
+        states = states  | LoadingState::ForceReset;
+    }
+    return  states;
 }
 
-void Program::ProcessDataLoading(const LoadingState &state)
+void Program::ContinueDataLoading(LoadingStates states)
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Продолжаем загрузку..."));
-    switch (state) {
-    case NoFiles:
-    case NoUserDb:
-    case NoRoleData:
+    switch (states)
     {
-        if(CanGetAdminAccess())
+    case LoadingState::NoUserDb | LoadingState::ForceReset:
+    case LoadingState::NoRoleData| LoadingState::ForceReset:
+    case LoadingState::NoFiles| LoadingState::ForceReset:
+    case LoadingState::Fine| LoadingState::ForceReset:
+    case LoadingState::NoUserDb :
+    case LoadingState::NoRoleData:
+    case LoadingState::NoFiles:
+    {
+        if (CanGetAdminAccess())
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, но данные не полные, запускаем мастер настройки..."));
-            const ThemesNames currentThemeName=GetThemeNameFromSettings();
+            const ThemesNames currentThemeName = GetThemeNameFromSettings();
             InitFramelessWindow(currentThemeName);
             InitStyleChanger(currentThemeName);
-            StartSettingsWizard(state);
+            StartSettingsWizard(states);
         }
         else
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика недоступны и данные не полные, дальнейшая работа невозможна... "));
             QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запуститься"), QStringLiteral("Права разработчика недоступны, запустите программу от имени администратора и повторите попытку..."), QMessageBox::Ok);
+            quit();
         }
         break;
     }
-
-    case Fine: {
-        if(CanGetAdminAccess())
+    case LoadingState::Fine:
+    {
+        if (CanGetAdminAccess())
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Права разработчика доступны, имеются все данные, запускаем программу администрирования..."));
-            const ThemesNames currentThemeName=GetThemeNameFromSettings();
+            const ThemesNames currentThemeName = GetThemeNameFromSettings();
             InitFramelessWindow(currentThemeName);
             InitStyleChanger(currentThemeName);
             OnFullLoading();
@@ -245,8 +206,9 @@ void Program::ProcessDataLoading(const LoadingState &state)
         }
         break;
     }
-    default:{
-        qFatal("%s", QString(Q_FUNC_INFO+ QStringLiteral(" Невозможно обработать ошибку так как обработчик не написан")).toUtf8().constData());
+    default:
+    {
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Невозможно обработать ошибку так как обработчик не написан")).toUtf8().constData());
     }
     }
 }
@@ -255,15 +217,15 @@ ThemesNames Program::GetThemeNameFromSettings() const
 {
 
     const QSettings settings(organizationName(), applicationName());
-    const ThemesNames themeName=qvariant_cast<ThemesNames>(settings.value(QStringLiteral("theme"), ThemesNames::BlackTheme));
+    const ThemesNames themeName = qvariant_cast<ThemesNames>(settings.value(QLatin1Literal("theme")));
     return themeName;
 }
 
 void Program::InitFramelessWindow(ThemesNames themeName)
 {
     m_framelessWindow = new FramelessWindow(themeName, Q_NULLPTR);
-    setWindowIcon(QIcon(QStringLiteral(":/images/0.jpg")));
-    m_framelessWindow->setObjectName(QStringLiteral("FramelessWindowObject"));//QSS
+    setWindowIcon(QIcon(QLatin1Literal(":/images/programIcon.png")));
+    m_framelessWindow->setObjectName(QLatin1Literal("FramelessWindowObject"));//QSS
     m_framelessWindow->OnSetWindowTitle(QStringLiteral("Мастер первоначальной настройки"));
     m_framelessWindow->show();
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали безрамочное окно "));
@@ -275,13 +237,13 @@ void Program::InitStyleChanger(ThemesNames themeName)
     m_styleChanger->OnChangeTheme(themeName);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
     connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
-    Q_EMIT m_tray->ToUpdateViewColors();
+    Q_EMIT m_tray->ToUpdateViewColors(themeName);
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали обьект изменения тем "));
 }
 
-void Program::StartSettingsWizard(const LoadingState &state)
+void Program::StartSettingsWizard(LoadingStates states)
 {
-    m_startupWizard = new StartupWizard(applicationName(), m_rlstiFolder, state, m_linuxUserService, m_sqlDatabaseService, m_styleChanger->GetThemeName(), Q_NULLPTR);
+    m_startupWizard = new StartupWizard(applicationDirPath(), applicationName(), m_rlstiFolder, states, m_linuxUserService, m_sqlDatabaseService, m_styleChanger->GetThemeName(), Q_NULLPTR);
     connect(m_startupWizard, &QWizard::accepted, this, &Program::OnFullLoading);
     connect(m_startupWizard, &QWizard::rejected, this, &QApplication::quit);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_startupWizard, &StartupWizard::OnChangeTheme);
@@ -299,7 +261,7 @@ void Program::UserLoading()
     }
     else
     {
-        QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запустить подпрограмму"), QStringLiteral("При наличии прав администратора измените парметры роли для пользователя: ")+ m_currentUserName, QMessageBox::Ok);
+        QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запустить подпрограмму"), QStringLiteral("При наличии прав администратора измените парметры роли для пользователя: ") + m_currentUserName, QMessageBox::Ok);
     }
 }
 
@@ -320,7 +282,7 @@ bool Program::AllAppsRunnedWell()
 void Program::InitRarmSocket()
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем сокет к рарму "));
-    m_socketToRarm = new SocketToRarm(QStringLiteral("127.0.0.1"), 4242, this);
+    m_socketToRarm = new SocketToRarm(QLatin1Literal("127.0.0.1"), 4242, this);
 }
 
 void Program::InitAdminUI()
@@ -329,6 +291,7 @@ void Program::InitAdminUI()
     m_framelessWindow->OnSetWindowTitle(QStringLiteral("Панель управления пользователями и модулями РЛС ТИ"));
     m_framelessWindow->SetMainWidget(m_AdminGui);
     m_framelessWindow->show();
+
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали админ вью "));
 }
 
@@ -347,8 +310,8 @@ void Program::ConnectUserObjects()
 
 void Program::ConnectAdminObjects()
 {
-    connect(m_framelessWindow, &FramelessWindow::ToSetDelegateView, m_AdminGui, &Admin_GUI::ToSetDelegateView);
-    connect(m_framelessWindow, &FramelessWindow::ToHideAdditionalSettings, m_AdminGui, &Admin_GUI::OnHideAdditionalSettings);
+    connect(m_tray, &Tray::ToDropDatabase, m_sqlDatabaseService, &SqlDatabaseSerivce::OnDropDatabase);
+    connect(m_tray, &Tray::ToDropDatabase, this, &QApplication::quit, Qt::QueuedConnection);
     connect(m_AdminGui, &Admin_GUI::ToCurrentUserRoleChanged, m_startupRunnableService, &StartupRunnableManager::OnCurrentUserRoleChanged);
 }
 
@@ -358,7 +321,7 @@ bool Program::CanGetAdminAccess()
     {
         if (m_sqlDatabaseService->CheckUsersTable())
         {
-            const QStringList adminsUserName=m_sqlDatabaseService->GetAdminsRoleUserName();
+            const QStringList adminsUserName = m_sqlDatabaseService->GetAdminsRoleUserName();
             return  true;
         }
         else

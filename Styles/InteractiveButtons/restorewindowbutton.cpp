@@ -1,7 +1,7 @@
 #include "restorewindowbutton.h"
 
 RestoreWindowButton::RestoreWindowButton(QWidget* parent)
-    : InteractiveButtonBase(parent)
+    : InteractiveButton(parent)
     , m_pen(QPen(Qt::white))
     , m_buttonSize(QSize(40, 40))
     , m_br(new QRect())

@@ -16,34 +16,33 @@ ThemeButton::~ThemeButton()
 
 void ThemeButton::FillThemesAndFindCurrentTheme(const ThemesNames &themeName)
 {
-    ThemeItem black(ThemesNames::BlackTheme, QStringLiteral("Изменить тему на красную"), QStringLiteral(":/images/themes/themes_red"));
-    ThemeItem astraRed(ThemesNames::AstraRedTheme, QStringLiteral("Изменить тему на черную"), QStringLiteral(":/images/themes/themes_blacked"));
+    const ThemeItem black(ThemesNames::BlackTheme, QStringLiteral("Изменить тему на красную"), QStringLiteral(":/images/themes/themes_red"));
+    const ThemeItem astraRed(ThemesNames::AstraRedTheme, QStringLiteral("Изменить тему на черную"), QStringLiteral(":/images/themes/themes_blacked"));
     m_themeList.append(black);
     m_themeList.append(astraRed);
-    QVector<ThemeItem>::ConstIterator themeListIterator=m_themeList.cbegin();
-    while(themeListIterator!=m_themeList.cend())
+    QVector<ThemeItem>::ConstIterator themeListIterator = m_themeList.cbegin();
+    while (themeListIterator != m_themeList.cend())
     {
-        if(themeName==themeListIterator->themeName)
+        if (themeName == themeListIterator->themeName)
         {
-            m_themeListCurrentItem=themeListIterator;
+            m_themeItemIterator = themeListIterator;
             return;
         }
     }
-    m_themeListCurrentItem=m_themeList.cbegin();
+    m_themeItemIterator = m_themeList.cbegin();
 }
 
 void ThemeButton::InitButton()
 {
     setFlat(true);
     setFocusPolicy(Qt::NoFocus);
-    setStyleSheet(QStringLiteral("border: 0px;"));
 }
 
 void ThemeButton::FillButton()
 {
-    setIcon(m_themeListCurrentItem->themeIcon);
+    setIcon(m_themeItemIterator->themeIcon);
     setIconSize(QSize(30, 30));
-    setToolTip(m_themeListCurrentItem->nextThemeToolTip);
+    setToolTip(m_themeItemIterator->nextThemeToolTip);
 }
 
 void ThemeButton::ConnectObjects()
@@ -53,11 +52,16 @@ void ThemeButton::ConnectObjects()
 
 void ThemeButton::OnButtonPressed()
 {
-    ++m_themeListCurrentItem;
-    if(m_themeList.cend()==m_themeListCurrentItem)
+    ++m_themeItemIterator;
+    if (m_themeList.cend() == m_themeItemIterator)
     {
-        m_themeListCurrentItem=m_themeList.cbegin();
+        m_themeItemIterator = m_themeList.cbegin();
     }
     FillButton();
-    Q_EMIT ToChangeTheme(m_themeListCurrentItem->themeName);
+    Q_EMIT ToChangeTheme(m_themeItemIterator->themeName);
+}
+
+ThemesNames ThemeButton::GetCurrentThemeName()
+{
+    return m_themeItemIterator->themeName;
 }

@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include "Styles/Themes/stylechanger.h"
+#include "Logging/logger.h"
+#include "Logging/logmanager.h"
 #include "Server/DataMessage.h"
 #include "Tray/traymenu.h"
 
@@ -21,21 +24,25 @@ private:
     void InitActions();
     void CreateUI();
     void InitUIAndInsertWidgetIntoLayouts();
+    void FillObjects();
     void StartTimer();
     void ConnectObjects();
 Q_SIGNALS:
     void ToHideApp();
     void ToShowApp();
     void ToCloseApp();
-    void ToUpdateViewColors();
+    void ToUpdateViewColors(ThemesNames themeName);
     void ToPauseUserControl();
     void ToStopUserControl();
     void ToRestartUserControl();
     void ToResumeUserControl();
+    void ToDropDatabase();
 public Q_SLOTS:
     void OnSendWeather(const DevicesMeteoKitGetMessage &message);
 private Q_SLOTS:
     void OnActivated(QSystemTrayIcon::ActivationReason reason);
+    void OnDisableLogs();
+    void OnActivateLogs();
 public:
     void ShowMessage(const QString &message);
 protected:
@@ -63,11 +70,12 @@ private:
 
 private:
     QSystemTrayIcon *m_programIcon;
-    int m_programPixMapIndex=0;
+    int m_programPixMapIndex = 0;
     QSystemTrayIcon *m_trayWeatherIcon;
-    float m_lastWeatherTemperature=0.0f;
+    float m_lastWeatherTemperature = 0.0f;
+    int index = 1;
 
-    const int m_spacing=5;
+    const int m_spacing = 5;
 };
 
 #endif // TRAY_TRAY_H

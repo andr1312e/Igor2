@@ -4,6 +4,11 @@
 UserEditPanel::UserEditPanel(QStringView currentUserName, QWidget *parent)
     : QWidget(parent)
     , m_currentUserName(currentUserName)
+    , m_rolesToolTip{  QStringLiteral("Интерфейс редактирования недоступен. Доступны только базовые возможности в запускаемом ПО"),
+                       QStringLiteral("Интерфейс редактирования недоступен. В запускаемых программах будут включены доп. возможности"),
+                       QStringLiteral("Обладает возможностями по просмотру базы данных, а так же доп. возможности запускаемого ПО"),
+                       QStringLiteral("Обладает неограниченными возможностями по редактированию базы данных, устанавливаете эту роль только по необходимости"),
+                    }
 {
     InitServicesAndModel();
     CreateUI();
@@ -41,31 +46,31 @@ UserEditPanel::~UserEditPanel()
 
 void UserEditPanel::InitServicesAndModel()
 {
-    m_kioskService=new KioskService();
+    m_kioskService = new KioskService();
 }
 
 void UserEditPanel::CreateUI()
 {
-    m_mainLayout=new QVBoxLayout();
+    m_mainLayout = new QVBoxLayout();
 
-    m_editFieldsLabel=new QLabel();
+    m_editFieldsLabel = new QLabel();
 
-    m_FCSFieldsLabel=new QLabel();
-    m_FCSLineEdit=new QLineEdit();
+    m_FCSFieldsLabel = new QLabel();
+    m_FCSLineEdit = new QLineEdit();
 
-    m_roleEditLabel=new QLabel();
-    m_roleComboBox=new QComboBox();
+    m_roleEditLabel = new QLabel();
+    m_roleComboBox = new QComboBox();
 
-    m_actionLayout=new QHBoxLayout();
-    m_saveUserDataButton=new QPushButton();
-    m_removeUserButton=new QPushButton();
+    m_actionLayout = new QHBoxLayout();
+    m_saveUserDataButton = new QPushButton();
+    m_removeUserButton = new QPushButton();
 
-    m_kioskLayout=new QHBoxLayout();
-    m_kioskModeIsEnabledLabel=new QLabel();
-    m_kioskModeIsDisabledLabel=new QLabel();
-    m_kioskModeState=new QtMaterialToggle();
+    m_kioskLayout = new QHBoxLayout();
+    m_kioskModeIsEnabledLabel = new QLabel();
+    m_kioskModeIsDisabledLabel = new QLabel();
+    m_kioskModeState = new QtMaterialToggle();
 
-    m_messagBox=new QMessageBox(this);
+    m_messagBox = new QMessageBox(this);
 }
 
 void UserEditPanel::InsertWidgetsIntoLayout()
@@ -80,29 +85,29 @@ void UserEditPanel::InsertWidgetsIntoLayout()
     m_actionLayout->addWidget(m_removeUserButton);
 
     m_kioskLayout->addWidget(m_kioskModeIsDisabledLabel);
-    m_kioskLayout->addStretch(3);
     m_kioskLayout->addWidget(m_kioskModeState);
-    m_kioskLayout->addStretch(3);
     m_kioskLayout->addWidget(m_kioskModeIsEnabledLabel);
 
     m_mainLayout->addLayout(m_actionLayout);
     m_mainLayout->addLayout(m_kioskLayout);
+    m_mainLayout->setContentsMargins(2, 0, 2, 0);
+    m_mainLayout->setSpacing(3);
 
     setLayout(m_mainLayout);
 }
 
 void UserEditPanel::FillUI()
 {
-    m_editPanelFont= QFont(m_FCSFieldsLabel->font());
+    m_editPanelFont = QFont(m_FCSFieldsLabel->font());
 
     m_editFieldsLabel->setText(userEditFields.front());
     m_FCSFieldsLabel->setText(QStringLiteral("Фамилия имя отчество: "));
     m_roleEditLabel->setText(QStringLiteral("Роль в системе: "));
 
-    for (int i=0; i<Roles.count(); ++i)
+    for (int i = 0; i < Roles.count(); ++i)
     {
         m_roleComboBox->addItem(Roles.at(i));
-        m_roleComboBox->setItemData(i, RolesToolTip.at(i), Qt::ToolTipRole);
+        m_roleComboBox->setItemData(i, m_rolesToolTip.at(i), Qt::ToolTipRole);
     }
 
     m_saveUserDataButton->setText(QStringLiteral("Сохранить"));
@@ -133,16 +138,16 @@ void UserEditPanel::ConnectObjects()
 
 void UserEditPanel::OnSaveUser()
 {
-    const QString FCS=m_FCSLineEdit->text();
+    const QString FCS = m_FCSLineEdit->text();
     if (FCS.isEmpty() || m_userId.isEmpty())
     {
         m_messagBox->show();
     }
     else
     {
-        const int roleIndex=m_roleComboBox->currentIndex();
+        const int roleIndex = m_roleComboBox->currentIndex();
         Q_EMIT ToSaveUser(m_userId, m_userName, FCS, m_oldRoleIndex, roleIndex);
-        m_oldRoleIndex=roleIndex;
+        m_oldRoleIndex = roleIndex;
         ShowSaveUserToast(m_userName);
     }
 }
@@ -171,12 +176,12 @@ void UserEditPanel::OnSetKioskMode(bool kioskModeState)
 
 void UserEditPanel::SetUser(const User &user)
 {
-    m_userName=user.name;
-    m_userId=user.userId;
-    m_oldRoleIndex=user.role;
+    m_userName = user.GetUserName();
+    m_userId = user.GetUserId();
+    m_oldRoleIndex = user.GetUserRole();
     GetUserKioskState(m_userName);
     InsertUserData(user);
-    if (m_currentUserName==m_userName)
+    if (m_currentUserName == m_userName)
     {
         m_kioskModeState->setDisabled(true);
         m_kioskModeState->setToolTip(QStringLiteral("Режим системного киоска для текущего пользователя установить нельзя"));
@@ -227,23 +232,23 @@ void UserEditPanel::GetUserKioskState(const QString &userName)
 
 void UserEditPanel::InsertUserData(const User &user)
 {
-    if (-1==user.role)
+    if (user.RoleIsValid())
+    {
+        m_editFieldsLabel->setText(userEditFields.back());
+        m_FCSLineEdit->setText(user.GetUserFCS());
+        m_roleComboBox->setCurrentText(Roles.at(user.GetUserRole()));
+    }
+    else
     {
         m_editFieldsLabel->setText(userEditFields.front());
         m_FCSLineEdit->clear();
         m_roleComboBox->setCurrentIndex(0);
     }
-    else
-    {
-        m_editFieldsLabel->setText(userEditFields.back());
-        m_FCSLineEdit->setText(user.FCS);
-        m_roleComboBox->setCurrentText(Roles.at(user.role));
-    }
 }
 
 void UserEditPanel::ShowSaveUserToast(const QString &userName)
 {
-    QToast* const pToast=QToast::CreateToast("Данные пользователя " + userName + " сохранены в базе",QToast::LENGTH_LONG, this);
+    QToast *const pToast = QToast::CreateToast("Данные пользователя " + userName + " сохранены в базе", QToast::LENGTH_LONG, this);
     pToast->show();
 }
 

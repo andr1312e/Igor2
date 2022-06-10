@@ -5,10 +5,10 @@
 
 #include <QObject>
 
-class CloseWindowButton : public InteractiveButtonBase
+class CloseWindowButton : public InteractiveButton
 {
 public:
-    explicit CloseWindowButton(QWidget* parent);
+    explicit CloseWindowButton(QWidget *parent);
     ~CloseWindowButton();
 
 private:
@@ -18,7 +18,7 @@ public:
     void setTopRightRadius(int radius);
 
 protected:
-    virtual void paintEvent(QPaintEvent*event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual QPainterPath GetBackGroundPainterPath() Q_DECL_OVERRIDE;
     virtual QPainterPath getWaterPainterPath(Water water) Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;

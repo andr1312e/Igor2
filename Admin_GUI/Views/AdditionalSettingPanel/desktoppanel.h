@@ -21,16 +21,17 @@
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/mylistview.h"
 
-enum ICONS_PANEL_TYPE {
-    USER_ICONS,
-    ROLE_ICONS
+enum class IconsPanelType
+{
+    UserIcons,
+    RoleIcons
 };
 
 class DesktopPanel: public QWidget
 {
     Q_OBJECT
 public:
-    explicit DesktopPanel(const ICONS_PANEL_TYPE type, UserDesktopService * userDesktopService, RoleDesktopService * roleDesktopService, QWidget *parent);
+    explicit DesktopPanel(const IconsPanelType type, UserDesktopService *userDesktopService, RoleDesktopService *roleDesktopService, QWidget *parent);
     ~DesktopPanel();
 
 private:
@@ -59,9 +60,9 @@ private:
     bool IsUserData() const;
 private:
     int m_currentRoleId;
-    const ICONS_PANEL_TYPE m_type;
-    UserDesktopService* const m_userDesktopService;
-    RoleDesktopService* const m_roleDesktopService;
+    const IconsPanelType m_type;
+    UserDesktopService *const m_userDesktopService;
+    RoleDesktopService *const m_roleDesktopService;
 
     QStandardItemModel *m_model;
     FileDelegate *m_fileDelegate;

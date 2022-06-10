@@ -1,136 +1,184 @@
 #include "interactivebuttonbase.h"
 
-InteractiveButtonBase::InteractiveButtonBase(QWidget *parent)
-    : QPushButton(parent), icon(nullptr), text(""), paint_addin(),
-      fore_paddings(4, 4, 4, 4),
-      self_enabled(true), parent_enabled(false), fore_enabled(true),
-      isShowAnimation(false), isShowForeground(true), show_ani_appearing(false), show_ani_disappearing(false),
-      show_duration(300), show_timestamp(0), hide_timestamp(0), show_ani_progress(0), show_ani_point(0, 0),
-      enter_pos(-1, -1), press_pos(-1, -1), release_pos(-1, -1), mouse_pos(-1, -1), anchor_pos(-1, -1),
-      offset_pos(0, 0), effect_pos(-1, -1), release_offset(0, 0),
-      hovering(false), pressing(false),
-      hover_timestamp(0), leave_timestamp(0), press_timestamp(0), release_timestamp(0),
-      hover_bg_duration(300), press_bg_duration(300), click_ani_duration(300),
-      move_speed(5),
-      icon_color(0, 0, 0), text_color(0, 0, 0),
+InteractiveButton::InteractiveButton(QWidget *parent)
+    : QPushButton(parent)
+    , icon(Q_NULLPTR)
+    , m_buttonText("")
+    , paint_addin()
+    , fore_paddings(4, 4, 4, 4)
+    , self_enabled(true)
+    , parent_enabled(false)
+    , fore_enabled(true)
+    , isShowAnimation(false)
+    , isShowForeground(true)
+    , m_isShowAppearAnimation(false)
+    , show_ani_disappearing(false)
+    , show_duration(300)
+    , show_timestamp(0)
+    , hide_timestamp(0)
+    , show_ani_progress(0)
+    , show_ani_point(0, 0)
+    , enter_pos(-1, -1)
+    , press_pos(-1, -1)
+    , release_pos(-1, -1)
+    , mouse_pos(-1, -1)
+    , anchor_pos(-1, -1)
+    , offset_pos(0, 0)
+    , effect_pos(-1, -1)
+    , release_offset(0, 0)
+    , m_isHovering(false)
+    , m_isOnPressing(false)
+    , hover_timestamp(0)
+    , leave_timestamp(0)
+    , press_timestamp(0)
+    , release_timestamp(0)
+    , hover_bg_duration(300)
+    , press_bg_duration(300)
+    , click_ani_duration(300)
+    , anchor_timer(new QTimer(this))
+    , move_speed(5),
+      m_iconColor(0, 0, 0), text_color(0, 0, 0),
       normal_bg(0xF2, 0xF2, 0xF2, 0), hover_bg(128, 128, 128, 32), press_bg(128, 128, 128, 64), border_bg(0, 0, 0, 0),
       focus_bg(0, 0, 0, 0), focus_border(0, 0, 0, 0),
-      hover_speed(5), press_start(40), press_speed(5),
-      hover_progress(0), press_progress(0), icon_padding_proper(0.2), icon_text_padding(4), icon_text_size(16),
-      border_width(1), radius_x(0), radius_y(0),
-      fontSize(0), fixed_fore_pos(false), fixed_fore_size(false), text_dynamic_size(false), auto_text_color(true), focusing(false),
+      m_hoverSpeed(5), press_start(40), m_pressSpeed(5),
+      m_hoverProgress(0), m_pressProgress(0), icon_padding_proper(0.2), icon_text_padding(4), m_iconTextSize(16),
+      m_borderWidth(1), m_radiusX(0), m_radiusY(0),
+      m_fontSize(0), fixed_fore_pos(false), fixed_fore_size(false), isTextDynamicSize(false), auto_text_color(true), focusing(false),
       click_ani_appearing(false), click_ani_disappearing(false), click_ani_progress(0),
-      mouse_press_event(nullptr), mouse_release_event(nullptr),
+      m_mousePressEventPointer(Q_NULLPTR), m_mouseReleaseEventPointer(Q_NULLPTR),
       unified_geometry(false), _l(0), _t(0), _w(32), _h(32),
       jitter_animation(true), elastic_coefficient(1.2), jitter_duration(300),
-      waterAnimation(true), water_press_duration(800), water_release_duration(400), water_finish_duration(300),
-      align(Qt::AlignCenter), _state(false), leave_after_clicked(false), _block_hover(false),
-      double_clicked(false), double_timer(nullptr), double_prevent(false)
+      m_hasWaterAnimation(true), m_waterPressDuration(800), m_waterReleaseDuration(400), m_waterFinishDuration(300),
+      m_aligment(Qt::AlignCenter), _state(false), m_leaveAfterClick(false), _block_hover(false),
+      m_hasDoubleClicked(false), m_doubleClickTimer(Q_NULLPTR), m_doubleIsPrevented(false)
 {
-    setMouseTracking(true); // 鼠标没有按下时也能捕获移动事件
+    setMouseTracking(true); // Захват событий движения, даже когда мышь не нажата, для дебага убрать
 
-    model = PaintModel::None;
+    m_paintModel = PaintModel::None;
 
-    anchor_timer = new QTimer(this);
     anchor_timer->setInterval(10);
-    connect(anchor_timer, SIGNAL(timeout()), this, SLOT(OnAnchorTimeOut()));
+    connect(anchor_timer, &QTimer::timeout, this, &InteractiveButton::OnAnchorTimeOut);
 
-    setWaterRipple();
+    SetWaterRipple();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(OnClicked()));
+    connect(this, &QPushButton::clicked, this, &InteractiveButton::OnClicked);
 
-//    setFocusPolicy(Qt::NoFocus); // 避免一个按钮还获取Tab键焦点
+    //    setFocusPolicy(Qt::NoFocus); // Избегайте кнопки, также получающей фокус табуляции
 }
 
 /**
- * 文字类型的按钮
+ * кнопка типа текста
  */
-InteractiveButtonBase::InteractiveButtonBase(QString text, QWidget *parent)
-    : InteractiveButtonBase(parent)
+InteractiveButton::InteractiveButton(const QString &text, QWidget *parent)
+    : InteractiveButton(parent)
 {
-    setText(text);
+    SetText(text);
 }
 
 /**
- * 图标类型的按钮
+ * Кнопка типа значка
  */
-InteractiveButtonBase::InteractiveButtonBase(QIcon icon, QWidget *parent)
-    : InteractiveButtonBase(parent)
+InteractiveButton::InteractiveButton(const QIcon &icon, QWidget *parent)
+    : InteractiveButton(parent)
 {
-    setIcon(icon);
+    SetIcon(icon);
 }
 
 /**
- * 变色图标类型的按钮
+ * Кнопки с изменяющимся цветом значка
  */
-InteractiveButtonBase::InteractiveButtonBase(QPixmap pixmap, QWidget *parent)
-    : InteractiveButtonBase(parent)
+InteractiveButton::InteractiveButton(const QPixmap &pixmap, QWidget *parent)
+    : InteractiveButton(parent)
 {
-    setPixmap(pixmap);
+    SetPixmap(pixmap);
 }
 
-InteractiveButtonBase::InteractiveButtonBase(QIcon icon, QString text, QWidget *parent)
-    : InteractiveButtonBase(parent)
+InteractiveButton::InteractiveButton(const QIcon &icon, const  QString &text, QWidget *parent)
+    : InteractiveButton(parent)
 {
-    setIcon(icon);
-    setText(text);
+    SetIcon(icon);
+    SetText(text);
 }
 
-InteractiveButtonBase::InteractiveButtonBase(QPixmap pixmap, QString text, QWidget *parent)
-    : InteractiveButtonBase(parent)
+InteractiveButton::InteractiveButton(const QPixmap &pixmap, const  QString &text, QWidget *parent)
+    : InteractiveButton(parent)
 {
-    setPixmap(pixmap);
-    setText(text);
+    SetPixmap(pixmap);
+    SetText(text);
+}
+
+InteractiveButton::~InteractiveButton()
+{
+    delete anchor_timer;
 }
 
 /**
- * 设置按钮文字
- * @param text 按钮文字
+ * установить текст кнопки
+ * @param buttonText текст кнопки
  */
-void InteractiveButtonBase::setText(QString text)
+void InteractiveButton::SetText(const QString &buttonText)
 {
-    this->text = text;
-    if (model == PaintModel::None)
+    m_buttonText = buttonText;
+    switch (m_paintModel)
     {
-        model = PaintModel::Text;
-        setAlign(Qt::AlignCenter);
+    case PaintModel::None:
+    {
+        m_paintModel = PaintModel::Text;
+        SetAlign(Qt::AlignCenter);
+        break;
     }
-    else if (model == PaintModel::PixmapMask)
+    case PaintModel::PixmapMask:
     {
         if (pixmap.isNull())
-            model = PaintModel::Text;
-        else
-            model = PaintModel::PixmapText;
-        setAlign(Qt::AlignLeft | Qt::AlignVCenter);
-        QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
-    }
-    else if (model == PaintModel::Icon)
-    {
-        if (text.isEmpty())
         {
-            model = PaintModel::Icon;
-            setAlign(Qt::AlignCenter);
+            m_paintModel = PaintModel::Text;
+        }
+        else
+        {
+            m_paintModel = PaintModel::PixmapText;
+        }
+        SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
+        const QFontMetrics fm(QWidget::font());
+        m_iconTextSize = fm.lineSpacing();
+        break;
+    }
+    case PaintModel::Icon:
+    {
+        if (buttonText.isEmpty())
+        {
+            m_paintModel = PaintModel::Icon;
+            SetAlign(Qt::AlignCenter);
         }
         else
         {
             if (icon.isNull())
-                model = PaintModel::Text;
+            {
+                m_paintModel = PaintModel::Text;
+            }
             else
-                model = PaintModel::IconText;
-            setAlign(Qt::AlignLeft | Qt::AlignVCenter);
-            QFontMetrics fm(this->font());
-            icon_text_size = fm.lineSpacing();
+            {
+                m_paintModel = PaintModel::IconText;
+            }
+            SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
+            const QFontMetrics fm(QWidget::font());
+            m_iconTextSize = fm.lineSpacing();
+            break;
         }
+    }
+    default:
+    {
+        break;
+    }
     }
 
     if (parent_enabled)
-        QPushButton::setText(text);
-
-    // 根据字体调整大小
-    if (text_dynamic_size)
     {
-        adjustMinimumSize();
+        QPushButton::setText(buttonText);
+    }
+    // Изменить размер в соответствии со шрифтом
+    if (isTextDynamicSize)
+    {
+        RegulateMinimumSize();
     }
     update();
 }
@@ -139,61 +187,63 @@ void InteractiveButtonBase::setText(QString text)
  * 设置 icon 图标
  * @param path 图标路径文本
  */
-void InteractiveButtonBase::setIconPath(QString path)
+void InteractiveButton::SetIcon(const QString &path)
 {
-    setIcon(QIcon(path));
+    m_iconPath = path;
+    const QIcon icon(path);
+    SetIcon(icon);
 }
 
 /**
  * 设置 pixmap 图标
  * @param path 图标路径文本
  */
-void InteractiveButtonBase::setPixmapPath(QString path)
+void InteractiveButton::setPixmapPath(const QString &path)
 {
-    setPixmap(QPixmap(path));
+    SetPixmap(QPixmap(path));
 }
 
 /**
  * 设置 icon
  * @param icon 图标
  */
-void InteractiveButtonBase::setIcon(QIcon icon)
+void InteractiveButton::SetIcon(const QIcon &icon)
 {
-    if (model == PaintModel::None)
+    if (m_paintModel == PaintModel::None)
     {
-        model = PaintModel::Icon;
-        setAlign(Qt::AlignCenter);
+        m_paintModel = PaintModel::Icon;
+        SetAlign(Qt::AlignCenter);
     }
-    else if (model == PaintModel::Text)
+    else if (m_paintModel == PaintModel::Text)
     {
-        if (text.isEmpty())
-            model = PaintModel::Icon;
+        if (m_buttonText.isEmpty())
+            m_paintModel = PaintModel::Icon;
         else
-            model = PaintModel::IconText;
-        setAlign(Qt::AlignLeft | Qt::AlignVCenter);
+            m_paintModel = PaintModel::IconText;
+        SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
         QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
+        m_iconTextSize = fm.lineSpacing();
     }
-    else if (model == PaintModel::PixmapMask)
+    else if (m_paintModel == PaintModel::PixmapMask)
     {
         pixmap = QPixmap();
-        model = PaintModel::Icon;
+        m_paintModel = PaintModel::Icon;
     }
-    else if (model == PaintModel::PixmapText)
+    else if (m_paintModel == PaintModel::PixmapText)
     {
         pixmap = QPixmap();
-        if (text.isEmpty())
-            model = PaintModel::Icon;
+        if (m_buttonText.isEmpty())
+            m_paintModel = PaintModel::Icon;
         else
-            model = PaintModel::IconText;
-        setAlign(Qt::AlignLeft | Qt::AlignVCenter);
+            m_paintModel = PaintModel::IconText;
+        SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
         QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
+        m_iconTextSize = fm.lineSpacing();
     }
-    else if (model == PaintModel::IconText && text.isEmpty())
+    else if (m_paintModel == PaintModel::IconText && m_buttonText.isEmpty())
     {
-        model = PaintModel::Icon;
-        setAlign(Qt::AlignCenter);
+        m_paintModel = PaintModel::Icon;
+        SetAlign(Qt::AlignCenter);
     }
     this->icon = icon;
     if (parent_enabled)
@@ -205,37 +255,37 @@ void InteractiveButtonBase::setIcon(QIcon icon)
  * 设置 Pixmap
  * @param pixmap [description]
  */
-void InteractiveButtonBase::setPixmap(QPixmap pixmap)
+void InteractiveButton::SetPixmap(const QPixmap &pixmap)
 {
-    if (model == PaintModel::None)
-        model = PaintModel::PixmapMask;
-    else if (model == PaintModel::Text)
+    if (m_paintModel == PaintModel::None)
+        m_paintModel = PaintModel::PixmapMask;
+    else if (m_paintModel == PaintModel::Text)
     {
-        if (text.isEmpty())
-            model = PaintModel::PixmapMask;
+        if (m_buttonText.isEmpty())
+            m_paintModel = PaintModel::PixmapMask;
         else
-            model = PaintModel::PixmapText;
-        setAlign(Qt::AlignLeft | Qt::AlignVCenter);
+            m_paintModel = PaintModel::PixmapText;
+        SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
         QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
+        m_iconTextSize = fm.lineSpacing();
     }
-    else if (model == PaintModel::Icon)
+    else if (m_paintModel == PaintModel::Icon)
     {
         icon = QIcon();
-        model = PaintModel::PixmapMask;
+        m_paintModel = PaintModel::PixmapMask;
     }
-    else if (model == PaintModel::IconText)
+    else if (m_paintModel == PaintModel::IconText)
     {
         icon = QIcon();
-        if (text.isEmpty())
-            model = PaintModel::PixmapMask;
+        if (m_buttonText.isEmpty())
+            m_paintModel = PaintModel::PixmapMask;
         else
-            model = PaintModel::PixmapText;
-        setAlign(Qt::AlignLeft | Qt::AlignVCenter);
+            m_paintModel = PaintModel::PixmapText;
+        SetAlign(Qt::AlignLeft | Qt::AlignVCenter);
         QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
+        m_iconTextSize = fm.lineSpacing();
     }
-    this->pixmap = getMaskPixmap(pixmap, isEnabled() ? icon_color : getOpacityColor(icon_color));
+    this->pixmap = getMaskPixmap(pixmap, isEnabled() ? m_iconColor : getOpacityColor(m_iconColor));
     if (parent_enabled)
         QPushButton::setIcon(QIcon(pixmap));
     update();
@@ -247,10 +297,10 @@ void InteractiveButtonBase::setPixmap(QPixmap pixmap)
  * @param align  对齐方式
  * @param size   图标尺寸
  */
-void InteractiveButtonBase::setPaintAddin(QPixmap pixmap, Qt::Alignment align, QSize size)
+void InteractiveButton::setPaintAddin(QPixmap pixmap, Qt::Alignment align, QSize size)
 {
     QBitmap mask = pixmap.mask();
-    pixmap.fill(icon_color);
+    pixmap.fill(m_iconColor);
     pixmap.setMask(mask);
     paint_addin = PaintAddin(pixmap, align, size);
     update();
@@ -261,7 +311,7 @@ void InteractiveButtonBase::setPaintAddin(QPixmap pixmap, Qt::Alignment align, Q
  * 如果关闭，则相当于默认的 QPushButton
  * @param e 开关
  */
-void InteractiveButtonBase::setSelfEnabled(bool e)
+void InteractiveButton::setSelfEnabled(bool e)
 {
     self_enabled = e;
 }
@@ -271,16 +321,16 @@ void InteractiveButtonBase::setSelfEnabled(bool e)
  * 如果开启，则绘制父类背景、父类前景
  * @param e 开关
  */
-void InteractiveButtonBase::setParentEnabled(bool e)
+void InteractiveButton::setParentEnabled(bool e)
 {
     parent_enabled = e;
 
-    // 传递子类内容到父类去，避免子类关掉后不显示
-    if (model == PaintModel::Text || model == PaintModel::IconText || model == PaintModel::PixmapText)
-        QPushButton::setText(text);
-    if (model == PaintModel::Icon || model == PaintModel::IconText)
+    // Передаем содержимое подкласса родительскому классу, чтобы подкласс не отображался после его отключения
+    if (m_paintModel == PaintModel::Text || m_paintModel == PaintModel::IconText || m_paintModel == PaintModel::PixmapText)
+        QPushButton::setText(m_buttonText);
+    if (m_paintModel == PaintModel::Icon || m_paintModel == PaintModel::IconText)
         QPushButton::setIcon(icon);
-    if (model == PaintModel::PixmapMask || model == PaintModel::PixmapText)
+    if (m_paintModel == PaintModel::PixmapMask || m_paintModel == PaintModel::PixmapText)
         QPushButton::setIcon(QIcon(pixmap));
 }
 
@@ -289,7 +339,7 @@ void InteractiveButtonBase::setParentEnabled(bool e)
  * 关闭后则只绘制背景
  * @param e 开启
  */
-void InteractiveButtonBase::setForeEnabled(bool e)
+void InteractiveButton::setForeEnabled(bool e)
 {
     fore_enabled = e;
 }
@@ -298,7 +348,7 @@ void InteractiveButtonBase::setForeEnabled(bool e)
  * 设置鼠标悬浮背景渐变的动画时长
  * @param d 动画时长（毫秒）
  */
-void InteractiveButtonBase::setHoverAniDuration(int d)
+void InteractiveButton::setHoverAniDuration(int d)
 {
     this->hover_bg_duration = d;
     //    hover_progress = 0; // 重置hover效果
@@ -308,7 +358,7 @@ void InteractiveButtonBase::setHoverAniDuration(int d)
  * 设置鼠标按下渐变效果的动画时长
  * @param d 动画时长（毫秒）
  */
-void InteractiveButtonBase::setPressAniDuration(int d)
+void InteractiveButton::setPressAniDuration(int d)
 {
     this->press_bg_duration = d;
 }
@@ -317,7 +367,7 @@ void InteractiveButtonBase::setPressAniDuration(int d)
  * 设置单击效果的动画时长
  * @param d 动画时长（毫秒）
  */
-void InteractiveButtonBase::setClickAniDuration(int d)
+void InteractiveButton::setClickAniDuration(int d)
 {
     this->click_ani_duration = d;
 }
@@ -328,34 +378,34 @@ void InteractiveButtonBase::setClickAniDuration(int d)
  * @param release 松开后速度（时长毫秒）
  * @param finish  渐变消失速度（时长毫秒）
  */
-void InteractiveButtonBase::setWaterAniDuration(int press, int release, int finish)
+void InteractiveButton::setWaterAniDuration(int press, int release, int finish)
 {
-    this->water_press_duration = press;
-    this->water_release_duration = release;
-    this->water_finish_duration = finish;
+    this->m_waterPressDuration = press;
+    this->m_waterReleaseDuration = release;
+    this->m_waterFinishDuration = finish;
 }
 
 /**
- * 各种状态改变
- * 主要是监控 可用 状态，不可用时设置为半透明
+ * Различные изменения статуса
+ * В основном для контроля доступного статуса, установите полупрозрачный, когда недоступен
  */
-void InteractiveButtonBase::changeEvent(QEvent *event)
+void InteractiveButton::changeEvent(QEvent *event)
 {
     QPushButton::changeEvent(event);
 
-    if (event->type() == QEvent::EnabledChange && model == PixmapMask) // 可用状态改变了
+    if (event->type() == QEvent::EnabledChange && m_paintModel == PaintModel::PixmapMask) // 可用状态改变了
     {
-        if (isEnabled()) // 恢复可用：透明度变回去
+        if (isEnabled()) // Восстановлено доступно: прозрачность изменена обратно
         {
-            QColor color = icon_color;
+            QColor color = m_iconColor;
             color.setAlpha(color.alpha() * 2);
-            setIconColor(color);
+            SetIconColor(color);
         }
-        else // 变成不可用：透明度减半
+        else // Стать недоступным: прозрачность уменьшена вдвое
         {
-            QColor color = icon_color;
+            QColor color = m_iconColor;
             color.setAlpha(color.alpha() / 2);
-            setIconColor(color);
+            SetIconColor(color);
         }
     }
 }
@@ -365,11 +415,11 @@ void InteractiveButtonBase::changeEvent(QEvent *event)
  * 关闭时，将使用渐变动画
  * @param enable 开关
  */
-void InteractiveButtonBase::setWaterRipple(bool enable)
+void InteractiveButton::SetWaterRipple(bool enable)
 {
-    if (waterAnimation == enable)
+    if (m_hasWaterAnimation == enable)
         return;
-    waterAnimation = enable;
+    m_hasWaterAnimation = enable;
 }
 
 /**
@@ -377,7 +427,7 @@ void InteractiveButtonBase::setWaterRipple(bool enable)
  * 鼠标拖拽移动的距离越长，抖动距离越长、次数越多
  * @param enable 开关
  */
-void InteractiveButtonBase::setJitterAni(bool enable)
+void InteractiveButton::setJitterAni(bool enable)
 {
     jitter_animation = enable;
 }
@@ -387,7 +437,7 @@ void InteractiveButtonBase::setJitterAni(bool enable)
  * 监听图标尺寸大小变化、中心点偏移，计算新的中心坐标位置
  * @param enable 开关
  */
-void InteractiveButtonBase::setUnifyGeomerey(bool enable)
+void InteractiveButton::setUnifyGeomerey(bool enable)
 {
     unified_geometry = enable;
     _l = _t = 0;
@@ -396,84 +446,84 @@ void InteractiveButtonBase::setUnifyGeomerey(bool enable)
 }
 
 /**
- * 设置背景颜色
+ * установить цвет фона
  * @param bg 背景颜色
  */
-void InteractiveButtonBase::setBgColor(QColor bg)
+void InteractiveButton::SetBackgroundColor(const QColor &color)
 {
-    SetNormalColor(bg);
+    SetNormalColor(color);
     update();
 }
 
 /**
- * 设置事件背景颜色
+ * Установить цвет фона события
  * @param hover 鼠标悬浮时的背景颜色
  * @param press 鼠标按下时的背景颜色
  */
-void InteractiveButtonBase::setBgColor(QColor hover, QColor press)
+void InteractiveButton::SetBackgroundColor(const QColor &hover, const QColor &press)
 {
     if (hover != Qt::black)
         SetHoverColor(hover);
     if (press != Qt::black)
-        setPressColor(press);
+        SetPressColor(press);
     update();
 }
 
 /**
- * 设置按钮背景颜色
- * @param color 背景颜色
+ * Установить цвет фона кнопки
+ * @param color фоновый цвет
  */
-void InteractiveButtonBase::SetNormalColor(QColor color)
+void InteractiveButton::SetNormalColor(const QColor &color)
 {
     normal_bg = color;
     update();
 }
 
 /**
- * 设置边框线条颜色
- * @param color 边框颜色
+ * Установить цвет линии границы
+ * @param color цвет границы
  */
-void InteractiveButtonBase::SetBorderColor(QColor color)
+void InteractiveButton::SetBorderColor(const QColor &color)
 {
     border_bg = color;
 }
 
 /**
- * 设置鼠标悬浮时的背景颜色
- * @param color 背景颜色
+ * Установите цвет фона при наведении мыши
+ * @param color фоновый цвет
  */
-void InteractiveButtonBase::SetHoverColor(QColor color)
+void InteractiveButton::SetHoverColor(const QColor &color)
 {
     hover_bg = color;
 }
 
 /**
- * 设置鼠标按住时的背景颜色
- * @param color 背景颜色
+ * Установите цвет фона, когда мышь удерживается нажатой
+ * @param color фоновый цвет
  */
-void InteractiveButtonBase::setPressColor(QColor color)
+void InteractiveButton::SetPressColor(const QColor &color)
 {
     press_bg = color;
 }
 
 /**
- * 设置图标颜色（仅针对可变色的 pixmap 图标）
- * @param color 图标颜色
+ * Установите цвет значка (только для изменяющих цвет значков растрового изображения)
+ * @param color Цвет значка
  */
-void InteractiveButtonBase::setIconColor(QColor color)
+void InteractiveButton::SetIconColor(const QColor &color)
 {
-    icon_color = color;
+    m_iconColor = color;
 
-    // 绘制图标（如果有）
-    if (model == PaintModel::PixmapMask || model == PaintModel::PixmapText)
+    // нарисовать значок (если есть)
+    if (m_paintModel == PaintModel::PixmapMask || m_paintModel == PaintModel::PixmapText)
     {
-        pixmap = getMaskPixmap(pixmap, isEnabled() ? icon_color : getOpacityColor(icon_color));
+        pixmap = getMaskPixmap(pixmap, isEnabled() ? m_iconColor : getOpacityColor(m_iconColor));
     }
 
-    // 绘制额外角标（如果有的话）
+    // нарисовать дополнительные метки (если есть)
     if (paint_addin.enable)
     {
-        paint_addin.pixmap = getMaskPixmap(paint_addin.pixmap, isEnabled() ? icon_color : getOpacityColor(icon_color));
+        paint_addin.pixmap = getMaskPixmap(paint_addin.pixmap, isEnabled() ? m_iconColor : getOpacityColor(m_iconColor));
     }
 
     update();
@@ -483,7 +533,7 @@ void InteractiveButtonBase::setIconColor(QColor color)
  * 设置前景文字颜色
  * @param color 文字颜色
  */
-void InteractiveButtonBase::SetTextColor(QColor color)
+void InteractiveButton::SetTextColor(QColor color)
 {
     text_color = color;
     update();
@@ -493,7 +543,7 @@ void InteractiveButtonBase::SetTextColor(QColor color)
  * 设置获取焦点时的背景颜色（默认关闭）
  * @param color 背景颜色
  */
-void InteractiveButtonBase::setFocusBg(QColor color)
+void InteractiveButton::setFocusBg(QColor color)
 {
     setFocusPolicy(Qt::StrongFocus);
     focus_bg = color;
@@ -503,160 +553,161 @@ void InteractiveButtonBase::setFocusBg(QColor color)
  * 设置获取焦点时的边框颜色（默认关闭）
  * @param color 边框颜色
  */
-void InteractiveButtonBase::setFocusBorder(QColor color)
+void InteractiveButton::setFocusBorder(QColor color)
 {
     setFocusPolicy(Qt::StrongFocus);
     focus_border = color;
 }
 
 /**
- * 设置文字大小（PointSize，覆盖 font() 字体大小）
- * @param f 文字大小
+ * Установите размер текста (PointSize, переопределить font() размер шрифта)
  */
-void InteractiveButtonBase::setFontSize(int f)
+void InteractiveButton::SetFontSize(int newFontSize)
 {
-    if (!fontSize) // 第一次设置字体大小，直接设置
+    if (!m_fontSize) // Установите размер шрифта в первый раз, установите его напрямую
     {
-        fontSize = f;
+        m_fontSize = newFontSize;
         QFont font(this->font());
-        font.setPointSize(f);
+        font.setPointSize(newFontSize);
         setFont(font);
         update();
     }
-    else // 改变字体大小，使用字体缩放动画
+    else // Изменить размер шрифта, использовать анимацию масштабирования шрифта
     {
-        QPropertyAnimation *ani = new QPropertyAnimation(this, "font_size");
-        ani->setStartValue(fontSize);
-        ani->setEndValue(f);
-        ani->setDuration(click_ani_duration);
-        connect(ani, &QPropertyAnimation::finished, [=] {
-            QFontMetrics fm(this->font());
-            icon_text_size = fm.lineSpacing();
-            ani->deleteLater();
+        QPropertyAnimation *const animation = new QPropertyAnimation(this, "font_size");
+        animation->setStartValue(m_fontSize);
+        animation->setEndValue(newFontSize);
+        animation->setDuration(click_ani_duration);
+        connect(animation, &QPropertyAnimation::finished, [ = ]
+        {
+            const QFontMetrics fm(QPushButton::font());
+            m_iconTextSize = fm.lineSpacing();
         });
-        ani->start();
+        animation->start(QPropertyAnimation::DeleteWhenStopped);
     }
-    // 修改字体大小时调整按钮的最小尺寸，避免文字显示不全
-    if (text_dynamic_size)
+    // Отрегулируйте минимальный размер кнопки при изменении размера шрифта, чтобы избежать неполного отображения текста.
+    if (isTextDynamicSize)
     {
         QFont font;
-        font.setPointSize(f);
+        font.setPointSize(newFontSize);
         QFontMetrics fms(font);
-        setMinimumSize(fms.horizontalAdvance(text) + fore_paddings.left + fore_paddings.right, fms.lineSpacing() + fore_paddings.top + fore_paddings.bottom);
+        setMinimumSize(fms.horizontalAdvance(m_buttonText) + fore_paddings.left + fore_paddings.right, fms.lineSpacing() + fore_paddings.top + fore_paddings.bottom);
     }
-    if (model != PaintModel::Text)
+    if (m_paintModel != PaintModel::Text)
     {
-        QFontMetrics fm(this->font());
-        icon_text_size = fm.lineSpacing();
+        const QFontMetrics fm(this->font());
+        m_iconTextSize = fm.lineSpacing();
     }
 }
 
 /**
- * 获取字体大小
- * 用来作为字体动画的属性参数
- * @return 临时字体大小
+ * Получить размер шрифта
+ * Используется как параметр свойства для анимации шрифта
+ * @return временный размер шрифта
  */
-int InteractiveButtonBase::getFontSizeT()
+int InteractiveButton::GetFontSizeT()
 {
-    return fontSize;
+    return m_fontSize;
 }
 
 /**
- * 设置动画中的临时字体大小
- * 用来作为字体动画的属性参数
- * @param f 临时字体大小
+ * Установить временный размер шрифта в анимации
+ * Используется как параметр свойства для анимации шрифта
+ * @param f временный размер шрифта
  */
-void InteractiveButtonBase::setFontSizeT(int f)
+void InteractiveButton::SetFontSizeT(int fontSize)
 {
-    this->fontSize = f;
+    m_fontSize = fontSize;
     QFont font(this->font());
-    font.setPointSize(f);
+    font.setPointSize(fontSize);
     setFont(font);
     update();
 }
 
 /**
- * 如果点击失去焦点的话，即使鼠标移到上面，也不会出现背景
- * 可以用这个方法继续保持悬浮状态
+ * Если щелчок потеряет фокус, фон не появится, даже если мышь наведется на него
+ * Вы можете использовать этот метод, чтобы продолжать поддерживать приостановленное состояние
  */
-void InteractiveButtonBase::setHover()
+void InteractiveButton::SetHover()
 {
-    if (!hovering && inArea(mapFromGlobal(QCursor::pos())))
-        InteractiveButtonBase::enterEvent(new QEvent(QEvent::Type::None));
+    if (!m_isHovering && inArea(mapFromGlobal(QCursor::pos())))
+    {
+        InteractiveButton::enterEvent(new QEvent(QEvent::Type::None));
+    }
 }
 
 /**
- * 设置对齐方式
- * @param a 对齐方式
+ * установить выравнивание
+ * @param a Выравнивание
  */
-void InteractiveButtonBase::setAlign(Qt::Alignment a)
+void InteractiveButton::SetAlign(Qt::Alignment aligment)
 {
-    align = a;
+    m_aligment = aligment;
     update();
 }
 
 /**
- * 设置四个角的半径
+ * Установите бордер радиус
  * @param r 半径
  */
-void InteractiveButtonBase::setRadius(int r)
+void InteractiveButton::SetRadius(int radius)
 {
-    radius_x = radius_y = r;
+    m_radiusX = m_radiusY = radius;
 }
 
 /**
- * 分开设置 X、Y 的半径
- * @param rx X半径
- * @param ry Y半径
+ * Установите радиус X, Y отдельно
+ * @param radiusX X радиус
+ * @param radiusY Y радиус
  */
-void InteractiveButtonBase::setRadius(int rx, int ry)
+void InteractiveButton::SetRadius(int radiusX, int radiusY)
 {
-    radius_x = rx;
-    radius_y = ry;
+    m_radiusX = radiusX;
+    m_radiusY = radiusY;
 }
 
 /**
- * 设置边框线条的粗细
- * @param x 线条粗细
+ * Установите толщину линии границы
+ * @param x Толщина линии
  */
-void InteractiveButtonBase::setBorderWidth(int x)
+void InteractiveButton::setBorderWidth(int borderWidth)
 {
-    border_width = x;
+    m_borderWidth = borderWidth;
 }
 
 /**
- * 设置不可用情况（默认为假）
- * 区别于 setEnabled(bool)，两个相反的，并不是覆盖方法
- * @param dis 不可用
+ * установить недоступное условие
+ * отличный от setEnabled(bool)，Два противоположных, не переопределяющих метода
  */
-void InteractiveButtonBase::setDisabled(bool dis)
+void InteractiveButton::SetDisabled(bool newState)
 {
-    if (dis == !isEnabled()) // 相同的
+    if (newState == !isEnabled()) //идентичный
+    {
         return;
+    }
+    setEnabled(!newState);
 
-    setEnabled(!dis);
-
-    if (parentWidget() != nullptr)
+    if (parentWidget() != Q_NULLPTR)
     {
-        setAttribute(Qt::WA_TransparentForMouseEvents, dis); // 点击穿透
+        setAttribute(Qt::WA_TransparentForMouseEvents, newState); // Пролистать
     }
 
-    if (model == PixmapMask || model == PixmapText)
+    if (PaintModel::PixmapMask == m_paintModel || PaintModel::PixmapText == m_paintModel)
     {
-        pixmap = getMaskPixmap(pixmap, dis ? getOpacityColor(icon_color) : icon_color);
+        pixmap = getMaskPixmap(pixmap, newState ? getOpacityColor(m_iconColor) : m_iconColor);
     }
 
-    update(); // 修改透明度
+    update(); // Изменить прозрачность
 }
 
 /**
- * 设置前景和四条边的 paddings
- * @param l 左边空白
- * @param r 右边空白
- * @param t 顶边空白
- * @param b 底边空白
+ * Установите отступы для переднего плана и четырех сторон
+ * @param l левое поле
+ * @param r правое поле
+ * @param t верхнее поле
+ * @param b Нижнее поле
  */
-void InteractiveButtonBase::setPaddings(int l, int r, int t, int b)
+void InteractiveButton::SetPaddings(int l, int r, int t, int b)
 {
     fore_paddings.left = l;
     fore_paddings.right = r;
@@ -670,7 +721,7 @@ void InteractiveButtonBase::setPaddings(int l, int r, int t, int b)
  * @param h 横向
  * @param v 纵向
  */
-void InteractiveButtonBase::setPaddings(int h, int v)
+void InteractiveButton::SetPaddings(int h, int v)
 {
     fore_paddings.left = fore_paddings.right = (h + 1) / 2;
     fore_paddings.top = fore_paddings.bottom = (v + 1) / 2;
@@ -681,7 +732,7 @@ void InteractiveButtonBase::setPaddings(int h, int v)
  * 统一设置前景和四条边的 paddings
  * @param x 一样大小的四边留白
  */
-void InteractiveButtonBase::setPaddings(int x)
+void InteractiveButton::SetPaddings(int x)
 {
     fore_paddings.left = x;
     fore_paddings.right = x;
@@ -694,12 +745,12 @@ void InteractiveButtonBase::setPaddings(int x)
  * 设置Icon模式旁边空多少
  * @param x 0~1.0，越大越空
  */
-void InteractiveButtonBase::setIconPaddingProper(double x)
+void InteractiveButton::SetIconPaddingProper(double x)
 {
     icon_padding_proper = x;
-    int short_side = min(width(), height()); // 短边
-    // 非固定的情况，尺寸大小变了之后所有 padding 都要变
-    int padding = int(short_side * icon_padding_proper); //static_cast<int>(short_side * (1 - GOLDEN_RATIO) / 2);
+    const int shortSide = min(width(), height()); // Короткая сторона
+    //Для нефиксированных случаев все отступы должны быть изменены после изменения размера.
+    const int padding = int(shortSide * icon_padding_proper); //static_cast<int>(short_side * (1 - GOLDEN_RATIO) / 2);
     fore_paddings.left = fore_paddings.top = fore_paddings.right = fore_paddings.bottom = padding;
     update();
 }
@@ -708,15 +759,15 @@ void InteractiveButtonBase::setIconPaddingProper(double x)
  * 设置字体大小时是否同步修改按钮的最小尺寸（避免按钮显示不全）
  * @param d 开关
  */
-void InteractiveButtonBase::setTextDynamicSize(bool d)
+void InteractiveButton::setTextDynamicSize(bool d)
 {
-    text_dynamic_size = d;
+    isTextDynamicSize = d;
 }
 
 /**
  * 见 setFixedForePos(bool f)
  */
-void InteractiveButtonBase::setFixedTextPos(bool f)
+void InteractiveButton::setFixedTextPos(bool f)
 {
     fixed_fore_pos = f;
 }
@@ -728,7 +779,7 @@ void InteractiveButtonBase::setFixedTextPos(bool f)
  * 不影响任何其他功能
  * @param f [description]
  */
-void InteractiveButtonBase::setFixedForePos(bool f)
+void InteractiveButton::setFixedForePos(bool f)
 {
     fixed_fore_pos = f;
 }
@@ -739,33 +790,33 @@ void InteractiveButtonBase::setFixedForePos(bool f)
  * @param f     是否固定前景
  * @param addin 留白的像素大小
  */
-void InteractiveButtonBase::setFixedForeSize(bool f, int addin)
+void InteractiveButton::setFixedForeSize(bool f, int addin)
 {
     fixed_fore_size = f;
 
     if (!f)
         return;
-    if (model == PaintModel::Text || model == PaintModel::IconText || model == PaintModel::PixmapText)
+    if (m_paintModel == PaintModel::Text || m_paintModel == PaintModel::IconText || m_paintModel == PaintModel::PixmapText)
     {
-        int icon_width = (model != PaintModel::Text && icon.isNull()) ? 0 : icon_text_size;
+        int icon_width = (m_paintModel != PaintModel::Text && icon.isNull()) ? 0 : m_iconTextSize;
         QFont font = this->font();
-        if (fontSize > 0)
-            font.setPointSize(fontSize);
+        if (m_fontSize > 0)
+            font.setPointSize(m_fontSize);
         QFontMetrics fm(font);
-        int w = fm.horizontalAdvance(text);
+        int w = fm.horizontalAdvance(m_buttonText);
         w = icon_width + w + quick_sqrt(w / 2) + fore_paddings.left + fore_paddings.right;
         setMinimumSize(
             w + addin,
             fm.lineSpacing() + fore_paddings.top + fore_paddings.bottom + addin);
     }
-    else if (model == PaintModel::Icon || model == PaintModel::PixmapMask)
+    else if (m_paintModel == PaintModel::Icon || m_paintModel == PaintModel::PixmapMask)
     {
         int size = height();
         setMinimumSize(size + addin, size + addin);
     }
 }
 
-void InteractiveButtonBase::setSquareSize()
+void InteractiveButton::setSquareSize()
 {
     setFixedWidth(height());
     setMinimumWidth(height());
@@ -777,9 +828,9 @@ void InteractiveButtonBase::setSquareSize()
  * 避免菜单、弹窗出现后，由于鼠标仍然留在按钮上面，导致依旧显示 hover 背景
  * @param l 开关
  */
-void InteractiveButtonBase::setLeaveAfterClick(bool l)
+void InteractiveButton::setLeaveAfterClick(bool l)
 {
-    leave_after_clicked = l;
+    m_leaveAfterClick = l;
 }
 
 /**
@@ -788,35 +839,36 @@ void InteractiveButtonBase::setLeaveAfterClick(bool l)
  * 建议在 QListWidget 等地方使用！
  * @param e 开关
  */
-void InteractiveButtonBase::setDoubleClicked(bool e)
+void InteractiveButton::setDoubleClicked(bool e)
 {
-    double_clicked = e;
+    m_hasDoubleClicked = e;
 
-    if (double_timer == nullptr)
+    if (m_doubleClickTimer == Q_NULLPTR)
     {
-        double_timer = new QTimer(this);
-        double_timer->setInterval(DOUBLE_PRESS_INTERVAL);
-        connect(double_timer, &QTimer::timeout, [=] {
-            double_timer->stop();
-            emit clicked(); // 手动触发单击事件
+        m_doubleClickTimer = new QTimer(this);
+        m_doubleClickTimer->setInterval(DOUBLE_PRESS_INTERVAL);
+        connect(m_doubleClickTimer, &QTimer::timeout, [ = ]
+        {
+            m_doubleClickTimer->stop();
+            Q_EMIT clicked(); // 手动触发单击事件
         });
     }
 }
 
 /**
- * 动画时是否自动设置文字的颜色
+ * Автоматически устанавливать цвет текста во время анимации
  */
-void InteractiveButtonBase::setAutoTextColor(bool a)
+void InteractiveButton::setAutoTextColor(bool a)
 {
     this->auto_text_color = a;
 }
 
 /**
- * 一开始没有聚焦时，假装获取焦点
- * 通过信号槽使其他控件（例如QLineEdit）按下enter键触发此按钮事件
- * 直到触发了焦点改变事件，此控件失去焦点（需要手动改变）
+ * Делайте вид, что сфокусировались, когда изначально не были сфокусированы
+ * Сделайте другие элементы управления (например, QLineEdit) нажатием клавиши ввода, чтобы вызвать это событие кнопки через слот сигнала
+ * Пока не сработает событие изменения фокуса, элемент управления теряет фокус (требуется ручное изменение)
  */
-void InteractiveButtonBase::setPretendFocus(bool f)
+void InteractiveButton::setPretendFocus(bool f)
 {
     focusing = f;
     update();
@@ -827,11 +879,11 @@ void InteractiveButtonBase::setPretendFocus(bool f)
  * 一开始鼠标下的按钮一直在hover状态，移开也不会变
  * 开启后临时屏蔽，记得在动画结束后关闭
  */
-void InteractiveButtonBase::setBlockHover(bool b)
+void InteractiveButton::setBlockHover(bool b)
 {
     _block_hover = b;
-    if (b && hovering)
-        leaveEvent(nullptr);
+    if (b && m_isHovering)
+        leaveEvent(Q_NULLPTR);
 }
 
 /**
@@ -839,7 +891,7 @@ void InteractiveButtonBase::setBlockHover(bool b)
  * 鼠标进入按钮区域，前景图标从对面方向缩放出现
  * @param enable 开关
  */
-void InteractiveButtonBase::setShowAni(bool enable)
+void InteractiveButton::setShowAni(bool enable)
 {
     isShowAnimation = enable;
 
@@ -849,15 +901,15 @@ void InteractiveButtonBase::setShowAni(bool enable)
     }
     else if (isShowAnimation) // 开启隐藏前景
     {
-        if (!hovering && !pressing) // 应该是隐藏状态
+        if (!m_isHovering && !m_isOnPressing) // 应该是隐藏状态
         {
-            show_ani_appearing = show_ani_disappearing = isShowForeground = false;
+            m_isShowAppearAnimation = show_ani_disappearing = isShowForeground = false;
             show_ani_progress = 0;
         }
         else // 应该是显示状态
         {
             isShowForeground = true;
-            show_ani_appearing = show_ani_disappearing = false;
+            m_isShowAppearAnimation = show_ani_disappearing = false;
             show_ani_progress = 100;
         }
     }
@@ -867,7 +919,7 @@ void InteractiveButtonBase::setShowAni(bool enable)
  * 按钮前景出现动画
  * 从中心点出现的缩放动画
  */
-void InteractiveButtonBase::showForeground()
+void InteractiveButton::showForeground()
 {
     if (!isShowAnimation)
         return;
@@ -876,7 +928,7 @@ void InteractiveButtonBase::showForeground()
         anchor_timer->start();
     if (show_ani_disappearing)
         show_ani_disappearing = false;
-    show_ani_appearing = true;
+    m_isShowAppearAnimation = true;
     show_timestamp = getTimestamp();
     isShowForeground = true;
     show_ani_point = QPoint(0, 0);
@@ -887,7 +939,7 @@ void InteractiveButtonBase::showForeground()
  * 指定方向（笛卡尔坐标），从反方向至中心点
  * @param point 最开始出现的方向（大小不影响，只按 x、y 比例来）
  */
-void InteractiveButtonBase::showForeground2(QPoint point)
+void InteractiveButton::showForeground2(QPoint point)
 {
     showForeground();
     if (point == QPoint(0, 0))
@@ -902,14 +954,14 @@ void InteractiveButtonBase::showForeground2(QPoint point)
  * 隐藏前景
  * 为下一次的出现动画做准备
  */
-void InteractiveButtonBase::hideForeground()
+void InteractiveButton::hideForeground()
 {
     if (!isShowAnimation)
         return;
     if (!anchor_timer->isActive())
         anchor_timer->start();
-    if (show_ani_appearing)
-        show_ani_appearing = false;
+    if (m_isShowAppearAnimation)
+        m_isShowAppearAnimation = false;
     show_ani_disappearing = true;
     hide_timestamp = getTimestamp();
 }
@@ -920,14 +972,15 @@ void InteractiveButtonBase::hideForeground()
  * @param time  延迟时长（毫秒）
  * @param point 出现方向
  */
-void InteractiveButtonBase::delayShowed(int time, QPoint point)
+void InteractiveButton::delayShowed(int time, QPoint point)
 {
     setShowAni(true);
-    QTimer::singleShot(time, [=] {
+    QTimer::singleShot(time, [ = ]
+    {
         showForeground2(point);
-        connect(this, &InteractiveButtonBase::ToShowAnimationFinished, [=] {
+        connect(this, &InteractiveButton::ToShowAnimationFinished, [ = ] {
             setShowAni(false);
-            disconnect(this, SIGNAL(ToShowAnimationFinished()), nullptr, nullptr);
+            disconnect(this, SIGNAL(ToShowAnimationFinished()), Q_NULLPTR, Q_NULLPTR);
         });
     });
 }
@@ -935,9 +988,9 @@ void InteractiveButtonBase::delayShowed(int time, QPoint point)
 /**
  * 获取文字
  */
-QString InteractiveButtonBase::getText()
+const QString &InteractiveButton::GetText() const noexcept
 {
-    return text;
+    return m_buttonText;
 }
 
 /**
@@ -945,37 +998,38 @@ QString InteractiveButtonBase::getText()
  * 并解决菜单无法监听到 release 的问题
  * @param menu 菜单对象
  */
-void InteractiveButtonBase::setMenu(QMenu *menu)
+void InteractiveButton::setMenu(QMenu *menu)
 {
-    // 默认设置了不获取焦点事件，所以如果设置了菜单的话，就不会有Release事件，水波纹动画会一直飘荡
-    // 在 focusOut 事件中，模拟了 release 事件，
-    this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
-
+    // Значение по умолчанию — не получать событие фокуса
+    //, поэтому, если установлено меню, события Release не будет
+    //, а анимация водной ряби всегда будет плавать.
+    // В событии focusOut моделируется событие освобождения,
+    QWidget::setFocusPolicy(Qt::FocusPolicy::ClickFocus);
     QPushButton::setMenu(menu);
 }
 
 /**
  * 根据内容，调整最小尺寸（不影响最大值）
  */
-void InteractiveButtonBase::adjustMinimumSize()
+void InteractiveButton::RegulateMinimumSize()
 {
-    int icon_width = (model == PaintModel::Text || model == PaintModel::None) || icon.isNull() ? 0 : icon_text_size;
-    if (icon_width && !text.isEmpty())
+    int icon_width = (m_paintModel == PaintModel::Text || m_paintModel == PaintModel::None) || icon.isNull() ? 0 : m_iconTextSize;
+    if (icon_width && !m_buttonText.isEmpty())
         icon_width += icon_text_padding;
     int w = 0, h = 0;
-    if (fontSize <= 0)
+    if (m_fontSize <= 0)
     {
         QFontMetrics fm(font());
-        w = fm.horizontalAdvance(text);
+        w = fm.horizontalAdvance(m_buttonText);
         w = icon_width + w + quick_sqrt(w / 2) + fore_paddings.left + fore_paddings.right;
         h = fm.lineSpacing() + fore_paddings.top + fore_paddings.bottom;
     }
     else
     {
         QFont font;
-        font.setPointSize(fontSize);
+        font.setPointSize(m_fontSize);
         QFontMetrics fm(font);
-        w = fm.horizontalAdvance(text);
+        w = fm.horizontalAdvance(m_buttonText);
         w = icon_width + w + quick_sqrt(w / 2) + fore_paddings.left + fore_paddings.right;
         h = fm.lineSpacing() + fore_paddings.top + fore_paddings.bottom;
     }
@@ -987,7 +1041,7 @@ void InteractiveButtonBase::adjustMinimumSize()
  * 一个用来作为开关效果的属性
  * @param s 状态
  */
-void InteractiveButtonBase::setState(bool s)
+void InteractiveButton::setState(bool s)
 {
     _state = s;
     update();
@@ -997,7 +1051,7 @@ void InteractiveButtonBase::setState(bool s)
  * 获取状态
  * @return 状态
  */
-bool InteractiveButtonBase::getState()
+bool InteractiveButton::GetCheckedState() const noexcept
 {
     return _state;
 }
@@ -1008,9 +1062,9 @@ bool InteractiveButtonBase::getState()
  * @param s 目标状态（默认为false）
  * @param a 鼠标在区域内则点击无效（恐怕再次点击）
  */
-void InteractiveButtonBase::simulateStatePress(bool s, bool a)
+void InteractiveButton::simulateStatePress(bool s, bool a)
 {
-    if (getState() == s)
+    if (GetCheckedState() == s)
         return;
 
     // 鼠标悬浮在上方，有两种情况：
@@ -1023,7 +1077,7 @@ void InteractiveButtonBase::simulateStatePress(bool s, bool a)
     mouseReleaseEvent(new QMouseEvent(QMouseEvent::Type::None, QPoint(width() / 2, height() / 2), Qt::LeftButton, Qt::NoButton, Qt::NoModifier));
 
     // if (!inArea(mapFromGlobal(QCursor::pos()))) // 针对模拟release 后面 // 必定成立
-    hovering = false;
+    m_isHovering = false;
 }
 
 /**
@@ -1031,13 +1085,13 @@ void InteractiveButtonBase::simulateStatePress(bool s, bool a)
  * 适用于键盘操作时，模拟鼠标hover状态
  * 用 discardHoverPress 取消状态
  */
-void InteractiveButtonBase::simulateHover()
+void InteractiveButton::simulateHover()
 {
-    if (!hovering)
+    if (!m_isHovering)
     {
         if (_block_hover)
             setBlockHover(false); // 可能已经临时屏蔽掉鼠标 enter 事件，强制hover
-        enterEvent(nullptr);
+        enterEvent(Q_NULLPTR);
     }
 }
 
@@ -1047,12 +1101,12 @@ void InteractiveButtonBase::simulateHover()
  * 浮窗关闭后调用此方法
  * @param force 如果鼠标仍在此按钮内，是否强制取消hover/press状态
  */
-void InteractiveButtonBase::discardHoverPress(bool force)
+void InteractiveButton::discardHoverPress(bool force)
 {
     if (!force && inArea(mapFromGlobal(QCursor::pos()))) // 鼠标还在这范围内
         return;
 
-    if (pressing)
+    if (m_isOnPressing)
     {
         mouseReleaseEvent(new QMouseEvent(QMouseEvent::Type::None, QPoint(width() / 2, height() / 2), Qt::LeftButton, Qt::NoButton, Qt::NoModifier));
     }
@@ -1061,7 +1115,7 @@ void InteractiveButtonBase::discardHoverPress(bool force)
 /**
  * 鼠标移入事件，触发 hover 时间戳
  */
-void InteractiveButtonBase::enterEvent(QEvent *event)
+void InteractiveButton::enterEvent(QEvent *event)
 {
     if (_block_hover) // 临时屏蔽hover事件
     {
@@ -1074,12 +1128,12 @@ void InteractiveButtonBase::enterEvent(QEvent *event)
     {
         anchor_timer->start();
     }
-    hovering = true;
+    m_isHovering = true;
     hover_timestamp = getTimestamp();
     leave_timestamp = 0;
     if (mouse_pos == QPoint(-1, -1))
         mouse_pos = mapFromGlobal(QCursor::pos());
-    emit ToMouseEnter();
+    Q_EMIT ToMouseEnter();
 
     return QPushButton::enterEvent(event);
 }
@@ -1087,12 +1141,12 @@ void InteractiveButtonBase::enterEvent(QEvent *event)
 /**
  * 鼠标移开事件，触发 leave 时间戳
  */
-void InteractiveButtonBase::leaveEvent(QEvent *event)
+void InteractiveButton::leaveEvent(QEvent *event)
 {
-    hovering = false;
-    if (!pressing)
+    m_isHovering = false;
+    if (!m_isOnPressing)
         mouse_pos = QPoint(width() / 2, height() / 2);
-    emit ToMouseLeave();
+    Q_EMIT ToMouseLeave();
 
     return QPushButton::leaveEvent(event);
 }
@@ -1101,33 +1155,33 @@ void InteractiveButtonBase::leaveEvent(QEvent *event)
  * 鼠标按下事件，触发 press 时间戳
  * 添加水波纹动画 waters 队列
  */
-void InteractiveButtonBase::mousePressEvent(QMouseEvent *event)
+void InteractiveButton::mousePressEvent(QMouseEvent *event)
 {
     mouse_pos = event->pos();
 
     if (event->button() == Qt::LeftButton)
     {
-        if (!hovering)
-            InteractiveButtonBase::enterEvent(new QEvent(QEvent::Type::None));
+        if (!m_isHovering)
+            InteractiveButton::enterEvent(new QEvent(QEvent::Type::None));
 
-        pressing = true;
+        m_isOnPressing = true;
         press_pos = mouse_pos;
         // 判断双击事件
-        if (double_clicked)
+        if (m_hasDoubleClicked)
         {
             qint64 last_press_timestamp = press_timestamp;
             press_timestamp = getTimestamp();
             if (release_timestamp + DOUBLE_PRESS_INTERVAL >= press_timestamp && last_press_timestamp + SINGLE_PRESS_INTERVAL > release_timestamp && release_pos == press_pos) // 是双击(判断两次单击的间隔)
             {
-                double_prevent = true; // 阻止本次的release识别为单击
+                m_doubleIsPrevented = true; // 阻止本次的release识别为单击
                 press_timestamp = 0;   // 避免很可能出现的三击、四击...
-                double_timer->stop();  // 取消延迟一小会儿的单击信号
-                emit ToDoubleClicked();
+                m_doubleClickTimer->stop();  // 取消延迟一小会儿的单击信号
+                Q_EMIT ToDoubleClicked();
                 return;
             }
             else
             {
-                double_prevent = false; // 避免有额外的 bug
+                m_doubleIsPrevented = false; // 避免有额外的 bug
             }
         }
         else
@@ -1135,20 +1189,22 @@ void InteractiveButtonBase::mousePressEvent(QMouseEvent *event)
             press_timestamp = getTimestamp();
         }
 
-        if (waterAnimation)
+        if (m_hasWaterAnimation)
         {
-            if (waters.size() && waters.last().release_timestamp == 0) // 避免两个按键同时按下
-                waters.last().release_timestamp = getTimestamp();
+            if (!waters.isEmpty() && waters.constLast().m_releaseTimestamp == 0) // 避免两个按键同时按下
+            {
+                waters.last().m_releaseTimestamp = getTimestamp();
+            }
             waters << Water(press_pos, press_timestamp);
         }
         else // 透明渐变
         {
-            if (press_progress < press_start)
-                press_progress = press_start; // 直接设置为按下效果初始值（避免按下反应慢）
+            if (m_pressProgress < press_start)
+                m_pressProgress = press_start; // 直接设置为按下效果初始值（避免按下反应慢）
         }
     }
-    mouse_press_event = event;
-    emit ToMousePress(event);
+    m_mousePressEventPointer = event;
+    Q_EMIT ToMousePress(event);
 
     return QPushButton::mousePressEvent(event);
 }
@@ -1157,15 +1213,15 @@ void InteractiveButtonBase::mousePressEvent(QMouseEvent *event)
  * 鼠标松开事件，触发 release 时间戳
  * 添加抖动动画 jitters 队列
  */
-void InteractiveButtonBase::mouseReleaseEvent(QMouseEvent *event)
+void InteractiveButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (pressing && event->button() == Qt::LeftButton)
+    if (m_isOnPressing && event->button() == Qt::LeftButton)
     {
-        if (!inArea(event->pos()) || leave_after_clicked)
+        if (!inArea(event->pos()) || m_leaveAfterClick)
         {
-            hovering = false;
+            m_isHovering = false;
         }
-        pressing = false;
+        m_isOnPressing = false;
         release_pos = event->pos();
         release_timestamp = getTimestamp();
 
@@ -1175,16 +1231,16 @@ void InteractiveButtonBase::mouseReleaseEvent(QMouseEvent *event)
             setJitter();
         }
 
-        if (waterAnimation && waters.size())
+        if (m_hasWaterAnimation && waters.size())
         {
-            waters.last().release_timestamp = release_timestamp;
+            waters.last().m_releaseTimestamp = release_timestamp;
         }
 
-        if (double_clicked)
+        if (m_hasDoubleClicked)
         {
-            if (double_prevent) // 双击的当次release，不参与单击计算
+            if (m_doubleIsPrevented) // 双击的当次release，不参与单击计算
             {
-                double_prevent = false;
+                m_doubleIsPrevented = false;
                 return;
             }
 
@@ -1194,22 +1250,22 @@ void InteractiveButtonBase::mouseReleaseEvent(QMouseEvent *event)
             }
             else // 可能是双击，准备
             {
-                double_timer->start();
+                m_doubleClickTimer->start();
                 return; // 禁止单击事件
             }
         }
     }
-    else if (leave_after_clicked && !pressing && double_clicked && double_prevent) // 双击，失去焦点了，pressing 丢失
+    else if (m_leaveAfterClick && !m_isOnPressing && m_hasDoubleClicked && m_doubleIsPrevented) // 双击，失去焦点了，pressing 丢失
     {
         return;
     }
     else if (event->button() == Qt::RightButton && event->buttons() == Qt::NoButton)
     {
         if ((release_pos - press_pos).manhattanLength() < QApplication::startDragDistance())
-            emit ToRightClicked();
+            Q_EMIT ToRightClicked();
     }
-    mouse_release_event = event;
-    emit ToMouseRelease(event);
+    m_mouseReleaseEventPointer = event;
+    Q_EMIT ToMouseRelease(event);
 
     return QPushButton::mouseReleaseEvent(event);
 }
@@ -1217,7 +1273,7 @@ void InteractiveButtonBase::mouseReleaseEvent(QMouseEvent *event)
 /**
  * 鼠标移动事件
  */
-void InteractiveButtonBase::mouseMoveEvent(QMouseEvent *event)
+void InteractiveButton::mouseMoveEvent(QMouseEvent *event)
 {
     if (_block_hover) // 临时屏蔽hover事件
     {
@@ -1225,9 +1281,9 @@ void InteractiveButtonBase::mouseMoveEvent(QMouseEvent *event)
             event->accept();
         return;
     }
-    if (hovering == false) // 失去焦点又回来了
+    if (m_isHovering == false) // 失去焦点又回来了
     {
-        enterEvent(nullptr);
+        enterEvent(Q_NULLPTR);
     }
     mouse_pos = mapFromGlobal(QCursor::pos());
 
@@ -1238,16 +1294,16 @@ void InteractiveButtonBase::mouseMoveEvent(QMouseEvent *event)
  * 尺寸大小改变事件
  * 同步调整和尺寸有关的所有属性
  */
-void InteractiveButtonBase::resizeEvent(QResizeEvent *event)
+void InteractiveButton::resizeEvent(QResizeEvent *event)
 {
-    if (!pressing && !hovering)
+    if (!m_isOnPressing && !m_isHovering)
     {
         mouse_pos = QPoint(width() / 2, height() / 2);
         anchor_pos = mouse_pos;
     }
-    water_radius = static_cast<int>(max(width(), height()) * 1.42); // 长边
+    m_waterRadius = static_cast<int>(max(width(), height()) * 1.42); // 长边
     // 非固定的情况，尺寸大小变了之后所有 padding 都要变
-    if (!fixed_fore_size && (model == PaintModel::Icon || model == PaintModel::PixmapMask))
+    if (!fixed_fore_size && (m_paintModel == PaintModel::Icon || m_paintModel == PaintModel::PixmapMask))
     {
         int short_side = min(width(), height());        // 短边
         int padding = int(short_side * icon_padding_proper); //static_cast<int>(short_side * (1 - GOLDEN_RATIO) / 2);
@@ -1264,13 +1320,13 @@ void InteractiveButtonBase::resizeEvent(QResizeEvent *event)
  * 获得焦点事件
  * 已经取消按钮获取焦点，focusIn和focusOut事件都不会触发
  */
-void InteractiveButtonBase::focusInEvent(QFocusEvent *event)
+void InteractiveButton::focusInEvent(QFocusEvent *event)
 {
-    if (!hovering && inArea(mapFromGlobal(QCursor::pos())))
-        InteractiveButtonBase::enterEvent(new QEvent(QEvent::Type::None));
+    if (!m_isHovering && inArea(mapFromGlobal(QCursor::pos())))
+        InteractiveButton::enterEvent(new QEvent(QEvent::Type::None));
 
     focusing = true;
-    emit ToFocusIn();
+    Q_EMIT ToFocusIn();
 
     return QPushButton::focusInEvent(event);
 }
@@ -1279,32 +1335,32 @@ void InteractiveButtonBase::focusInEvent(QFocusEvent *event)
  * 失去焦点事件
  * 兼容按住时突然失去焦点（例如弹出菜单、被其他窗口抢走了）
  */
-void InteractiveButtonBase::focusOutEvent(QFocusEvent *event)
+void InteractiveButton::focusOutEvent(QFocusEvent *event)
 {
-    if (hovering)
+    if (m_isHovering)
     {
-        hovering = false;
+        m_isHovering = false;
     }
-    if (pressing) // 鼠标一直按住，可能在click事件中移动了焦点
+    if (m_isOnPressing) // 鼠标一直按住，可能在click事件中移动了焦点
     {
-        pressing = false;
+        m_isOnPressing = false;
         release_pos = mapFromGlobal(QCursor::pos());
         release_timestamp = getTimestamp();
 
-        if (waterAnimation && waters.size())
+        if (m_hasWaterAnimation && waters.size())
         {
-            waters.last().release_timestamp = release_timestamp;
+            waters.last().m_releaseTimestamp = release_timestamp;
         }
     }
 
     focusing = false;
-    emit ToFocusOut();
+    Q_EMIT ToFocusOut();
 
     return QPushButton::focusOutEvent(event);
 }
 
 
-void InteractiveButtonBase::paintEvent(QPaintEvent *event)
+void InteractiveButton::paintEvent(QPaintEvent *event)
 {
     if (parent_enabled)
     {
@@ -1329,27 +1385,27 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
         painter.fillPath(pathBack, focus_bg);
     }
 
-    if ((border_bg.alpha() != 0 || (focusing && focus_border.alpha() != 0)) && border_width > 0)
+    if ((border_bg.alpha() != 0 || (focusing && focus_border.alpha() != 0)) && m_borderWidth > 0)
     {
         painter.save();
         QPen pen;
         pen.setColor((focusing && focus_border.alpha()) ? focus_border : border_bg);
-        pen.setWidth(border_width);
+        pen.setWidth(m_borderWidth);
         painter.setPen(pen);
         painter.drawPath(pathBack);
         painter.restore();
     }
 
-    if (hover_progress) // 悬浮背景
+    if (m_hoverProgress) // 悬浮背景
     {
-        painter.fillPath(pathBack, getOpacityColor(hover_bg, hover_progress / 100.0));
+        painter.fillPath(pathBack, getOpacityColor(hover_bg, m_hoverProgress / 100.0));
     }
 
-    if (press_progress && !waterAnimation) // 按下渐变淡化消失
+    if (m_pressProgress && !m_hasWaterAnimation) // 按下渐变淡化消失
     {
-        painter.fillPath(pathBack, getOpacityColor(press_bg, press_progress / 100.0));
+        painter.fillPath(pathBack, getOpacityColor(press_bg, m_pressProgress / 100.0));
     }
-    else if (waterAnimation && waters.size()) // 水波纹，且至少有一个水波纹
+    else if (m_hasWaterAnimation && waters.size()) // 水波纹，且至少有一个水波纹
     {
         paintWaterRipple(painter);
     }
@@ -1357,7 +1413,7 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
     // ==== 绘制前景 ====
     if (fore_enabled && isShowForeground)
     {
-        painter.setPen(isEnabled() ? icon_color : getOpacityColor(icon_color));
+        painter.setPen(isEnabled() ? m_iconColor : getOpacityColor(m_iconColor));
         if (paint_addin.enable)
         {
             int l = fore_paddings.left, t = fore_paddings.top, r = width() - fore_paddings.right, b = height() - fore_paddings.bottom;
@@ -1387,12 +1443,12 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
 
         QRectF &rect = paint_rect;
         rect = QRectF(fore_paddings.left + (fixed_fore_pos ? 0 : offset_pos.x()),
-                     fore_paddings.top + (fixed_fore_pos ? 0 : offset_pos.y()), // 原来的位置，不包含点击、出现效果
-                     width() - fore_paddings.left - fore_paddings.right,
-                     height() - fore_paddings.top - fore_paddings.bottom);
+                      fore_paddings.top + (fixed_fore_pos ? 0 : offset_pos.y()), // 原来的位置，不包含点击、出现效果
+                      width() - fore_paddings.left - fore_paddings.right,
+                      height() - fore_paddings.top - fore_paddings.bottom);
 
         // 抖动出现动画
-        if ((show_ani_appearing || show_ani_disappearing) && show_ani_point != QPoint(0, 0) && !fixed_fore_pos)
+        if ((m_isShowAppearAnimation || show_ani_disappearing) && show_ani_point != QPoint(0, 0) && !fixed_fore_pos)
         {
             //int w = width(), h = height();
             int pro = getSpringBackProgress(show_ani_progress, 50);
@@ -1400,16 +1456,16 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
             // show_ani_point 是鼠标进入的点，那么起始方向应该是相反的
             double x = show_ani_point.x(), y = show_ani_point.y();
             int gen = quick_sqrt(long(x * x + y * y));
-            x = water_radius * x / gen; // 动画起始中心点横坐标 反向
-            y = water_radius * y / gen; // 动画起始中心点纵坐标 反向
+            x = m_waterRadius * x / gen; // 动画起始中心点横坐标 反向
+            y = m_waterRadius * y / gen; // 动画起始中心点纵坐标 反向
 
             rect = QRectF(
-                rect.left() - x * (100 - pro) / 100 + rect.width() * (100 - pro) / 100,
-                rect.top() - y * (100 - pro) / 100 + rect.height() * (100 - pro) / 100,
-                rect.width() * pro / 100,
-                rect.height() * pro / 100);
+                       rect.left() - x * (100 - pro) / 100 + rect.width() * (100 - pro) / 100,
+                       rect.top() - y * (100 - pro) / 100 + rect.height() * (100 - pro) / 100,
+                       rect.width() * pro / 100,
+                       rect.height() * pro / 100);
         }
-        else if (align == Qt::AlignCenter && model != PaintModel::Text && !fixed_fore_size) // 默认的缩放动画
+        else if (m_aligment == Qt::AlignCenter && m_paintModel != PaintModel::Text && !fixed_fore_size) // 默认的缩放动画
         {
             double delta_x = 0, delta_y = 0;
             if (click_ani_progress != 0) // 图标缩放
@@ -1417,48 +1473,48 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
                 delta_x = rect.width() * click_ani_progress / 400;
                 delta_y = rect.height() * click_ani_progress / 400;
             }
-            else if (show_ani_appearing)
+            else if (m_isShowAppearAnimation)
             {
-                double pro = getNolinearProg(show_ani_progress, SpringBack50);
+                double pro = getNolinearProg(show_ani_progress, NolinearType::SpringBack50);
                 delta_x = static_cast<int>(rect.width() * (1 - pro));
                 delta_y = static_cast<int>(rect.height() * (1 - pro));
             }
             else if (show_ani_disappearing)
             {
-                double pro = 1 - getNolinearProg(show_ani_progress, SlowFaster);
+                double pro = 1 - getNolinearProg(show_ani_progress, NolinearType::SlowFaster);
                 delta_x = rect.width() * pro;  // (100-show_ani_progress) / 100;
                 delta_y = rect.height() * pro; // (100-show_ani_progress) / 100;
             }
-            if (int(delta_x+1e-6) || int(delta_y+1e-6))
+            if (int(delta_x + 1e-6) || int(delta_y + 1e-6))
                 rect = QRectF(rect.left() + delta_x, rect.top() + delta_y,
-                             rect.width() - delta_x * 2, rect.height() - delta_y * 2);
+                              rect.width() - delta_x * 2, rect.height() - delta_y * 2);
         }
 
 
-        if (model == Text)
+        if (m_paintModel == PaintModel::Text)
         {
             painter.setPen(isEnabled() ? text_color : getOpacityColor(text_color));
-            if (fontSize > 0)
+            if (m_fontSize > 0)
             {
                 QFont font = painter.font();
-                font.setPointSize(fontSize);
+                font.setPointSize(m_fontSize);
                 painter.setFont(font);
             }
-            painter.drawText(rect, static_cast<int>(align), text);
+            painter.drawText(rect, static_cast<int>(m_aligment), m_buttonText);
         }
-        else if (model == Icon) // 绘制图标
+        else if (m_paintModel == PaintModel::Icon) // 绘制图标
         {
-            icon.paint(&painter, rect.toRect(), align, getIconMode());
+            icon.paint(&painter, rect.toRect(), m_aligment, getIconMode());
         }
-        else if (model == PixmapMask)
+        else if (m_paintModel == PaintModel::PixmapMask)
         {
             painter.setRenderHint(QPainter::SmoothPixmapTransform, true); // 可以让边缘看起来平滑一些
             painter.drawPixmap(rect.toRect(), pixmap);
         }
-        else if (model == IconText || model == PixmapText) // 强制左对齐；左图标中文字
+        else if (m_paintModel == PaintModel::IconText || m_paintModel == PaintModel::PixmapText) // 强制左对齐；左图标中文字
         {
             // 绘制图标
-            int &sz = icon_text_size;
+            int &sz = m_iconTextSize;
             QRectF icon_rect(rect.left(), rect.top() + rect.height() / 2 - sz / 2, sz, sz);
             icon_rect.moveTo(icon_rect.left() - quick_sqrt(long(offset_pos.x())), icon_rect.top() - quick_sqrt(long(offset_pos.y())));
             drawIconBeforeText(painter, icon_rect.toRect());
@@ -1468,76 +1524,76 @@ void InteractiveButtonBase::paintEvent(QPaintEvent *event)
             // 扩展文字范围，确保文字可见
             painter.setPen(isEnabled() ? text_color : getOpacityColor(text_color));
             rect.setWidth(rect.width() + sz + icon_text_padding);
-            if (fontSize > 0)
+            if (m_fontSize > 0)
             {
                 QFont font = painter.font();
-                font.setPointSize(fontSize);
+                font.setPointSize(m_fontSize);
                 painter.setFont(font);
             }
-            painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text);
+            painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, m_buttonText);
         }
     }
 }
 
-void InteractiveButtonBase::drawIconBeforeText(QPainter &painter, QRect icon_rect)
+void InteractiveButton::drawIconBeforeText(QPainter &painter, QRect icon_rect)
 {
-    if (model == IconText)
-        icon.paint(&painter, icon_rect, align, getIconMode());
-    else if (model == PixmapText)
+    if (m_paintModel == PaintModel::IconText)
+        icon.paint(&painter, icon_rect, m_aligment, getIconMode());
+    else if (m_paintModel == PaintModel::PixmapText)
         painter.drawPixmap(icon_rect, pixmap);
 }
 
 
-bool InteractiveButtonBase::inArea(QPoint point)
+bool InteractiveButton::inArea(QPoint point)
 {
     return !(point.x() < 0 || point.y() < 0 || point.x() > width() || point.y() > height());
 }
 
-bool InteractiveButtonBase::inArea(QPointF point)
+bool InteractiveButton::inArea(QPointF point)
 {
     return !(point.x() < 0 || point.y() < 0 || point.x() > width() || point.y() > height());
 }
 
-QPainterPath InteractiveButtonBase::GetBackGroundPainterPath()
+QPainterPath InteractiveButton::GetBackGroundPainterPath()
 {
     QPainterPath path;
-    if (radius_x || radius_y)
-        path.addRoundedRect(QRect(0, 0, width(), height()), radius_x, radius_y);
+    if (m_radiusX || m_radiusY)
+        path.addRoundedRect(QRect(0, 0, width(), height()), m_radiusX, m_radiusY);
     else
         path.addRect(QRect(0, 0, width(), height()));
     return path;
 }
 
-QPainterPath InteractiveButtonBase::getWaterPainterPath(InteractiveButtonBase::Water water)
+QPainterPath InteractiveButton::getWaterPainterPath(InteractiveButton::Water water)
 {
-    double prog = getNolinearProg(water.progress, FastSlower);
-    double ra = water_radius * prog;
+    double prog = getNolinearProg(water.progress, NolinearType::FastSlower);
+    double ra = m_waterRadius * prog;
     QRectF circle(water.point.x() - ra,
-                 water.point.y() - ra,
-                 ra * 2,
-                 ra * 2);
+                  water.point.y() - ra,
+                  ra * 2,
+                  ra * 2);
     /*QRect circle(water.point.x() - water_radius*water.progress/100,
                 water.point.y() - water_radius*water.progress/100,
                 water_radius*water.progress/50,
                 water_radius*water.progress/50);*/
     QPainterPath path;
     path.addEllipse(circle);
-    if (radius_x || radius_y)
+    if (m_radiusX || m_radiusY)
         return path & GetBackGroundPainterPath();
     return path;
 }
 
-QRectF InteractiveButtonBase::getUnifiedGeometry()
+QRectF InteractiveButton::getUnifiedGeometry()
 {
     // 将动画进度转换为回弹动画进度
-    int pro = show_ani_appearing ? getSpringBackProgress(show_ani_progress, 50) : show_ani_progress;
+    int pro = m_isShowAppearAnimation ? getSpringBackProgress(show_ani_progress, 50) : show_ani_progress;
     double ul = 0, ut = 0, uw = width(), uh = height();
 
     // show_ani_point 是鼠标进入的点，那么起始方向应该是相反的
     double x = show_ani_point.x(), y = show_ani_point.y();
     int gen = quick_sqrt(long(x * x + y * y));
-    x = -water_radius * x / gen; // 动画起始中心点横坐标 反向
-    y = -water_radius * y / gen; // 动画起始中心点纵坐标 反向
+    x = -m_waterRadius * x / gen; // 动画起始中心点横坐标 反向
+    y = -m_waterRadius * y / gen; // 动画起始中心点纵坐标 反向
 
     ul = ul + x * (100 - pro) / 100 + uw * (100 - pro) / 200;
     ut = ut + y * (100 - pro) / 100 + uh * (100 - pro) / 200;
@@ -1551,22 +1607,22 @@ QRectF InteractiveButtonBase::getUnifiedGeometry()
  * 更新统一绘制区域
  * 内部的 _l, _t, _w, _h 可直接使用
  */
-void InteractiveButtonBase::updateUnifiedGeometry()
+void InteractiveButton::updateUnifiedGeometry()
 {
     _l = 0;
     _t = 0;
     _w = width();
     _h = height();
-    if ((show_ani_appearing || show_ani_disappearing) && show_ani_point != QPoint(0, 0))
+    if ((m_isShowAppearAnimation || show_ani_disappearing) && show_ani_point != QPoint(0, 0))
     {
         int pro; // 将动画进度转换为回弹动画进度
-        pro = show_ani_appearing ? getSpringBackProgress(show_ani_progress, 50) : show_ani_progress;
+        pro = m_isShowAppearAnimation ? getSpringBackProgress(show_ani_progress, 50) : show_ani_progress;
 
         // show_ani_point 是鼠标进入的点，那么起始方向应该是相反的
         double x = show_ani_point.x(), y = show_ani_point.y();
         int gen = quick_sqrt(long(x * x + y * y));
-        x = -water_radius * x / gen; // 动画起始中心点横坐标 反向
-        y = -water_radius * y / gen; // 动画起始中心点纵坐标 反向
+        x = -m_waterRadius * x / gen; // 动画起始中心点横坐标 反向
+        y = -m_waterRadius * y / gen; // 动画起始中心点纵坐标 反向
 
         _l = _l + x * (100 - pro) / 100 + _w * (100 - pro) / 200;
         _t = _t + y * (100 - pro) / 100 + _h * (100 - pro) / 200;
@@ -1579,14 +1635,14 @@ void InteractiveButtonBase::updateUnifiedGeometry()
  * 绘制一个水波纹动画
  * @param painter 绘制对象（即painter(this)对象）
  */
-void InteractiveButtonBase::paintWaterRipple(QPainter &painter)
+void InteractiveButton::paintWaterRipple(QPainter &painter)
 {
     QColor water_finished_color(press_bg);
 
     for (int i = 0; i < waters.size(); i++)
     {
         Water water = waters.at(i);
-        if (water.finished) // 渐变消失
+        if (water.m_isFinished) // 渐变消失
         {
             water_finished_color.setAlpha(press_bg.alpha() * water.progress / 100);
             QPainterPath path_back = GetBackGroundPainterPath();
@@ -1605,7 +1661,7 @@ void InteractiveButtonBase::paintWaterRipple(QPainter &painter)
  * 鼠标松开的时候，计算所有抖动效果的路径和事件
  * 在每次重绘界面的时候，依次遍历所有的路径
  */
-void InteractiveButtonBase::setJitter()
+void InteractiveButton::setJitter()
 {
     jitters.clear();
     QPoint center_pos = geometry().center() - geometry().topLeft();
@@ -1629,7 +1685,7 @@ void InteractiveButtonBase::setJitter()
         jitters << Jitter(center_pos, timestamp);
         anchor_pos = mouse_pos = center_pos;
     }
-    else if (!hovering) // 悬浮的时候依旧有效
+    else if (!m_isHovering) // 悬浮的时候依旧有效
     {
         // 未达到抖动距离，直接恢复
         mouse_pos = center_pos;
@@ -1641,7 +1697,7 @@ void InteractiveButtonBase::setJitter()
  * @param  X 待开方的数字
  * @return   平方根
  */
-int InteractiveButtonBase::quick_sqrt(long X) const
+int InteractiveButton::quick_sqrt(long X) const
 {
     bool fu = false;
     if (X < 0)
@@ -1686,18 +1742,24 @@ int InteractiveButtonBase::quick_sqrt(long X) const
 /**
  * 最大值
  */
-int InteractiveButtonBase::max(int a, int b) const { return a > b ? a : b; }
+int InteractiveButton::max(int a, int b) const
+{
+    return a > b ? a : b;
+}
 
 /**
  * 最小值
  */
-int InteractiveButtonBase::min(int a, int b) const { return a < b ? a : b; }
+int InteractiveButton::min(int a, int b) const
+{
+    return a < b ? a : b;
+}
 
 /**
  * 获取现行时间戳，13位，精确到毫秒
  * @return 时间戳
  */
-qint64 InteractiveButtonBase::getTimestamp() const
+qint64 InteractiveButton::getTimestamp() const
 {
     return QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
@@ -1707,7 +1769,7 @@ qint64 InteractiveButtonBase::getTimestamp() const
  * @param  color 颜色
  * @return       是否为亮色
  */
-bool InteractiveButtonBase::isLightColor(QColor color)
+bool InteractiveButton::isLightColor(QColor color)
 {
     return color.red() * 0.299 + color.green() * 0.578 + color.blue() * 0.114 >= 192;
 }
@@ -1719,7 +1781,7 @@ bool InteractiveButtonBase::isLightColor(QColor color)
  * @param  max 前半部分动画进度上限
  * @return     应当显示的动画进度
  */
-int InteractiveButtonBase::getSpringBackProgress(int x, int max)
+int InteractiveButton::getSpringBackProgress(int x, int max)
 {
     if (x <= max)
         return x * 100 / max;
@@ -1728,13 +1790,13 @@ int InteractiveButtonBase::getSpringBackProgress(int x, int max)
     return 100 + (100 - x) / 2;
 }
 
-QColor InteractiveButtonBase::getOpacityColor(QColor color, double level)
+QColor InteractiveButton::getOpacityColor(QColor color, double level)
 {
     color.setAlpha(static_cast<int>(color.alpha() * level));
     return color;
 }
 
-QPixmap InteractiveButtonBase::getMaskPixmap(QPixmap p, QColor c)
+QPixmap InteractiveButton::getMaskPixmap(QPixmap p, QColor c)
 {
     QBitmap mask = p.mask();
     p.fill(c);
@@ -1742,7 +1804,7 @@ QPixmap InteractiveButtonBase::getMaskPixmap(QPixmap p, QColor c)
     return p;
 }
 
-double InteractiveButtonBase::getNolinearProg(int p, InteractiveButtonBase::NolinearType type)
+double InteractiveButton::getNolinearProg(int p, InteractiveButton::NolinearType type)
 {
     if (p <= 0)
         return 0.0;
@@ -1751,19 +1813,19 @@ double InteractiveButtonBase::getNolinearProg(int p, InteractiveButtonBase::Noli
 
     switch (type)
     {
-    case Linear:
+    case NolinearType::Linear:
         return p / 100.0;
-    case SlowFaster:
+    case NolinearType::SlowFaster:
         return p * p / 10000.0;
-    case FastSlower:
+    case NolinearType::FastSlower:
         return quick_sqrt(p * 100) / 100.0;
-    case SlowFastSlower:
+    case NolinearType::SlowFastSlower:
         if (p <= 50)
             return p * p / 50.0;
         else
             return 0.5 + quick_sqrt(50 * (p - 50)) / 100.0;
-    case SpringBack20:
-    case SpringBack50:
+    case NolinearType::SpringBack20:
+    case NolinearType::SpringBack50:
         if (p <= 50)
             return p / 50.0;
         else if (p < 75)
@@ -1773,101 +1835,101 @@ double InteractiveButtonBase::getNolinearProg(int p, InteractiveButtonBase::Noli
     }
 }
 
-QIcon::Mode InteractiveButtonBase::getIconMode()
+QIcon::Mode InteractiveButton::getIconMode()
 {
-    return isEnabled() ? (getState() ? QIcon::Selected : (hovering || pressing ? QIcon::Active : QIcon::Normal)) : QIcon::Disabled;
+    return isEnabled() ? (GetCheckedState() ? QIcon::Selected : (m_isHovering || m_isOnPressing ? QIcon::Active : QIcon::Normal)) : QIcon::Disabled;
 }
 
 /**
- * 锚点变成到鼠标位置的定时时钟
- * 同步计算所有和时间或者帧数有关的动画和属性
+* Точка привязки становится синхронизирующими часами с положением мыши
+  * Одновременно рассчитывайте все анимации и свойства, связанные со временем или частотой кадров
  */
-void InteractiveButtonBase::OnAnchorTimeOut()
+void InteractiveButton::OnAnchorTimeOut()
 {
-    qint64 timestamp = getTimestamp();
-    if (pressing) // 鼠标按下
+    const qint64 timestamp = getTimestamp();
+    if (m_isOnPressing) // 鼠标按下
     {
-        if (press_progress < 100) // 透明渐变，且没有完成
+        if (m_pressProgress < 100) // 透明渐变，且没有完成
         {
-            press_progress += press_speed;
-            if (press_progress >= 100)
+            m_pressProgress += m_pressSpeed;
+            if (m_pressProgress >= 100)
             {
-                press_progress = 100;
-                if (mouse_press_event)
+                m_pressProgress = 100;
+                if (m_mousePressEventPointer)
                 {
-                    emit ToMousePressLater(mouse_press_event);
-                    mouse_press_event = nullptr;
+                    Q_EMIT ToMousePressLater(m_mousePressEventPointer);
+                    m_mousePressEventPointer = Q_NULLPTR;
                 }
             }
         }
-        if (hovering && hover_progress < 100)
+        if (m_isHovering && m_hoverProgress < 100)
         {
-            hover_progress += hover_speed;
-            if (hover_progress >= 100)
+            m_hoverProgress += m_hoverSpeed;
+            if (m_hoverProgress >= 100)
             {
-                hover_progress = 100;
-                emit ToMouseEnterLater();
+                m_hoverProgress = 100;
+                Q_EMIT ToMouseEnterLater();
             }
         }
     }
-    else // 鼠标悬浮
+    else // наведение мыши
     {
-        if (press_progress > 0) // 如果按下的效果还在，变浅
+        if (m_pressProgress > 0) // 如果按下的效果还在，变浅
         {
-            press_progress -= press_speed;
-            if (press_progress <= 0)
+            m_pressProgress -= m_pressSpeed;
+            if (m_pressProgress <= 0)
             {
-                press_progress = 0;
-                if (mouse_release_event)
+                m_pressProgress = 0;
+                if (m_mouseReleaseEventPointer)
                 {
-                    emit ToMouseReleaseLater(mouse_release_event);
-                    mouse_release_event = nullptr;
+                    Q_EMIT ToMouseReleaseLater(m_mouseReleaseEventPointer);
+                    m_mouseReleaseEventPointer = Q_NULLPTR;
                 }
             }
         }
 
-        if (hovering) // 在框内：加深
+        if (m_isHovering) // 在框内：加深
         {
-            if (hover_progress < 100)
+            if (m_hoverProgress < 100)
             {
-                hover_progress += hover_speed;
-                if (hover_progress >= 100)
+                m_hoverProgress += m_hoverSpeed;
+                if (m_hoverProgress >= 100)
                 {
-                    hover_progress = 100;
-                    emit ToMouseEnterLater();
+                    m_hoverProgress = 100;
+                    Q_EMIT ToMouseEnterLater();
                 }
             }
         }
         else // 在框外：变浅
         {
-            if (hover_progress > 0)
+            if (m_hoverProgress > 0)
             {
-                hover_progress -= hover_speed;
-                if (hover_progress <= 0)
+                m_hoverProgress -= m_hoverSpeed;
+                if (m_hoverProgress <= 0)
                 {
-                    hover_progress = 0;
-                    emit ToMouseLeaveLater();
+                    m_hoverProgress = 0;
+                    Q_EMIT ToMouseLeaveLater();
                 }
             }
         }
     }
 
-    // ==== 按下背景水波纹动画 ====
-    if (waterAnimation)
+    // ==== Нажмите на фоновую анимацию водной ряби ====
+    if (m_hasWaterAnimation)
     {
         for (int i = 0; i < waters.size(); i++)
         {
             Water &water = waters[i];
-            if (water.finished) // 结束状态
+            if (water.m_isFinished) // конечное состояние
             {
-                water.progress = static_cast<int>(100 - 100 * (timestamp - water.finish_timestamp) / water_finish_duration);
+                water.progress = static_cast<int>(100 - 100 * (timestamp - water.m_finishTimestamp) / m_waterFinishDuration);
                 if (water.progress <= 0)
                 {
                     waters.removeAt(i--);
-                    if (mouse_release_event) // 还没有发送按下延迟信号
+                    if (m_mouseReleaseEventPointer) // Сигнал задержки нажатия не отправлен
                     {
-                        emit ToMouseReleaseLater(mouse_release_event);
-                        mouse_release_event = nullptr;
+                        Q_EMIT ToMouseReleaseLater(m_mouseReleaseEventPointer);
+                        m_mouseReleaseEventPointer = Q_NULLPTR;
                     }
                 }
             }
@@ -1876,29 +1938,29 @@ void InteractiveButtonBase::OnAnchorTimeOut()
                 if (water.progress >= 100) // 满了
                 {
                     water.progress = 100;
-                    if (water.release_timestamp) // 鼠标已经松开了
+                    if (water.m_releaseTimestamp) // 鼠标已经松开了
                     {
-                        water.finished = true; // 准备结束
-                        water.finish_timestamp = timestamp;
+                        water.m_isFinished = true; // 准备结束
+                        water.m_finishTimestamp = timestamp;
                     }
                 }
-                else // 动画中的
+                else // в анимации
                 {
-                    if (water.release_timestamp) // 鼠标已经松开了
+                    if (water.m_releaseTimestamp) // Мышь была отпущена
                     {
-                        water.progress = static_cast<int>(100 * (water.release_timestamp - water.press_timestamp) / water_press_duration + 100 * (timestamp - water.release_timestamp) / water_release_duration);
+                        water.progress = static_cast<int>(100 * (water.m_releaseTimestamp - water.m_pressTimestamp) / m_waterPressDuration + 100 * (timestamp - water.m_releaseTimestamp) / m_waterReleaseDuration);
                     }
-                    else // 鼠标一直按下
+                    else // мышь нажата
                     {
-                        water.progress = static_cast<int>(100 * (timestamp - water.press_timestamp) / water_press_duration);
+                        water.progress = static_cast<int>(100 * (timestamp - water.m_pressTimestamp) / m_waterPressDuration);
                     }
                     if (water.progress >= 100)
                     {
                         water.progress = 100;
-                        if (mouse_press_event) // 还没有发送按下延迟信号
+                        if (m_mousePressEventPointer) // Сигнал задержки нажатия не отправлен
                         {
-                            emit ToMousePressLater(mouse_press_event);
-                            mouse_press_event = nullptr;
+                            Q_EMIT ToMousePressLater(m_mousePressEventPointer);
+                            m_mousePressEventPointer = Q_NULLPTR;
                         }
                     }
                 }
@@ -1906,99 +1968,113 @@ void InteractiveButtonBase::OnAnchorTimeOut()
         }
     }
 
-    // ==== 出现动画 ====
+    // ==== Появляется анимация ====
     if (isShowAnimation)
     {
-        if (show_ani_appearing) // 出现
+        if (m_isShowAppearAnimation) // Появляться
         {
-            qint64 delta = getTimestamp() - show_timestamp;
-            if (show_ani_progress >= 100) // 出现结束
+            const qint64 animationDurationDelta = getTimestamp() - show_timestamp;
+            if (show_ani_progress >= 100) // конец
             {
-                show_ani_appearing = false;
-                emit ToShowAnimationFinished();
+                m_isShowAppearAnimation = false;
+                Q_EMIT ToShowAnimationFinished();
             }
             else
             {
-                show_ani_progress = static_cast<int>(100 * delta / show_duration);
+                show_ani_progress = static_cast<int>(100 * animationDurationDelta / show_duration);
                 if (show_ani_progress > 100)
+                {
                     show_ani_progress = 100;
+                }
             }
         }
-        if (show_ani_disappearing) // 消失
+        if (show_ani_disappearing) //пропадать
         {
-            qint64 delta = getTimestamp() - hide_timestamp;
+            const qint64 delta = getTimestamp() - hide_timestamp;
             if (show_ani_progress <= 0) // 消失结束
             {
                 show_ani_disappearing = false;
                 isShowForeground = false;
                 show_ani_point = QPoint(0, 0);
-                emit ToHideAnimationFinished();
+                Q_EMIT ToHideAnimationFinished();
             }
             else
             {
                 show_ani_progress = static_cast<int>(100 - 100 * delta / show_duration);
                 if (show_ani_progress < 0)
+                {
                     show_ani_progress = 0;
+                }
             }
         }
     }
 
-    // ==== 按下动画 ====
-    if (click_ani_disappearing) // 点击动画效果消失
+    // ==== Нажмите анимацию ====
+    if (click_ani_disappearing) // Эффект анимации щелчка исчезает
     {
-        qint64 delta = getTimestamp() - release_timestamp - click_ani_duration;
+        const qint64 delta = getTimestamp() - release_timestamp - click_ani_duration;
         if (delta <= 0)
+        {
             click_ani_progress = 100;
+        }
         else
+        {
             click_ani_progress = static_cast<int>(100 - delta * 100 / click_ani_duration);
+        }
         if (click_ani_progress < 0)
         {
             click_ani_progress = 0;
             click_ani_disappearing = false;
-            emit ToPressAppearAnimationFinished();
+            Q_EMIT ToPressAppearAnimationFinished();
         }
     }
-    if (click_ani_appearing) // 点击动画效果
+    if (click_ani_appearing) // нажмите анимацию
     {
-        qint64 delta = getTimestamp() - release_timestamp;
+        const qint64 delta = getTimestamp() - release_timestamp;
         if (delta <= 0)
+        {
             click_ani_progress = 0;
+        }
         else
+        {
             click_ani_progress = static_cast<int>(delta * 100 / click_ani_duration);
+        }
         if (click_ani_progress > 100)
         {
-            click_ani_progress = 100; // 保持100的状态，下次点击时回到0
+            click_ani_progress = 100; // Сохраняйте состояние 100 и возвращайтесь к 0 при следующем щелчке
             click_ani_appearing = false;
             click_ani_disappearing = true;
-            emit ToPressDisappearAnimationFinished();
+            Q_EMIT ToPressDisappearAnimationFinished();
         }
     }
 
-    // ==== 锚点移动 ====
-    if (jitters.size() > 0) // 松开时的抖动效果
+    //==== Перемещение якоря ====
+    if (jitters.size() > 0) //Эффект дрожания при отпускании
     {
-        // 当前应该是处在最后一个点
-        Jitter cur = jitters.first();
-        Jitter aim = jitters.at(1);
-        int del = static_cast<int>(getTimestamp() - cur.timestamp);
-        int dur = static_cast<int>(aim.timestamp - cur.timestamp);
+        // должно быть в последней точке
+        const Jitter cur = jitters.first();
+        const Jitter aim = jitters.at(1);
+        const int del = static_cast<int>(getTimestamp() - cur.timestamp);
+        const int dur = static_cast<int>(aim.timestamp - cur.timestamp);
         effect_pos = cur.point + (aim.point - cur.point) * del / dur;
         offset_pos = effect_pos - (geometry().center() - geometry().topLeft());
 
         if (del >= dur)
+        {
             jitters.removeFirst();
+        }
 
-        // 抖动结束
+        // Джиттер заканчивается
         if (jitters.size() == 1)
         {
             jitters.clear();
-            emit ToJitterAnimationFinished();
+            Q_EMIT ToJitterAnimationFinished();
         }
     }
-    else if (anchor_pos != mouse_pos) // 移动效果
+    else if (anchor_pos != mouse_pos) // движущийся эффект
     {
-        double delta_x = anchor_pos.x() - mouse_pos.x(),
-               delta_y = anchor_pos.y() - mouse_pos.y();
+        const double delta_x = anchor_pos.x() - mouse_pos.x(),
+                     delta_y = anchor_pos.y() - mouse_pos.y();
 
         anchor_pos.setX(anchor_pos.x() - quick_sqrt(int(delta_x)));
         anchor_pos.setY(anchor_pos.y() - quick_sqrt(int(delta_y)));
@@ -2008,12 +2084,14 @@ void InteractiveButtonBase::OnAnchorTimeOut()
         effect_pos.setX((width() >> 1) + offset_pos.x());
         effect_pos.setY((height() >> 1) + offset_pos.y());
     }
-    else if (!pressing && !hovering && !hover_progress && !press_progress && !click_ani_appearing && !click_ani_disappearing && !jitters.size() && !waters.size() && !show_ani_appearing && !show_ani_disappearing) // 没有需要加载的项，暂停（节约资源）
+    else
     {
-        anchor_timer->stop();
+        if (!m_isOnPressing && !m_isHovering && !m_hoverProgress && !m_pressProgress && !click_ani_appearing && !click_ani_disappearing && !jitters.size() && !waters.size() && !m_isShowAppearAnimation && !show_ani_disappearing) // 没有需要加载的项，暂停（节约资源）
+        {
+            anchor_timer->stop();
+        }
     }
-
-    // ==== 统一坐标的出现动画 ====
+    // ==== Анимация появления юниформ-координат ====
     if (unified_geometry)
     {
         updateUnifiedGeometry();
@@ -2022,17 +2100,17 @@ void InteractiveButtonBase::OnAnchorTimeOut()
     update();
 }
 
-void InteractiveButtonBase::OnClicked()
+void InteractiveButton::OnClicked()
 {
     click_ani_appearing = true;
     click_ani_disappearing = false;
     click_ani_progress = 0;
     release_offset = offset_pos;
 
-    jitters.clear(); // 清除抖动
+    jitters.clear(); // убрать дрожание
 }
 
-void InteractiveButtonBase::OnCloseState()
+void InteractiveButton::OnCloseState()
 {
     setState(false);
 }

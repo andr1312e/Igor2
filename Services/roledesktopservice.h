@@ -1,11 +1,11 @@
-#ifndef ROLEDESKTOPSERVICE_H
-#define ROLEDESKTOPSERVICE_H
-class QStandardItemModel;
+#ifndef SERVICES_ROLEDESKTOPSERVICE_H
+#define SERVICES_ROLEDESKTOPSERVICE_H
 
-#include <Services/idesktopservice.h>
+#include <QStandardItemModel>
 
-class Terminal;
-class ISqlDatabaseService;
+#include "Services/idesktopservice.h"
+#include "Services/Terminals/terminal.h"
+#include "Services/Sql/isqlservice.h"
 
 class RoleDesktopService : public DesktopService
 {
@@ -17,7 +17,7 @@ public:
     void CheckRoleDesktopTable(int roleId);
     void GetAllRoleDesktops(int roleId);
     void AddIconToRole(int roleId, const DesktopEntity &entity);
-    void DeleteIconToRole(int roleId, const QString iconName);
+    void DeleteIconToRole(int roleId, const QString &iconName);
     void SetDefaultIconsToUserOnUserRoleUpdate(int oldRoleId, int newRoleId, const QString &userName);
 
 private:
@@ -26,4 +26,4 @@ private:
     DesktopEntity CopyExecToRlsTIFolderAndReturnNewEntity(const DesktopEntity &entity);
 };
 
-#endif // ROLEDESKTOPSERVICE_H
+#endif // SERVICES_ROLEDESKTOPSERVICE_H

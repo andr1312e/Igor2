@@ -3,7 +3,6 @@
 
 UserDesktopService::UserDesktopService(ISqlDatabaseService *sqlDatabaseService)
     : DesktopService(sqlDatabaseService)
-    , m_desktopFileType(".desktop")
 {
 
 }
@@ -18,12 +17,14 @@ void UserDesktopService::GetAllUserDesktops(const QString &userName)
     CheckPath(userDesktopPath);
     UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
 }
-
+/**
+ * Добавляем иконку к пользователю из вью
+ */
 void UserDesktopService::AddIconToUser(const QString &userName, const DesktopEntity &entityData)
 {
-    QString fileName(entityData.name);
+    QString fileName(entityData.GetName());
     fileName.replace(' ', '_');
-    const QString userDesktopPath = GetUserDesktopPath(userName);
+    const QString userDesktopPath(GetUserDesktopPath(userName));
     CheckPath(userDesktopPath);
     CreateIconWithData(userDesktopPath, entityData);
     UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
@@ -33,110 +34,98 @@ void UserDesktopService::DeleteIconToUser(const QString &userName, const QString
 {
     const QString userDesktopPath = GetUserDesktopPath(userName);
     CheckPath(userDesktopPath);
-    if (m_terminal->IsFileExists(userDesktopPath+iconName, Q_FUNC_INFO, true))
+    if (m_terminal->IsFileExists(userDesktopPath + iconName, Q_FUNC_INFO, true))
     {
         m_terminal->DeleteFileSudo(userDesktopPath + iconName, Q_FUNC_INFO);
     }
     UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
 }
 
-void UserDesktopService::DeleteAllIconsToUser(const int &roleId, const QString &userName)
+void UserDesktopService::DeleteAllIconsToUser(int roleId, const QString &userName)
 {
     const QString userDesktopPath = GetUserDesktopPath(userName);
     CheckPath(userDesktopPath);
-    const QList<DesktopEntity> entities=m_sqlDatabaseService->GetAllRoleDesktops(roleId);
+    const QList<DesktopEntity> entities = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     for (const DesktopEntity &entity : entities)
     {
-        DeleteIcon(userDesktopPath, entity.name);
+        DeleteIcon(userDesktopPath, entity.GetName());
     }
 }
-
+/**
+ * Обновляем модель, собирая все иконки по указанному пути
+ */
 void UserDesktopService::UpdateIconListDataAndModelFromUserDesktop(const QString &userDesktopPath)
 {
-    UpdateIconsListFromUserDesktop(userDesktopPath);
-    UpdateModel(m_filesList);
+    const QList<DesktopEntity> listOfDesktopIcons = UpdateIconsListFromUserDesktop(userDesktopPath);
+    UpdateModel(listOfDesktopIcons);
 }
 
-void UserDesktopService::UpdateIconsListFromUserDesktop(const QString &userDesktopPath)
+QList<DesktopEntity> UserDesktopService::UpdateIconsListFromUserDesktop(const QString &userDesktopPath)
 {
-    m_filesList.clear();
-    QStringList allUserDesktopIconsAndFiles = GetAllDesktopEntities(userDesktopPath);
-
-    for ( QString &entity : allUserDesktopIconsAndFiles)
+    QList<DesktopEntity> iconsList;
+    const QStringList allUserDesktopIconsAndFiles = GetAllDesktopEntities(userDesktopPath);
+    for ( const QString &entity : allUserDesktopIconsAndFiles)
     {
-        if ('@' == entity.back() ||
-                '*' == entity.back()) {
-            entity.chop(1);
-        }
-
-        if (IsIcon(entity)) {
-            const QString entityInfo = m_terminal->GetFileText(
-                        userDesktopPath + entity, Q_FUNC_INFO);
-            ParseAndAppendIconInfoToList(entity, entityInfo);
-        } else {
-            ParseAndAppendFileInfoToList(entity);
+        if (IsIcon(entity))
+        {
+            const QString entityInfo = m_terminal->GetFileText(userDesktopPath + entity, Q_FUNC_INFO);
+            iconsList.append(ParseAndAppendIconInfoToList(entity, entityInfo));
         }
     }
+    return iconsList;
 }
 
 QStringList UserDesktopService::GetAllDesktopEntities(const QString &userDesktopPath)
 {
-    QStringList desktopEntitesNames;
     if (m_terminal->IsDirExists(userDesktopPath, Q_FUNC_INFO, true))
     {
-        desktopEntitesNames = m_terminal->GetFileList(
-                    userDesktopPath, Q_FUNC_INFO, true);
+        return m_terminal->GetFileList(userDesktopPath, Q_FUNC_INFO, true);
     }
-    return desktopEntitesNames;
+    return QStringList();
 }
-
-void UserDesktopService::ParseAndAppendIconInfoToList(const QString &programName,
-                                              const QString &iconInfo)
+/**
+ * Парсер текста иконки в структуру
+ */
+DesktopEntity UserDesktopService::ParseAndAppendIconInfoToList(const QString &programName,
+        const QString &iconInfo) const
 {
     DesktopEntity program;
-    program.name = programName;
-    program.type = "Application";
+    program.SetName(programName);
     QStringList iconDataList = iconInfo.split('\n');
     iconDataList.removeLast();
 
-    for (const QString parametr : iconDataList) {
+    for (const QString parametr : iconDataList)
+    {
 
-        if (parametr.startsWith(QStringLiteral("Exec"))) {
-            int index = parametr.indexOf('=');
-            Q_ASSERT(index>0);
-            program.exec = parametr.mid(index + 1);
-        } else {
-            if (parametr.startsWith(QStringLiteral("Icon"))) {
-                int index = parametr.indexOf('=');
-                Q_ASSERT(index>0);
+        if (parametr.startsWith(QStringLiteral("Exec")))
+        {
+            const int index = parametr.indexOf('=');
+            Q_ASSERT(index > 0);
+            program.SetExec(parametr.mid(index + 1));
+        }
+        else
+        {
+            if (parametr.startsWith(QStringLiteral("Icon")))
+            {
+                const int index = parametr.indexOf('=');
+                Q_ASSERT(index > 0);
                 QString iconPath = parametr.mid(index + 1);
                 if (!iconPath.contains('/'))
                 {
-                    iconPath=GetFullAstraDefaultIconImagePath(iconPath);
+                    iconPath = GetFullAstraDefaultIconImagePath(iconPath);
                 }
-                program.icon=iconPath;
+                program.SetIcon(iconPath);
             }
         }
     }
 
-    m_filesList.push_back(program);
+    return  program;
 }
-
-void UserDesktopService::ParseAndAppendFileInfoToList(const QString &fileName)
+/**
+ * Проверяем иконка ли по концу имени файла
+ * @return true- икона, иначе не иконка
+ */
+bool UserDesktopService::IsIcon(const QString &entityName) const noexcept
 {
-    DesktopEntity file;
-    file.name = fileName;
-    file.icon = m_fileIconPath;
-    file.exec = m_path + '/' + fileName;
-    file.type = QStringLiteral("Файл");
-    m_filesList.push_back(file);
-}
-
-bool UserDesktopService::IsIcon(const QString &entityName) const
-{
-    if (entityName.endsWith(QStringLiteral(".desktop"))) {
-        return true;
-    } else {
-        return false;
-    }
+    return entityName.endsWith(QStringLiteral(".desktop"));
 }

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 
+
 StartupRunnableManager::StartupRunnableManager(const QString &currentUserName, QStringView rlstiFolderPath, ISqlDatabaseService *sqlService, QObject *parent)
     : QObject(parent)
     , m_currentUserName(currentUserName)
@@ -19,8 +20,8 @@ StartupRunnableManager::~StartupRunnableManager()
 
 void StartupRunnableManager::OnRestartProcess()
 {
-    QProcess *process = qobject_cast<QProcess *>(sender());
-    if(process->exitCode()==0)
+    QProcess *const process = qobject_cast<QProcess *>(sender());
+    if ( 0 == process->exitCode())
     {
         process->start();
         Q_EMIT ToProgramFall();
@@ -30,7 +31,7 @@ void StartupRunnableManager::OnRestartProcess()
 void StartupRunnableManager::OnCurrentUserRoleChanged()
 {
     m_listAlreadyRunningsApps.clear();
-    for (QProcess *process:m_runnableProcess)
+    for (QProcess *process : m_runnableProcess)
     {
         disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
         process->kill();
@@ -42,31 +43,31 @@ void StartupRunnableManager::OnCurrentUserRoleChanged()
 void StartupRunnableManager::OnPauseStartupRunnableManager()
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пользователь поставил на паузу перезапуск программ "));
-    for (QProcess* const process :qAsConst(m_runnableProcess))
+    for (QProcess *const process : qAsConst(m_runnableProcess))
     {
         disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
     }
-    if(m_currentTimerId!=-1)
+    if (m_currentTimerId != -1)
     {
         QObject::killTimer(m_currentTimerId);
-        m_currentTimerId=-1;
+        m_currentTimerId = -1;
     }
 }
 
 void StartupRunnableManager::OnStopStartupRunnableManager()
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пользователь остановил перезапуск программ "));
-    for (QProcess* const process :qAsConst(m_runnableProcess))
+    for (QProcess *const process : qAsConst(m_runnableProcess))
     {
         disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
         process->terminate();
     }
     m_runnableProcess.clear();
     m_listAlreadyRunningsApps.clear();
-    if(m_currentTimerId!=-1)
+    if (m_currentTimerId != -1)
     {
         QObject::killTimer(m_currentTimerId);
-        m_currentTimerId=-1;
+        m_currentTimerId = -1;
     }
 }
 
@@ -82,11 +83,14 @@ bool StartupRunnableManager::OnRunStartupRunnableManager()
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" начинаем запуск приложений для роли "));
     const QStringList starups = ReadUserStartupFile();
 
-    if (IsAllStartupValid(starups)) {
+    if (IsAllStartupValid(starups))
+    {
         InitStartupProcessList(starups);
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запуск приложений для роли успешен."));
         return true;
-    } else {
+    }
+    else
+    {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запуск приложений для роли не успешен."));
         return false;
     }
@@ -94,16 +98,16 @@ bool StartupRunnableManager::OnRunStartupRunnableManager()
 
 void StartupRunnableManager::timerEvent(QTimerEvent *event)
 {
-    if(m_listAlreadyRunningsApps.isEmpty())
+    if (m_listAlreadyRunningsApps.isEmpty())
     {
         killTimer(event->timerId());
     }
     else
     {
-        QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList(Q_FUNC_INFO);
-        for (const QString &alreadyRunningApp:qAsConst(m_listAlreadyRunningsApps))
+        QStringList listOfAlreadyRunningProcessName = m_terminal->GetAllProcessList(Q_FUNC_INFO);
+        for (const QString &alreadyRunningApp : qAsConst(m_listAlreadyRunningsApps))
         {
-            if(!listOfAlreadyRunningProcessName.contains(alreadyRunningApp))
+            if (!listOfAlreadyRunningProcessName.contains(alreadyRunningApp))
             {
                 Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Программа на подписке упала."));
                 m_runnableProcess.append(CreateReRestartApp(alreadyRunningApp));
@@ -114,32 +118,34 @@ void StartupRunnableManager::timerEvent(QTimerEvent *event)
 
 QProcess *StartupRunnableManager::CreateReRestartApp(const QString &startup)
 {
-    QProcess *process=new QProcess();
-    process->setObjectName(m_rlsTiFolderPath+startup);
-    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем процесс. Путь для исполняемого файла: " )+ process->objectName());
+    QProcess *const process = new QProcess();
+    process->setObjectName(m_rlsTiFolderPath + startup);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем процесс. Путь для исполняемого файла: " ) + process->objectName());
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
-    process->start(m_rlsTiFolderPath+startup);
+    process->start(m_rlsTiFolderPath + startup);
     return process;
 }
 
 QStringList StartupRunnableManager::ReadUserStartupFile()
 {
     QStringList startupsList;
-    const int userRole=m_sqlService->GetUserRole(m_currentUserName);
-    if (!(-1==userRole))
+    const int roleId = m_sqlService->GetUserRole(m_currentUserName);
+    if (User::RoleIsValid(roleId))
     {
-        startupsList=m_sqlService->GetAllRoleStartups(userRole);
-        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получили список перезапускаемых приложений. Роль пользователя: ")+ QString::number(userRole));
+        startupsList = m_sqlService->GetAllRoleStartups(roleId);
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получили список перезапускаемых приложений. Роль пользователя: ") + Roles.at(roleId));
     }
     return startupsList;
 }
 
 bool StartupRunnableManager::IsAllStartupValid(const QStringList &startupsList)
 {
-    for (const QString &startup:startupsList) {
-        if (!QFile::exists(m_rlsTiFolderPath+startup)) {
-            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Отсутсвует файл:")+ startup);
-            Q_EMIT ToStartupApplicationNotExsists(m_rlsTiFolderPath+startup);
+    for (const QString &startup : startupsList)
+    {
+        if (!QFile::exists(m_rlsTiFolderPath + startup))
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Отсутсвует файл:") + startup);
+            Q_EMIT ToStartupApplicationNotExsists(m_rlsTiFolderPath + startup);
             return false;
         }
     }
@@ -154,26 +160,26 @@ void StartupRunnableManager::InitStartupProcessList(const QStringList &startupsL
     }
     else
     {
-        const QStringList listOfAlreadyRunningProcessName=m_terminal->GetAllProcessList(Q_FUNC_INFO);
+        const QStringList listOfAlreadyRunningProcessName = m_terminal->GetAllProcessList(Q_FUNC_INFO);
         QStringList notRunnedApps;
         GetRunnedProcessesAndProcecessesForListen(listOfAlreadyRunningProcessName, startupsList, m_listAlreadyRunningsApps, notRunnedApps);
         for (const QString &startup : qAsConst(notRunnedApps))
         {
             m_runnableProcess.push_back(CreateReRestartApp(startup));
         }
-        if(!m_listAlreadyRunningsApps.isEmpty())
+        if (!m_listAlreadyRunningsApps.isEmpty())
         {
-            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Есть программы с таким же именем, что были запущены до этой, контроль над ними будет осуществляться с помощью таймера. Их колличество : ")+ QString::number(m_listAlreadyRunningsApps.count()));
-            m_currentTimerId=QObject::startTimer(1000, Qt::VeryCoarseTimer);
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Есть программы с таким же именем, что были запущены до этой, контроль над ними будет осуществляться с помощью таймера. Их колличество : ") + QString::number(m_listAlreadyRunningsApps.count()));
+            m_currentTimerId = QObject::startTimer(1000, Qt::VeryCoarseTimer);
         }
     }
 }
 
 void StartupRunnableManager::GetRunnedProcessesAndProcecessesForListen(const QStringList &listOfAllRunningProcessesName, const QStringList &currentUserStartupsList, QStringList &listAlreadyRunningsApps, QStringList &notRunnedAppsList)
 {
-    for (const QString & startup :currentUserStartupsList)
+    for (const QString &startup : currentUserStartupsList)
     {
-        if(listOfAllRunningProcessesName.contains(startup))
+        if (listOfAllRunningProcessesName.contains(startup))
         {
             listAlreadyRunningsApps.push_back(startup);
         }

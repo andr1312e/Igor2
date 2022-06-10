@@ -20,58 +20,34 @@
 #define DOUBLE_PRESS_INTERVAL 300
 #define SINGLE_PRESS_INTERVAL 200
 
-class InteractiveButtonBase : public QPushButton
+class InteractiveButton : public QPushButton
 {
     Q_OBJECT
-    Q_PROPERTY(bool self_enabled READ getSelfEnabled WRITE setSelfEnabled)                      // 是否启用自定义的按钮（true）
-    Q_PROPERTY(bool parent_enabled READ getParentEnabled WRITE setParentEnabled)                // 是否启用父类按钮（false）
-    Q_PROPERTY(bool fore_enabled READ getForeEnabled WRITE setForeEnabled)                      // 是否绘制自定义按钮前景色（true）
-    Q_PROPERTY(QString text READ getText WRITE setText)                                         // 前景文字
-    Q_PROPERTY(QString icon_path READ getIconPath WRITE setIconPath)                            // 前景图标
-    Q_PROPERTY(QString pixmap_path READ getPixmapPath WRITE setPixmapPath)                      // 前景图标
-    Q_PROPERTY(QColor icon_color READ getIconColor WRITE setIconColor)                          // 前景图标帅色
-    Q_PROPERTY(QColor text_color READ getTextColor WRITE SetTextColor)                          // 前景文字颜色
-    Q_PROPERTY(QColor background_color READ getNormalColor WRITE SetNormalColor)                // 背景颜色
-    Q_PROPERTY(QColor border_color READ getBorderColor WRITE SetBorderColor)                    // 边界颜色
-    Q_PROPERTY(QColor hover_color READ getHoverColor WRITE SetHoverColor)                       // 鼠标悬浮背景颜色
-    Q_PROPERTY(QColor press_color READ getPressColor WRITE setPressColor)                       // 鼠标按下背景颜色
-    Q_PROPERTY(int hover_duration READ getHoverAniDuration WRITE setHoverAniDuration)           // 鼠标悬浮动画周期
-    Q_PROPERTY(int press_duration READ getPressAniDuration WRITE setPressAniDuration)           // 鼠标按下动画周期
-    Q_PROPERTY(int click_duration READ getClickAniDuration WRITE setClickAniDuration)           // 鼠标点击动画周期
-    Q_PROPERTY(double icon_padding_proper READ getIconPaddingProper WRITE setIconPaddingProper) // 图标四边空白处大小比例
-    Q_PROPERTY(int radius READ getRadius WRITE setRadius)                                       // 边框圆角半径
-    Q_PROPERTY(int border_width READ getBorderWidth WRITE setBorderWidth)                       // 边框线条粗细
-    Q_PROPERTY(bool fixed_fore_pos READ getFixedTextPos WRITE setFixedTextPos)                  // 是否固定前景位置（false）
-    Q_PROPERTY(bool text_dynamic_size READ getTextDynamicSize WRITE setTextDynamicSize)         // 修改字体大小时调整按钮最小尺寸（false）
-    Q_PROPERTY(bool leave_after_clicked READ getLeaveAfterClick WRITE setLeaveAfterClick)       // 鼠标单击松开后取消悬浮效果（针对菜单、弹窗）
-    Q_PROPERTY(bool isShowAnimation READ getShowAni WRITE setShowAni)                            // 是否启用出现动画（鼠标移开则消失）（false）
-    Q_PROPERTY(bool waterAnimation READ getWaterRipple WRITE setWaterRipple)                   // 是否启用点击水波纹动画（否则使用渐变）（true）
-    Q_PROPERTY(int fontSize READ getFontSizeT WRITE setFontSizeT)                              // 动：按钮字体动画效果（自动，不应该设置）
 public:
-    InteractiveButtonBase(QWidget *parent = nullptr);
-    InteractiveButtonBase(QString text, QWidget *parent = nullptr);
-    InteractiveButtonBase(QIcon icon, QWidget *parent = nullptr);
-    InteractiveButtonBase(QPixmap pixmap, QWidget *parent = nullptr);
-    InteractiveButtonBase(QIcon icon, QString text, QWidget *parent = nullptr);
-    InteractiveButtonBase(QPixmap pixmap, QString text, QWidget *parent = nullptr);
-
+    InteractiveButton(QWidget *parent);
+    InteractiveButton(const QString &m_buttonText, QWidget *parent);
+    InteractiveButton(const QIcon &icon, QWidget *parent);
+    InteractiveButton(const QPixmap &pixmap, QWidget *parent);
+    InteractiveButton(const QIcon &icon, const  QString &m_buttonText, QWidget *parent);
+    InteractiveButton(const QPixmap &pixmap, const  QString &m_buttonText, QWidget *parent);
+    virtual ~InteractiveButton();
     /**
-     * 前景实体
+     * объект переднего плана
      */
-    enum PaintModel
+    enum class PaintModel
     {
-        None,       // 无前景，仅使用背景
-        Text,       // 纯文字（替代父类）
-        Icon,       // 纯图标
-        PixmapMask, // 可变色图标（通过pixmap+遮罩实现），锯齿化明显
-        IconText,   // 图标+文字（强制左对齐）
-        PixmapText  // 变色图标+文字（强制左对齐）
+        None,       // нет переднего плана, только фон
+        Text,       // обычный текст (заменяет родительский класс)
+        Icon,
+        PixmapMask, // Иконки, меняющие цвет (реализовано через pixmap+mask), с явным алиасингом
+        IconText,   // Значок + текст (принудительное выравнивание по левому краю)
+        PixmapText  // Меняющий цвет значок + текст (принудительное выравнивание по левому краю)
     };
 
     /**
-     * 前景额外的图标（可以多个）
-     * 可能是角标（比如展开箭头）
-     * 可能是前缀（图例）
+     * Дополнительные значки переднего плана (можно несколько)
+     * * может быть угловым маркером (например, стрелкой расширения)
+     * * может быть префиксом
      */
     struct PaintAddin
     {
@@ -91,8 +67,8 @@ public:
     struct Jitter
     {
         Jitter(QPointF p, qint64 t) : point(p), timestamp(t) {}
-        QPointF point;     // 要运动到的目标坐标
-        qint64 timestamp; // 运动到目标坐标应该的时间戳，结束后删除本次抖动路径对象
+        QPointF point;     // целевая координата для перемещения
+        qint64 timestamp; // Перейдите к отметке времени целевой координаты, удалите объект пути дрожания после окончания
     };
 
     /**
@@ -102,14 +78,28 @@ public:
      */
     struct Water
     {
-        Water(QPointF p, qint64 t) : point(p), progress(0), press_timestamp(t),
-                                    release_timestamp(0), finish_timestamp(0), finished(false) {}
+        Water(QPointF p, qint64 t)
+            : point(p)
+            , progress(0)
+            , m_pressTimestamp(t)
+            , m_releaseTimestamp(0)
+            , m_finishTimestamp(0)
+            , m_isFinished(false)
+        {
+
+        }
+        ~Water()
+        {
+
+        }
+
         QPointF point;
         int progress;             // 水波纹进度100%（已弃用，当前使用时间戳）
-        qint64 press_timestamp;   // 鼠标按下时间戳
-        qint64 release_timestamp; // 鼠标松开时间戳。与按下时间戳、现行时间戳一起成为水波纹进度计算参数
-        qint64 finish_timestamp;  // 结束时间戳。与当前时间戳相减则为渐变消失经过的时间戳
-        bool finished;            // 是否结束。结束后改为渐变消失
+        qint64 m_pressTimestamp;   // отметка времени наведения мыши
+        qint64 m_releaseTimestamp; // Отметка времени выпуска мыши.
+        //Вместе с нажатой временной меткой и текущей временной меткой он становится параметром расчета прогресса водной ряби.
+        qint64 m_finishTimestamp;  // Отметка времени окончания. Из текущей метки времени вычитается метка времени после исчезновения градиента.
+        bool m_isFinished;            // кончится ли. После окончания градиент исчезает
     };
 
     /**
@@ -119,11 +109,22 @@ public:
     struct EdgeVal
     {
         EdgeVal() {}
-        EdgeVal(int l, int t, int r, int b) : left(l), top(t), right(r), bottom(b) {}
-        int left, top, right, bottom; // 四个边界的空白距离
+        EdgeVal(int l, int t, int r, int b)
+            : left(l)
+            , top(t)
+            , right(r)
+            , bottom(b)
+        {
+
+        }
+        ~EdgeVal()
+        {
+
+        }
+        int left, top, right, bottom; // расстояние для четырех границ
     };
 
-    enum NolinearType
+    enum class NolinearType
     {
         Linear,
         SlowFaster,
@@ -133,12 +134,12 @@ public:
         SpringBack50
     };
 
-    virtual void setText(QString text);
-    virtual void setIconPath(QString path);
-    virtual void setIcon(QIcon icon);
-    virtual void setPixmapPath(QString path);
-    virtual void setPixmap(QPixmap pixmap);
-    virtual void setPaintAddin(QPixmap pixmap, Qt::Alignment align = Qt::AlignRight, QSize size = QSize(0, 0));
+    virtual void SetText(const QString &buttonText);
+    virtual void SetIcon(const QString &path);
+    virtual void SetIcon(const QIcon &icon);
+    virtual void setPixmapPath(const QString &path);
+    virtual void SetPixmap(const QPixmap &pixmap);
+    virtual void setPaintAddin(QPixmap pixmap, Qt::Alignment m_aligment = Qt::AlignRight, QSize size = QSize(0, 0));
 
     void setSelfEnabled(bool e = true);
     void setParentEnabled(bool e = false);
@@ -148,30 +149,30 @@ public:
     void setPressAniDuration(int d);
     void setClickAniDuration(int d);
     void setWaterAniDuration(int press, int release, int finish);
-    void setWaterRipple(bool enable = true);
+    void SetWaterRipple(bool enable = true);
     void setJitterAni(bool enable = true);
     void setUnifyGeomerey(bool enable = true);
-    void setBgColor(QColor bg);
-    void setBgColor(QColor hover, QColor press);
-    void SetNormalColor(QColor color);
-    void SetBorderColor(QColor color);
-    void SetHoverColor(QColor color);
-    void setPressColor(QColor color);
-    void setIconColor(QColor color = QColor(0, 0, 0));
+    void SetBackgroundColor(const QColor &color);
+    void SetBackgroundColor(const QColor &hover, const QColor &press);
+    void SetNormalColor(const QColor &color);
+    void SetBorderColor(const QColor &color);
+    void SetHoverColor(const QColor &color);
+    void SetPressColor(const QColor &color);
+    void SetIconColor(const QColor &color = QColor(0, 0, 0));
     void SetTextColor(QColor color = QColor(0, 0, 0));
     void setFocusBg(QColor color);
     void setFocusBorder(QColor color);
-    void setFontSize(int f);
-    void setHover();
-    void setAlign(Qt::Alignment a);
-    void setRadius(int r);
-    void setRadius(int rx, int ry);
-    void setBorderWidth(int x);
-    void setDisabled(bool dis = true);
-    void setPaddings(int l, int r, int t, int b);
-    void setPaddings(int h, int v);
-    void setPaddings(int x);
-    void setIconPaddingProper(double x);
+    void SetFontSize(int newFontSize);
+    void SetHover();
+    void SetAlign(Qt::Alignment aligment);
+    void SetRadius(int radius);
+    void SetRadius(int radiusX, int radiusY);
+    void setBorderWidth(int borderWidth);
+    void SetDisabled(bool newState);
+    void SetPaddings(int l, int r, int t, int b);
+    void SetPaddings(int h, int v);
+    void SetPaddings(int x);
+    void SetIconPaddingProper(double x);
     void setFixedForePos(bool f = true);
     void setFixedForeSize(bool f = true, int addin = 0);
     void setSquareSize();
@@ -189,39 +190,111 @@ public:
     void hideForeground();
     void delayShowed(int time, QPoint point = QPoint(0, 0));
 
-    QString getText();
+    const QString &GetText() const noexcept;
     void setMenu(QMenu *menu);
-    void adjustMinimumSize();
+    void RegulateMinimumSize();
     void setState(bool s = true);
-    bool getState();
+    bool GetCheckedState() const noexcept;
     virtual void simulateStatePress(bool s = true, bool a = false);
-    bool isHovering() { return hovering; }
-    bool isPressing() { return pressing; }
+    bool HasIcon() const noexcept
+    {
+        return !m_iconPath.isEmpty();
+    }
+    bool isHovering()
+    {
+        return m_isHovering;
+    }
+    bool isPressing()
+    {
+        return m_isOnPressing;
+    }
     void simulateHover();
     void discardHoverPress(bool force = false);
 
-    bool getSelfEnabled() { return self_enabled; }
-    bool getParentEnabled() { return parent_enabled; }
-    bool getForeEnabled() { return fore_enabled; }
-    QColor getIconColor() { return icon_color; }
-    QColor getTextColor() { return text_color; }
-    QColor getNormalColor() { return normal_bg; }
-    QColor getBorderColor() { return border_bg; }
-    QColor getHoverColor() { return hover_bg; }
-    QColor getPressColor() { return press_bg; }
-    QString getIconPath() { return ""; }
-    QString getPixmapPath() { return ""; }
-    int getHoverAniDuration() { return hover_bg_duration; }
-    int getPressAniDuration() { return press_bg_duration; }
-    int getClickAniDuration() { return click_ani_duration; }
-    double getIconPaddingProper() { return icon_padding_proper; }
-    int getRadius() { return qMax(radius_x, radius_y); }
-    int getBorderWidth() { return border_width; }
-    bool getFixedTextPos() { return fixed_fore_pos; }
-    bool getTextDynamicSize() { return text_dynamic_size; }
-    bool getLeaveAfterClick() { return leave_after_clicked; }
-    bool getShowAni() { return isShowAnimation; }
-    bool getWaterRipple() { return waterAnimation; }
+    bool getSelfEnabled()
+    {
+        return self_enabled;
+    }
+    bool getParentEnabled()
+    {
+        return parent_enabled;
+    }
+    bool getForeEnabled()
+    {
+        return fore_enabled;
+    }
+    QColor getIconColor()
+    {
+        return m_iconColor;
+    }
+    QColor getTextColor()
+    {
+        return text_color;
+    }
+    QColor getNormalColor()
+    {
+        return normal_bg;
+    }
+    QColor getBorderColor()
+    {
+        return border_bg;
+    }
+    QColor getHoverColor()
+    {
+        return hover_bg;
+    }
+    QColor getPressColor()
+    {
+        return press_bg;
+    }
+    const QString &GetIconPath() const noexcept
+    {
+        return m_iconPath;
+    }
+    int getHoverAniDuration()
+    {
+        return hover_bg_duration;
+    }
+    int getPressAniDuration()
+    {
+        return press_bg_duration;
+    }
+    int getClickAniDuration()
+    {
+        return click_ani_duration;
+    }
+    double getIconPaddingProper()
+    {
+        return icon_padding_proper;
+    }
+    int getRadius()
+    {
+        return qMax(m_radiusX, m_radiusY);
+    }
+    int getBorderWidth()
+    {
+        return m_borderWidth;
+    }
+    bool getFixedTextPos()
+    {
+        return fixed_fore_pos;
+    }
+    bool getTextDynamicSize()
+    {
+        return isTextDynamicSize;
+    }
+    bool getLeaveAfterClick()
+    {
+        return m_leaveAfterClick;
+    }
+    bool getShowAni()
+    {
+        return isShowAnimation;
+    }
+    bool getWaterRipple()
+    {
+        return m_hasWaterAnimation;
+    }
 
     virtual bool inArea(QPoint point);
     virtual bool inArea(QPointF point);
@@ -247,8 +320,8 @@ protected:
     void paintWaterRipple(QPainter &painter);
     void setJitter();
 
-    int getFontSizeT();
-    void setFontSizeT(int f);
+    int GetFontSizeT();
+    void SetFontSizeT(int m_fontSize);
 
     int max(int a, int b) const;
     int min(int a, int b) const;
@@ -274,9 +347,9 @@ Q_SIGNALS:
     void ToFocusOut();
 
     void ToMouseEnter();
-    void ToMouseEnterLater(); // 进入后延迟信号（以渐变动画完成为准，相当于可手动设置）
+    void ToMouseEnterLater(); // Задержка сигнала после входа (при условии завершения анимации градиента, что эквивалентно ручной настройке)
     void ToMouseLeave();
-    void ToMouseLeaveLater(); // 离开后延迟的信号（直至渐变动画完成（要是划过一下子离开，这个也会变快））
+    void ToMouseLeaveLater(); // Задержка сигнала после ухода (до завершения анимации затухания (если сразу смахнуть, то это тоже будет быстрее))
     void ToMousePress(QMouseEvent *event);
     void ToMousePressLater(QMouseEvent *event);
     void ToMouseRelease(QMouseEvent *event);
@@ -288,9 +361,10 @@ public Q_SLOTS:
     void OnCloseState();
 
 protected:
-    PaintModel model;
+    PaintModel m_paintModel;
     QIcon icon;
-    QString text;
+    QString m_iconPath;
+    QString m_buttonText;
     QPixmap pixmap;
     PaintAddin paint_addin;
     EdgeVal fore_paddings;
@@ -299,75 +373,75 @@ protected:
 
     bool self_enabled, parent_enabled, fore_enabled; // 是否启用子类、启动父类、绘制子类前景
 
-    // 出现前景的动画
+    // анимация с передним планом
     bool isShowAnimation, isShowForeground;
-    bool show_ani_appearing, show_ani_disappearing;
+    bool m_isShowAppearAnimation, show_ani_disappearing;
     int show_duration;
     qint64 show_timestamp, hide_timestamp;
     int show_ani_progress;
     QPointF show_ani_point;
     QRectF paint_rect;
 
-    // 鼠标开始悬浮、按下、松开、离开的坐标和时间戳
-    // 鼠标锚点、目标锚点、当前锚点的坐标；当前XY的偏移量
-    QPointF enter_pos, press_pos, release_pos, mouse_pos, anchor_pos /*目标锚点渐渐靠近鼠标*/;
-    QPointF offset_pos /*当前偏移量*/, effect_pos, release_offset;                // 相对中心、相对左上角、弹起时的平方根偏移
-    bool hovering, pressing;                                                     // 是否悬浮和按下的状态机
+    // Координаты и метка времени, когда мышь начинает зависать, нажимать, отпускать и уходить.
+    // Точка привязки мыши, целевая точка привязки, координаты текущей точки привязки, текущее смещение XY
+    QPointF enter_pos, press_pos, release_pos, mouse_pos, anchor_pos /*Целевая точка привязки приближается к мыши*/;
+    QPointF offset_pos /* текущее смещение */, effect_pos, release_offset;                // 相对中心、相对左上角、弹起时的平方根偏移
+    bool m_isHovering, m_isOnPressing;                                                     // 是否悬浮和按下的状态机
     qint64 hover_timestamp, leave_timestamp, press_timestamp, release_timestamp; // 各种事件的时间戳
     int hover_bg_duration, press_bg_duration, click_ani_duration;                // 各种动画时长
 
-    // 定时刷新界面（保证动画持续）
-    QTimer *anchor_timer;
+    // Регулярно обновлять интерфейс (чтобы анимация продолжалась)
+    QTimer *const anchor_timer;
     int move_speed;
 
     // 背景与前景
-    QColor icon_color, text_color;                   // 前景颜色
+    QColor m_iconColor, text_color;                   // 前景颜色
     QColor normal_bg, hover_bg, press_bg, border_bg; // 各种背景颜色
     QColor focus_bg, focus_border;                   // 有焦点的颜色
-    int hover_speed, press_start, press_speed;       // 颜色渐变速度
-    int hover_progress, press_progress;              // 颜色渐变进度
+    int m_hoverSpeed, press_start, m_pressSpeed;       // 颜色渐变速度
+    int m_hoverProgress, m_pressProgress;              // 颜色渐变进度
     double icon_padding_proper;                      // 图标的大小比例
-    int icon_text_padding, icon_text_size;           // 图标+文字模式共存时，两者间隔、图标大小
-    int border_width;
-    int radius_x, radius_y;
-    int fontSize;
+    int icon_text_padding, m_iconTextSize;           // 图标+文字模式共存时，两者间隔、图标大小
+    int m_borderWidth;
+    int m_radiusX, m_radiusY;
+    int m_fontSize;
     bool fixed_fore_pos;    // 鼠标进入时是否固定文字位置
     bool fixed_fore_size;   // 鼠标进入/点击时是否固定前景大小
-    bool text_dynamic_size; // 设置字体时自动调整最小宽高
+    bool isTextDynamicSize; // 设置字体时自动调整最小宽高
     bool auto_text_color;   // 动画时是否自动调整文字颜色
     bool focusing;          // 是否获得了焦点
 
-    // 鼠标单击动画
+    // анимация щелчка мышью
     bool click_ani_appearing, click_ani_disappearing; // 是否正在按下的动画效果中
     int click_ani_progress;                           // 按下的进度（使用时间差计算）
-    QMouseEvent *mouse_press_event, *mouse_release_event;
+    QMouseEvent *m_mousePressEventPointer, *m_mouseReleaseEventPointer;
 
-    // 统一绘制图标的区域（从整个按钮变为中心三分之二，并且根据偏移计算）
-    bool unified_geometry; // 上面用不到的话，这个也用不到……
+    // Область, в которой иконка отрисовывается равномерно (от всей кнопки до центра на две трети и рассчитывается по смещению)
+    bool unified_geometry; // Если вышеперечисленное не работает, то и это тоже не работает...
     double _l, _t, _w, _h;
 
-    // 鼠标拖拽弹起来回抖动效果
+    // Эффект перетаскивания мышью и обратного дрожания
     bool jitter_animation;      // 是否开启鼠标松开时的抖动效果
     double elastic_coefficient; // 弹性系数
     QList<Jitter> jitters;
     int jitter_duration; // 抖动一次，多次效果叠加
 
-    // 鼠标按下水波纹动画效果
-    bool waterAnimation; // 是否开启水波纹动画
+    // Эффект анимации пульсации воды при нажатии мыши
+    bool m_hasWaterAnimation; // Включить ли анимацию ряби на воде
     QList<Water> waters;
-    int water_press_duration, water_release_duration, water_finish_duration;
-    int water_radius;
+    int m_waterPressDuration, m_waterReleaseDuration, m_waterFinishDuration;
+    int m_waterRadius;
 
-    // 其他效果
-    Qt::Alignment align;      // 文字/图标对其方向
-    bool _state;              // 一个记录状态的变量，比如是否持续
-    bool leave_after_clicked; // 鼠标单击松开后取消悬浮效果（针对菜单、弹窗），按钮必定失去焦点
-    bool _block_hover;        // 如果有出现动画，临时屏蔽hovering效果
+    // другие эффекты
+    Qt::Alignment m_aligment;      // текст/значок: ориентации
+    bool _state;              // Переменная, которая записывает состояние, например, сохраняется ли оно
+    bool m_leaveAfterClick; // После отпускания щелчка мыши эффект приостановки (для меню и всплывающих окон) отменяется, и кнопка должна терять фокус
+    bool _block_hover;        // Если есть анимация, временно заблокируйте эффект зависания
 
-    // 双击
-    bool double_clicked;  // 开启双击
-    QTimer *double_timer; // 双击时钟
-    bool double_prevent;  // 双击阻止单击release的flag
+    // Двойной клик
+    bool m_hasDoubleClicked;  // Включить двойной щелчок
+    QTimer *m_doubleClickTimer;
+    bool m_doubleIsPrevented;  // запрещающий флаг
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_INTERACTIVEBUTTONBASE_H

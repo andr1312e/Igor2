@@ -71,6 +71,11 @@ void Logger::setLevel(Level level)
     mLevel = level;
 }
 
+void Logger::resetLevel()
+{
+    mLevel = Level::OFF_INT;
+}
+
 // Note: use MainThreadAppender if you want write the log from non-main threads
 // within the main trhead
 void Logger::callAppenders(const LoggingEvent &event) const
@@ -290,10 +295,10 @@ void Logger::log(const LoggingEvent &logEvent) const
 void Logger::logWithLocation(Level level, const char *file, int line, const char *function, const QString &message) const
 {
     LoggingEvent loggingEvent = LoggingEvent(this,
-                                             level,
-                                             message,
-                                             MessageContext(file, line, function),
-                                             QString());
+                                level,
+                                message,
+                                MessageContext(file, line, function),
+                                QString());
     forcedLog(loggingEvent);
 }
 

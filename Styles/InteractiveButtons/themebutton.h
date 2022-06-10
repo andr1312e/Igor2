@@ -23,10 +23,10 @@ Q_SIGNALS:
 private Q_SLOTS:
     void OnButtonPressed();
 public:
-    ThemesNames GetCurrentThemeName(){ return (m_themeListCurrentItem)->themeName;}
+    ThemesNames GetCurrentThemeName();
 private:
-    QVector<ThemeItem> m_themeList;
-    QVector<ThemeItem>::ConstIterator m_themeListCurrentItem;
+    QVector< ThemeItem> m_themeList;
+    QVector< ThemeItem>::const_iterator m_themeItemIterator;
 };
 
 #endif // STYLES_INTERACTIVEBUTTONS_THEMEBUTTON_H

@@ -36,7 +36,7 @@ private:
 Q_SIGNALS:
     void ToDeleteUser(const QString &userId, const QString &userName);
     void ToRoleToViewChanged(int roleId);
-    void ToSaveUser(const QString&userId, const QString&m_userName, const QString &FCS, const int &oldRoleIndex, const int &newRoleIndex);
+    void ToSaveUser(const QString &userId, const QString &m_userName, const QString &FCS, const int &oldRoleIndex, const int &newRoleIndex);
 
 private Q_SLOTS:
     void OnSaveUser();
@@ -55,7 +55,7 @@ private:
 
 private:
     const QStringView m_currentUserName;
-
+    const QStringList m_rolesToolTip;
     QFont m_editPanelFont;
 
     KioskService *m_kioskService;

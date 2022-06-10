@@ -2,7 +2,8 @@
 #define TABLECOLUMNSNAMES_H
 #include <QString>
 
-namespace CN {
+namespace CN
+{
 
 static const QString userId(QStringLiteral("userid"));
 
@@ -15,8 +16,6 @@ static const QString role(QStringLiteral("role"));
 static const QString startupPath(QStringLiteral("startuppath"));
 
 static const QString desktopName(QStringLiteral("desktopname"));
-
-static const QString desktopType(QStringLiteral("desktoptype"));
 
 static const QString execPath(QStringLiteral("execpath"));
 

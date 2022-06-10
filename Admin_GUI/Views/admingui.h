@@ -33,27 +33,23 @@ private:
     void InitTopBar(QStringView currentUserName);
     void InsertWidgetsIntoLayout();
     void ConnectObjects();
-    void SetMaximumWidgetSize();
 
 Q_SIGNALS:
     void ToChangeTheme(bool isDarkTheme);
-    void ToSetDelegateView(bool state);
     void ToCurrentUserRoleChanged();
-public Q_SLOTS:
-    void OnHideAdditionalSettings(bool state);
 private Q_SLOTS:
     void OnUserClick(const User &user);
     void OnDeleteUser(const QString &userId, const QString &userName);
-    void OnSaveUser(const QString&userId, const QString &userName, const QString &FCS, int oldRole, int newRole);
+    void OnSaveUser(const QString &userId, const QString &userName, const QString &FCS, int oldRole, int newRole);
 private:
     int m_maxWidth;
     int m_maxHeight;
     const QStringView m_currentAdminId;
 
-    ISqlDatabaseService* const m_sqlDatabaseService;
-    LinuxUserService* const m_linuxUserService;
-    UserDesktopService * m_userDesktopService;
-    RoleDesktopService * m_roleDesktopService;
+    ISqlDatabaseService *const m_sqlDatabaseService;
+    LinuxUserService *const m_linuxUserService;
+    UserDesktopService *m_userDesktopService;
+    RoleDesktopService *m_roleDesktopService;
     UserModel *m_userModel;
 
 private:
@@ -64,8 +60,8 @@ private:
     LinuxUsersListWidget *m_usersListWidget;
 
     QVBoxLayout *m_centerSideLayout;
-    UserEditPanel *m_userEditPanel;
     DesktopPanel *m_userDesktopPanel;
+    UserEditPanel *m_userEditPanel;
 
     RoleEditPanel *m_roleEditPanel;
 };

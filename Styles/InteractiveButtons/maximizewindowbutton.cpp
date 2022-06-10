@@ -1,7 +1,7 @@
 #include "Styles/InteractiveButtons/maximizewindowbutton.h"
 
 MaximizeWindowButton::MaximizeWindowButton(QWidget *parent)
-    : InteractiveButtonBase (parent)
+    : InteractiveButton (parent)
     , m_pen(Qt::white)
     , m_buttonSize(40, 40)
 {
@@ -15,7 +15,7 @@ MaximizeWindowButton::~MaximizeWindowButton()
 
 void MaximizeWindowButton::paintEvent(QPaintEvent *event)
 {
-    InteractiveButtonBase::paintEvent(event);
+    InteractiveButton::paintEvent(event);
     QPainter painter(this);
     painter.setPen(m_pen);
     if (!isShowForeground)

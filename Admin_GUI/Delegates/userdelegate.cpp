@@ -85,16 +85,16 @@ void UserDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         m_userFCSRect->setRect(m_userIdRect->left(), m_userNameRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font.pointSize() + 10);
         m_userRoleRect->setRect(m_userIdRect->left(), m_userFCSRect->bottom() - 1, m_globalRect->width() - m_iconRect->width(), m_font.pointSize() + 10);
 
-        painter->drawImage(*m_iconRect, QImage(user.userImage));
+        painter->drawImage(*m_iconRect, QImage(user.GetUserImage()));
 
         painter->setPen(*m_titlePen);
         painter->setFont(m_font);
-        painter->drawText(*m_userIdRect, "Идентификатор: " + user.userId);
+        painter->drawText(*m_userIdRect, "Идентификатор: " + user.GetUserId());
 
         painter->setPen(*m_textPen);
-        painter->drawText(*m_userNameRect, "Имя пользователя: " + user.name);
-        painter->drawText(*m_userFCSRect, "ФИО: " + user.FCS);
-        const QString role=(user.role>=0 && user.role < Roles.count()) ? Roles.at(user.role) : " ";
+        painter->drawText(*m_userNameRect, "Имя пользователя: " + user.GetUserName());
+        painter->drawText(*m_userFCSRect, "ФИО: " + user.GetUserFCS());
+        const QString role=(user.GetUserRole()>=0 && user.GetUserRole() < Roles.count()) ? Roles.at(user.GetUserRole()) : " ";
         painter->drawText(*m_userRoleRect, "Роль: " + role);
         painter->restore();
 

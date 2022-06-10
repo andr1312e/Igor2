@@ -13,13 +13,13 @@ UserModel::~UserModel()
     delete m_model;
 }
 
-int UserModel::GetRoleIdByUserId(const QString &userId) const
+int UserModel::GetRoleIdByUserId(const QString &userId) const noexcept
 {
     for (const User &user : qAsConst(m_users))
     {
-        if (userId==user.userId)
+        if (userId == user.GetUserId())
         {
-            return user.role;
+            return user.GetUserRole();
         }
     }
     return -1;
@@ -29,12 +29,11 @@ void UserModel::AddUserToModel(const QString &userId, const QString &userName, c
 {
     for (User &user  : m_users)
     {
-        if (userId==user.userId && userName==user.name)
+        if (userId == user.GetUserId() && userName == user.GetUserName())
         {
-            user.FCS = FCS;
-            user.role = role;
+            user.SetUserData(FCS, role);
             m_databaseService->AppendUserIntoTable(user);
-            SetImageToUser(user.role, user.userImage);
+            user.SetUserImage(GetUserImageFromRole(user.GetUserRole()));
             FillModelByList();
             return;
         }
@@ -46,12 +45,11 @@ void UserModel::DeleteUser(const QString &userId)
 {
     for (User &user  : m_users)
     {
-        if (user.userId == userId)
+        if (user.GetUserId() == userId)
         {
-            m_databaseService->RemoveUserIntoTable(user.role, user);
-            user.FCS.clear();
-            user.role=-1;
-            SetImageToUser(user.role, user.userImage);
+            m_databaseService->RemoveUserIntoTable(user.GetUserRole(), user);
+            user.ClearUserData();
+            user.SetUserImage(GetUserImageFromRole(user.GetUserRole()));
             FillModelByList();
             return;
         }
@@ -59,26 +57,30 @@ void UserModel::DeleteUser(const QString &userId)
     qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Неудачная попытка удалить пользователя. Ид пользователя: ") + userId + QStringLiteral(" , его и не было ")).toUtf8().constData());
 }
 
-QStandardItemModel *UserModel::GetModel() const
+QStandardItemModel *UserModel::GetModel() const noexcept
 {
     return m_model;
+}
+
+void UserModel::OpenFlyAdminSmc()
+{
+    m_linuxUserService->OpenFlyAdminSmc();
 }
 
 void UserModel::DataChanged()
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Заполняем юзеров инфой из бд в соответствии с ид и именем в системе"));
-    const QList<QPair<QString, QString>> namesAndIdsList=m_linuxUserService->GetSystemUsersNamesWithIds();
-    m_users=FillListByUserService(namesAndIdsList);
-    const QList<User> databaseUsers=FillListByDatabaseService();
+    const QList<QPair<QString, QString>> namesAndIdsList = m_linuxUserService->GetSystemUsersNamesWithIds();
+    m_users = FillListByUserService(namesAndIdsList);
+    const QList<User> databaseUsers = FillListByDatabaseService();
     for (User &user : m_users)
     {
-        for (const User &databaseUser: databaseUsers)
+        for (const User &databaseUser : databaseUsers)
         {
-            if(user.userId==databaseUser.userId && user.name==databaseUser.name)
+            if (user.GetUserId() == databaseUser.GetUserId() && user.GetUserName() == databaseUser.GetUserName())
             {
-                user.FCS=databaseUser.FCS;
-                user.role=databaseUser.role;
-                SetImageToUser(user.role, user.userImage);
+                user.SetUserData(databaseUser.GetUserFCS(), databaseUser.GetUserRole());
+                user.SetUserImage(GetUserImageFromRole(user.GetUserRole()));
             }
         }
     }
@@ -91,11 +93,8 @@ QList<User> UserModel::FillListByUserService(const QList<QPair<QString, QString>
     QList<User> usersInSystem;
     for (const QPair<QString, QString> &userNameAndId : namesAndIdsList)
     {
-        User user;
-        user.name=userNameAndId.first;
-        user.userId=userNameAndId.second;
-        user.userImage=QStringLiteral(":/images/0.jpg");
-        user.role=-1;
+        User user(userNameAndId.second, userNameAndId.first);
+        user.SetUserImage(GetUserImageFromRole(-1));
         usersInSystem.append(user);
     }
     return  usersInSystem;
@@ -107,31 +106,35 @@ QList<User> UserModel::FillListByDatabaseService()
     return m_databaseService->GetAllUsers();
 }
 
-void UserModel::FillModelByList()
+void UserModel::FillModelByList() noexcept
 {
     m_model->clear();
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Заполняем модель из листа "));
-    for (const User & user :qAsConst(m_users)) {
-        QStandardItem * const item = new QStandardItem();
+    for (const User &user : qAsConst(m_users))
+    {
+        QStandardItem *const item = new QStandardItem();
         item->setData(QVariant::fromValue(user), Qt::UserRole + 1);
         m_model->appendRow(item);
     }
 }
 
-void UserModel::SetImageToUser(const int &userRole, QString &userImage)
+const QString UserModel::GetUserImageFromRole(int userRole) const noexcept
 {
-    if (0 == userRole) {
-        userImage = QStringLiteral(":/images/0.jpg");
-    } else {
-        if (1==userRole) {
-            userImage = QStringLiteral(":/images/1.jpg");
-        } else {
-            if (2==userRole) {
-                userImage = QStringLiteral(":/images/2.jpg");
-            } else {
-                userImage = QStringLiteral(":/images/3.jpg");
-            }
-        }
+    switch (userRole)
+    {
+    case -1:
+        return QStringLiteral(":/images/users/noRole.png");
+    case 0:
+        return  QStringLiteral(":/images/users/user.png");
+    case 1:
+        return QStringLiteral(":/images/users/operator.png");
+    case 2:
+        return QStringLiteral(":/images/users/specialist.png");
+    case 3://Админ
+        return QStringLiteral(":/images/users/admin.png");
+    default:
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Неудачная попытка найти картинку для пользователя. Роль: ") + QString::number(userRole)).toUtf8().constData());
+        break;
     }
 }
 

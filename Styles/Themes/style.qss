@@ -42,6 +42,12 @@ QMenu
     border:1px solid palette(shadow);
 }
 
+QMenu#TrayMenu
+{
+    border: none;
+    border-radius:5px;
+}
+
 QMenu::item
 {
     padding:3px 25px 3px 25px;
@@ -216,19 +222,24 @@ QTabWidget::tab-bar{
     top:1px;
 }
 
-QTabBar{
-background-color:transparent;
-qproperty-drawBase:0;
-border-bottom:1px solid rgba(25,25,25,50%);
+QTabBar
+{
+    background-color:transparent;
+    qproperty-drawBase:0;
+    border-bottom:1px solid rgba(25,25,25,50%);
 }
-QTabBar::tab{
-padding:4px 6px;
-background-color:qlineargradient(x1:0,y1:1,x2:0,y2:0,stop:0 rgba(25,25,25,127),stop:1 rgba(53,53,53,75));
-border:1px solid rgba(25,25,25,75);
-border-top-left-radius:4px;
-border-top-right-radius:4px;
+
+QTabBar::tab
+{
+    padding:4px 6px;
+    background-color:qlineargradient(x1:0,y1:1,x2:0,y2:0,stop:0 rgba(25,25,25,127),stop:1 rgba(53,53,53,75));
+    border:1px solid rgba(25,25,25,75);
+    border-top-left-radius:4px;
+    border-top-right-radius:4px;
 }
-QCheckBox::indicator{
+
+QCheckBox::indicator
+{
     width:18px;
     height:18px;
 }
@@ -559,3 +570,7 @@ QLineEdit#wizard
     border:1px solid palette(highlight);
 }
 
+QLabel#TrayMenuLabel
+{
+    margin: 4px;
+}

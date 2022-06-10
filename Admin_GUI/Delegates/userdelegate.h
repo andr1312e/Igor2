@@ -4,13 +4,13 @@
 #include <QPainter>
 #include <QStyledItemDelegate>
 
-#include "Structs/userstruct.h"
+#include "Structs/user.h"
 
 class UserDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    UserDelegate(QFont &font, QObject *parent);
+    explicit UserDelegate(QFont &font, QObject *parent);
     ~UserDelegate();
 public:
     virtual void paint(QPainter *painter,

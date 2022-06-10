@@ -5,15 +5,13 @@ TrayMenu::TrayMenu(QWidget *parent)
     : QMenu(parent)
     , m_backgroundImage(QWidget::size(), QImage::Format_ARGB32_Premultiplied)
 {
-    OnUpdateViewColors();
+//    OnUpdateViewColors();
     setObjectName(QStringLiteral("TrayMenu"));
     setWindowFlag(Qt::Popup, true);
     setAttribute(Qt::WA_StyledBackground);
     m_mainVerticalLayout = new QVBoxLayout(this);
     m_mainVerticalLayout->setMargin(0);
     m_mainVerticalLayout->setSpacing(1);
-
-    setStyleSheet(QStringLiteral("#TrayMenu {; border: none; border-radius:5px; }"));
 }
 
 TrayMenu::~TrayMenu()
@@ -23,7 +21,7 @@ TrayMenu::~TrayMenu()
 
 void TrayMenu::AddButtonToMenu(QAction *action)
 {
-    TrayMenuItem* const addedActionMenuItem = CreateMenuItem(action);
+    TrayMenuItem *const addedActionMenuItem = CreateMenuItem(action);
     addedActionMenuItem->setToolTip(action->toolTip());
     connect(addedActionMenuItem, &QPushButton::clicked, action, &QAction::trigger);
     connect(addedActionMenuItem, &QPushButton::clicked, this, &TrayMenu::OnChangeButtonIcon);
@@ -31,7 +29,7 @@ void TrayMenu::AddButtonToMenu(QAction *action)
 
 void TrayMenu::BeginInsertInRow()
 {
-    QHBoxLayout* const horizontalLayout = new QHBoxLayout();
+    QHBoxLayout *const horizontalLayout = new QHBoxLayout();
     m_rowHorizontalLayoutsList.push_back(horizontalLayout);
     m_mainVerticalLayout->addLayout(horizontalLayout);
     m_addingHorizontMode = true;
@@ -44,8 +42,8 @@ void TrayMenu::EndInsertInRow()
 
 void TrayMenu::AddTextToMenu(const QString &text)
 {
-    QLabel* const label = new QLabel(text, this);
-    label->setStyleSheet(QStringLiteral("margin: 4px;"));
+    QLabel *const label = new QLabel(text, this);
+    label->setObjectName("TrayMenuLabel");
     InstertLabelIntoMenu(label);
 }
 /**
@@ -67,7 +65,7 @@ QBoxLayout *TrayMenu::GetCurrentLayout() const
 
 void TrayMenu::InstertLabelIntoMenu(QLabel *labelWidget)
 {
-    QBoxLayout* layoutToInsert = Q_NULLPTR;
+    QBoxLayout *layoutToInsert = Q_NULLPTR;
     if (m_addingHorizontMode && !m_rowHorizontalLayoutsList.empty()) // Если он добавляет горизонтальную кнопку
     {
         layoutToInsert = m_rowHorizontalLayoutsList.back();
@@ -82,7 +80,7 @@ void TrayMenu::InstertLabelIntoMenu(QLabel *labelWidget)
 
 TrayMenuItem *TrayMenu::CreateMenuItem(QAction *action)
 {
-    TrayMenuItem* itemToAdd;
+    TrayMenuItem *itemToAdd;
 
     if (action->text().isEmpty())
     {
@@ -92,9 +90,9 @@ TrayMenuItem *TrayMenu::CreateMenuItem(QAction *action)
     {
         itemToAdd =  new TrayMenuItem(action->text(), this);
     }
-    if(!action->objectName().isEmpty())//если путь к иконке есть
+    if (!action->objectName().isEmpty()) //если путь к иконке есть
     {
-        itemToAdd->SetIconPath(action->objectName());//Путь к иконке
+        itemToAdd->SetIcon(action->objectName());//Путь к иконке
     }
     SetStyleToButton(itemToAdd);
 
@@ -121,55 +119,87 @@ void TrayMenu::AddSpacing(int size)
  */
 void TrayMenu::AddSeparatorLineHorizontal()
 {
-    TrayMenuItem* item = new TrayMenuItem(this);
+    TrayMenuItem *const item = new TrayMenuItem(this);
     item->setFixedHeight(1);
-    item->setPaddings(32, 32, 0, 0);
-    item->setDisabled(true);
+    item->SetPaddings(32, 32, 0, 0);
+    item->SetDisabled(true);
 
     m_mainVerticalLayout->addWidget(item);
     m_horizontalSeparatorsList.push_back(item);
 }
 
-void TrayMenu::OnUpdateViewColors()
+void TrayMenu::OnUpdateViewColors(ThemesNames themeName)
 {
-    const QPalette palette=qApp->palette();
-    const QColor newBackGroundColor=palette.color(QPalette::Window);
-    const QColor newHoverBackgroudColor=palette.color(QPalette::Base);  // при наведении фон
-    const QColor newTextColor=palette.color(QPalette::Text);
-    //    qDebug()<< newBackGroundColor.name() << newHoverBackgroudColor.name() << newTextColor.name();
+    const QPalette palette = qApp->palette();
+    const QColor newBackGroundColor = palette.color(QPalette::Window);
+    const QColor newHoverBackgroudColor = palette.color(QPalette::Base); // при наведении фон
+    const QColor newTextColor = palette.color(QPalette::Text);
     m_normalBackGroud = newBackGroundColor;
     MakeTransparentImage();
-    for (TrayMenuItem * const horizontalSeparate: qAsConst(m_horizontalSeparatorsList))
+    for (TrayMenuItem *const horizontalSeparate : qAsConst(m_horizontalSeparatorsList))
     {
         horizontalSeparate->SetNormalColor(newTextColor);
     }
-    for (TrayMenuItem *const item:qAsConst(m_trayMenuItems))
+    for (TrayMenuItem *const item : qAsConst(m_trayMenuItems))
     {
         item->SetNormalColor(newBackGroundColor);
         item->SetHoverColor(newHoverBackgroudColor);
         item->SetTextColor(newTextColor);
+        if (item->HasIcon())
+        {
+            item->ChangeButtonIconColor(themeName);
+        }
     }
 }
-
+/**
+ * Меняем По клику на кажду кнопку которая в горигонте
+ * Идем по
+ */
 void TrayMenu::OnChangeButtonIcon()
 {
-    TrayMenuItem * const item=qobject_cast<TrayMenuItem*>(sender());
-    if(Q_NULLPTR==item)
+    TrayMenuItem *const itemSender = qobject_cast<TrayMenuItem *>(sender());
+    const QHBoxLayout *senderWidgetLayout = Q_NULLPTR;
+    if (Q_NULLPTR == itemSender)
     {
-        qFatal("ffdf");
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Нереализованное поведение")).toUtf8().constData());
     }
     else
     {
-
+        bool findet = false;
+        for (const QHBoxLayout  *const layout : m_rowHorizontalLayoutsList)
+        {
+            for (int widgetIndex = 0; widgetIndex < layout->count(); ++widgetIndex)
+            {
+                TrayMenuItem *const itemInLayout = qobject_cast<TrayMenuItem *>(layout->itemAt(widgetIndex)->widget());
+                if (itemInLayout == itemSender)
+                {
+                    findet = true;
+                    break;
+                }
+            }
+            if (findet)
+            {
+                senderWidgetLayout = layout;
+                break;
+            }
+        }
+        if (senderWidgetLayout != Q_NULLPTR)
+        {
+            for (int widgetIndex = 0; widgetIndex < senderWidgetLayout->count(); ++widgetIndex)
+            {
+                TrayMenuItem *const itemInLayout = qobject_cast<TrayMenuItem *>(senderWidgetLayout->itemAt(widgetIndex)->widget());
+                itemInLayout->ChangeButtonIconEnabled();
+            }
+        }
     }
 }
 
 /**
  * Установите стиль для кнопки (размер, цвет и т. д.)
  */
-void TrayMenu::SetStyleToButton(InteractiveButtonBase *button)
+void TrayMenu::SetStyleToButton(InteractiveButton *button)
 {
-    button->setPaddings(m_itemPadding);
+    button->SetPaddings(m_itemPadding);
     QFont font(button->font());
     font.setWeight(QFont::Medium);
     button->setFont(font);
@@ -178,15 +208,15 @@ void TrayMenu::SetStyleToButton(InteractiveButtonBase *button)
 QPoint TrayMenu::CalculateTopLeftWidgetPosOnScreen() const
 {
     // Автоматически регулировать диапазон на основе высоты и ширины
-    const int widgetHeight=QWidget::height();
-    const int widgetWidht=QWidget::width();
+    const int widgetHeight = QWidget::height();
+    const int widgetWidht = QWidget::width();
 
-    const QScreen *screen = QGuiApplication::primaryScreen();
+    const QScreen *const screen = QGuiApplication::primaryScreen();
     const QRect screenGeometry = screen->geometry();
     const int heightScreen = screenGeometry.height();
     const int widthScreen = screenGeometry.width();
 
-    const QPoint topLeftPosition=QPoint(widthScreen-widgetWidht-100, heightScreen-widgetHeight-55);
+    const QPoint topLeftPosition = QPoint(widthScreen - widgetWidht - 100, heightScreen - widgetHeight - 55);
     return topLeftPosition;
 }
 
@@ -222,12 +252,14 @@ void TrayMenu::MakeTransparentImage()
  */
 void TrayMenu::ShowAnimationPlay()
 {
+    qDebug() << "ShowAnimationPlay";
     // анимация кнопок задается параметром m_buttonsAnimatingCurve a m_rowAnimationCurve отвечает за тип анимаций линий;
     m_mainVerticalLayout->setEnabled(false);
     //Анимировать показать менюшку
-    AnimateDisclosureOfAllButtons()->start(QAbstractAnimation::DeleteWhenStopped);
+    AnimateExpansionOfAllButtons()->start(QAbstractAnimation::DeleteWhenStopped);
     //включаем кнопки и режим анимации выключаем после анимации кнопок
-    QTimer::singleShot(m_showAnimateDurationInMiliseconds, this, [&]{
+    QTimer::singleShot(m_showAnimateDurationInMiliseconds, this, [&]
+    {
         m_mainVerticalLayout->setEnabled(true);
     });
 }
@@ -236,53 +268,62 @@ void TrayMenu::HiddenAnimationPlay()
 {
     m_mainVerticalLayout->setEnabled(false);
     AnimateFoldingOfAllButtons()->start(QAbstractAnimation::DeleteWhenStopped);
-    QTimer::singleShot(m_showAnimateDurationInMiliseconds, this, [&]{
+    QTimer::singleShot(m_showAnimateDurationInMiliseconds, this, [&]
+    {
         m_mainVerticalLayout->setEnabled(true);
     });
 }
 
-QParallelAnimationGroup *TrayMenu::AnimateDisclosureOfAllButtons()
+QParallelAnimationGroup *TrayMenu::AnimateExpansionOfAllButtons()
 {
     QParallelAnimationGroup *const allButtonsAnimation = new QParallelAnimationGroup(Q_NULLPTR);
-    for (InteractiveButtonBase *const item : qAsConst(m_trayMenuItems))
+    for (InteractiveButton *const item : qAsConst(m_trayMenuItems))
     {
-        QGraphicsOpacityEffect * const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
+        QGraphicsOpacityEffect *const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
         graphicsButtonOpacity->setOpacity(1);
         item->setGraphicsEffect(graphicsButtonOpacity);
-        QPropertyAnimation* const propertyActionAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
+        QPropertyAnimation *const propertyActionAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
         propertyActionAnimation->setStartValue(0);
         propertyActionAnimation->setEndValue(1);
         propertyActionAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         allButtonsAnimation->addAnimation(propertyActionAnimation);
     }
-    for (QLabel *const label: qAsConst(m_menuLabels))
+    for (QLabel *const label : qAsConst(m_menuLabels))
     {
-        QGraphicsOpacityEffect * const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
+        QGraphicsOpacityEffect *const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
         graphicsButtonOpacity->setOpacity(1);
         label->setGraphicsEffect(graphicsButtonOpacity);
-        QPropertyAnimation* const propertyLabelAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
+        QPropertyAnimation *const propertyLabelAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
         propertyLabelAnimation->setStartValue(0);
         propertyLabelAnimation->setEndValue(1);
         propertyLabelAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         allButtonsAnimation->addAnimation(propertyLabelAnimation);
     }
-    for (InteractiveButtonBase* const horizontalSeparate: qAsConst(m_horizontalSeparatorsList))
+    for (TrayMenuItem *const horizontalSeparate : qAsConst(m_horizontalSeparatorsList))
     {
-        horizontalSeparate->show();
-        horizontalSeparate->setMinimumSize(0, 0);
-        QPropertyAnimation * const propertyAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
-        propertyAnimation->setStartValue(QRect(horizontalSeparate->geometry().center(), QSize(1,1)));
-        propertyAnimation->setEndValue(horizontalSeparate->geometry());
+        horizontalSeparate->setMinimumSize(1, 1);
+        QPropertyAnimation *const propertyAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
+        propertyAnimation->setStartValue(QRect(horizontalSeparate->geometry().center(), QSize(1, 1)));
+        if (m_isFirstAnimation)
+        {
+            horizontalSeparate->SetEndAnimationGeometry(horizontalSeparate->geometry());
+            propertyAnimation->setEndValue(horizontalSeparate->geometry());
+        }
+        else
+        {
+            propertyAnimation->setEndValue(horizontalSeparate->GetEndAnimationRect());
+        }
         propertyAnimation->setEasingCurve(m_rowAnimationCurve);
         propertyAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         allButtonsAnimation->addAnimation(propertyAnimation);
     }
+    m_isFirstAnimation = false;
     return allButtonsAnimation;
 }
 
 void TrayMenu::showEvent(QShowEvent *event)
 {
-    const QPoint topLeftPosition=CalculateTopLeftWidgetPosOnScreen();//Получаем координаты виджета, вдруг юзер разрешение поменяет
+    const QPoint topLeftPosition = CalculateTopLeftWidgetPosOnScreen(); //Получаем координаты виджета, вдруг юзер разрешение поменяет
     QWidget::move(topLeftPosition);
     SetRoundedFormToWidget();
     MakeTransparentImage();
@@ -293,7 +334,6 @@ void TrayMenu::showEvent(QShowEvent *event)
 
 void TrayMenu::closeEvent(QCloseEvent *event)
 {
-    //    qDebug()<< Q_FUNC_INFO;
     event->ignore();
     HiddenAnimationPlay();
     QWidget::clearFocus();
@@ -311,44 +351,44 @@ void TrayMenu::paintEvent(QPaintEvent *event)
     else
     {
         QPainter painter(this);
-        painter.drawImage(0,0, m_backgroundImage);
+        painter.drawImage(0, 0, m_backgroundImage);
     }
 }
 
 QParallelAnimationGroup *TrayMenu::AnimateFoldingOfAllButtons()
 {
     QParallelAnimationGroup *const allButtonsAnimation = new QParallelAnimationGroup(Q_NULLPTR);
-    for (InteractiveButtonBase *const item : qAsConst(m_trayMenuItems))
+    for (InteractiveButton *const item : qAsConst(m_trayMenuItems))
     {
-        QGraphicsOpacityEffect * const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
+        QGraphicsOpacityEffect *const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
         graphicsButtonOpacity->setOpacity(1);
         item->setGraphicsEffect(graphicsButtonOpacity);
-        QPropertyAnimation* const propertyActionAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
+        QPropertyAnimation *const propertyActionAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
         propertyActionAnimation->setStartValue(1);
         propertyActionAnimation->setEndValue(0);
         propertyActionAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         allButtonsAnimation->addAnimation(propertyActionAnimation);
     }
-    for (QLabel *const label: qAsConst(m_menuLabels))
+    for (QLabel *const label : qAsConst(m_menuLabels))
     {
-        QGraphicsOpacityEffect * const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
+        QGraphicsOpacityEffect *const graphicsButtonOpacity = new QGraphicsOpacityEffect(Q_NULLPTR);
         graphicsButtonOpacity->setOpacity(1);
         label->setGraphicsEffect(graphicsButtonOpacity);
-        QPropertyAnimation* const propertyLabelAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
+        QPropertyAnimation *const propertyLabelAnimation = new QPropertyAnimation(graphicsButtonOpacity, "opacity", Q_NULLPTR);
         propertyLabelAnimation->setStartValue(1);
         propertyLabelAnimation->setEndValue(0);
         propertyLabelAnimation->setDuration(m_showAnimateDurationInMiliseconds);
         allButtonsAnimation->addAnimation(propertyLabelAnimation);
     }
-    for (InteractiveButtonBase* const horizontalSeparate: qAsConst(m_horizontalSeparatorsList))
+    for (TrayMenuItem *const horizontalSeparate : qAsConst(m_horizontalSeparatorsList))
     {
-        horizontalSeparate->setMinimumSize(0, 0);
-        QPropertyAnimation * const horizontalSepareteHideAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
-        horizontalSepareteHideAnimation->setStartValue(horizontalSeparate->geometry());
-        horizontalSepareteHideAnimation->setEndValue(QRect(horizontalSeparate->geometry().center(), QSize(1,1)));
-        horizontalSepareteHideAnimation->setEasingCurve(m_rowAnimationCurve);
-        horizontalSepareteHideAnimation->setDuration(m_showAnimateDurationInMiliseconds);
-        allButtonsAnimation->addAnimation(horizontalSepareteHideAnimation);
+        horizontalSeparate->setMinimumSize(1, 1);
+        QPropertyAnimation *const propertyAnimation = new QPropertyAnimation(horizontalSeparate, "geometry", Q_NULLPTR);
+        propertyAnimation->setStartValue(horizontalSeparate->GetEndAnimationRect());
+        propertyAnimation->setEndValue(QRect(horizontalSeparate->geometry().center(), QSize(1, 1)));
+        propertyAnimation->setEasingCurve(m_rowAnimationCurve);
+        propertyAnimation->setDuration(m_showAnimateDurationInMiliseconds);
+        allButtonsAnimation->addAnimation(propertyAnimation);
     }
     return allButtonsAnimation;
 }

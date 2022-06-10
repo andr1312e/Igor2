@@ -1,7 +1,7 @@
 #include "minimizewindowbutton.h"
 
 MinimizeWindowButton::MinimizeWindowButton(QWidget* parent)
-    : InteractiveButtonBase(parent)
+    : InteractiveButton(parent)
     , m_left(new QPoint())
     , m_right(new QPoint())
     , m_mid(new QPoint())
@@ -22,7 +22,7 @@ void MinimizeWindowButton::paintEvent(QPaintEvent* event)
 {
     if (isShowForeground)
     {
-        InteractiveButtonBase::paintEvent(event);
+        InteractiveButton::paintEvent(event);
         QPainter *m_painter=new QPainter(this);
         m_painter->setPen(m_pen);
         int w = _w, h = _h;

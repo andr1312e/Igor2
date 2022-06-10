@@ -7,6 +7,7 @@
 #include <QTimerEvent>
 
 #include "Logging/logger.h"
+#include "Structs/user.h"
 
 #include "Services/Terminals/terminal.h"
 #include "Services/Sql/isqlservice.h"
@@ -36,7 +37,7 @@ protected:
     virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    QProcess * CreateReRestartApp(const QString &startup);
+    QProcess *CreateReRestartApp(const QString &startup);
     QStringList ReadUserStartupFile();
     bool IsAllStartupValid(const QStringList &startupsList);
     void InitStartupProcessList(const QStringList &startupsList);
@@ -47,9 +48,9 @@ private:
 private:
     const QString m_currentUserName;
     const QStringView m_rlsTiFolderPath;
-    ISqlDatabaseService *m_sqlService;
-    Terminal *m_terminal;
-    QList<QProcess*> m_runnableProcess;
+    ISqlDatabaseService *const m_sqlService;
+    Terminal *const m_terminal;
+    QList<QProcess *> m_runnableProcess;
     QStringList m_listAlreadyRunningsApps;
     int m_currentTimerId;
 };

@@ -4,7 +4,7 @@
 #include "Logging/logger.h"
 
 #include "Services/Terminals/terminal.h"
-#include "Structs/userstruct.h"
+#include "Structs/user.h"
 
 class LinuxUserService
 {
@@ -12,13 +12,13 @@ public:
     explicit LinuxUserService();
     ~LinuxUserService();
     void GetAllUsersWithIdInSystem();
-    const QList<QPair<QString, QString>>& GetSystemUsersNamesWithIds(){ return m_users;}
+    const QList<QPair<QString, QString>> &GetSystemUsersNamesWithIds();
 
 public:
     const QString GetCurrentUserName();
     const QString GetCurrentUserId();
     bool HasCurrentUserAdminPrivileges();
-
+    void OpenFlyAdminSmc();
 private:
     QStringList GetUserGroups(const QString &userName);
     void PushUserToNameIdList(const QString &name, const QString &userId);
@@ -26,7 +26,7 @@ private:
     bool IsUserSystem(const int &userIdNumber) const;
 
 private:
-    Terminal * const m_terminal;
+    Terminal *const m_terminal;
     QString m_currentUserName;
     QString m_currentUserId;
     QList<QPair<QString, QString>> m_users;

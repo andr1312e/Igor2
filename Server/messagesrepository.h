@@ -7,10 +7,10 @@
 class MessagesRepository
 {
 public:
-    MessagesRepository();
+    explicit MessagesRepository();
     ~MessagesRepository();
 private:
-    const quint8 m_messageIdSize=(quint8)(sizeof(quint8));
+    const quint8 m_messageIdSize = (quint8)(sizeof(quint8));
 public:
     const quint8 m_trackSettingMessageId = MESSAGES_ID::RMO_VOI_TRACK_SETTING_MESSAGE;
     const quint8 m_trackSettingsMesageSize = m_messageIdSize + sizeof(RMOTrackSetting);

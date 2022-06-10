@@ -3,8 +3,10 @@
 
 #include <QMap>
 #include <QPalette>
-
-const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
+namespace
+{
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor =
+{
     QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(53, 53, 53)),
     QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, Qt::white),
     QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(42, 42, 42)),
@@ -22,7 +24,8 @@ const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> darkThemeColor = {
     QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, Qt::gray),
 };
 
-const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledColor =
+{
     QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, QColor(127, 127, 127)),
     QPair<QPalette::ColorRole, QColor>(QPalette::Text, QColor(127, 127, 127)),
     QPair<QPalette::ColorRole, QColor>(QPalette::ButtonText, QColor(127, 127, 127)),
@@ -30,7 +33,8 @@ const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> darkThemeDisabledCo
     QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, QColor(127, 127, 127)),
 };
 
-const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor = {
+const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15> astraThemeColor =
+{
     QPair<QPalette::ColorRole, QColor>(QPalette::Window, QColor(255, 255, 255)), // цвет фона приложения
     QPair<QPalette::ColorRole, QColor>(QPalette::WindowText, Qt::black),//цвет текста
     QPair<QPalette::ColorRole, QColor>(QPalette::Base, QColor(242, 242, 242)), //цвет фона листвиджетов и линеедитов
@@ -57,7 +61,9 @@ const QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5> astraThemeDisabledC
     QPair<QPalette::ColorRole, QColor>(QPalette::HighlightedText, QColor(127, 127, 127)),
 };
 
-enum ThemesNames
+}
+
+enum class ThemesNames
 {
     BlackTheme = 0,
     AstraRedTheme = 1,
@@ -66,13 +72,7 @@ enum ThemesNames
 
 Q_DECLARE_METATYPE(ThemesNames)
 
-static QMap<QString, int> my_map{
-    {"a", 1},
-    {"b", 2},
-    {"c", 3}
-};
-
-const QMap<ThemesNames, QPair<QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15>, QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5>>> themesList =
+static const QMap<ThemesNames, QPair<QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 15>, QVarLengthArray<QPair<QPalette::ColorRole, QColor>, 5>>> themesList =
 {
     {ThemesNames::BlackTheme, qMakePair(darkThemeColor, darkThemeDisabledColor)},
     {ThemesNames::AstraRedTheme, qMakePair(astraThemeColor, astraThemeDisabledColor)}
