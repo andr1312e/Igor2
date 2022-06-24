@@ -23,7 +23,7 @@ class Admin_GUI : public QWidget
     Q_OBJECT
 
 public:
-    Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QStringView currentAdminId, QStringView currentUserName, QWidget *parent);
+    explicit Admin_GUI(ISqlDatabaseService *databaseService, LinuxUserService *userService, QStringView currentAdminId, QStringView currentUserName, QWidget *parent);
     ~Admin_GUI();
 
 private:

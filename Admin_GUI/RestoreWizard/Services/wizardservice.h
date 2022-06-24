@@ -5,6 +5,8 @@
 #include <QApplication>
 #include <QStringList>
 
+#include "Logging/logger.h"
+
 #include "Services/Sql/isqlservice.h"
 
 #include "Admin_GUI/RestoreWizard/Repositories/roleappsandstartupsettingsrepository.h"
@@ -13,6 +15,7 @@
 #include "Admin_GUI/RestoreWizard/Structs/programfilesstate.h"
 #include "Admin_GUI/RestoreWizard/Services/dependenciesserivce.h"
 #include "Admin_GUI/RestoreWizard/Services/filesandfoldersserivce.h"
+#include "Admin_GUI/RestoreWizard/Services/enviromentalvariables.h"
 
 #include "Admin_GUI/RestoreWizard/Views/actionsRestore.h"
 
@@ -65,14 +68,14 @@ public:
     void UpdateAdminFCS(const QString &adminFCS, DbWizardDataType type);
 
     void SetActionWithUserRepository(int action);
-    int GetActionIndexWithUserRepository() const;
+    int GetActionIndexWithUserRepository() const noexcept;
     void SetActionWithRoleRepository(int roleIndex, int actionIndex);
     int GetActionWithRoleRepository(int roleIndex) const;
     const QStringList &GetAllDependenciesList() const;
 
 private:
-    RolesAndStartupsWizardRepository *GetRolesRepositoryType(DbWizardDataType dataType) const;
-    UsersDataWizardRepository *GetUserReposiotry(DbWizardDataType dataType) const;
+    RolesAndStartupsWizardRepository *GetRolesRepositoryType(DbWizardDataType dataType) const noexcept;
+    UsersDataWizardRepository *GetUserReposiotry(DbWizardDataType dataType) const noexcept;
     void GetExsistsRepositoriesData(LoadingStates state);
     void GetExsistsUsersListFromDb();
     void GetExsistsExecsAndDesktopFilesFromDb();
@@ -84,13 +87,13 @@ private:
     int GetAllActionsCount() const;
     void ApplySettingsWithUserRepository(int actionIndexWithUserRepository, UsersDataWizardRepository *backupRepository, UsersDataWizardRepository *oldRepository);
     void ApplySettingsWithRolesRepository(const QVarLengthArray<int, 4> &actionsWithRoleRepository, RolesAndStartupsWizardRepository *backupRepository);
-    void ApplySettingsWithDependencies();
     void CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList &programs);
 
 private:
     Terminal *const m_terminal;
     DependenciesService *const m_dependenciesService;
     FilesAndFoldersSerivce *const m_filesAndFoldersSerivce;
+    EnviromentalVariablesService *const m_enviromentalVariablesService;
 private:
     const QString m_rlsTiFolder;
     const QString m_currentUserId;
@@ -112,7 +115,7 @@ private:
 
 private:
     const QString m_globalTagName;
-    const QStringList m_backupCorrectTagsList = {QLatin1Literal("USERS"), QLatin1Literal("FIRSTROLE"), QLatin1Literal("SECONDROLE"), QLatin1Literal("THIRDROLE"), QLatin1Literal("FOURTHROLE"), QLatin1Literal("DEPENDENCIES"), QLatin1Literal("FILES"), QLatin1Literal("FOLDERS")};
+    const QStringList m_backupCorrectTagsList = {QLatin1Literal("USERS"), QLatin1Literal("FIRSTROLE"), QLatin1Literal("SECONDROLE"), QLatin1Literal("THIRDROLE"), QLatin1Literal("FOURTHROLE"), QLatin1Literal("DEPENDENCIES"), QLatin1Literal("FILES"), QLatin1Literal("FOLDERS"), QLatin1Literal("PROFILES")};
 
 };
 

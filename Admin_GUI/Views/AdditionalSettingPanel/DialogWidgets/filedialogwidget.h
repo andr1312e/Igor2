@@ -18,7 +18,7 @@ class DesktopUploadDialogWidget: public QWidget
 {
     Q_OBJECT
 public:
-    DesktopUploadDialogWidget(QWidget *parent);
+    explicit DesktopUploadDialogWidget(QWidget *parent);
     ~DesktopUploadDialogWidget();
 
 private:

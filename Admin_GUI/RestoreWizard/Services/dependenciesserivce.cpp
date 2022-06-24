@@ -3,6 +3,7 @@
 DependenciesService::DependenciesService(QObject *parent)
     : QObject(parent)
     , m_terminal(Terminal::GetTerminal())
+    , m_mountChecker(new MountChecker())
     , m_needToInstall(true)
     , m_astraPackageManagerName(QStringLiteral("synaptic"))
     , m_astraPackageManagerNameService(QStringLiteral("synaptic-pkexec"))
@@ -12,7 +13,7 @@ DependenciesService::DependenciesService(QObject *parent)
 
 DependenciesService::~DependenciesService()
 {
-
+    delete m_mountChecker;
 }
 
 void DependenciesService::GetDependenciesFromBackUp(const QDomElement &dependenciedsXmlElement)
@@ -39,8 +40,9 @@ void DependenciesService::ClearDependencies()
 
 void DependenciesService::InstallDependencies()
 {
-    if (m_dependenciesList.isEmpty())
+    if (m_dependenciesList.isEmpty() || !m_needToInstall)
     {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Список пакетов для установки пуст"));
         return;
     }
     else
@@ -48,6 +50,7 @@ void DependenciesService::InstallDependencies()
         CloseSynapticIfItRunned();
         const QStringList installedInSystemPackages = m_terminal->GetAllInstalledPackageNames(Q_FUNC_INFO);
         const QStringList notInstalledInSystemPackages = m_terminal->GetAllNotInstalledPackageNames(Q_FUNC_INFO);
+        CheckAndMountRepository();
         for (const QString &dependency : qAsConst(m_dependenciesList))
         {
             if (notInstalledInSystemPackages.contains(dependency))
@@ -58,6 +61,7 @@ void DependenciesService::InstallDependencies()
             {
                 if (installedInSystemPackages.contains(dependency))
                 {
+                    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пакет уже установлен: ") + dependency);
                     continue;
                 }
                 else
@@ -76,7 +80,14 @@ const QStringList &DependenciesService::GetAllDependenciesList() const noexcept
 
 int DependenciesService::GetDependeciesCount() const noexcept
 {
-    return m_dependenciesList.count();
+    if (!m_needToInstall)
+    {
+        return 0;
+    }
+    else
+    {
+        return m_dependenciesList.count();
+    }
 }
 
 void DependenciesService::SetNeedInstallState(bool state)
@@ -98,7 +109,27 @@ void DependenciesService::CloseSynapticIfItRunned()
     const QStringList allProcessesList(m_terminal->GetAllProcessList(Q_FUNC_INFO));
     if (allProcessesList.contains(m_astraPackageManagerName) || allProcessesList.contains(m_astraPackageManagerNameService))
     {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Убиваем синаптик"));
         m_terminal->KillProcess(m_astraPackageManagerName, Q_FUNC_INFO);
+    }
+}
+
+void DependenciesService::CheckAndMountRepository()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Проверка наличие исо образов"));
+    if (m_mountChecker->HasMountFiles())
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral("Образы в наличии. Проверка монтировки репозиториев"));
+        if (!m_mountChecker->IsReposiotoryMounted(Q_FUNC_INFO))
+        {
+            m_mountChecker->MountRepository();
+        }
+    }
+    else
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral("Образы отсутвуют. Необходимо поместить их в папку. Имена /opt/devel-smolensk-1.6.iso и /opt/smolensk-1.6.iso или /opt/boot/boot.iso и /opt/dev/dev.iso"));
+        QMessageBox::critical(Q_NULLPTR, QStringLiteral("Ошибка поиска образов"), QStringLiteral("Образы отсутвуют. Необходимо поместить их в папку. Имена /opt/devel-smolensk-1.6.iso и /opt/smolensk-1.6.iso или /opt/boot/boot.iso и /opt/dev/dev.iso"));
+        QApplication::exit();
     }
 }
 

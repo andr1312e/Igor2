@@ -76,19 +76,26 @@ DbErrorState SqlDatabaseSerivce::AnalyzeError(const QString &errorString, const 
     }
     else
     {
-        if (errorString.startsWith(QStringLiteral("не удалось подключится к серверу")))
+        if (errorString.startsWith(QStringLiteral("не удалось подключиться к серверу: В соединении отказано")))
         {
             return DbErrorState::NoPostgre;
         }
         else
         {
-            if (errorString.startsWith(QStringLiteral("СБОЙ:  пользователь \"") + userName + QStringLiteral("\" не прошёл проверку")))
+            if (errorString.contains(QStringLiteral("СБОЙ:  пользователь \"") + userName + QStringLiteral("\" не прошёл проверку")))
             {
                 return DbErrorState::WrongPassword;
             }
             else
             {
-                return DbErrorState::UnknownError;
+                if (errorString.contains("в соединении отказано"))
+                {
+                    return DbErrorState::ServiceNotStart;
+                }
+                else
+                {
+                    return DbErrorState::UnknownError;
+                }
             }
         }
     }
@@ -126,6 +133,22 @@ DbConnectionState SqlDatabaseSerivce::FixError(DbErrorState newError, const QStr
     {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд неверный пароль и/или имя пользователя"));
         problemFixer.ResetPostgreUserPassword(userName, password);
+        if (m_db.open())
+        {
+            return DbConnectionState::Connected;
+        }
+        else
+        {
+            newErrorString = m_db.lastError().text();
+            problemFixer.SetLastError(AnalyzeError(newErrorString, userName));
+        }
+        break;
+    }
+    case DbErrorState::ServiceNotStart:
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Сервис постгре не запущен"));
+        Q_EMIT ToTrayMessage(QStringLiteral("Запускаем сервис постгре "));
+        problemFixer.StartPostgreSqlService();
         if (m_db.open())
         {
             return DbConnectionState::Connected;

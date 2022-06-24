@@ -7,6 +7,8 @@
 #include <QString>
 #include <QStandardItemModel>
 
+#include "Logging/logger.h"
+
 #include "Services/idesktopservice.h"
 
 #include "Structs/programstruct.h"

@@ -1,6 +1,8 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
+#include "unistd.h"
+
 #include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
@@ -64,8 +66,10 @@ private:
     const QString m_rlstiFolder;
     Terminal *const m_terminal;
     LinuxUserService *const m_linuxUserService;
+public:
     const QString m_currentUserName;
     const QString m_currentUserId;
+private:
     SqlDatabaseSerivce *const m_sqlDatabaseService;
 
     SingleInstanceMaker *m_singleInstance;

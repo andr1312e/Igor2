@@ -14,6 +14,7 @@ StartupWizard::StartupWizard(const QString &applicationPath, const QString &appl
 StartupWizard::~StartupWizard()
 {
     delete m_wizardService;
+    delete m_iconMakingService;
 
     delete m_wizardNavigationBar;
     delete m_introPage;
@@ -246,6 +247,7 @@ void StartupWizard::OnPageNumMove(int pageIdToMove)
 
 void StartupWizard::accept()
 {
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Нажали на кнопку завершить в мастере восстановления"));
     m_iconMakingService->ApplyWizardActions();
     m_wizardService->ApplyWizardActions();
     QWizard::accept();
@@ -253,5 +255,6 @@ void StartupWizard::accept()
 
 void StartupWizard::reject()
 {
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Нажали на кнопку отменить в мастере восстановления"));
     QWizard::reject();
 }

@@ -2,9 +2,12 @@
 #define DEPENDENCIESSERIVCE_H
 #include <QDomElement>
 #include <QObject>
+#include <QMessageBox>
+#include <QApplication>
 
 #include "Logging/logger.h"
 #include "Services/Terminals/terminal.h"
+#include "Services/mountchecker.h"
 
 class DependenciesService : public QObject
 {
@@ -24,9 +27,11 @@ public:
 private:
     bool IsFixable(QString &dependency);
     void CloseSynapticIfItRunned();
+    void CheckAndMountRepository();
     void InstallPackage(const QString &packageName);
 private:
     Terminal *const m_terminal;
+    MountChecker *const m_mountChecker;
     QStringList m_dependenciesList;
     bool m_needToInstall;
     const QString m_astraPackageManagerName;

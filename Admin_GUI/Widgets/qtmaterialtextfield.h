@@ -35,6 +35,7 @@ public:
 
     void setLabelColor(const QColor &color);
     QColor labelColor() const;
+    QColor labelFocusedColor() const;
 
     void setInkColor(const QColor &color);
     QColor inkColor() const;

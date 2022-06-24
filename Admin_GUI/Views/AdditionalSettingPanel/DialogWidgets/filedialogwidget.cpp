@@ -77,7 +77,7 @@ void DesktopUploadDialogWidget::FillUI()
     m_iconName->setLabel(QStringLiteral("Название на рабочем столе: (Обязательно)"));
     m_titleLabel->setAlignment(Qt::AlignCenter);
     m_execButton->setText(QStringLiteral("Выбрать файл"));
-    m_exec->setLabel(QStringLiteral("Путь к исполняемому файлу: (Обязательно)"));
+    m_exec->setLabel(QStringLiteral("Путь к файлу: (Обязательно)"));
     m_saveDialogButton->setText(QStringLiteral("Применить"));
     m_closeDialogButton->setText(QStringLiteral("Выйти без сохранения"));
     m_messagBox->setWindowTitle(QStringLiteral("Внимание!"));

@@ -14,7 +14,10 @@ StartupPanelPresenter::~StartupPanelPresenter()
 
 void StartupPanelPresenter::CheckStartupTable(int roleId)
 {
-    m_sqlDatabaseService->CreateStartupsTableIfNotExists(roleId);
+    if (!m_sqlDatabaseService->CheckStartupTables(roleId))
+    {
+        m_sqlDatabaseService->CreateStartupsTableIfNotExists(roleId);
+    }
 }
 
 QSqlQueryModel *StartupPanelPresenter::GetRoleStartupsModel()

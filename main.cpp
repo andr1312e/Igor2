@@ -42,15 +42,22 @@ int main(int argc, char *argv[])
         QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
         QApplication::setDesktopSettingsAware(false);
         Program program(argc, argv);
-        QApplication::setOrganizationName(QLatin1Literal("kbk"));
-        QApplication::setApplicationName(QLatin1Literal("users"));
-        SetupRootLogger();
-        if (program.HasNoRunningInstance())
+        if (program.m_currentUserName == QLatin1Literal("root"))
         {
-            const DbConnectionState dbConnectionState = program.CreateAndRunApp();
-            if (DbConnectionState::Connected == dbConnectionState)
+            QMessageBox::critical(Q_NULLPTR, "Приложение панель управления пользователями", "Запуск не должен производится от пользователя root");
+        }
+        else
+        {
+            QApplication::setOrganizationName(QLatin1Literal("kbk"));
+            QApplication::setApplicationName(QLatin1Literal("users"));
+            SetupRootLogger();
+            if (program.HasNoRunningInstance())
             {
-                return program.exec();
+                const DbConnectionState dbConnectionState = program.CreateAndRunApp();
+                if (DbConnectionState::Connected == dbConnectionState)
+                {
+                    return program.exec();
+                }
             }
         }
     }
@@ -101,7 +108,7 @@ void SetupRootLogger()
 
     // Create a file appender
     // Очищаем файл до
-    const QString loggerPath = QDir::homePath() + QStringLiteral("/users.log");
+    const QString loggerPath = QDir::homePath() + QLatin1Literal("/users.log");
     Log4Qt::FileAppender *const fileAppender = new Log4Qt::FileAppender(layout, loggerPath, true);
     fileAppender->setName(QLatin1Literal("File logger"));
     fileAppender->activateOptions();

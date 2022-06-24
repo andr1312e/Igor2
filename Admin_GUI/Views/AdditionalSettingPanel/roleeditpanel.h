@@ -16,7 +16,7 @@ class RoleEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService,  QWidget *parent);
+    explicit RoleEditPanel(ISqlDatabaseService *sqlDatabaseService, RoleDesktopService *roleDesktopService,  QWidget *parent);
     ~RoleEditPanel();
 
 private:

@@ -1,4 +1,6 @@
 #include "program.h"
+
+
 #include <QDebug>
 
 Program::Program(int &argc, char **argv)
@@ -55,7 +57,7 @@ bool Program::HasNoRunningInstance()
 {
     Log4QtInfo(QStringLiteral("Аргументы командной строки приложения: ") + arguments().join(','));
     m_singleInstance = new SingleInstanceMaker(applicationName());
-    if (QStringLiteral("restart") == arguments().constLast())
+    if (QLatin1Literal("restart") == arguments().constLast())
     {
         m_singleInstance->ConnectToExsistsApp();
         return true;
@@ -107,8 +109,12 @@ DbConnectionState Program::CreateAndRunApp()//MAIN
             else
             {
                 appArguments.append(QLatin1Literal("restart"));
-                QProcess::startDetached(qApp->arguments().front(), appArguments);
-                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу "));
+                const QString programPath=qApp->arguments().front();
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Путь к программе: ") + programPath);
+                const char *path=programPath.toUtf8().constData();
+                char* const  arr[]={programPath.toUtf8().data(), "restart"};
+                execl(path, *arr);
+                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу"));
             }
         }
     }
@@ -247,7 +253,7 @@ void Program::StartSettingsWizard(LoadingStates states)
     connect(m_startupWizard, &QWizard::accepted, this, &Program::OnFullLoading);
     connect(m_startupWizard, &QWizard::rejected, this, &QApplication::quit);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_startupWizard, &StartupWizard::OnChangeTheme);
-    m_framelessWindow->SetMainWidget(m_startupWizard);
+    m_framelessWindow->SetWizardWidget(m_startupWizard);
     m_framelessWindow->repaint();
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали мастера первоначальной настройки "));
 }

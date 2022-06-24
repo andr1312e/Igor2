@@ -6,9 +6,9 @@
 
 QT += xml network widgets sql concurrent
 
-VERSION=1.1
+VERSION=3.0
 BUILD_DATE = $$system( date "+%d.%m.%Y_%H:%M" )
-#message("Дата сборки= $$BUILD_DATE")
+
 DEFINES +=APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += BUILD_DATE=\\\"$$BUILD_DATE\\\"
 
@@ -59,7 +59,6 @@ SOURCES += \
     Admin_GUI/RestoreWizard/Services/filesandfoldersserivce.cpp \
     Admin_GUI/RestoreWizard/Views/startupwizard.cpp \
     Admin_GUI/Views/topleftbar.cpp \
-    Admin_GUI/Wizard/Updater/View/programupdaterpage.cpp \
     Logging/appender.cpp \
     Logging/appenderskeleton.cpp \
     Logging/asyncappender.cpp \
@@ -164,7 +163,6 @@ SOURCES += \
     Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.cpp \
     Services/kioskservice.cpp \
     Services/linuxuserservice.cpp \
-    Services/toolbardisableservice.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/desktoppanel.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/roleeditpanel.cpp \
     Admin_GUI/Views/AdditionalSettingPanel/startuppanel.cpp \
@@ -182,8 +180,9 @@ SOURCES += \
     Tray/tray.cpp \
     Styles/InteractiveButtons/themebutton.cpp \
     Services/singleinstancemaker.cpp \
-    Admin_GUI/Views/AdditionalSettingPanel/mylistview.cpp \
-    Structs/user.cpp
+    Structs/user.cpp \
+    Admin_GUI/RestoreWizard/Services/enviromentalvariables.cpp \
+    Services/mountchecker.cpp
 #    Admin_GUI/Wizard/Updater/View/intropage.cpp
 
 HEADERS += \
@@ -207,7 +206,6 @@ HEADERS += \
     Admin_GUI/RestoreWizard/Views/startupwizard.h \
     Admin_GUI/RestoreWizard/Services/filesandfoldersserivce.h \
     Admin_GUI/Views/topleftbar.h \
-    Admin_GUI/Wizard/Updater/View/programupdaterpage.h \
     Logging/appender.h \
     Logging/appenderskeleton.h \
     Logging/asyncappender.h \
@@ -343,8 +341,9 @@ HEADERS += \
     Styles/InteractiveButtons/themebutton.h \
     Structs/themeitem.h \
     Services/singleinstancemaker.h \
-    Admin_GUI/Views/AdditionalSettingPanel/mylistview.h \
-    Structs/user.h
+    Structs/user.h \
+    Admin_GUI/RestoreWizard/Services/enviromentalvariables.h \
+    Services/mountchecker.h
 #    Admin_GUI/Wizard/Updater/View/intropage.h
 
 *-g++* {

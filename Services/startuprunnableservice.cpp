@@ -21,8 +21,22 @@ StartupRunnableManager::~StartupRunnableManager()
 void StartupRunnableManager::OnRestartProcess()
 {
     QProcess *const process = qobject_cast<QProcess *>(sender());
-    if ( 0 == process->exitCode())
+    const QString programName = process->program().right(process->program().count() - process->program().lastIndexOf('/') - 1);
+    const int exitCode = process->exitCode();
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Закрыли процесс: ") + programName + QStringLiteral(" Код:") + QString::number(exitCode));
+    if ( 0 == process->exitCode() && QLatin1Literal("RLS_TI_Locator") == programName)
     {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Закрыли локатор, убиваем процессы "));
+        for (QProcess *process : m_runnableProcess)
+        {
+            disconnect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &StartupRunnableManager::OnRestartProcess);
+            process->close();
+        }
+        qApp->exit();
+    }
+    else
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Умер: ") + process->program());
         process->start();
         Q_EMIT ToProgramFall();
     }
@@ -30,6 +44,7 @@ void StartupRunnableManager::OnRestartProcess()
 
 void StartupRunnableManager::OnCurrentUserRoleChanged()
 {
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Роль поменялась. Убиваем старые программы..."));
     m_listAlreadyRunningsApps.clear();
     for (QProcess *process : m_runnableProcess)
     {
@@ -80,7 +95,7 @@ void StartupRunnableManager::OnRestartStartupRunnableManager()
 
 bool StartupRunnableManager::OnRunStartupRunnableManager()
 {
-    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" начинаем запуск приложений для роли "));
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Начинаем запуск приложений для роли "));
     const QStringList starups = ReadUserStartupFile();
 
     if (IsAllStartupValid(starups))
@@ -100,6 +115,7 @@ void StartupRunnableManager::timerEvent(QTimerEvent *event)
 {
     if (m_listAlreadyRunningsApps.isEmpty())
     {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Все программы контроня находятся под контролем QProcess..."));
         killTimer(event->timerId());
     }
     else

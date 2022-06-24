@@ -58,12 +58,13 @@ void QtMaterialTextField::setUseThemeColors(bool value)
 {
     Q_D(QtMaterialTextField);
 
-    if (d->useThemeColors == value) {
+    if (d->useThemeColors == value)
+    {
         return;
     }
 
     d->useThemeColors = value;
-    d->stateMachine->setupProperties();
+    d->stateMachine->OnSetupProperties();
 }
 
 bool QtMaterialTextField::useThemeColors() const
@@ -77,20 +78,25 @@ void QtMaterialTextField::setShowLabel(bool value)
 {
     Q_D(QtMaterialTextField);
 
-    if (d->showLabel == value) {
+    if (d->showLabel == value)
+    {
         return;
     }
 
     d->showLabel = value;
 
-    if (!d->label && value) {
+    if (!d->label && value)
+    {
         d->label = new QtMaterialTextFieldLabel(this);
         d->stateMachine->setLabel(d->label);
     }
 
-    if (value) {
+    if (value)
+    {
         setContentsMargins(0, 23, 0, 0);
-    } else {
+    }
+    else
+    {
         setContentsMargins(0, 0, 0, 0);
     }
 }
@@ -148,16 +154,19 @@ void QtMaterialTextField::setTextColor(const QColor &color)
     setStyleSheet(QString("QLineEdit { color: %1; }").arg(color.name()));
 
     MATERIAL_DISABLE_THEME_COLORS
-    d->stateMachine->setupProperties();
+    d->stateMachine->OnSetupProperties();
 }
 
 QColor QtMaterialTextField::textColor() const
 {
     Q_D(const QtMaterialTextField);
 
-    if (d->useThemeColors || !d->textColor.isValid()) {
+    if (d->useThemeColors || !d->textColor.isValid())
+    {
         return QtMaterialStyle::instance().themeColor("text");
-    } else {
+    }
+    else
+    {
         return d->textColor;
     }
 }
@@ -169,23 +178,19 @@ void QtMaterialTextField::setLabelColor(const QColor &color)
     d->labelColor = color;
 
     MATERIAL_DISABLE_THEME_COLORS
-    d->stateMachine->setupProperties();
+    d->stateMachine->OnSetupProperties();
 }
 
 QColor QtMaterialTextField::labelColor() const
 {
     Q_D(const QtMaterialTextField);
- return Qt::white;
-//    if (d->useThemeColors || !d->labelColor.isValid()) {
-//        return QtMaterialStyle::instance().themeColor("accent3");
-//    } else {
-//        return d->labelColor;
-//    }
-//        if (d->useThemeColors || !d->labelColor.isValid()) {
+    return palette().color(QPalette::Text);
+}
 
-//        } else {
-//            return Qt::black;
-//        }
+QColor QtMaterialTextField::labelFocusedColor() const
+{
+    Q_D(const QtMaterialTextField);
+    return palette().color(QPalette::Highlight);
 }
 
 void QtMaterialTextField::setInkColor(const QColor &color)
@@ -195,7 +200,7 @@ void QtMaterialTextField::setInkColor(const QColor &color)
     d->inkColor = color;
 
     MATERIAL_DISABLE_THEME_COLORS
-    d->stateMachine->setupProperties();
+    d->stateMachine->OnSetupProperties();
 }
 
 QColor QtMaterialTextField::inkColor() const
@@ -211,16 +216,19 @@ void QtMaterialTextField::setInputLineColor(const QColor &color)
     d->inputLineColor = color;
 
     MATERIAL_DISABLE_THEME_COLORS
-    d->stateMachine->setupProperties();
+    d->stateMachine->OnSetupProperties();
 }
 
 QColor QtMaterialTextField::inputLineColor() const
 {
     Q_D(const QtMaterialTextField);
 
-    if (d->useThemeColors || !d->inputLineColor.isValid()) {
+    if (d->useThemeColors || !d->inputLineColor.isValid())
+    {
         return QtMaterialStyle::instance().themeColor("border");
-    } else {
+    }
+    else
+    {
         return d->inputLineColor;
     }
 }
@@ -229,7 +237,8 @@ void QtMaterialTextField::setShowInputLine(bool value)
 {
     Q_D(QtMaterialTextField);
 
-    if (d->showInputLine == value) {
+    if (d->showInputLine == value)
+    {
         return;
     }
 
@@ -261,8 +270,10 @@ bool QtMaterialTextField::event(QEvent *event)
     switch (event->type())
     {
     case QEvent::Resize:
-    case QEvent::Move: {
-        if (d->label) {
+    case QEvent::Move:
+    {
+        if (d->label)
+        {
             d->label->setGeometry(rect());
         }
     }
@@ -287,20 +298,20 @@ void QtMaterialTextField::paintEvent(QPaintEvent *event)
 
     if (text().isEmpty() && progress < 1)
     {
-        painter.setOpacity(1-progress);
-        painter.fillRect(rect(), parentWidget()->palette().color(backgroundRole()));
+        painter.setOpacity(1 - progress);
+        painter.fillRect(rect(), parentWidget()->palette().color(QPalette::AlternateBase));
     }
 
-    const int y = height()-1;
-    const int wd = width()-5;
+    const int y = height() - 1;
+    const int wd = width() - 5;
 
     if (d->showInputLine)
     {
         QPen pen;
         pen.setWidth(1);
-        pen.setColor(inputLineColor());
+        pen.setColor(inputLineColor());// полосочка снизу текста
 
-        if (!isEnabled()) 
+        if (!isEnabled())
             pen.setStyle(Qt::DashLine);
 
         painter.setPen(pen);
@@ -309,14 +320,14 @@ void QtMaterialTextField::paintEvent(QPaintEvent *event)
 
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
-        brush.setColor(inkColor());
+        brush.setColor(palette().color(QPalette::Highlight));
 
         if (progress > 0)
         {
             painter.setPen(Qt::NoPen);
             painter.setBrush(brush);
-            const int w = (1-progress)*static_cast<qreal>(wd/2);
-            painter.drawRect(w+2.5, height()-2, wd-w*2, 2);
+            const int w = (1 - progress) * static_cast<qreal>(wd / 2);
+            painter.drawRect(w + 2.5, height() - 2, wd - w * 2, 2);
         }
     }
 }

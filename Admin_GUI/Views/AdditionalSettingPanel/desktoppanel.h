@@ -19,7 +19,6 @@
 #include "Admin_GUI/Delegates/filedelegate.h"
 #include "Admin_GUI/Widgets/qtmaterialdialog.h"
 #include "Admin_GUI/Views/AdditionalSettingPanel/DialogWidgets/filedialogwidget.h"
-#include "Admin_GUI/Views/AdditionalSettingPanel/mylistview.h"
 
 enum class IconsPanelType
 {

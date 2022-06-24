@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QObject>
 #include <QTimerEvent>
+#include <QApplication>
 
 #include "Logging/logger.h"
 #include "Structs/user.h"

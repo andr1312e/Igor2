@@ -13,6 +13,7 @@ UserWizardWidget::UserWizardWidget(const QStringList &headerLabels, WizardServic
 UserWizardWidget::~UserWizardWidget()
 {
     delete m_stringValidator;
+
     delete m_userFCSLayout;
     delete m_numOfUsersLayout;
     delete m_mainLayout;

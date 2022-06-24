@@ -10,9 +10,10 @@ public:
     explicit FilesAndFoldersSerivce(const QString &rlsTiFolders);
     ~FilesAndFoldersSerivce();
 public:
-    void SetBackupFolder(const QString &backupFolder);
+    void SetBackupFolderPath(const QString &backupFolder);
     void GetFilesFromBackup(const QDomElement &elem);
     void GetFoldersFromBackup(const QDomElement &elem);
+    void ClearAll();
 public:
     void CopyFiles();
     void CopyFolders();
@@ -21,7 +22,7 @@ private:
     QStringList ReturnExsistsFullPathFiles(const QStringList &fileNames);
     QStringList ReturnExsistsFullPathsFolders(const QStringList &folderNames);
 private:
-    const QString m_rlsTiFolders;
+    const QString m_rlsTiFolder;
     Terminal *const m_terminal;
 private:
     QString m_backupFolder;

@@ -10,52 +10,53 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QWidget>
+#include <QApplication>
 
 #include "Logging/logger.h"
 #include "Admin_GUI/Widgets/qtmaterialtextfield.h"
 
 class StartupDialogWidget : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   explicit StartupDialogWidget(QWidget *parent);
-   ~StartupDialogWidget();
+    explicit StartupDialogWidget(QWidget *parent);
+    ~StartupDialogWidget();
 
 private:
-   void CreateUI();
-   void InsertWidgetsIntoLayouts();
-   void InitUI();
-   void ConnectObjects();
+    void CreateUI();
+    void InsertWidgetsIntoLayouts();
+    void InitUI();
+    void ConnectObjects();
 
 Q_SIGNALS:
-   void ToHideDialog();
-   void ToAddExecPathToFile(const QString &exec);
+    void ToHideDialog();
+    void ToAddExecPathToFile(const QString &exec);
 
 
 private Q_SLOTS:
-   void OnHideAndClearDialog();
-   void OnAddEcexPath();
-   void OnCheckExec();
+    void OnHideAndClearDialog();
+    void OnAddEcexPath();
+    void OnCheckExec();
 
 private:
-   void CearAllTextFiels();
+    void CearAllTextFiels();
 
 private:
 
-   QVBoxLayout *m_mainLayout;
-   QLabel *m_titleLabel;
-   QHBoxLayout *m_execPathLayout;
-   QtMaterialTextField *m_execTextField;
-   QPushButton *m_execButton;
+    QVBoxLayout *m_mainLayout;
+    QLabel *m_titleLabel;
+    QHBoxLayout *m_execPathLayout;
+    QtMaterialTextField *m_execTextField;
+    QPushButton *m_execButton;
 
-   QHBoxLayout *m_bottomButtonsLayout;
-   QPushButton *m_saveDialogButton;
-   QPushButton *m_closeDialogButton;
-   QMessageBox *m_errorMessagBox;
+    QHBoxLayout *m_bottomButtonsLayout;
+    QPushButton *m_saveDialogButton;
+    QPushButton *m_closeDialogButton;
+    QMessageBox *m_errorMessagBox;
 
 private:
-   const QString m_desktopPath;
+    const QString m_desktopPath;
 };
 
 #endif // ADMIN_GUI_VIEWS_ADDITIONALSETTINGSPANEL_DIALOGWIDGET_EXECDIALOGWIDGET_H

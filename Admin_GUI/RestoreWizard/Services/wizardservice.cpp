@@ -5,6 +5,7 @@ WizardService::WizardService(const QString &rlsTiFolder, LoadingStates states, L
     , m_terminal(Terminal::GetTerminal())
     , m_dependenciesService(new DependenciesService(this))
     , m_filesAndFoldersSerivce(new FilesAndFoldersSerivce(rlsTiFolder))
+    , m_enviromentalVariablesService(new EnviromentalVariablesService())
     , m_rlsTiFolder(rlsTiFolder)
     , m_currentUserId(service->GetCurrentUserId())
     , m_currentUserName(service->GetCurrentUserName())
@@ -24,6 +25,8 @@ WizardService::WizardService(const QString &rlsTiFolder, LoadingStates states, L
 WizardService::~WizardService()
 {
     delete m_dependenciesService;
+    delete m_filesAndFoldersSerivce;
+    delete m_enviromentalVariablesService;
     delete m_oldDataCurrentUserWizardRepositry;
     delete m_backupDataUserWizardRepositry;
     delete m_oldDataRolesAndStartupsWizardRepository;
@@ -140,6 +143,8 @@ void WizardService::ClearBackup()
     m_backupDataRolesAndStartupsWizardRepository->Clear();
     m_dependenciesService->ClearDependencies();
     m_backupVersion = QLatin1Literal("1.0");
+    m_filesAndFoldersSerivce->ClearAll();
+    m_enviromentalVariablesService->ClearProFiles();
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Файл настроек был отчищен"));
 }
 
@@ -183,10 +188,13 @@ void WizardService::ParseBackupFile(const QString &backupPath, const QDomNodeLis
     }
     const QDomElement dependeciesDomElement = backupNodeLists.at(Roles.count() + 1).toElement();
     m_dependenciesService->GetDependenciesFromBackUp(dependeciesDomElement);
-    const QDomElement filesDomElement = backupNodeLists.at(backupNodeLists.length() - 1).toElement();
-
-    const QDomElement foldersDomElement = backupNodeLists.at(backupNodeLists.length() - 1).toElement();
-
+    const QDomElement filesDomElement = backupNodeLists.at(Roles.count() + 2).toElement();
+    const QDomElement foldersDomElement = backupNodeLists.at(Roles.count() + 3).toElement();
+    m_filesAndFoldersSerivce->SetBackupFolderPath(backupPath);
+    m_filesAndFoldersSerivce->GetFilesFromBackup(filesDomElement);
+    m_filesAndFoldersSerivce->GetFoldersFromBackup(foldersDomElement);
+    const QDomElement envVariablesDomElement = backupNodeLists.at(Roles.count() + 4).toElement();
+    m_enviromentalVariablesService->GetProfileDataFromBackUp(envVariablesDomElement);
 }
 
 void WizardService::ApplyWizardActions()
@@ -195,7 +203,11 @@ void WizardService::ApplyWizardActions()
     Q_EMIT ToSetActionsCount(actionsCount);
     ApplySettingsWithUserRepository(m_indexActionWithUserRepository, m_backupDataUserWizardRepositry, m_oldDataCurrentUserWizardRepositry);
     ApplySettingsWithRolesRepository(m_actionWithRolesRepository, m_backupDataRolesAndStartupsWizardRepository);
-    ApplySettingsWithDependencies();
+
+    m_enviromentalVariablesService->AppendProfileDataInfo();
+    m_filesAndFoldersSerivce->CopyFiles();
+    m_filesAndFoldersSerivce->CopyFolders();
+    m_dependenciesService->InstallDependencies();
 }
 
 int WizardService::GetAllActionsCount() const
@@ -264,11 +276,6 @@ void WizardService::ApplySettingsWithRolesRepository(const QVarLengthArray<int, 
         programsNamesToCopy.removeDuplicates();
         CopyFilesFromRoleToFolder(m_backupFilePath, programsNamesToCopy);
     }
-}
-
-void WizardService::ApplySettingsWithDependencies()
-{
-    m_dependenciesService->InstallDependencies();
 }
 
 void WizardService::CopyFilesFromRoleToFolder(const QString &sourceFolder, const QStringList &programs)
@@ -356,7 +363,7 @@ void WizardService::SetActionWithUserRepository(int actionIndex)
     m_indexActionWithUserRepository = actionIndex;
 }
 
-int WizardService::GetActionIndexWithUserRepository() const
+int WizardService::GetActionIndexWithUserRepository() const noexcept
 {
     return m_indexActionWithUserRepository;
 }
@@ -376,7 +383,7 @@ const QStringList &WizardService::GetAllDependenciesList() const
     return m_dependenciesService->GetAllDependenciesList();
 }
 
-RolesAndStartupsWizardRepository *WizardService::GetRolesRepositoryType(DbWizardDataType dataType) const
+RolesAndStartupsWizardRepository *WizardService::GetRolesRepositoryType(DbWizardDataType dataType) const noexcept
 {
     if (DbWizardDataType::OldData == dataType)
     {
@@ -388,7 +395,7 @@ RolesAndStartupsWizardRepository *WizardService::GetRolesRepositoryType(DbWizard
     }
 }
 
-UsersDataWizardRepository *WizardService::GetUserReposiotry(DbWizardDataType dataType) const
+UsersDataWizardRepository *WizardService::GetUserReposiotry(DbWizardDataType dataType) const noexcept
 {
     if (DbWizardDataType::OldData == dataType)
     {

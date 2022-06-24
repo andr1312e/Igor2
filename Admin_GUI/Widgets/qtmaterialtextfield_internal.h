@@ -3,6 +3,8 @@
 
 #include <QStateMachine>
 #include <QtWidgets/QWidget>
+#include <QDebug>
+
 #include "qtmaterialtextfield.h"
 
 class QPropertyAnimation;
@@ -24,7 +26,7 @@ public:
     inline qreal progress() const;
 
 public slots:
-    void setupProperties();
+    void OnSetupProperties();
 
 private:
     Q_DISABLE_COPY(QtMaterialTextFieldStateMachine)

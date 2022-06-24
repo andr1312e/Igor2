@@ -125,7 +125,7 @@ void FramelessWindow::CreateConnections()
     });
     connect(m_maximizeButton, &QToolButton::clicked, this, &FramelessWindow::OnMaximizeButtonClicked);
     connect(m_zoomButton, &QToolButton::clicked, this, &FramelessWindow::OnRestoreButtonClicked);
-    connect(m_closeButton, &QToolButton::clicked, this, &QWidget::close);
+
     connect(m_WindowTitleBar, &WindowTitleBar::ToDoubleClicked, this, &FramelessWindow::OnWindowDraggerDoubleClicked);
     connect(m_changeThemePushButton, &ThemeButton::ToChangeTheme, this, &FramelessWindow::ToChangeTheme);
 }
@@ -200,10 +200,7 @@ void FramelessWindow::changeEvent(QEvent *event)
     }
 }
 
-void FramelessWindow::SetMainWidget(QWidget *widget)
-{
-    m_verticalLayout->addWidget(widget);
-}
+
 
 void FramelessWindow::OnSetWindowTitle(const QString &text)
 {
@@ -681,4 +678,19 @@ bool FramelessWindow::eventFilter(QObject *obj, QEvent *event)
     return QWidget::eventFilter(obj, event);
 }
 
+void FramelessWindow::SetWizardWidget(StartupWizard *wizard)
+{
+    m_verticalLayout->addWidget(wizard);
+    connect(m_closeButton, &QToolButton::clicked, qApp, &QApplication::exit);
+}
 
+void FramelessWindow::SetMainWidget(QWidget *widget)
+{
+    const QMetaMethod buttonSignal = QMetaMethod::fromSignal(&QToolButton::clicked);
+    if (isSignalConnected(buttonSignal))
+    {
+        disconnect(m_closeButton, &QToolButton::clicked, Q_NULLPTR, Q_NULLPTR);
+    }
+    m_verticalLayout->addWidget(widget);
+    connect(m_closeButton, &QToolButton::clicked, this, &QWidget::hide);
+}

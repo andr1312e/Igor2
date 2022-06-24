@@ -19,16 +19,6 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const Q_DECL_OVERRIDE;
 private:
-    QRect *m_globalRect;
-    QRect *m_iconRect;
-    QRect *m_userIdRect;
-    QRect *m_userNameRect;
-    QRect *m_userFCSRect;
-    QRect *m_userRoleRect;
-    QPen *m_textPen;
-    QPen *m_titlePen;
-    QPen *m_mouseOverPen;
-    QPen *m_mouseSelectedPen;
     QFont m_font;
 };
 

@@ -10,6 +10,7 @@
 #include <QDesktopWidget>
 #include <QBoxLayout>
 #include <QGraphicsDropShadowEffect>
+#include <QMetaMethod>
 
 #include "Styles/InteractiveButtons/minimizewindowbutton.h"
 #include "Styles/InteractiveButtons/maximizewindowbutton.h"
@@ -18,6 +19,8 @@
 #include "Styles/InteractiveButtons/themebutton.h"
 #include "Styles/Frameless/windowtitlebar.h"
 #include "Styles/Themes/themecolors.h"
+
+#include "Admin_GUI/RestoreWizard/Views/startupwizard.h"
 
 class FramelessWindow : public QWidget
 {
@@ -64,6 +67,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     virtual bool eventFilter(QObject *obj, QEvent *event) Q_DECL_OVERRIDE;
 public:
+    void SetWizardWidget(StartupWizard *wizard);
     void SetMainWidget(QWidget *widget);
 private:
     WindowTitleBar *m_WindowTitleBar;

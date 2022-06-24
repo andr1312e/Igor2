@@ -84,18 +84,18 @@ protected:
     ~AppenderSkeleton() override;
 
 public:
-    FilterSharedPtr filter() const override;
-    LayoutSharedPtr layout() const override;
+    FilterSharedPtr filter() const Q_DECL_OVERRIDE;
+    LayoutSharedPtr layout() const Q_DECL_OVERRIDE;
     bool isActive() const;
     bool isClosed() const;
     QString name() const override;
     Level threshold() const;
-    void setLayout(const LayoutSharedPtr &layout) override;
+    void setLayout(const LayoutSharedPtr &layout) Q_DECL_OVERRIDE;
     void setName(const QString &name) override;
     void setThreshold(Level level);
 
-    virtual void activateOptions();
-    void addFilter(const FilterSharedPtr &filter) override;
+    virtual void activateOptions() Q_DECL_OVERRIDE;
+    void addFilter(const FilterSharedPtr &filter) Q_DECL_OVERRIDE;
     void clearFilters() override;
     void close() override;
 
@@ -105,14 +105,14 @@ public:
      *
      * \sa append(), checkEntryConditions(), isAsSevereAsThreshold(), Filter
      */
-    void doAppend(const LoggingEvent &event) override;
+    void doAppend(const LoggingEvent &event) Q_DECL_OVERRIDE;
 
     FilterSharedPtr firstFilter() const;
     bool isAsSevereAsThreshold(Level level) const;
 
 protected:
     virtual void append(const LoggingEvent &event) = 0;
-    void customEvent(QEvent *event) override;
+    void customEvent(QEvent *event) Q_DECL_OVERRIDE;
 
     /*!
      * Tests if all entry conditions for using append() in this class are

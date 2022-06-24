@@ -16,29 +16,38 @@ ConclusionWizardPage::~ConclusionWizardPage()
     delete m_oldDataLayout;
     delete m_backupLayout;
     delete m_dataLayout;
+    delete m_installingPackesLayout;
 
     delete m_topLabel;
+    delete m_descriptionLabel;
+
     delete m_backupLabel;
     delete m_backupValue;
+
     delete m_oldDataLabel;
     delete m_oldDataValue;
     delete m_actionsLabel;
+
     delete m_usersLabel;
     delete m_usersActionValue;
     delete m_usersCommentLabel;
     delete m_usersCommentValue;
+
     delete m_firstRoleLabel;
     delete m_firstRoleActionValue;
     delete m_firstRoleCommentLabel;
     delete m_firstRoleCommentValue;
+
     delete m_secondRoleLabel;
     delete m_secondRoleActionValue;
     delete m_secondRoleCommentLabel;
     delete m_secondRoleCommentValue;
+
     delete m_thirdRoleLabel;
     delete m_thirdRoleActionValue;
     delete m_thirdRoleCommentLabel;
     delete m_thirdRoleCommentValue;
+
     delete m_fourthRoleLabel;
     delete m_fourthRoleActionValue;
     delete m_fourthRoleCommentLabel;
@@ -48,9 +57,14 @@ ConclusionWizardPage::~ConclusionWizardPage()
     delete m_packagesToInstallList;
 
     delete m_additionalActionsLabel;
+    delete m_needInstallPackages;
     delete m_addIconToDesktopToCurrentUser;
     delete m_addIconToDesktopToAllUsers;
     delete m_addIconToStartMenu;
+
+    delete m_currentDoingActionLabel;
+    delete m_currentDoingActionName;
+    delete m_totalProgressBar;
 }
 
 int ConclusionWizardPage::nextId() const
@@ -60,14 +74,14 @@ int ConclusionWizardPage::nextId() const
 
 void ConclusionWizardPage::initializePage()
 {
-
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перешли на страницу завершения"));
     if (m_wizardService->HasUserData(DbWizardDataType::OldData))
     {
         m_oldDataValue->setText(QStringLiteral("имеются"));
     }
     else
     {
-        m_oldDataValue->setText(QStringLiteral("отсутствует"));
+        m_oldDataValue->setText(QStringLiteral("отсутствуют"));
     }
     if (m_wizardService->HasUserData(DbWizardDataType::BackupData))
     {
@@ -93,7 +107,8 @@ void ConclusionWizardPage::CreateUI()
 {
     m_topLabel = new QLabel(QStringLiteral("Итоговые настройки"));
     m_descriptionLabel = new QLabel(QStringLiteral("Настройки пока НЕ применены, проверьте корректность ввода данных.\n"
-                                    "Если все настройки выставлены правильно, нажмите кнопку Завершить. Иначе, нажмите Назад и выполните перенастройку..."));
+                                    "Если все настройки выставлены правильно, нажмите кнопку Завершить."
+                                    "\nИначе, нажмите Назад и выполните перенастройку..."));
     m_backupLayout = new QHBoxLayout();
     m_backupLabel = new QLabel(QStringLiteral("Папка восстановления: "));
     m_backupValue = new QLabel();
@@ -151,9 +166,6 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
     MainLayout()->addWidget(m_topLabel, 0, Qt::AlignHCenter);
     MainLayout()->addWidget(m_descriptionLabel);
 
-//    m_backupLayout->addWidget(m_backupLabel);
-//    m_backupLayout->addWidget(m_backupValue, 1, Qt::AlignRight);
-
     MainLayout()->addLayout(m_backupLayout);
 
     m_oldDataLayout->addWidget(m_oldDataLabel);
@@ -187,7 +199,6 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
     m_dataLayout->addWidget(m_fourthRoleCommentLabel, 4, 2, 1, 1, Qt::AlignHCenter);
     m_dataLayout->addWidget(m_fourthRoleCommentValue, 4, 3, 1, 1, Qt::AlignRight);
     MainLayout()->addLayout(m_dataLayout, 1);
-//    MainLayout()->addSpacing(110);
     MainLayout()->addWidget(m_packagesToInstallLabel);
     MainLayout()->addWidget(m_packagesToInstallList);
 
@@ -199,8 +210,7 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
     MainLayout()->addWidget(m_addIconToStartMenu, 0, Qt::AlignHCenter);
 
     m_installingPackesLayout->addWidget(m_currentDoingActionLabel);
-    m_installingPackesLayout->addWidget(m_currentDoingActionName, 0, Qt::AlignRight);
-//    m_installingPackesLayout->setMargin(20);
+    m_installingPackesLayout->addWidget(m_currentDoingActionName);
 
     MainLayout()->addLayout(m_installingPackesLayout);
     MainLayout()->addWidget(m_totalProgressBar);
@@ -376,6 +386,7 @@ void ConclusionWizardPage::SetFutureInstalledPackagesToList()
     }
     else
     {
+        m_packagesToInstallLabel->setText(("Пакетов для установки: ") + QString::number(items.count()));
         m_currentDoingActionLabel->setVisible(true);
         m_currentDoingActionName->setVisible(true);
         m_needInstallPackages->setVisible(true);

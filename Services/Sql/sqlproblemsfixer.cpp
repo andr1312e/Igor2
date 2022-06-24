@@ -2,22 +2,26 @@
 
 SqlProblemsFixer::SqlProblemsFixer()
     : m_terminal(Terminal::GetTerminal())
+    , m_mountChecker(new MountChecker())
     , m_error(DbErrorState::UnknownError)
     , m_astraPackageManagerName(QLatin1Literal("synaptic"))
     , m_astraPackageManagerNameService(QLatin1Literal("synaptic-pkexec"))
     , m_securityAstraFileName(QLatin1Literal("/etc/parsec/mswitch.conf"))
     , m_postgreSqlDriverName(QLatin1Literal("libqt5sql5-psql"))
-    , m_postgreSqlPackageName(QLatin1Literal("libqt5sql5-psql"))
+    , m_postgreSqlPackageName(QLatin1Literal("postgresql-9.6"))
+    , m_postgreSqlSerivceStartCommand(QLatin1Literal("service postgresql start"))
 {
+
 }
 
 SqlProblemsFixer::~SqlProblemsFixer()
 {
-
+    delete m_mountChecker;
 }
 
 bool SqlProblemsFixer::InstallPostgreSqlAndDriver()
 {
+    CheckAndMountRepository();
     CloseSynapticIfItRunned();
     QString outputInfo, errorInfo;
     m_terminal->InstallPackageSudo(m_postgreSqlPackageName, outputInfo, errorInfo);
@@ -29,11 +33,15 @@ bool SqlProblemsFixer::InstallPostgreSqlAndDriver()
             return false;
         }
     }
-    return InstallSqlDriverForQt5();
+    if (InstallSqlDriverForQt5())
+    {
+        return StartPostgreSqlService();
+    }
 }
 
 bool SqlProblemsFixer::InstallSqlDriverForQt5()
 {
+    CheckAndMountRepository();
     CloseSynapticIfItRunned();
     QString outputInfo, errorInfo;
     m_terminal->InstallPackageSudo(m_postgreSqlDriverName, outputInfo, errorInfo);
@@ -48,20 +56,26 @@ bool SqlProblemsFixer::InstallSqlDriverForQt5()
     return true;
 }
 
+bool SqlProblemsFixer::StartPostgreSqlService()
+{
+    QString outputInfo, errorInfo;
+    m_terminal->RunConsoleCommandSync(m_postgreSqlSerivceStartCommand, outputInfo, errorInfo);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Запуск сервиса постгре Вывод: ") + outputInfo + QStringLiteral(" Ошибки:") + errorInfo);
+    return true;
+}
+
 bool SqlProblemsFixer::ResetPostgreUserPassword(const QString &postgresUser, const QString &postgresPassword)
 {
     Terminal *const terminal = Terminal::GetTerminal();
     //Попытка создать пользователя
-    const QString createUserCommand = "sudo -u postgres bash -c \"psql -c \\\"CREATE USER '"
-                                      + postgresUser + "' WITH  SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS INHERIT LOGIN PASSWORD '" + postgresPassword + "';\\\"\"";
+    const QString createUserCommand = "sudo -i -u postgres psql -c \"CREATE USER " + postgresUser + " WITH SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS INHERIT LOGIN PASSWORD '" + postgresPassword + "';\"";
     QString commandOutput, commandError;
     terminal->RunConsoleCommandSync(createUserCommand, commandOutput, commandError);
     if (commandOutput.isEmpty())
     {
         //Пытаемся поменять у пользователя пароль
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Ошибка смены логина:") + commandError);
-        const QString replaceUserPassword = "sudo -u postgres bash -c \"psql -c \\\"ALTER USER '"
-                                            + postgresUser + "' WITH LOGIN SUPERUSER CREATEDB CREATEROLE REPLICATION IBYPASSRLS NHERIT LOGIN PASSWORD '" + postgresPassword + "';\\\"\"";
+        const QString replaceUserPassword = "sudo -i -u postgres psql -c \"ALTER USER " + postgresUser + " WITH SUPERUSER CREATEDB CREATEROLE REPLICATION BYPASSRLS INHERIT LOGIN PASSWORD '" + postgresPassword + "';\"";
         terminal->RunConsoleCommandSync(replaceUserPassword, commandOutput, commandError);
         if (commandOutput.isEmpty())
         {
@@ -87,7 +101,7 @@ void SqlProblemsFixer::SetLastError(DbErrorState newError) noexcept
 
 void SqlProblemsFixer::RemoveAstraLinuxPostgreSecurityControl()
 {
-    //Убираем защитный костыль от астры
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Убираем защитный костыль от астры"));
     const QString fileData = m_terminal->GetFileText(m_securityAstraFileName, Q_FUNC_INFO, true);
     QStringList rowsList = fileData.split('\n');
     rowsList.removeAll("");
@@ -114,6 +128,7 @@ void SqlProblemsFixer::RemoveAstraLinuxPostgreSecurityControl()
             m_terminal->AppendTextToFileSudo(row, m_securityAstraFileName, Q_FUNC_INFO);
         }
     }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Костыль убран"));
 }
 
 void SqlProblemsFixer::CloseSynapticIfItRunned()
@@ -126,18 +141,35 @@ void SqlProblemsFixer::CloseSynapticIfItRunned()
     }
 }
 
+void SqlProblemsFixer::CheckAndMountRepository()
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Проверка наличие исо образов"));
+    if (m_mountChecker->HasMountFiles())
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral("Образы в наличии. Проверка монтировки репозиториев"));
+        if (!m_mountChecker->IsReposiotoryMounted(Q_FUNC_INFO))
+        {
+            m_mountChecker->MountRepository();
+        }
+    }
+    else
+    {
+        Log4QtInfo(Q_FUNC_INFO + QStringLiteral("Образы отсутвуют. Необходимо поместить их в папку. Имена /opt/devel-smolensk-1.6.iso и /opt/smolensk-1.6.iso или /opt/boot/boot.iso и /opt/dev/dev.iso"));
+        QMessageBox::critical(Q_NULLPTR, QStringLiteral("Ошибка поиска образов"), QStringLiteral("Образы отсутвуют. Необходимо поместить их в папку. Имена /opt/devel-smolensk-1.6.iso и /opt/smolensk-1.6.iso или /opt/boot/boot.iso и /opt/dev/dev.iso"));
+        QApplication::exit();
+    }
+}
+
 bool SqlProblemsFixer::ErrorIsCritical(const QString &errorInstall)
 {
-    if (errorInstall.contains("Невозможно получить некоторые архивы"))
+    if (errorInstall.contains("интерфейс: Dialog"))
     {
-        QMessageBox msgWarning;
-        msgWarning.setText(QStringLiteral("Для монтирования диска разработчика обратитесь к 1 части руководства:"
-                                          "\nАдминистратора Операционной системы специального назначения «Astra Linux»\n"
-                                          "РУСБ.10015-01 95 01-1, Глава 9, стр. 228-231"));
-        msgWarning.setIcon(QMessageBox::Critical);
-        msgWarning.setWindowTitle(QStringLiteral("Не примонтирован диск разработчика."));
-        msgWarning.exec();
-        return  true;
+        return false;
     }
-    return false;
+    QMessageBox msgWarning;
+    msgWarning.setText(errorInstall);
+    msgWarning.setIcon(QMessageBox::Critical);
+    msgWarning.setWindowTitle(QStringLiteral("Ошибка при подключении к бд."));
+    msgWarning.exec();
+    return  true;
 }

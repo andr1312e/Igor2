@@ -1,6 +1,6 @@
 #include "roleappswizardpage.h"
 
-RoleAppsWizardPage::RoleAppsWizardPage(const QString &role, const int currentRoleIndex, WizardService * const service, QWidget *parent)
+RoleAppsWizardPage::RoleAppsWizardPage(const QString &role, const int currentRoleIndex, WizardService *const service, QWidget *parent)
     : MyWizardPage(parent)
     , m_currentRoleIndex(currentRoleIndex)
     , m_wizardService(service)
@@ -17,7 +17,6 @@ RoleAppsWizardPage::~RoleAppsWizardPage()
     delete m_backupWidget;
     delete m_oldWidget;
     delete m_actionComboBox;
-
 }
 
 void RoleAppsWizardPage::CreateUI()
@@ -39,8 +38,8 @@ void RoleAppsWizardPage::InsertWidgetsIntoLayout()
 void RoleAppsWizardPage::InitUI(const QString &role)
 {
     m_topLabel->setText("Ярлыки и программы на рабочем столе для роли: " + role);
-    QFont font=m_topLabel->font();
-    font.setPointSize(font.pointSize()+2);
+    QFont font = m_topLabel->font();
+    font.setPointSize(font.pointSize() + 2);
     m_topLabel->setFont(font);
 }
 
@@ -52,7 +51,7 @@ void RoleAppsWizardPage::ConnectObjects()
 
 void RoleAppsWizardPage::OnCurrentIndexChanged(const QString &action)
 {
-    if (action==wizardRolesAllActions.at(1))
+    if (action == wizardRolesAllActions.at(1))
     {
         m_oldWidget->setEnabled(false);
         m_backupWidget->setEnabled(true);
@@ -62,7 +61,7 @@ void RoleAppsWizardPage::OnCurrentIndexChanged(const QString &action)
         m_oldWidget->setEnabled(true);
         m_backupWidget->setEnabled(false);
     }
-    const int absoluteIndexOfAction=wizardRolesAllActions.indexOf(action);
+    const int absoluteIndexOfAction = wizardRolesAllActions.indexOf(action);
     m_wizardService->SetActionWithRoleRepository(m_currentRoleIndex, absoluteIndexOfAction);
 }
 
@@ -73,6 +72,7 @@ int RoleAppsWizardPage::nextId() const
 
 void RoleAppsWizardPage::initializePage()
 {
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перешли на страницу роли"));
     QStringList currentStartups;
     QList<DesktopEntity> currentDesktops;
     m_actionComboBox->clear();
@@ -89,22 +89,29 @@ void RoleAppsWizardPage::initializePage()
             m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
             m_actionComboBox->addItems(wizardRolesAllActions);
 
-        } else {
+        }
+        else
+        {
             m_oldWidget->setVisible(false);
             m_actionComboBox->addItems(wizardRolesDeleteAndRestoreActions);
         }
 
         m_actionComboBox->setCurrentIndex(1);
-    } else {
+    }
+    else
+    {
         m_backupWidget->setVisible(false);
 
-        if (m_wizardService->HasRoleIdAnyData(DbWizardDataType::OldData, m_currentRoleIndex)) {
+        if (m_wizardService->HasRoleIdAnyData(DbWizardDataType::OldData, m_currentRoleIndex))
+        {
             m_wizardService->GetDataToViewFromDesktopRepository(DbWizardDataType::OldData, m_currentRoleIndex, currentDesktops, currentStartups);
             m_oldWidget->setVisible(true);
             m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
             m_actionComboBox->addItems(wizardRolesDeleteAndOldActions);
             m_actionComboBox->setCurrentIndex(1);
-        } else {
+        }
+        else
+        {
             m_oldWidget->SetWizardWidgetFileds(currentDesktops, currentStartups);
             m_actionComboBox->addItems(wizardRolesDeleteActions);
         }

@@ -49,6 +49,10 @@ public:
 
     void WriteTextToFileSudo(const QString &text, const QString &filePath, const char *calledFunc);
 
+    void DeleteEmptyFolderSudo(const QString &folderPath, const char *calledFunc);
+
+    void DeleteFolderSudo(const QString &folderPath, const char *calledFunc);
+
     void DeleteFileSudo(const QString filePath, const char *calledFunc);
 
     void ClearFolderSudo(const QString &folderPath, const char *calledFunc);
@@ -96,6 +100,8 @@ private:
     QString CreateClearFolderCommandSudo(const QString &folderPath) const noexcept;
 
     QString CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) const noexcept;
+
+    QString CreateDeleteFolderCommandSudo(const QString &folderPath) const noexcept;
 
     QString CreateCopyFileCommandSudo(const QString &source, const QString &destination) const noexcept;
 

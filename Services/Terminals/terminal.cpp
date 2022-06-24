@@ -269,6 +269,18 @@ void Terminal::WriteTextToFileSudo(const QString &text, const QString &filePath,
     RunConsoleCommandSync(writeTextToFileCommand, calledFunc);
 }
 
+void Terminal::DeleteEmptyFolderSudo(const QString &folderPath, const char *calledFunc)
+{
+    const  QString deleteFolderEmptyCommand = CreateDeleteEmptyFolderCommandSudo(folderPath);
+    RunConsoleCommandSync(deleteFolderEmptyCommand, calledFunc);
+}
+
+void Terminal::DeleteFolderSudo(const QString &folderPath, const char *calledFunc)
+{
+    const  QString deleteFolderCommand = CreateDeleteFolderCommandSudo(folderPath);
+    RunConsoleCommandSync(deleteFolderCommand, calledFunc);
+}
+
 void Terminal::DeleteFileSudo(const QString filePath, const char *calledFunc)
 {
     const  QString deleteFileCommand = CreateDeleteFileCommandSudo(filePath);
@@ -354,7 +366,7 @@ void Terminal::InstallPackageSudo(const QString &packageName, QString &outpiutIn
 
 const QString Terminal::CreateGetAllUsersCommand() const noexcept
 {
-    return QStringLiteral("awk -F: '{print $1 \":\" $3}' /etc/passwd");
+    return QLatin1Literal("awk -F: '{print $1 \":\" $3}' /etc/passwd");
 }
 
 QString Terminal::CreateCreateFolderCommand(const QString &folderPath, bool hasRoot) const noexcept
@@ -447,6 +459,11 @@ QString Terminal::CreateDeleteEmptyFolderCommandSudo(const QString &folderPath) 
     return QStringLiteral("sudo rmdir -p ") + folderPath;
 }
 
+QString Terminal::CreateDeleteFolderCommandSudo(const QString &folderPath) const noexcept
+{
+    return QStringLiteral("sudo rm -r ") + folderPath;
+}
+
 QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString &destination) const noexcept
 {
     return QStringLiteral("sudo cp '") + source + QStringLiteral("' '") + destination + '\'';
@@ -454,9 +471,8 @@ QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString
 
 QString Terminal::CreateCopyFolderCommandSudo(const QString &source, const QString &destination) const noexcept
 {
-    return QStringLiteral("sudo cp -R ") + source + QStringLiteral("' '") + destination + '\'';
+    return QStringLiteral("sudo cp -R '") + source + QStringLiteral("' '") + destination + '\'';
 }
-
 
 
 QString Terminal::CreatePermissionToExecuteCommandSudo(const QString &filePath) const noexcept
@@ -486,7 +502,7 @@ QString Terminal::CreateGettingAllInstalledPackagesNamesListCommandSudo() const 
 
 QString Terminal::CreateGettingAllNotInstalledPackageNamesListCommandSudo() const noexcept
 {
-    return  QStringLiteral("aptitude -F %p search '!~i'");
+    return  QLatin1Literal("aptitude -F %p search '!~i'");
 }
 
 QString Terminal::CreateInstallPackageCommandSudo(const QString &packageName) const noexcept

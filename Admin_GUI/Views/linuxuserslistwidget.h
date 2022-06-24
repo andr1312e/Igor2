@@ -22,7 +22,7 @@ class LinuxUsersListWidget : public QWidget
     Q_OBJECT
 public:
 
-    LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
+    explicit LinuxUsersListWidget(UserModel *userModel, QWidget *parent);
     ~LinuxUsersListWidget();
 
 private:

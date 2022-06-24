@@ -25,6 +25,7 @@ IntroPage::~IntroPage()
     delete m_backupLabel;
     delete m_backupLineEdit;
     delete m_faqLabel;
+    delete m_errorLabel;
 }
 
 void IntroPage::CreateUI()

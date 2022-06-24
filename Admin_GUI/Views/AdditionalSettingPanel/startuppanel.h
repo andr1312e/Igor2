@@ -20,46 +20,46 @@
 
 class StartupPanel : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
-   ~StartupPanel();
+    explicit StartupPanel(ISqlDatabaseService *sqlDatabaseService, QWidget *parent);
+    ~StartupPanel();
 
 private:
-   void CreateServices(ISqlDatabaseService *sqlDatabaseService);
-   void SetBackGroundColor();
-   void CreateUI();
-   void InsertWidgetsIntoLayout();
-   void FillUI();
-   void ConnectObjects();
+    void CreateServices(ISqlDatabaseService *sqlDatabaseService);
+    void SetBackGroundColor();
+    void CreateUI();
+    void InsertWidgetsIntoLayout();
+    void FillUI();
+    void ConnectObjects();
 
 private Q_SLOTS:
-   void OnDeleteProgram();
-   void OnAddProgram(const QString &startupPath);
-   void OnClicked();
+    void OnDeleteProgram();
+    void OnAddProgram(const QString &startupPath);
+    void OnClicked();
 
 public:
-   void SetRoleId(int roleId);
+    void SetRoleId(int roleId);
 
 private:
-   void GetAllStartups();
+    void GetAllStartups();
 
 private:
-   int m_currentRoleId;
-   StartupPanelPresenter *m_startupRepositoryPresenter;
+    int m_currentRoleId;
+    StartupPanelPresenter *m_startupRepositoryPresenter;
 
 private:
-   QVBoxLayout *m_mainLayout;
+    QVBoxLayout *m_mainLayout;
 
-   QLabel *m_titleLabel;
-   QListView *m_allProgramsListView;
-   QHBoxLayout *m_bottomLayout;
-   QPushButton *m_addProgramButton;
-   QPushButton *m_deleteProgramButton;
-   QtMaterialDialog *m_dialog;
-   QVBoxLayout *m_dialogLayout;
-   StartupDialogWidget *m_dialogWidget;
+    QLabel *m_titleLabel;
+    QListView *m_allProgramsListView;
+    QHBoxLayout *m_bottomLayout;
+    QPushButton *m_addProgramButton;
+    QPushButton *m_deleteProgramButton;
+    QtMaterialDialog *m_dialog;
+    QVBoxLayout *m_dialogLayout;
+    StartupDialogWidget *m_dialogWidget;
 };
 
 #endif // ADMIN_GUI_VIEWS_STARTUPPANEL_H

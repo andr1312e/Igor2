@@ -67,8 +67,11 @@ void FileDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
         iconRect.setRect(globalRect.left() + 5, globalRect.top() + 5, 45, 45);
         programNameRect.setRect(iconRect.right() + 5, iconRect.top(), globalRect.width() - 10 - iconRect.width(), 20);
         pathRect.setRect(programNameRect.left(), programNameRect.bottom() + 1, globalRect.width() - iconRect.width(), 20);
+        if (!icon.GetIcon().isEmpty())
+        {
+            painter->drawImage(iconRect, QImage(icon.GetIcon()));
+        }
 
-        painter->drawImage(iconRect, QImage(icon.GetIcon()));
 
         painter->setPen(titlePen);
         painter->setFont(QFont(QStringLiteral("Microsoft Yahei"), 13));

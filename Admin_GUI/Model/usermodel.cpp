@@ -123,15 +123,15 @@ const QString UserModel::GetUserImageFromRole(int userRole) const noexcept
     switch (userRole)
     {
     case -1:
-        return QStringLiteral(":/images/users/noRole.png");
+        return QLatin1Literal(":/images/users/noRole.png");
     case 0:
-        return  QStringLiteral(":/images/users/user.png");
+        return  QLatin1Literal(":/images/users/user.png");
     case 1:
-        return QStringLiteral(":/images/users/operator.png");
+        return QLatin1Literal(":/images/users/operator.png");
     case 2:
-        return QStringLiteral(":/images/users/specialist.png");
+        return QLatin1Literal(":/images/users/specialist.png");
     case 3://Админ
-        return QStringLiteral(":/images/users/admin.png");
+        return QLatin1Literal(":/images/users/admin.png");
     default:
         qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Неудачная попытка найти картинку для пользователя. Роль: ") + QString::number(userRole)).toUtf8().constData());
         break;

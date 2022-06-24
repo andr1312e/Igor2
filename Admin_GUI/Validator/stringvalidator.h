@@ -9,6 +9,7 @@ class StringValidator: public QValidator
 public:
     explicit StringValidator(QObject *parent);
     ~StringValidator();
+public:
     virtual State validate(QString &input, int &pos) const Q_DECL_OVERRIDE;
     virtual void fixup(QString &input) const Q_DECL_OVERRIDE;
 };

@@ -26,15 +26,15 @@ StartupDialogWidget::~StartupDialogWidget()
 
 void StartupDialogWidget::CreateUI()
 {
-    m_mainLayout= new QVBoxLayout;
-    m_titleLabel=new QLabel();
-    m_execPathLayout=new QHBoxLayout();
-    m_execTextField=new QtMaterialTextField();
-    m_execButton=new QPushButton();
-    m_bottomButtonsLayout=new QHBoxLayout();
+    m_mainLayout = new QVBoxLayout;
+    m_titleLabel = new QLabel();
+    m_execPathLayout = new QHBoxLayout();
+    m_execTextField = new QtMaterialTextField();
+    m_execButton = new QPushButton();
+    m_bottomButtonsLayout = new QHBoxLayout();
     m_saveDialogButton = new QPushButton();
     m_closeDialogButton = new QPushButton();
-    m_errorMessagBox=new QMessageBox();
+    m_errorMessagBox = new QMessageBox();
 }
 
 void StartupDialogWidget::InsertWidgetsIntoLayouts()
@@ -58,8 +58,8 @@ void StartupDialogWidget::InsertWidgetsIntoLayouts()
 void StartupDialogWidget::InitUI()
 {
     m_titleLabel->setAlignment(Qt::AlignCenter);
-    m_execTextField->setLabel(QStringLiteral("Путь к исполняемому файлу: (Обязательно)"));
-    m_execTextField->setText(QStringLiteral("Выбрать файл"));
+    m_titleLabel->setText("Добавить программу перезапуска");
+    m_execTextField->setLabel(QStringLiteral("Путь к  файлу: (Обязательно)"));
 
     m_saveDialogButton->setText(QStringLiteral("Применить"));
     m_closeDialogButton->setText(QStringLiteral("Выйти без сохранения"));
@@ -68,6 +68,8 @@ void StartupDialogWidget::InitUI()
 
     m_errorMessagBox->setIcon(QMessageBox::Critical);
     m_errorMessagBox->setWindowTitle(QStringLiteral("Внимание!"));
+
+    m_execButton->setText(QStringLiteral("Выбрать файл"));
 }
 
 void StartupDialogWidget::ConnectObjects()
@@ -105,12 +107,20 @@ void StartupDialogWidget::OnCheckExec()
     {
         if (QFile::exists(m_execTextField->text()))
         {
-            if(Log4Qt::Logger::rootLogger()->HasAppenders())
+            if (m_execTextField->text() == QApplication::applicationFilePath())
             {
-                Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили исполняемый файл: ") + m_execTextField->text().simplified());
+                m_errorMessagBox->setText(QStringLiteral("Вы ввели путь к файлу, в котором вы и работаете. Зачем? "));
+                m_errorMessagBox->exec();
             }
-            Q_EMIT ToAddExecPathToFile(m_execTextField->text().simplified());
-            OnHideAndClearDialog();
+            else
+            {
+                if (Log4Qt::Logger::rootLogger()->HasAppenders())
+                {
+                    Log4Qt::Logger::rootLogger()->info(Q_FUNC_INFO + QStringLiteral(" Добавили исполняемый файл: ") + m_execTextField->text().simplified());
+                }
+                Q_EMIT ToAddExecPathToFile(m_execTextField->text().simplified());
+                OnHideAndClearDialog();
+            }
         }
         else
         {

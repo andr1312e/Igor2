@@ -1,7 +1,7 @@
 #include "filesandfoldersserivce.h"
 
 FilesAndFoldersSerivce::FilesAndFoldersSerivce(const QString &rlsTiFolders)
-    : m_rlsTiFolders(rlsTiFolders)
+    : m_rlsTiFolder(rlsTiFolders)
     , m_terminal(Terminal::GetTerminal())
 {
 
@@ -12,7 +12,7 @@ FilesAndFoldersSerivce::~FilesAndFoldersSerivce()
 
 }
 
-void FilesAndFoldersSerivce::SetBackupFolder(const QString &backupFolder)
+void FilesAndFoldersSerivce::SetBackupFolderPath(const QString &backupFolder)
 {
     m_backupFolder = backupFolder;
 }
@@ -45,15 +45,26 @@ void FilesAndFoldersSerivce::GetFoldersFromBackup(const QDomElement &elem)
     }
 }
 
+void FilesAndFoldersSerivce::ClearAll()
+{
+    m_filesNames.clear();
+    m_foldersNames.clear();
+    m_backupFolder.clear();
+}
+
 void FilesAndFoldersSerivce::CopyFiles()
 {
     for (const QString &fileName : qAsConst(m_filesNames))
     {
         const QString sourceFile = m_backupFolder + fileName;
-        const QString destinationFile = m_rlsTiFolders + fileName;
+        const QString destinationFile = m_rlsTiFolder + fileName;
         if (m_terminal->IsFileExists(sourceFile, Q_FUNC_INFO, true))
         {
-            m_terminal->CopyFileSudo(sourceFile, destinationFile, Q_FUNC_INFO);
+            if (m_terminal->IsFileExists(destinationFile, Q_FUNC_INFO, true))
+            {
+                m_terminal->DeleteFileSudo(destinationFile, Q_FUNC_INFO);
+            }
+            m_terminal->CopyFileSudo(sourceFile, m_rlsTiFolder, Q_FUNC_INFO);
             m_terminal->SetPermissionToExecuteSudo(destinationFile, Q_FUNC_INFO);
         }
     }
@@ -64,9 +75,14 @@ void FilesAndFoldersSerivce::CopyFolders()
     for (const QString &folderName : qAsConst(m_foldersNames))
     {
         const QString sourceFolder = m_backupFolder + folderName;
-        if (m_terminal->IsDirExists(folderName, Q_FUNC_INFO, true))
+        const QString resultFolder = m_rlsTiFolder + folderName;
+        if (m_terminal->IsDirExists(sourceFolder, Q_FUNC_INFO, true))
         {
-            m_terminal->CopyFolderSudo(sourceFolder, m_rlsTiFolders, Q_FUNC_INFO);
+            if (m_terminal->IsDirExists(resultFolder, Q_FUNC_INFO, true))
+            {
+                m_terminal->DeleteFolderSudo(resultFolder, Q_FUNC_INFO);
+            }
+            m_terminal->CopyFolderSudo(sourceFolder, m_rlsTiFolder, Q_FUNC_INFO);
         }
     }
 }

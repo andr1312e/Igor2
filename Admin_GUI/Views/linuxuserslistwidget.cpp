@@ -55,7 +55,7 @@ void LinuxUsersListWidget::CreateUI()
     m_topLayout = new QHBoxLayout();
     m_linuxUsersLabel = new QLabel(QStringLiteral("Пользователи операционной системы Astra Linux: "));
     m_addNewUserOpenPanel = new QPushButton(QStringLiteral("Добавить"));
-    m_addNewUserOpenPanel->setToolTip(QStringLiteral("Добавление новых пользователей выполняется на вкладке пользователи\n с последующим нажатием на иконку + и внесением данных"));
+    m_addNewUserOpenPanel->setToolTip(QStringLiteral("Добавление новых пользователей осуществляется на вкладке пользователи\n с последующим нажатием на иконку + и внесением данных"));
     m_font = m_linuxUsersLabel->font();
 
     m_userDelegate = new UserDelegate(m_font, this);

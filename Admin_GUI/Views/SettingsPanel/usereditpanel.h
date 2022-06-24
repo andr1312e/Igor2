@@ -22,7 +22,7 @@ class UserEditPanel : public QWidget
     Q_OBJECT
 
 public:
-    UserEditPanel(QStringView currentUserName, QWidget *parent);
+    explicit UserEditPanel(QStringView currentUserName, QWidget *parent);
     ~UserEditPanel();
 
 private:
