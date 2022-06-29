@@ -11,8 +11,7 @@ class LinuxUserService
 public:
     explicit LinuxUserService();
     ~LinuxUserService();
-    void GetAllUsersWithIdInSystem();
-    const QList<QPair<QString, QString>> &GetSystemUsersNamesWithIds();
+    QList<QPair<QString, QString> > GetAllUsersWithIdInSystem();
 
 public:
     const QString GetCurrentUserName();
@@ -21,15 +20,13 @@ public:
     void OpenFlyAdminSmc();
 private:
     QStringList GetUserGroups(const QString &userName);
-    void PushUserToNameIdList(const QString &name, const QString &userId);
-    void RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
+    QList<QPair<QString, QString> > RemoveSystemUsersFromAllUsersList(const QStringList &allUsers);
     bool IsUserSystem(const int &userIdNumber) const;
 
 private:
     Terminal *const m_terminal;
     QString m_currentUserName;
     QString m_currentUserId;
-    QList<QPair<QString, QString>> m_users;
 };
 
 

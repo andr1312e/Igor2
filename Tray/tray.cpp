@@ -4,11 +4,12 @@ Tray::Tray(QObject *parent)
     : QObject(parent)
     , state(MenuShowState::FullControl)
 {
-InitFullUI();
+    InitFullUI();
 }
 
 Tray::~Tray()
 {
+//    delete m_shortCut;
     delete m_trayMenu;
 
     delete m_quitAction;
@@ -17,6 +18,7 @@ Tray::~Tray()
 
     delete m_programIcon;
 }
+
 
 void Tray::InitActions()
 {
@@ -30,6 +32,7 @@ void Tray::InitActions()
     m_disactivateLogs = new QAction();
     m_dropAllDbAndClose = new QAction(QStringLiteral("Удалить базу данных и закрыть"));
     m_quitAction = new QAction(QStringLiteral("Выход из программы"), this);
+
 }
 
 void Tray::CreateUI()
@@ -87,6 +90,7 @@ void Tray::FillObjects()
     m_activateLogs->setToolTip(QStringLiteral("Включить информационные сообщения"));
     m_disactivateLogs->setObjectName(QLatin1Literal(":/images/tray/close_black_notchecked.png"));
     m_disactivateLogs->setToolTip(QStringLiteral("Выключить информационные сообщения"));
+
 }
 
 void Tray::StartTimer()
@@ -111,6 +115,7 @@ void Tray::ConnectObjects()
     connect(m_activateLogs, &QAction::triggered, this, &Tray::OnActivateLogs);
     connect(m_disactivateLogs, &QAction::triggered, this, &Tray::OnDisableLogs);
     connect(m_dropAllDbAndClose, &QAction::triggered, this, &Tray::ToDropDatabase);
+
 }
 
 void Tray::ShowMessage(const QString &message)
@@ -196,6 +201,11 @@ void Tray::OnActivateLogs()
     Log4Qt::LogManager::setHandleQtMessages(true);
     rootLogger->setLevel(Log4Qt::Level::INFO_INT);
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Логи включены пользователем"));
+}
+
+void Tray::OnPressShortCut()
+{
+    qInfo() << "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 }
 
 void Tray::InitFullUI()

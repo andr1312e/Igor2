@@ -9,6 +9,7 @@
 #include "Services/linuxuserservice.h"
 
 
+
 class UserModel
 {
 
@@ -19,21 +20,22 @@ public:
 public:
     int GetRoleIdByUserId(const QString &userId) const noexcept;
     void AddUserToModel(const QString &userId, const QString &userName, const QString &FCS, int role);
-    void DeleteUser(const QString &userId);
+    void DeleteUser(const QString &userId, const QString &userName);
     QStandardItemModel *GetModel() const noexcept;
     void OpenFlyAdminSmc();
+    void ListUpdate();
 private:
-    void DataChanged();
-    QList<User> FillListByUserService(const QList<QPair<QString, QString> > &namesAndIdsList) const;
+    QList<QPair<QString, QString> > RemoveNotExsistsUsers(const QList<QPair<QString, QString> > &namesAndIdsList);
+    void AppendNewUsers(const QList<QPair<QString, QString> > &namesAndIdsList);
     QList<User> FillListByDatabaseService();
-    void FillModelByList() noexcept;
+    void JoinModelAndDbList(const QList<User> &databaseUsers);
+
     const QString GetUserImageFromRole(int userRole) const noexcept;
 
 private:
     QStandardItemModel *const m_model;
     ISqlDatabaseService *const m_databaseService;
     LinuxUserService *const m_linuxUserService;
-    QList<User> m_users;
 
 };
 

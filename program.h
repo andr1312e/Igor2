@@ -26,6 +26,7 @@
 
 #include "Styles/Frameless/framelesswindow.h"
 #include "Styles/Themes/stylechanger.h"
+#include "Services/ShortCut/globalshortcut.h"
 
 class Program : public QApplication
 {
@@ -60,6 +61,7 @@ public:
     void InitAdminUI();
     void ConnectUserObjects();
     void ConnectAdminObjects();
+    void CreateGlobalShortCut();
 
 private:
     bool CanGetAdminAccess();
@@ -77,7 +79,7 @@ private:
 
     StartupRunnableManager *m_startupRunnableService;
 
-    Tray * m_tray;
+    Tray *m_tray;
 
     StartupWizard *m_startupWizard;
     SocketToRarm *m_socketToRarm;
@@ -85,5 +87,7 @@ private:
     FramelessWindow *m_framelessWindow;
 
     StyleChanger *m_styleChanger;
+private:
+    ShortCut::GlobalShortcut *m_shortCut;
 };
 #endif // PROGRAM_H

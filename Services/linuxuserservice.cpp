@@ -13,16 +13,12 @@ LinuxUserService::~LinuxUserService()
 
 }
 
-void LinuxUserService::GetAllUsersWithIdInSystem()
+QList<QPair<QString, QString> > LinuxUserService::GetAllUsersWithIdInSystem()
 {
     const QStringList allUsersList = m_terminal->GetAllUsersList(Q_FUNC_INFO);
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем список всех пользователей: ") + allUsersList.join(' '));
-    RemoveSystemUsersFromAllUsersList(allUsersList);
-}
-
-const QList<QPair<QString, QString> > &LinuxUserService::GetSystemUsersNamesWithIds()
-{
-    return m_users;
+    const QList<QPair<QString, QString> > users =  RemoveSystemUsersFromAllUsersList(allUsersList);
+    return users;
 }
 
 const QString LinuxUserService::GetCurrentUserName()
@@ -87,8 +83,9 @@ QStringList LinuxUserService::GetUserGroups(const QString &userName)
     return list;
 }
 
-void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allUsers)
+QList<QPair<QString, QString> > LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allUsers)
 {
+    QList<QPair<QString, QString>> users;
     QStringList nonSystemUsers;
     int index = 0;
     for (const QString &user : allUsers)
@@ -108,7 +105,7 @@ void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allU
             {
                 if (IsUserSystem(userIdNumber))
                 {
-                    PushUserToNameIdList(userName, userId);
+                    users.append(qMakePair(userName, userId));
                     index++;
                 }
             }
@@ -118,11 +115,7 @@ void LinuxUserService::RemoveSystemUsersFromAllUsersList(const QStringList &allU
             }
         }
     }
-}
-
-void LinuxUserService::PushUserToNameIdList(const QString &name, const QString &userId)
-{
-    m_users.append(qMakePair(name, userId));
+    return users;
 }
 
 bool LinuxUserService::IsUserSystem(const int &userIdNumber) const

@@ -14,10 +14,10 @@ public:
     void UnLockUser(const QString &userName);
     bool IsUserInKiosk(const QString &userName);
 private:
-    void SetPrivacyLevelZero(const QString &userName);// нужен режим приватности для киоска 0
+    void SetPrivacyLevelZero(const QString &userName);// нужен режим приватности 0 для киоска
 
 private:
-    Terminal * const m_terminal;
+    Terminal *const m_terminal;
 };
 
 #endif // SERVICES_KIOSKSERVICE_H

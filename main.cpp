@@ -109,12 +109,12 @@ void SetupRootLogger(int argc, char *argv[])
 
     // Create a file appender
     // Очищаем файл до
-    const QString currentdateTime=QTime::currentTime().toString(QLatin1Literal("hh::mm::ss"));
-    const QString loggerPath = QDir::homePath()+'/' +currentdateTime+ QStringLiteral("users.log");
+    const QString currentdateTime = QTime::currentTime().toString(QLatin1Literal("hh::mm::ss"));
+    const QString loggerPath = QDir::homePath() + '/' + currentdateTime + QStringLiteral("users.log");
     QFile logFile(loggerPath);
-    if(2==argc && QLatin1Literal("--cacheСlear")==argv[1])
+    if (2 == argc && QLatin1Literal("--cacheСlear") == argv[1])
     {
-        if(logFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        if (logFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
         {
             logFile.close();
         }

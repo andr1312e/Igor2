@@ -109,7 +109,7 @@ void Admin_GUI::OnUserClick(const User &user)
 void Admin_GUI::OnDeleteUser(const QString &userId, const QString &userName)
 {
     const int roleId = m_userModel->GetRoleIdByUserId(userId);
-    m_userModel->DeleteUser(userId);
+    m_userModel->DeleteUser(userId, userName);
     if (User::RoleIsValid(roleId))
     {
         m_userDesktopService->DeleteAllIconsToUser(roleId, userName);

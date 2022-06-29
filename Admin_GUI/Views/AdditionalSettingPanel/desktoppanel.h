@@ -54,9 +54,10 @@ protected:
     virtual void dragEnterEvent(QDragEnterEvent *event) Q_DECL_OVERRIDE;
     virtual void dropEvent(QDropEvent *event) Q_DECL_OVERRIDE;
     virtual void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
 private:
     void InsertDragItem(const DesktopEntity &entity);
-    bool IsUserData() const;
+    bool IsUserData() Q_DECL_CONST_FUNCTION;
 private:
     int m_currentRoleId;
     const IconsPanelType m_type;

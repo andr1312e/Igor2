@@ -59,23 +59,27 @@ QString DesktopService::CopyExecFile(const QString &pathToDesktopExec)
 
 QString DesktopService::CopyIconFile(const QString &pathToDesktopIcon)
 {
-    const int indexOfIconNameBegin = pathToDesktopIcon.lastIndexOf('/');
-    const QString iconFileName = pathToDesktopIcon.mid(indexOfIconNameBegin + 1);
-    const QStringRef iconFolderName = pathToDesktopIcon.leftRef(indexOfIconNameBegin + 1);
-    if (m_destinationFolder == pathToDesktopIcon)
+    if (!pathToDesktopIcon.isEmpty())
     {
-        return pathToDesktopIcon;
-    }
-    else
-    {
-        if (m_terminal->IsFileExists(m_destinationFolder + iconFileName, Q_FUNC_INFO, true))
+        const int indexOfIconNameBegin = pathToDesktopIcon.lastIndexOf('/');
+        const QString iconFileName = pathToDesktopIcon.mid(indexOfIconNameBegin + 1);
+        const QStringRef iconFolderName = pathToDesktopIcon.leftRef(indexOfIconNameBegin + 1);
+        if (m_destinationFolder == pathToDesktopIcon)
         {
-            m_terminal->DeleteFileSudo(m_destinationFolder + iconFileName, Q_FUNC_INFO);
+            return pathToDesktopIcon;
         }
-        m_terminal->CopyFileSudo(pathToDesktopIcon, m_destinationFolder, Q_FUNC_INFO);
-        m_terminal->SetPermissionToExecuteSudo(m_destinationFolder + iconFileName, Q_FUNC_INFO);
-        return m_destinationFolder + iconFileName;
+        else
+        {
+            if (m_terminal->IsFileExists(m_destinationFolder + iconFileName, Q_FUNC_INFO, true))
+            {
+                m_terminal->DeleteFileSudo(m_destinationFolder + iconFileName, Q_FUNC_INFO);
+            }
+            m_terminal->CopyFileSudo(pathToDesktopIcon, m_destinationFolder, Q_FUNC_INFO);
+            m_terminal->SetPermissionToExecuteSudo(m_destinationFolder + iconFileName, Q_FUNC_INFO);
+            return m_destinationFolder + iconFileName;
+        }
     }
+    return pathToDesktopIcon;
 }
 
 void DesktopService::CheckPath(const QString &pathToDesktop)
@@ -135,15 +139,36 @@ const QString DesktopService::GetUserDesktopPath(const QString &userName) const
 {
     return m_homeFolderPathName + userName + m_desktopName;
 }
-
-void DesktopService::UpdateModel(const QList<DesktopEntity> &listOfDesktopIcons)
+/**
+ * Список по значению - актуальные иконки на данный момент
+ * Передача по значению так как список меняем и работаем с измененым
+ * Сначала удаляем тех что нет, или если есть удаляем из списка по значению
+ * Потом добавляем новые
+ */
+void DesktopService::FillModel(QList<DesktopEntity> listOfDesktopIcons)
 {
-    m_fileModel->clear();
-
-    for (const DesktopEntity &icon : listOfDesktopIcons)
+    for (int i = m_fileModel->rowCount() - 1; i >= 0; i--)
+    {
+        const DesktopEntity entity = m_fileModel->item(i)->data(Qt::UserRole + 1).value<DesktopEntity>();
+        bool finden = false;
+        for (int j = listOfDesktopIcons.count() - 1; j >= 0 ; j--)
+        {
+            if (listOfDesktopIcons.at(j) == entity)
+            {
+                finden = true;
+                listOfDesktopIcons.removeAt(j);
+                break;
+            }
+        }
+        if (!finden)
+        {
+            m_fileModel->removeRow(i);
+        }
+    }
+    for (const DesktopEntity &newItem : qAsConst(listOfDesktopIcons))
     {
         QStandardItem *const item = new QStandardItem();
-        item->setData(QVariant::fromValue(icon), Qt::UserRole + 1);
+        item->setData(QVariant::fromValue(newItem), Qt::UserRole + 1);
         m_fileModel->appendRow(item);
     }
 }

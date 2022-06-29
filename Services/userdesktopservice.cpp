@@ -10,13 +10,21 @@ UserDesktopService::UserDesktopService(ISqlDatabaseService *sqlDatabaseService)
 UserDesktopService::~UserDesktopService()
 {
 }
-
+/**
+ * Первичное получение всех иконок пользователя
+ */
 void UserDesktopService::GetAllUserDesktops(const QString &userName)
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Получаем все иконки: ") + userName);
-    const QString userDesktopPath = GetUserDesktopPath(userName);
-    CheckPath(userDesktopPath);
-    UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
+    const QString userDesktopPath = GetUserDesktopPathAndChechFolder(userName);
+    FillDesktopsListByPath(userDesktopPath);
+}
+
+void UserDesktopService::UpdateUserDesktops(const QString &userName)
+{
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Обновляем иконки пользователя: ") + userName);
+    const QString userDesktopPath = GetUserDesktopPathAndChechFolder(userName);
+
 }
 /**
  * Добавляем иконку к пользователю из вью
@@ -26,42 +34,46 @@ void UserDesktopService::AddIconToUser(const QString &userName, const DesktopEnt
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Добавляем иконку: ") + entityData.GetName() + QStringLiteral(" пользователю: ") + userName);
     QString fileName(entityData.GetName());
     fileName.replace(' ', '_');
-    const QString userDesktopPath(GetUserDesktopPath(userName));
-    CheckPath(userDesktopPath);
+    const QString userDesktopPath = GetUserDesktopPathAndChechFolder(userName);
     CreateIconWithData(userDesktopPath, entityData);
-    UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
+    FillDesktopsListByPath(userDesktopPath);
 }
 
 void UserDesktopService::DeleteIconToUser(const QString &userName, const QString &iconName)
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Удаляем иконку: ") + iconName + QStringLiteral(" у пользователя: ") + userName);
-    const QString userDesktopPath = GetUserDesktopPath(userName);
-    CheckPath(userDesktopPath);
+    const QString userDesktopPath = GetUserDesktopPathAndChechFolder(userName);
     if (m_terminal->IsFileExists(userDesktopPath + iconName, Q_FUNC_INFO, true))
     {
         m_terminal->DeleteFileSudo(userDesktopPath + iconName, Q_FUNC_INFO);
     }
-    UpdateIconListDataAndModelFromUserDesktop(userDesktopPath);
+    FillDesktopsListByPath(userDesktopPath);
 }
 
 void UserDesktopService::DeleteAllIconsToUser(int roleId, const QString &userName)
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Удаляем иконки роли: ") + Roles.at(roleId) + QStringLiteral(" у пользователя: ") + userName);
-    const QString userDesktopPath = GetUserDesktopPath(userName);
-    CheckPath(userDesktopPath);
+    const QString userDesktopPath = GetUserDesktopPathAndChechFolder(userName);
     const QList<DesktopEntity> entities = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
     for (const DesktopEntity &entity : entities)
     {
         DeleteIcon(userDesktopPath, entity.GetName());
     }
 }
+
+QString UserDesktopService::GetUserDesktopPathAndChechFolder(const QString &userName)
+{
+    const QString userDesktopPath = GetUserDesktopPath(userName);
+    CheckPath(userDesktopPath);
+    return userDesktopPath;
+}
 /**
  * Обновляем модель, собирая все иконки по указанному пути
  */
-void UserDesktopService::UpdateIconListDataAndModelFromUserDesktop(const QString &userDesktopPath)
+void UserDesktopService::FillDesktopsListByPath(const QString &userDesktopPath)
 {
     const QList<DesktopEntity> listOfDesktopIcons = UpdateIconsListFromUserDesktop(userDesktopPath);
-    UpdateModel(listOfDesktopIcons);
+    FillModel(listOfDesktopIcons);
 }
 
 QList<DesktopEntity> UserDesktopService::UpdateIconsListFromUserDesktop(const QString &userDesktopPath)

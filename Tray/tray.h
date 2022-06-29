@@ -49,6 +49,7 @@ private Q_SLOTS:
     void OnActivated(QSystemTrayIcon::ActivationReason reason);
     void OnDisableLogs();
     void OnActivateLogs();
+    void OnPressShortCut();
 public:
     void InitFullUI();
     void ShowMessage(const QString &message);
@@ -58,7 +59,6 @@ private:
     QIcon GetNextProgramIcon();
     QString GetImageBasedOnData(int temperature, int wet);
 private:
-
     QAction *m_minimizeAction;
     QAction *m_restoreAction;
 
@@ -84,6 +84,7 @@ private:
     int index = 1;
 
     const int m_spacing = 5;
+
 };
 
 #endif // TRAY_TRAY_H

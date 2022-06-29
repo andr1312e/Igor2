@@ -1,8 +1,9 @@
 #include "user.h"
 
 User::User()
+    : m_userImage(QLatin1Literal(":/images/users/noRole.png"))
 {
-    m_roleIndex = 0;
+    m_roleIndex = -1;
 }
 
 User::User(const QString &_userId, const QString &_name, const QString &_FCS, int _role)
@@ -10,6 +11,7 @@ User::User(const QString &_userId, const QString &_name, const QString &_FCS, in
     , m_name(_name)
     , m_FCS(_FCS)
     , m_roleIndex(_role)
+    , m_userImage(QLatin1Literal(":/images/users/noRole.png"))
 {
 
 }

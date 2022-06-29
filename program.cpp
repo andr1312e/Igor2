@@ -109,8 +109,8 @@ DbConnectionState Program::CreateAndRunApp()//MAIN
         else
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу после установки Postgre. Путь к программе: ") + qApp->arguments().front());
-            const bool state=QProcess::startDetached(qApp->arguments().front(), QStringList()<< QLatin1Literal("--restartPostgre"));
-            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска")+ QString::number(state));
+            const bool state = QProcess::startDetached(qApp->arguments().front(), QStringList() << QLatin1Literal("--restartPostgre"));
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска") + QString::number(state));
         }
         break;
     }
@@ -124,8 +124,8 @@ DbConnectionState Program::CreateAndRunApp()//MAIN
         else
         {
             Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу после установки драйверов Postgre. Путь к программе: ") + qApp->arguments().front());
-            const bool state=QProcess::startDetached(qApp->arguments().front(), QStringList()<< QLatin1Literal("--restartDriver"));
-            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска")+ QString::number(state));
+            const bool state = QProcess::startDetached(qApp->arguments().front(), QStringList() << QLatin1Literal("--restartDriver"));
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска") + QString::number(state));
         }
         break;
     }
@@ -277,7 +277,7 @@ void Program::UserLoading()
 {
     if (AllAppsRunnedWell())
     {
-        m_tray=new Tray(Q_NULLPTR);
+        m_tray = new Tray(Q_NULLPTR);
         Q_EMIT m_tray->ToUpdateViewColors(m_styleChanger->GetThemeName());
         InitRarmSocket();
         ConnectUserObjects();
@@ -294,6 +294,7 @@ void Program::OnFullLoading()
     UserLoading();
     InitAdminUI();
     ConnectAdminObjects();
+    CreateGlobalShortCut();
 }
 
 bool Program::AllAppsRunnedWell()
@@ -337,6 +338,13 @@ void Program::ConnectAdminObjects()
     connect(m_tray, &Tray::ToDropDatabase, m_sqlDatabaseService, &SqlDatabaseSerivce::OnDropDatabase);
     connect(m_tray, &Tray::ToDropDatabase, this, &QApplication::quit, Qt::QueuedConnection);
     connect(m_AdminGui, &Admin_GUI::ToCurrentUserRoleChanged, m_startupRunnableService, &StartupRunnableManager::OnCurrentUserRoleChanged);
+}
+
+void Program::CreateGlobalShortCut()
+{
+    m_shortCut = new ShortCut::GlobalShortcut(this);
+    connect(m_shortCut, &ShortCut::GlobalShortcut::ToActivate, m_startupRunnableService, &StartupRunnableManager::OnStopStartupRunnableManager);
+    m_shortCut->SetShortcut(QKeySequence(Qt::Key_E + Qt::Key_Alt));
 }
 
 bool Program::CanGetAdminAccess()

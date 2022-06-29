@@ -23,11 +23,13 @@ public:
 
 public:
     void GetAllUserDesktops(const QString &userName);
+    void UpdateUserDesktops(const QString &userName);
     void AddIconToUser(const QString &userName, const DesktopEntity &entity);
     void DeleteIconToUser(const QString &userName, const QString &iconName);
     void DeleteAllIconsToUser(int roleId, const QString &userName);
 private:
-    void UpdateIconListDataAndModelFromUserDesktop(const QString &userDesktopPath);
+    QString GetUserDesktopPathAndChechFolder(const QString &UserName);
+    void FillDesktopsListByPath(const QString &userDesktopPath);
     QList<DesktopEntity> UpdateIconsListFromUserDesktop(const QString &userDesktopPath);
     QStringList GetAllDesktopEntities(const QString &userDesktopPath);
     DesktopEntity ParseAndAppendIconInfoToList(const QString &programName, const QString &iconInfo) const;

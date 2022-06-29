@@ -96,30 +96,19 @@ void IconMaker::CopyMyAppToRLSTIFolder()
  */
 void IconMaker::AddIconToStartMenu()
 {
-    const QString startPath(QDir::homePath() + QStringLiteral("/.fly/startmenu/"));
-    const QStringList foldersList(m_terminal->GetFolderList(startPath, Q_FUNC_INFO, true));
-    const QString rlsTiStartupFolderPath(startPath + QStringLiteral("RLS_TI/"));
-    if (foldersList.contains(QStringLiteral("RLS_TI/")))
+    const QString startPanelPath(QDir::homePath() + QStringLiteral("/.fly/startmenu/"));
+    const QStringList foldersList(m_terminal->GetFileList(startPanelPath, Q_FUNC_INFO, true));
+    const QString directoryIconFilePath(startPanelPath + m_iconName);
+    if (m_terminal->IsFileExists(directoryIconFilePath, Q_FUNC_INFO, true))
     {
-        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Отчищаем папку в меню пуск"));
-        m_terminal->ClearFolderSudo(rlsTiStartupFolderPath, Q_FUNC_INFO);
+        m_terminal->CreateFile(directoryIconFilePath, Q_FUNC_INFO, true);
     }
     else
     {
-        Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создаем папку в меню пуск"));
-        m_terminal->CreateFolder(rlsTiStartupFolderPath, Q_FUNC_INFO, true);
+        m_terminal->ClearFileSudo(directoryIconFilePath, Q_FUNC_INFO);
     }
-    const QString directoryIconFilePath(rlsTiStartupFolderPath + QStringLiteral(".directory"));
-    m_terminal->CreateFile(directoryIconFilePath, Q_FUNC_INFO, true);
-
-    QString iconString = QStringLiteral("[Desktop Entry]\nName=Group\nName[ru]=РЛС ТИ Программы\nType=Directory\nNoDisplay=false\nIcon=preferences-desktop-locale\nIcon[ru]=preferences-desktop-locale\nHidden=false");
+    const QString iconString = QStringLiteral("[Desktop Entry]\nName=РЛС ТИ\nName[ru]=РЛС ТИ\nType=Application\nExec=") + m_rlsTiFolder + m_applicationName + QStringLiteral("\nIcon=fly-phone-webbrowser\nCategories=Utility\nOnlyShowIn=Fly\nEncoding=UTF-8\nX-Fly-OriginFile=/usr/share/applications/fly-admin-iso.desktop");
     m_terminal->WriteTextToFileSudo(iconString, directoryIconFilePath, Q_FUNC_INFO);
-
-    const QString syncProgramIconFilePath = rlsTiStartupFolderPath + m_iconName;
-    m_terminal->CreateFile(syncProgramIconFilePath, Q_FUNC_INFO, true);
-
-    iconString = QStringLiteral("[Desktop Entry]\nName=Панель управления РЛС ТИ\nName[ru]=Панель управления РЛС ТИ\nType=Application\nExec=/usr/RLS_TI/") + m_applicationName + QStringLiteral("\nIcon=groups-users\nCategories=Utility\nOnlyShowIn=Fly\nEncoding=UTF-8\nX-Fly-OriginFile=/usr/share/applications/fly-admin-iso.desktop");
-    m_terminal->WriteTextToFileSudo(iconString, syncProgramIconFilePath, Q_FUNC_INFO);
 }
 
 void IconMaker::AddIconToCurrentUserDesktop()
@@ -132,7 +121,7 @@ void IconMaker::AddIconToCurrentUserDesktop()
 void IconMaker::AddIconToAllUserDesktops()
 {
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Добавляем икноки пользователю "));
-    const QList<QPair<QString, QString>> userNameAndIdList(m_linuxUserService->GetSystemUsersNamesWithIds());
+    const QList<QPair<QString, QString>> userNameAndIdList(m_linuxUserService->GetAllUsersWithIdInSystem());
     for (const QPair<QString, QString> &nameAndId : userNameAndIdList)
     {
         const QString userDesktopFolderPath(QStringLiteral("/home/") + nameAndId.first + QStringLiteral("/Desktop/"));
@@ -157,7 +146,7 @@ void IconMaker::AddIcon(const QString &desktopPath)
         m_terminal->CreateFile(userFileName, Q_FUNC_INFO, true);
     }
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Пишем текст в иконку "));
-    const QString iconString(QStringLiteral("[Desktop Entry]\nName=Панель управления РЛС ТИ\nName[ru]=Панель управления РЛС ТИ\nType=Application\nExec=/usr/RLS_TI/") + m_applicationName + QStringLiteral("\nIcon=groups-users\nCategories=Utility\nOnlyShowIn=Fly\nEncoding=UTF-8\nX-Fly-OriginFile=/usr/share/applications/fly-admin-iso.desktop"));
+    const QString iconString(QStringLiteral("[Desktop Entry]\nName=РЛС ТИ\nName[ru]=РЛС ТИ\nType=Application\nExec=/usr/RLS_TI/") + m_applicationName + QStringLiteral("\nIcon=fly-phone-webbrowser\nCategories=Utility\nOnlyShowIn=Fly\nEncoding=UTF-8\nX-Fly-OriginFile=/usr/share/applications/fly-admin-iso.desktop"));
     m_terminal->WriteTextToFileSudo(iconString, userFileName, Q_FUNC_INFO);
 }
 

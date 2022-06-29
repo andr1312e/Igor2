@@ -14,6 +14,10 @@ DesktopPanel::DesktopPanel(const IconsPanelType type, UserDesktopService *userDe
     InsertWidgetsIntoLayout();
     FillUI();
     ConnectObjects();
+    if (IsUserData())
+    {
+        startTimer(4000, Qt::VeryCoarseTimer);
+    }
 }
 
 DesktopPanel::~DesktopPanel()
@@ -261,12 +265,27 @@ void DesktopPanel::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void DesktopPanel::timerEvent(QTimerEvent *event)
+{
+    if (IsUserData())
+    {
+        if (!m_userName.isEmpty())
+        {
+            m_userDesktopService->GetAllUserDesktops(m_userName);
+        }
+    }
+    else
+    {
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Невозможно обновить данные рабочего стола, так как это виджет роли")).toUtf8().constData());
+    }
+}
+
 void DesktopPanel::InsertDragItem(const DesktopEntity &entity)
 {
     m_userDesktopService->AddIconToUser(m_userName, entity);
 }
 
-bool DesktopPanel::IsUserData() const
+bool DesktopPanel::IsUserData() Q_DECL_CONST_FUNCTION
 {
     return IconsPanelType::UserIcons == m_type;
 }

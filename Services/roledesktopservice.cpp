@@ -25,7 +25,7 @@ void RoleDesktopService::CheckRoleDesktopTable(int roleId)
 void RoleDesktopService::GetAllRoleDesktops(int roleId)
 {
     const QList<DesktopEntity> listOfDesktops = m_sqlDatabaseService->GetAllRoleDesktops(roleId);
-    UpdateModel(listOfDesktops);
+    FillModel(listOfDesktops);
 }
 
 void RoleDesktopService::AddIconToRole(int roleId, const DesktopEntity &entity)

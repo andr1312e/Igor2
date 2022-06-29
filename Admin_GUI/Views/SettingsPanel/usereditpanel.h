@@ -47,7 +47,6 @@ public:
     void SetUser(const User &user);
     void SetFontSize(int fontSize);
     void SetButtonSize(int size);
-
 private:
     void GetUserKioskState(const QString &userName);
     void InsertUserData(const User &user);

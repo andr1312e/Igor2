@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += xml network widgets sql concurrent
+QT += xml network widgets sql concurrent x11extras
 
 VERSION=3.0
 BUILD_DATE = $$system( date "+%d.%m.%Y_%H:%M" )
@@ -24,8 +24,10 @@ qmakeforce.depends = FORCE
 PRE_TARGETDEPS += $$qmakeforce.target
 QMAKE_EXTRA_TARGETS += qmakeforce
 
-CONFIG += no_lflags_merge rtti_off c++latest strict_c++ precompile_header utf8_source file_copies
+CONFIG += link_pkgconfig no_lflags_merge rtti_off c++latest strict_c++ precompile_header utf8_source file_copies
 CONFIG -= cmdline qml_debug no_include_pwd stl
+
+PKGCONFIG += x11
 
 COPIES += iniFiles
 iniFiles.files =$$files(sql.ini)
@@ -182,8 +184,10 @@ SOURCES += \
     Services/singleinstancemaker.cpp \
     Structs/user.cpp \
     Admin_GUI/RestoreWizard/Services/enviromentalvariables.cpp \
-    Services/mountchecker.cpp
-#    Admin_GUI/Wizard/Updater/View/intropage.cpp
+    Services/mountchecker.cpp \
+    Services/ShortCut/globalshortcut.cpp \
+    Services/ShortCut/globalshortcut_p.cpp \
+    Services/ShortCut/globaldata.cpp
 
 HEADERS += \
     Admin_GUI/RestoreWizard/Services/iconmaker.h \
@@ -343,8 +347,10 @@ HEADERS += \
     Services/singleinstancemaker.h \
     Structs/user.h \
     Admin_GUI/RestoreWizard/Services/enviromentalvariables.h \
-    Services/mountchecker.h
-#    Admin_GUI/Wizard/Updater/View/intropage.h
+    Services/mountchecker.h \
+    Services/ShortCut/globalshortcut.h \
+    Services/ShortCut/globalshortcut_p.h \
+    Services/ShortCut/globaldata.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt

@@ -12,6 +12,7 @@ LinuxUsersListWidget::LinuxUsersListWidget(UserModel *userModel, QWidget *parent
     InsertWidgetsIntoLayout();
     SetModelToListView();
     CreateConnections();
+    startTimer(2000, Qt::VeryCoarseTimer);
 }
 
 LinuxUsersListWidget::~LinuxUsersListWidget()
@@ -273,4 +274,9 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
             }
         }
     }
+}
+
+void LinuxUsersListWidget::timerEvent(QTimerEvent *event)
+{
+    m_userModel->ListUpdate();
 }

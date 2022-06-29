@@ -35,7 +35,7 @@ protected:
     const QString GetUserDesktopPath(const QString &userName) const;
 
     QString GetFullAstraDefaultIconImagePath(QStringView iconName) const;
-    void UpdateModel(const QList<DesktopEntity> &listOfDesktopEntities);
+    void FillModel(QList<DesktopEntity> listOfDesktopEntities);
 protected:
     Terminal *const m_terminal;
     ISqlDatabaseService *const m_sqlDatabaseService;
