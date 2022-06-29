@@ -20,6 +20,7 @@ public:
 public:
     void ChangeButtonIconColor(ThemesNames themeName);
     void ChangeButtonIconEnabled();
+    void ChangeButtonIconDisabled();
 public:
     bool IsChecked() const noexcept;
     void SetEndAnimationGeometry(const QRect &endAnimationGeometry) noexcept;

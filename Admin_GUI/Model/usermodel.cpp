@@ -35,6 +35,7 @@ void UserModel::AddUserToModel(const QString &userId, const QString &userName, c
         if (userId == user.GetUserId() && userName == user.GetUserName() )
         {
             User newUser(userId, userName, FCS, role);
+            m_databaseService->AppendUserIntoTable(newUser);
             newUser.SetUserImage(GetUserImageFromRole(newUser.GetUserRole()));
             QStandardItem *item = m_model->item(i);
             item->setData(QVariant::fromValue(newUser), Qt::UserRole + 1);

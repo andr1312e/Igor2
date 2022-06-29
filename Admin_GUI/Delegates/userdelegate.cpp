@@ -89,6 +89,6 @@ QSize UserDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 {
     Q_UNUSED(index)
     Q_UNUSED(option)
-    QSize size(300, m_font.pointSize() * 4 + 50);
+    QSize size(150, m_font.pointSize() * 4 + 50);
     return size;
 }

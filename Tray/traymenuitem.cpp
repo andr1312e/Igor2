@@ -34,21 +34,25 @@ TrayMenuItem::~TrayMenuItem()
 void TrayMenuItem::ChangeButtonIconEnabled()
 {
     QString path = InteractiveButton::GetIconPath();
-    QString stringEnd;
     if (path.endsWith(QLatin1Literal("notchecked")))
     {
-        stringEnd = QLatin1Literal("checked");
+        const int firstIndex = path.lastIndexOf('_');
+        path.chop(path.count() - firstIndex - 1);
+        path.append(QLatin1Literal("checked"));
+        InteractiveButton::SetIcon(path);
     }
-    else
+}
+
+void TrayMenuItem::ChangeButtonIconDisabled()
+{
+    QString path = InteractiveButton::GetIconPath();
+    if (!path.endsWith(QLatin1Literal("notchecked")))
     {
-        stringEnd = QLatin1Literal("notchecked");
+        const int firstIndex = path.lastIndexOf('_');
+        path.chop(path.count() - firstIndex - 1);
+        path.append(QLatin1Literal("notchecked"));
+        InteractiveButton::SetIcon(path);
     }
-    const int firstIndex = path.lastIndexOf('_');
-    qInfo() << "oldPath" << path << " end " << stringEnd;
-    path.chop(path.count() - firstIndex - 1);
-    path.append(stringEnd);
-    qInfo() << "newPath" << path;
-    InteractiveButton::SetIcon(path);
 }
 
 void TrayMenuItem::ChangeButtonIconColor(ThemesNames themeName)

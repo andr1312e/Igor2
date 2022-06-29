@@ -27,7 +27,7 @@ bool KioskService::IsUserInKiosk(const QString &userName)
 {
     const QString checkKioskMode(QStringLiteral("sudo fly-kiosk -s -u ") + userName);
     const QString userState = m_terminal->RunConsoleCommandSync(checkKioskMode, Q_FUNC_INFO);
-    return userState.contains(QLatin1Literal("not locked"));
+    return userState.contains(QLatin1Literal("is locked"));
 }
 
 void KioskService::SetPrivacyLevelZero(const QString &userName)

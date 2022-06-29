@@ -43,7 +43,7 @@ void TrayMenu::EndInsertInRow()
 void TrayMenu::AddTextToMenu(const QString &text)
 {
     QLabel *const label = new QLabel(text, this);
-    label->setObjectName("TrayMenuLabel");
+    label->setObjectName(QLatin1Literal("TrayMenuLabel"));
     InstertLabelIntoMenu(label);
 }
 /**
@@ -183,12 +183,23 @@ void TrayMenu::OnChangeButtonIcon()
                 break;
             }
         }
-        if (senderWidgetLayout != Q_NULLPTR)
+        if (Q_NULLPTR  == senderWidgetLayout)
+        {
+            qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Нереализованное поведение. Не найден горизонтальный компоновщик")).toUtf8().constData());
+        }
+        else
         {
             for (int widgetIndex = 0; widgetIndex < senderWidgetLayout->count(); ++widgetIndex)
             {
                 TrayMenuItem *const itemInLayout = qobject_cast<TrayMenuItem *>(senderWidgetLayout->itemAt(widgetIndex)->widget());
-                itemInLayout->ChangeButtonIconEnabled();
+                if (itemSender == itemInLayout)
+                {
+                    itemInLayout->ChangeButtonIconEnabled();
+                }
+                else
+                {
+                    itemInLayout->ChangeButtonIconDisabled();
+                }
             }
         }
     }
