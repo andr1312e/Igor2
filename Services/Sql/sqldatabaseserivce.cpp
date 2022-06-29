@@ -112,9 +112,9 @@ DbConnectionState SqlDatabaseSerivce::FixError(DbErrorState newError, const QStr
     {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Не можем подключится к бд нет пакета постгре установленого"));
         Q_EMIT ToTrayMessage(QStringLiteral("Устанавливаем базу данных Postgre SQL. Пожалуйста подождите..."));
-        if (problemFixer.InstallPostgreSqlAndDriver())
+        if (problemFixer.InstallPostgreSql())
         {
-            return DbConnectionState::NeedRestart;
+            return DbConnectionState::NeedRestartAfterPostgreInstall;
         }
         break;
 
@@ -125,7 +125,7 @@ DbConnectionState SqlDatabaseSerivce::FixError(DbErrorState newError, const QStr
         Q_EMIT ToTrayMessage(QStringLiteral("Устанавливаем драйвер базы данных Postgre SQL. Пожалуйста подождите... "));
         if (problemFixer.InstallSqlDriverForQt5())
         {
-            return DbConnectionState::NeedRestart;
+            return DbConnectionState::NeedRestartAfterDriverInstall;
         }
         break;
     }
@@ -148,7 +148,7 @@ DbConnectionState SqlDatabaseSerivce::FixError(DbErrorState newError, const QStr
     {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Сервис постгре не запущен"));
         Q_EMIT ToTrayMessage(QStringLiteral("Запускаем сервис постгре "));
-        problemFixer.StartPostgreSqlService();
+//        problemFixer.StartPostgreSqlService();
         if (m_db.open())
         {
             return DbConnectionState::Connected;

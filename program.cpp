@@ -13,7 +13,7 @@ Program::Program(int &argc, char **argv)
     , m_sqlDatabaseService(new SqlDatabaseSerivce(this))
     , m_singleInstance(Q_NULLPTR)
     , m_startupRunnableService(new StartupRunnableManager(m_currentUserName, m_rlstiFolder, m_sqlDatabaseService, this))
-    , m_tray(new Tray(this))
+    , m_tray(Q_NULLPTR)
     , m_startupWizard(Q_NULLPTR)
     , m_socketToRarm(Q_NULLPTR)
     , m_AdminGui(Q_NULLPTR)
@@ -30,9 +30,9 @@ Program::~Program()
     delete m_linuxUserService;
     delete m_sqlDatabaseService;
     delete m_startupRunnableService;
-    delete m_tray;
     if (Q_NULLPTR != m_startupWizard)
     {
+        delete m_tray;
         delete m_startupWizard;
     }
     if (Q_NULLPTR != m_AdminGui)
@@ -57,7 +57,7 @@ bool Program::HasNoRunningInstance()
 {
     Log4QtInfo(QStringLiteral("Аргументы командной строки приложения: ") + arguments().join(','));
     m_singleInstance = new SingleInstanceMaker(applicationName());
-    if (QLatin1Literal("restart") == arguments().constLast())
+    if (QLatin1Literal("--restartPostgre") == arguments().constLast() || QLatin1Literal("--restartDriver") == arguments().constLast() )
     {
         m_singleInstance->ConnectToExsistsApp();
         return true;
@@ -91,32 +91,49 @@ DbConnectionState Program::CreateAndRunApp()//MAIN
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Начало создания программы"));
     CollectAllUsersWithIdInSystem();
     const DbConnectionState connectionState = m_sqlDatabaseService->ConnectToDataBase();
-    if (DbConnectionState::Connected == connectionState)
+    switch (connectionState)
+    {
+    case DbConnectionState::Connected:
     {
         const LoadingStates states = GetLoadingStates();
         ContinueDataLoading(states);
+        break;
     }
-    else
+    case DbConnectionState::NeedRestartAfterPostgreInstall:
     {
-        if (DbConnectionState::NeedRestart == connectionState)
+        if (!qApp->arguments().isEmpty() && QLatin1Literal("--restartPostgre") == qApp->arguments().constLast())
         {
-            QStringList appArguments = qApp->arguments();
-            if (!appArguments.isEmpty() && QLatin1Literal("restart") == appArguments.constLast())
-            {
-                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаемся еще раз, что то не то с логикой программы "));
-                return DbConnectionState::FailedConnection;
-            }
-            else
-            {
-                appArguments.append(QLatin1Literal("restart"));
-                const QString programPath=qApp->arguments().front();
-                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Путь к программе: ") + programPath);
-                const char *path=programPath.toUtf8().constData();
-                char* const  arr[]={programPath.toUtf8().data(), "restart"};
-                execl(path, *arr);
-                Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу"));
-            }
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаемся еще раз, что то не то с логикой программы. Не можем установить постгре, происходит перезагрузка цикличная"));
+            return DbConnectionState::FailedConnection;
         }
+        else
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу после установки Postgre. Путь к программе: ") + qApp->arguments().front());
+            const bool state=QProcess::startDetached(qApp->arguments().front(), QStringList()<< QLatin1Literal("--restartPostgre"));
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска")+ QString::number(state));
+        }
+        break;
+    }
+    case DbConnectionState::NeedRestartAfterDriverInstall:
+    {
+        if (!qApp->arguments().isEmpty() && QLatin1Literal("--restartDriver") == qApp->arguments().constLast())
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаемся еще раз, что то не то с логикой программы. Не можем установить драйвер, происходит перезагрузка цикличная"));
+            return DbConnectionState::FailedConnection;
+        }
+        else
+        {
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапускаем программу после установки драйверов Postgre. Путь к программе: ") + qApp->arguments().front());
+            const bool state=QProcess::startDetached(qApp->arguments().front(), QStringList()<< QLatin1Literal("--restartDriver"));
+            Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Перезапустили программу. Успех перезапуска")+ QString::number(state));
+        }
+        break;
+    }
+    default:
+    {
+        qFatal("%s", QString(Q_FUNC_INFO + QStringLiteral(" Невозможно обработать состояние так как обработчик не написан")).toUtf8().constData());
+        break;
+    }
     }
     return connectionState;
 }
@@ -158,7 +175,7 @@ LoadingStates Program::GetLoadingStates()
             states = LoadingState::NoFiles;
         }
     }
-    if (QStringLiteral("--reset") == qApp->arguments().constLast())
+    if (QLatin1Literal("--reset") == qApp->arguments().constLast())
     {
         Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Вызвано принудительное восстановление..."));
         states = states  | LoadingState::ForceReset;
@@ -242,8 +259,6 @@ void Program::InitStyleChanger(ThemesNames themeName)
     m_styleChanger = new StyleChanger();
     m_styleChanger->OnChangeTheme(themeName);
     connect(m_framelessWindow, &FramelessWindow::ToChangeTheme, m_styleChanger, &StyleChanger::OnChangeTheme);
-    connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
-    Q_EMIT m_tray->ToUpdateViewColors(themeName);
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Создали обьект изменения тем "));
 }
 
@@ -262,6 +277,8 @@ void Program::UserLoading()
 {
     if (AllAppsRunnedWell())
     {
+        m_tray=new Tray(Q_NULLPTR);
+        Q_EMIT m_tray->ToUpdateViewColors(m_styleChanger->GetThemeName());
         InitRarmSocket();
         ConnectUserObjects();
     }
@@ -303,6 +320,7 @@ void Program::InitAdminUI()
 
 void Program::ConnectUserObjects()
 {
+    connect(m_styleChanger, &StyleChanger::ToUpdateViewColors, m_tray, &Tray::ToUpdateViewColors);
     connect(m_tray, &Tray::ToCloseApp, this, &QApplication::quit);
     connect(m_tray, &Tray::ToShowApp, m_framelessWindow, &FramelessWindow::show);
     connect(m_tray, &Tray::ToHideApp, m_framelessWindow, &QWidget::hide);

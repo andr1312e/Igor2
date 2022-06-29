@@ -2,13 +2,9 @@
 
 Tray::Tray(QObject *parent)
     : QObject(parent)
+    , state(MenuShowState::FullControl)
 {
-    InitActions();
-    CreateUI();
-    FillObjects();
-    InitUIAndInsertWidgetIntoLayouts();
-    StartTimer();
-    ConnectObjects();
+InitFullUI();
 }
 
 Tray::~Tray()
@@ -79,17 +75,17 @@ void Tray::InitUIAndInsertWidgetIntoLayouts()
 void Tray::FillObjects()
 {
     m_minimizeAction->setToolTip(QStringLiteral("Скрыть приложение из панели задач"));
-    m_pauseRunnableServiceButton->setObjectName(QStringLiteral(":/images/tray/pause_black_notchecked.png"));
+    m_pauseRunnableServiceButton->setObjectName(QLatin1Literal(":/images/tray/pause_black_notchecked.png"));
     m_pauseRunnableServiceButton->setToolTip(QStringLiteral("Приостановить контроль процессов"));
-    m_slopRunnableServiceButton->setObjectName(QStringLiteral(":/images/tray/stop_black_notchecked.png"));
+    m_slopRunnableServiceButton->setObjectName(QLatin1Literal(":/images/tray/stop_black_notchecked.png"));
     m_slopRunnableServiceButton->setToolTip(QStringLiteral("Остановить контроль процессов"));
-    m_restartAllAppsRunnableServiceButton->setObjectName(QStringLiteral(":/images/tray/refresh_black_notchecked.png"));
+    m_restartAllAppsRunnableServiceButton->setObjectName(QLatin1Literal(":/images/tray/refresh_black_notchecked.png"));
     m_restartAllAppsRunnableServiceButton->setToolTip(QStringLiteral("Перезапустить все программы"));
-    m_resumeRunnableServiceButton->setObjectName(QStringLiteral(":/images/tray/play_black_checked.png"));
+    m_resumeRunnableServiceButton->setObjectName(QLatin1Literal(":/images/tray/play_black_checked.png"));
     m_resumeRunnableServiceButton->setToolTip(QStringLiteral("Запустить контроль"));
-    m_activateLogs->setObjectName(QStringLiteral(":/images/tray/ok_black_checked.png"));
+    m_activateLogs->setObjectName(QLatin1Literal(":/images/tray/ok_black_checked.png"));
     m_activateLogs->setToolTip(QStringLiteral("Включить информационные сообщения"));
-    m_disactivateLogs->setObjectName(QStringLiteral(":/images/tray/close_black_notchecked.png"));
+    m_disactivateLogs->setObjectName(QLatin1Literal(":/images/tray/close_black_notchecked.png"));
     m_disactivateLogs->setToolTip(QStringLiteral("Выключить информационные сообщения"));
 }
 
@@ -144,7 +140,7 @@ void Tray::OnSendWeather(const DevicesMeteoKitGetMessage &message)
                 showedText.append(QString::number((int)message.temperature));
             }
             const QPen m_iconTextPen(Qt::white);
-            const QFont m_textFont(QStringLiteral("Carlito"), 22, QFont::Bold);
+            const QFont m_textFont(QLatin1Literal("Carlito"), 22, QFont::Bold);
             QPainter painter(&icon);
             painter.setPen(m_iconTextPen);
             painter.setFont(m_textFont);
@@ -202,6 +198,16 @@ void Tray::OnActivateLogs()
     Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Логи включены пользователем"));
 }
 
+void Tray::InitFullUI()
+{
+    InitActions();
+    CreateUI();
+    FillObjects();
+    InitUIAndInsertWidgetIntoLayouts();
+    StartTimer();
+    ConnectObjects();
+}
+
 void Tray::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
@@ -220,13 +226,13 @@ QIcon Tray::GetNextProgramIcon()
     {
     case 0:
         m_programPixMapIndex++;
-        return QIcon(QStringLiteral(":/images/tray/trayIcon0.png"));
+        return QIcon(QLatin1Literal(":/images/tray/trayIcon0.png"));
     case 1:
         m_programPixMapIndex++;
-        return QIcon(QStringLiteral(":/images/tray/trayIcon1.png"));
+        return QIcon(QLatin1Literal(":/images/tray/trayIcon1.png"));
     default:
         m_programPixMapIndex = 0;
-        return QIcon(QStringLiteral(":/images/tray/trayIcon2.png"));
+        return QIcon(QLatin1Literal(":/images/tray/trayIcon2.png"));
     }
 }
 
@@ -234,13 +240,13 @@ QString Tray::GetImageBasedOnData(int temperature, int wet)
 {
     if (temperature < -15)
     {
-        return QStringLiteral(":/images/weather/veryCold.png");
+        return QLatin1Literal(":/images/weather/veryCold.png");
     }
     else
     {
         if (temperature < 0)
         {
-            return QStringLiteral(":/images/weather/сold.png");
+            return QLatin1Literal(":/images/weather/сold.png");
         }
         else
         {
@@ -248,22 +254,22 @@ QString Tray::GetImageBasedOnData(int temperature, int wet)
             {
                 if (wet > 60)
                 {
-                    return QStringLiteral(":/images/weather/warmlyRain.png");
+                    return QLatin1Literal(":/images/weather/warmlyRain.png");
                 }
                 else
                 {
-                    return QStringLiteral(":/images/weather/warmlyDry.png");
+                    return QLatin1Literal(":/images/weather/warmlyDry.png");
                 }
             }
             else
             {
                 if (wet > 60)
                 {
-                    return QStringLiteral(":/images/weather/hotRain.png");
+                    return QLatin1Literal(":/images/weather/hotRain.png");
                 }
                 else
                 {
-                    return QStringLiteral(":/images/weather/hotDry.png");
+                    return QLatin1Literal(":/images/weather/hotDry.png");
                 }
             }
         }

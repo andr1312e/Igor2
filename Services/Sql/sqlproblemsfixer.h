@@ -9,7 +9,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "Logging/logger.h"
-
+#include "Admin_GUI/Views/qtoast.h"
 #include "Services/Terminals/terminal.h"
 #include "Services/mountchecker.h"
 
@@ -30,7 +30,7 @@ public:
     explicit SqlProblemsFixer();
     ~SqlProblemsFixer();
 public:
-    bool InstallPostgreSqlAndDriver();
+    bool InstallPostgreSql();
     bool InstallSqlDriverForQt5();
     bool StartPostgreSqlService();
     bool ResetPostgreUserPassword(const QString &postgresUser, const QString &postgresPassword);
@@ -41,6 +41,7 @@ private:
     void CloseSynapticIfItRunned();
     void CheckAndMountRepository();
     bool ErrorIsCritical(const QString &errorInstall);
+    void ShowToast(const QString &message);
 private:
     Terminal *const m_terminal;
     MountChecker *const m_mountChecker;

@@ -14,11 +14,17 @@
 #include "Server/DataMessage.h"
 #include "Tray/traymenu.h"
 
+enum class MenuShowState
+{
+    ViewState =  1,
+    FullControl = 2,
+};
+
 class Tray : public QObject
 {
     Q_OBJECT
 public:
-    explicit Tray( QObject *parent);
+    explicit Tray(QObject *parent);
     ~Tray();
 private:
     void InitActions();
@@ -44,6 +50,7 @@ private Q_SLOTS:
     void OnDisableLogs();
     void OnActivateLogs();
 public:
+    void InitFullUI();
     void ShowMessage(const QString &message);
 protected:
     virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
@@ -69,6 +76,7 @@ private:
     TrayMenu *m_trayMenu;
 
 private:
+    const MenuShowState state;
     QSystemTrayIcon *m_programIcon;
     int m_programPixMapIndex = 0;
     QSystemTrayIcon *m_trayWeatherIcon;

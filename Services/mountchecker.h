@@ -4,12 +4,13 @@
 #include "Terminals/terminal.h"
 #include "Logging/logger.h"
 
-enum class MountFilesName
+enum class MountFilesState
 {
-    Full = 0,
-    Short = 1,
-    NoFiles = 2,
-    Mounted = 3,
+    OriginalNames = 0,
+    ShortInSubFolder = 1,
+    ShortInOpt = 2,
+    NoFiles = 3,
+    Mounted = 4,
 };
 
 class MountChecker
@@ -23,6 +24,8 @@ public:
     void UnMountRepository();
     void RegisterMounting();
 private:
+    void CheckAndCreateMountFolder();
+    void UpdateAptGet();
     void MountRepository(const QString &isoPath, const QString &path);
     void UnMountRepository(const QString &path);
 
@@ -30,11 +33,13 @@ private:
     Terminal *m_terminal;
     bool m_isBootMounted = false;
     bool m_isDevMounted = false;
+    const QString m_bootFolder;
+    const QString m_devFolder;
 
     const QStringList m_bootIsoPaths;
     const QStringList m_devIsoPaths;
 
-    MountFilesName m_bootFileName, m_devFileName;
+    MountFilesState m_bootFileState, m_devFileState;
 
     const QString m_registerFilePath;
 

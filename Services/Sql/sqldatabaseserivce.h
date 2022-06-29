@@ -22,8 +22,9 @@
 enum class DbConnectionState
 {
     Connected = 0,
-    NeedRestart = 1,
-    FailedConnection = 2
+    NeedRestartAfterDriverInstall = 1,
+    NeedRestartAfterPostgreInstall = 2,
+    FailedConnection = 3
 };
 
 

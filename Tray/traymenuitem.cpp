@@ -35,17 +35,19 @@ void TrayMenuItem::ChangeButtonIconEnabled()
 {
     QString path = InteractiveButton::GetIconPath();
     QString stringEnd;
-    if (path.endsWith("notchecked"))
+    if (path.endsWith(QLatin1Literal("notchecked")))
     {
-        stringEnd = "checked";
+        stringEnd = QLatin1Literal("checked");
     }
     else
     {
-        stringEnd = "notchecked";
+        stringEnd = QLatin1Literal("notchecked");
     }
-    const int firstIndex = path.indexOf('_');
-    path.chop(path.count() - firstIndex);
+    const int firstIndex = path.lastIndexOf('_');
+    qInfo() << "oldPath" << path << " end " << stringEnd;
+    path.chop(path.count() - firstIndex - 1);
     path.append(stringEnd);
+    qInfo() << "newPath" << path;
     InteractiveButton::SetIcon(path);
 }
 

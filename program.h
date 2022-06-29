@@ -2,6 +2,7 @@
 #define PROGRAM_H
 
 #include "unistd.h"
+#include "errno.h"
 
 #include <QDebug>
 #include <QSettings>
@@ -76,7 +77,7 @@ private:
 
     StartupRunnableManager *m_startupRunnableService;
 
-    Tray *const m_tray;
+    Tray * m_tray;
 
     StartupWizard *m_startupWizard;
     SocketToRarm *m_socketToRarm;

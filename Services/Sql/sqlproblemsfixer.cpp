@@ -19,13 +19,14 @@ SqlProblemsFixer::~SqlProblemsFixer()
     delete m_mountChecker;
 }
 
-bool SqlProblemsFixer::InstallPostgreSqlAndDriver()
+bool SqlProblemsFixer::InstallPostgreSql()
 {
     CheckAndMountRepository();
     CloseSynapticIfItRunned();
     QString outputInfo, errorInfo;
+    ShowToast("Устанавливаем PostgreDB");
     m_terminal->InstallPackageSudo(m_postgreSqlPackageName, outputInfo, errorInfo);
-    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Установка постгре Вывод: ") + outputInfo + QStringLiteral(" Ошибки:") + errorInfo);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Установка PostgreDB Вывод: ") + outputInfo + QStringLiteral(" Ошибки:") + errorInfo);
     if (!errorInfo.isEmpty())
     {
         if (ErrorIsCritical(errorInfo))
@@ -33,10 +34,7 @@ bool SqlProblemsFixer::InstallPostgreSqlAndDriver()
             return false;
         }
     }
-    if (InstallSqlDriverForQt5())
-    {
-        return StartPostgreSqlService();
-    }
+    return true;
 }
 
 bool SqlProblemsFixer::InstallSqlDriverForQt5()
@@ -44,8 +42,9 @@ bool SqlProblemsFixer::InstallSqlDriverForQt5()
     CheckAndMountRepository();
     CloseSynapticIfItRunned();
     QString outputInfo, errorInfo;
+    ShowToast("Устанавливаем Postgre драйвер");
     m_terminal->InstallPackageSudo(m_postgreSqlDriverName, outputInfo, errorInfo);
-    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Установка постгре Вывод: ") + outputInfo + QStringLiteral(" Ошибки:") + errorInfo);
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Установка драйверов Postgre для Qt Вывод: ") + outputInfo + QStringLiteral(" Ошибки:") + errorInfo);
     if (!errorInfo.isEmpty())
     {
         if (ErrorIsCritical(errorInfo))
@@ -172,4 +171,10 @@ bool SqlProblemsFixer::ErrorIsCritical(const QString &errorInstall)
     msgWarning.setWindowTitle(QStringLiteral("Ошибка при подключении к бд."));
     msgWarning.exec();
     return  true;
+}
+
+void SqlProblemsFixer::ShowToast(const QString &message)
+{
+//    QToast *const pToast = QToast::CreateToast(message, QToast::LENGTH_LONG, Q_NULLPTR);
+//    pToast->show();
 }
