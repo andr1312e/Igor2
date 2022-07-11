@@ -222,12 +222,6 @@ void Tray::timerEvent(QTimerEvent *event)
 {
     Q_UNUSED(event);
     m_programIcon->setIcon(GetNextProgramIcon());
-    DevicesMeteoKitGetMessage message;
-    message.temperature = 20;
-    message.wet = 30;
-    message.pressure = 569;
-    message.state = 4;
-    OnSendWeather(message);
 }
 
 QIcon Tray::GetNextProgramIcon()

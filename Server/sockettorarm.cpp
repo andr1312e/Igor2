@@ -27,13 +27,11 @@ SocketToRarm::SocketToRarm(const QString &rarmAdress, const quint16 rarmPost, QO
 SocketToRarm::~SocketToRarm()
 {
     delete m_repository;
-
+    delete m_timeToConnectRarm;
     if (IsRarmConnected())
     {
         StopRarmConnect();
     }
-
-    delete m_timeToConnectRarm;
     delete m_pTcpSocketToRarm;
 }
 

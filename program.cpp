@@ -275,17 +275,14 @@ void Program::StartSettingsWizard(LoadingStates states)
 
 void Program::UserLoading()
 {
-    if (AllAppsRunnedWell())
-    {
-        m_tray = new Tray(Q_NULLPTR);
-        Q_EMIT m_tray->ToUpdateViewColors(m_styleChanger->GetThemeName());
-        InitRarmSocket();
-        ConnectUserObjects();
-    }
-    else
+    if (!AllAppsRunnedWell())
     {
         QMessageBox::critical(Q_NULLPTR, QStringLiteral("Приложение не может запустить подпрограмму"), QStringLiteral("При наличии прав администратора измените парметры роли для пользователя: ") + m_currentUserName, QMessageBox::Ok);
     }
+    m_tray = new Tray(Q_NULLPTR);
+    Q_EMIT m_tray->ToUpdateViewColors(m_styleChanger->GetThemeName());
+    InitRarmSocket();
+    ConnectUserObjects();
 }
 
 void Program::OnFullLoading()
@@ -335,6 +332,7 @@ void Program::ConnectUserObjects()
 
 void Program::ConnectAdminObjects()
 {
+    connect(m_tray, &Tray::ToDropDatabase, m_startupRunnableService, &StartupRunnableManager::OnStopStartupRunnableManager);
     connect(m_tray, &Tray::ToDropDatabase, m_sqlDatabaseService, &SqlDatabaseSerivce::OnDropDatabase);
     connect(m_tray, &Tray::ToDropDatabase, this, &QApplication::quit, Qt::QueuedConnection);
     connect(m_AdminGui, &Admin_GUI::ToCurrentUserRoleChanged, m_startupRunnableService, &StartupRunnableManager::OnCurrentUserRoleChanged);

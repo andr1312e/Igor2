@@ -43,6 +43,11 @@ void WizardService::OnChangeInstallState(bool state)
     m_dependenciesService->SetNeedInstallState(state);
 }
 
+EnviromentalVariablesService *WizardService::GetEnviromentalVariablesService() const noexcept
+{
+    return m_enviromentalVariablesService;
+}
+
 const QString &WizardService::GetCurrentUserId() const noexcept
 {
     return m_currentUserId;

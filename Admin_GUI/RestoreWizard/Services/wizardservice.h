@@ -43,6 +43,9 @@ Q_SIGNALS:
 public Q_SLOTS:
     void OnChangeInstallState(bool state);
 public:
+    EnviromentalVariablesService * GetEnviromentalVariablesService() const noexcept;
+
+public:
     const QString &GetCurrentUserId() const noexcept;
     const QString &GetCurrentUserName() const noexcept;
 public:

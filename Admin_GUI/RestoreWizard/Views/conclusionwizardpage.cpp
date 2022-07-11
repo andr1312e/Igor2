@@ -222,6 +222,9 @@ void ConclusionWizardPage::FillUI()
     font.setPointSize(font.pointSize() + 2);
     m_topLabel->setFont(font);
     m_needInstallPackages->setChecked(true);
+    m_addIconToDesktopToCurrentUser->setChecked(true);
+    m_addIconToDesktopToAllUsers->setChecked(true);
+    m_addIconToStartMenu->setChecked(true);
     m_currentDoingActionLabel->setText(QStringLiteral("Выполняемое действие:"));
     m_currentDoingActionName->setText(QStringLiteral("процесс пока не запущен"));
 }

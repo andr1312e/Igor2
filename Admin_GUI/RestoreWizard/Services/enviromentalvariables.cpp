@@ -66,6 +66,7 @@ void EnviromentalVariablesService::AppendProfileDataInfo()
                     const QString newProFileData = "export " + newKeys.first + '=' + newKeys.second;
                     m_terminal->AppendTextToFileSudo(newProFileData, m_proFilePath, Q_FUNC_INFO);
                 }
+
             }
         }
         else
@@ -76,6 +77,12 @@ void EnviromentalVariablesService::AppendProfileDataInfo()
             WriteItemsToProFile();
         }
     }
+    ApplyEtc();
+}
+
+const QList<QPair<QString, QString> > EnviromentalVariablesService::GetAllKeys() const noexcept
+{
+    return m_profileKeyWithData;
 }
 /**
  * Получаем из строки ключ значние по индексу оператора =
@@ -133,12 +140,19 @@ void EnviromentalVariablesService::WriteItemsToProFile()
 
 int EnviromentalVariablesService::HasItem(const QString &key) const noexcept
 {
+    const QString newKey=key.mid(7); //удаяем export
     for (int i = 0; i < m_profileKeyWithData.count(); ++i)
     {
-        if (key == m_profileKeyWithData.at(i).first)
+        const QString backupKey=m_profileKeyWithData.at(i).first;
+        if (newKey == backupKey)
         {
             return i;
         }
     }
     return -1;
+}
+
+void EnviromentalVariablesService::ApplyEtc()
+{
+    m_terminal->RunConsoleCommandSync(QLatin1Literal("source ")+m_proFilePath, Q_FUNC_INFO);
 }

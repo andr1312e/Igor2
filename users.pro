@@ -6,7 +6,7 @@
 
 QT += xml network widgets sql concurrent x11extras
 
-VERSION=3.0
+VERSION=1
 BUILD_DATE = $$system( date "+%d.%m.%Y_%H:%M" )
 
 DEFINES +=APP_VERSION=\\\"$$VERSION\\\"
@@ -187,7 +187,8 @@ SOURCES += \
     Services/mountchecker.cpp \
     Services/ShortCut/globalshortcut.cpp \
     Services/ShortCut/globalshortcut_p.cpp \
-    Services/ShortCut/globaldata.cpp
+    Services/ShortCut/globaldata.cpp \
+    Admin_GUI/RestoreWizard/Views/enviromentwizardpage.cpp
 
 HEADERS += \
     Admin_GUI/RestoreWizard/Services/iconmaker.h \
@@ -350,7 +351,8 @@ HEADERS += \
     Services/mountchecker.h \
     Services/ShortCut/globalshortcut.h \
     Services/ShortCut/globalshortcut_p.h \
-    Services/ShortCut/globaldata.h
+    Services/ShortCut/globaldata.h \
+    Admin_GUI/RestoreWizard/Views/enviromentwizardpage.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt

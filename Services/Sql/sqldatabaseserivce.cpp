@@ -27,10 +27,12 @@ SqlDatabaseSerivce::~SqlDatabaseSerivce()
 
 void SqlDatabaseSerivce::OnDropDatabase()
 {
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Начинаем удалять таблицы "));
     if (CheckUsersTable())
     {
         DropUsersTable();
     }
+    Log4QtInfo(Q_FUNC_INFO + QStringLiteral(" Удаляем таблицы ролей "));
     for (int roleIndex = 0; roleIndex < Roles.count(); ++roleIndex)
     {
         DropDesktopsTable(roleIndex);

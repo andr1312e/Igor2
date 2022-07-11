@@ -24,7 +24,7 @@ StartupWizard::~StartupWizard()
     {
         delete m_rolesPages.at(i);
     }
-
+    delete m_enviromentWizardPage;
     delete m_conclusionPage;
 }
 
@@ -47,6 +47,7 @@ void StartupWizard::CreateUI(LoadingStates states, ThemesNames themeName)
     {
         m_rolesPages.append(new RoleAppsWizardPage(Roles.at(i), i, m_wizardService, this));
     }
+    m_enviromentWizardPage=new EnviromentWizardPage(m_wizardService->GetEnviromentalVariablesService(), this);
     m_conclusionPage = new ConclusionWizardPage(m_wizardService, m_iconMakingService, this);
 }
 
@@ -72,6 +73,7 @@ void StartupWizard::InitBehaviour()
         addPage(m_rolesPages.at(i));
     }
 
+    setPage(static_cast<int>(WizardPage::Page_Enviroment), m_enviromentWizardPage);
     setPage(static_cast<int>(WizardPage::Page_Conclusion), m_conclusionPage);
 
     setStartId(static_cast<int>(WizardPage::Page_Intro));
@@ -155,11 +157,13 @@ void StartupWizard::OnHelpButtonClick()
     case WizardPage::Page_SecondRole:
     case WizardPage::Page_ThirdRole:
     case WizardPage::Page_FourthRole:
+    {
+        const int curId=currentId();
         if (hasBackUp)
         {
             if (hasOldData)
             {
-                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(currentId() - 2) +
+                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(curId - 2) +
                           QStringLiteral("\nВаша программа обнаружила уже имеющиеся данные, так же вы предоставили файл восстановления, "
                                          "все эти файлы были загружены.\n"
                                          "Необходимо выбрать только один источник, выбрать необходимый вы можете в самом "
@@ -170,7 +174,7 @@ void StartupWizard::OnHelpButtonClick()
             }
             else
             {
-                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(currentId() - 2) +
+                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(curId - 2) +
                           QStringLiteral("\nВы предоставили программе предоставили файл восстановления, данный файл был успешно заружен.\n"
                                          "Вы можете не использовать базу из файла восстановления, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
                                          "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
@@ -182,7 +186,7 @@ void StartupWizard::OnHelpButtonClick()
         {
             if (hasOldData)
             {
-                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(currentId() - 2) +
+                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(curId - 2) +
                           QStringLiteral("\nВаша программа обнаружила уже имеющиеся данные, они были загружены, файл восстановления не выбран, "
                                          "Так же вы можете не использовать имеющуюся базу, выбрав нужный вариант в самом нижнем поле, и создать новую, записав в нее только данные администратора.\n"
                                          "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
@@ -190,7 +194,7 @@ void StartupWizard::OnHelpButtonClick()
             }
             else
             {
-                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(currentId() + 2) +
+                message = QStringLiteral("Данные для программ-ярлыков на рабочем столе, а так же программ которые будут перезапущены для роли: ") + Roles.at(curId - 2) +
                           QStringLiteral("\nК сожалению, у вас нет ни данных, ни файла восстановления, поэтому "
                                          "Доступные программы разрешается отредактировать в интерфейсе программы позже.\n"
                                          "Нажмите кнопку Далее...");
@@ -198,14 +202,24 @@ void StartupWizard::OnHelpButtonClick()
         }
 
         break;
+    }
+    case WizardPage::Page_Enviroment:
+    {
+        message = QStringLiteral("Переменные окружения.\n"
+                                 "Переменные окружения РДДС и подпрограмм.\n"
+                                 "применяются сразу...\n");
 
+        break;
+    }
     case WizardPage::Page_Conclusion:
+    {
         message = QStringLiteral("Заключительный этап настройки.\n"
                                  "Проверьте правильность настроек, и импорт данных из источников.\n"
                                  "Если все правильно, нажмите кнопку Завершить...\n"
                                  "Иначе нажмите кнопку Назад, и измените необходимые параметры...\n");
 
         break;
+    }
     }
 
     QMessageBox::information(this, QStringLiteral("Окно справки"), message);

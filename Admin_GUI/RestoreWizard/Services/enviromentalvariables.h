@@ -17,12 +17,14 @@ public:
     void GetProfileDataFromBackUp(const QDomElement &profileElem);
     void ClearProFiles();
     void AppendProfileDataInfo();
+    const QList <QPair<QString, QString>> GetAllKeys() const noexcept;
 private:
     QPair<QString, QString> GetKeyAndVal(const QString &line) const noexcept;
     void RemoveDublicates(const QString &oldFileText);
     void CreateProFile();
     void WriteItemsToProFile();
     int HasItem(const QString &key) const noexcept;
+    void ApplyEtc();
 private:
     const QString m_proFilePath;
     QList <QPair<QString, QString>> m_profileKeyWithData;

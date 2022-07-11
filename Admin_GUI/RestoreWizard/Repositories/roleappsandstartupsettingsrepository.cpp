@@ -74,9 +74,10 @@ void RolesAndStartupsWizardRepository::SaveRoleDesktopsToDb(ISqlDatabaseService 
 
     const QList<DesktopEntity> currentRoleDesktops(GetDesktopsByIndex(roleIndex));
 
-    for (const DesktopEntity &enitty : currentRoleDesktops)
+    for (DesktopEntity entity : currentRoleDesktops)
     {
-        iSqlDatabaseService->AppendDesktopIntoRole(roleIndex, enitty);
+        entity.SetExec("/usr/RLS_TI/"+entity.GetExec());
+        iSqlDatabaseService->AppendDesktopIntoRole(roleIndex, entity);
     }
 }
 

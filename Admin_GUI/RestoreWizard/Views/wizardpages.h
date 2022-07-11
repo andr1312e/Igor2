@@ -9,7 +9,8 @@ enum class WizardPage
     Page_SecondRole = 3,
     Page_ThirdRole = 4,
     Page_FourthRole = 5,
-    Page_Conclusion = 6
+    Page_Enviroment = 6,
+    Page_Conclusion = 7
 };
 
 

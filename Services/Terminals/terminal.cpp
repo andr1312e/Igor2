@@ -471,7 +471,7 @@ QString Terminal::CreateCopyFileCommandSudo(const QString &source, const QString
 
 QString Terminal::CreateCopyFolderCommandSudo(const QString &source, const QString &destination) const noexcept
 {
-    return QStringLiteral("sudo cp -R '") + source + QStringLiteral("' '") + destination + '\'';
+    return QStringLiteral("sudo cp -a '") + source + QStringLiteral("' '") + destination + '\'';
 }
 
 

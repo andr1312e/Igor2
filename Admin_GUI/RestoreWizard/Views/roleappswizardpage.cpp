@@ -67,6 +67,7 @@ void RoleAppsWizardPage::OnCurrentIndexChanged(const QString &action)
 
 int RoleAppsWizardPage::nextId() const
 {
+    qInfo()<< "next " << m_currentRoleIndex + 3;
     return m_currentRoleIndex + 3;
 }
 

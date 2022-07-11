@@ -5,7 +5,7 @@ TrayMenu::TrayMenu(QWidget *parent)
     : QMenu(parent)
     , m_backgroundImage(QWidget::size(), QImage::Format_ARGB32_Premultiplied)
 {
-//    OnUpdateViewColors();
+    //    OnUpdateViewColors();
     setObjectName(QStringLiteral("TrayMenu"));
     setWindowFlag(Qt::Popup, true);
     setAttribute(Qt::WA_StyledBackground);
@@ -24,7 +24,11 @@ void TrayMenu::AddButtonToMenu(QAction *action)
     TrayMenuItem *const addedActionMenuItem = CreateMenuItem(action);
     addedActionMenuItem->setToolTip(action->toolTip());
     connect(addedActionMenuItem, &QPushButton::clicked, action, &QAction::trigger);
-    connect(addedActionMenuItem, &QPushButton::clicked, this, &TrayMenu::OnChangeButtonIcon);
+    const QString actionIcon=action->objectName();
+    if(!actionIcon.isEmpty())
+    {
+        connect(addedActionMenuItem, &QPushButton::clicked, this, &TrayMenu::OnChangeButtonIcon);
+    }
 }
 
 void TrayMenu::BeginInsertInRow()

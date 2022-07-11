@@ -20,6 +20,7 @@
 #include "Admin_GUI/RestoreWizard/Views/wizardpages.h"
 #include "Admin_GUI/RestoreWizard/Views/userwizardpage.h"
 #include "Admin_GUI/RestoreWizard/Views/roleappswizardpage.h"
+#include "Admin_GUI/RestoreWizard/Views/enviromentwizardpage.h"
 #include "Admin_GUI/RestoreWizard/Views/conclusionwizardpage.h"
 
 #include "Styles/Themes/themecolors.h"
@@ -60,6 +61,7 @@ private:
     IntroPage *m_introPage;
     UserWizardPage *m_userWizardPage;
     QVector<RoleAppsWizardPage *> m_rolesPages;
+    EnviromentWizardPage *m_enviromentWizardPage;
     ConclusionWizardPage *m_conclusionPage;
 };
 

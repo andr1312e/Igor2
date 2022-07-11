@@ -135,6 +135,7 @@ void IntroPage::ConnectObjects()
 
 void IntroPage::OnCheckBackupFile()
 {
+    OnClearBackup();
     const QString strDesktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     m_backupFilePath = QFileDialog::getOpenFileName(Q_NULLPTR, QStringLiteral("Выберите исполняемый файл"), strDesktop, QStringLiteral("Файл настроек (*.sync)"));
 
