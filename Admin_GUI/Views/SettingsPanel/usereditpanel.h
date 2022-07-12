@@ -36,7 +36,7 @@ private:
 Q_SIGNALS:
     void ToDeleteUser(const QString &userId, const QString &userName);
     void ToRoleToViewChanged(int roleId);
-    void ToSaveUser(const QString &userId, const QString &m_userName, const QString &FCS, const int &oldRoleIndex, const int &newRoleIndex);
+    void ToSaveUser(const QString &userId, const QString &m_userName, const QString &FCS, int oldRoleIndex, int newRoleIndex);
 
 private Q_SLOTS:
     void OnSaveUser();
@@ -45,12 +45,12 @@ private Q_SLOTS:
 
 public:
     void SetUser(const User &user);
-    void SetFontSize(int fontSize);
-    void SetButtonSize(int size);
+    void SetFontSize(int fontSize) noexcept;
+    void SetButtonSize(int size) noexcept;
 private:
     void GetUserKioskState(const QString &userName);
-    void InsertUserData(const User &user);
-    void ShowSaveUserToast(const QString &userName);
+    void InsertUserData(const User &user) noexcept;
+    void ShowSaveUserToast(const QString &userName) noexcept;
 
 private:
     const QStringView m_currentUserName;
@@ -78,8 +78,6 @@ private:
     QLabel *m_kioskModeIsEnabledLabel;
     QLabel *m_kioskModeIsDisabledLabel;
     QtMaterialToggle *m_kioskModeState;
-
-    QMessageBox *m_messagBox;
 };
 
 #endif // ADMIN_GUI_VIEWS_USEREDITPANEL_H

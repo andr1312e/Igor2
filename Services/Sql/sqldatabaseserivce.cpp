@@ -613,11 +613,11 @@ void SqlDatabaseSerivce::AppendUserIntoTable(const User &user)
 }
 
 
-void SqlDatabaseSerivce::RemoveUserIntoTable(int roleIndex, const User &user)
+void SqlDatabaseSerivce::RemoveUserIntoTable(const User &user)
 {
     QSqlQuery query(m_db);
-    const QString request = "DELETE FROM " + m_startupTablePrefix + QString::number(roleIndex) +
-                            " WHERE" + CN::userId + "=\'" + user.GetUserId() + "\'";
+    const QString request = "DELETE FROM " + m_usersTablePrefix +
+                            " WHERE " + CN::userId + "=\'" + user.GetUserId() + "\'";
     query.prepare(request);
     if (query.exec())
     {

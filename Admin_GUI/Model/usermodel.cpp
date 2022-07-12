@@ -52,7 +52,7 @@ void UserModel::DeleteUser(const QString &userId, const QString &userName)
         User user = m_model->item(i)->data(Qt::UserRole + 1).value<User>();
         if (user.GetUserId() == userId && user.GetUserName() == userName)
         {
-            m_databaseService->RemoveUserIntoTable(user.GetUserRole(), user);
+            m_databaseService->RemoveUserIntoTable(user);
             user.ClearUserData();
             user.SetUserImage(GetUserImageFromRole(user.GetUserRole()));
             QStandardItem *item = m_model->item(i);
@@ -91,6 +91,11 @@ void UserModel::ListUpdate()
     AppendNewUsers(usersThatNotContains);
     const QList<User> databaseUsers = FillListByDatabaseService();
     JoinModelAndDbList(databaseUsers);
+}
+
+bool UserModel::TwoOrMoreUsers() const noexcept
+{
+    return m_model->rowCount()>1;
 }
 /**
  * QList<QPair<QString, QString> > UserModel::RemoveNotExsistsUsers(const QList<QPair<QString, QString> > &namesAndIdsList)

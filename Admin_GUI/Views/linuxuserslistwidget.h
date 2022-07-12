@@ -36,6 +36,7 @@ private:
 Q_SIGNALS:
 
     void ToUserClick(const User &user);
+    void ToDeleteUser(const QString &userId, const QString &userName);
     void ToSearch(const QString &text, const QString &attribute);
 
 private Q_SLOTS:
@@ -50,6 +51,7 @@ private:
 protected:
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     virtual void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
+    virtual void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 private:
     QFont m_font;
     int m_oldFontSize;

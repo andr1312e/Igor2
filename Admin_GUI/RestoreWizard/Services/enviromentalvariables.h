@@ -2,22 +2,23 @@
 #define SERVICES_ENVIROMENTALVARIABLESSERVICE_H
 
 #include <QDomElement>
-#include <QHash>
+#include <QList>
 #include <QPair>
 
 #include "Logging/logger.h"
 #include "Services/Terminals/terminal.h"
 
-class EnviromentalVariablesService
+class ProfileVariablesService
 {
 public:
-    explicit EnviromentalVariablesService();
-    ~EnviromentalVariablesService();
+    explicit ProfileVariablesService();
+    ~ProfileVariablesService();
 public:
     void GetProfileDataFromBackUp(const QDomElement &profileElem);
-    void ClearProFiles();
+    void ClearProFiles() noexcept;
     void AppendProfileDataInfo();
-    const QList <QPair<QString, QString>> GetAllKeys() const noexcept;
+    QList <QPair<QString, QString>> GetAllKeys() const noexcept;
+    bool SetNewItem(const QString &itemValue, int itemPos, int column) noexcept;
 private:
     QPair<QString, QString> GetKeyAndVal(const QString &line) const noexcept;
     void RemoveDublicates(const QString &oldFileText);

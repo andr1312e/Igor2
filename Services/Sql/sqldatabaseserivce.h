@@ -58,7 +58,7 @@ public:
     virtual void ClearDesktopTable(int roleIndex) Q_DECL_OVERRIDE;
 
     virtual void AppendUserIntoTable(const User &user) Q_DECL_OVERRIDE;
-    virtual void RemoveUserIntoTable(int roleIndex, const User &user) Q_DECL_OVERRIDE ;
+    virtual void RemoveUserIntoTable(const User &user) Q_DECL_OVERRIDE ;
     virtual QList<User> GetAllUsers() Q_DECL_OVERRIDE;
 
     virtual void AppendStartupIntoRole(int roleIndex, const QString &exec) Q_DECL_OVERRIDE;

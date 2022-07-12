@@ -24,6 +24,7 @@ public:
     QStandardItemModel *GetModel() const noexcept;
     void OpenFlyAdminSmc();
     void ListUpdate();
+    bool TwoOrMoreUsers() const noexcept;
 private:
     QList<QPair<QString, QString> > RemoveNotExsistsUsers(const QList<QPair<QString, QString> > &namesAndIdsList);
     void AppendNewUsers(const QList<QPair<QString, QString> > &namesAndIdsList);

@@ -26,7 +26,7 @@ Q_SIGNALS:
 public:
     void SetButtonDown(int id) noexcept;
 private:
-    void SetButtonToolTip(QPushButton *button, const int &pageIndex);
+    void SetButtonToolTip(QPushButton *button, int pageIndex) noexcept;
 private:
     QLabel *m_descriptionLabel;
     QButtonGroup *m_buttonGroup;

@@ -40,8 +40,6 @@ UserEditPanel::~UserEditPanel()
     delete m_kioskModeIsEnabledLabel;
     delete m_kioskModeIsDisabledLabel;
     delete m_kioskModeState;
-
-    delete m_messagBox;
 }
 
 void UserEditPanel::InitServicesAndModel()
@@ -69,8 +67,6 @@ void UserEditPanel::CreateUI()
     m_kioskModeIsEnabledLabel = new QLabel();
     m_kioskModeIsDisabledLabel = new QLabel();
     m_kioskModeState = new QtMaterialToggle();
-
-    m_messagBox = new QMessageBox(this);
 }
 
 void UserEditPanel::InsertWidgetsIntoLayout()
@@ -118,8 +114,6 @@ void UserEditPanel::FillUI()
     m_kioskModeState->setMinimumHeight(45);
     m_kioskModeState->setOrientation(Qt::Horizontal);
     m_kioskModeState->setDisabled(true);
-
-    m_messagBox->setText(QStringLiteral("Введите все параметры"));
 }
 
 void UserEditPanel::SetObjectNames()
@@ -141,7 +135,7 @@ void UserEditPanel::OnSaveUser()
     const QString FCS = m_FCSLineEdit->text();
     if (FCS.isEmpty() || m_userId.isEmpty())
     {
-        m_messagBox->show();
+        QMessageBox::critical(this, QStringLiteral("Не все параметры введены"), QStringLiteral("Введите имя пользователя"));
     }
     else
     {
@@ -193,7 +187,7 @@ void UserEditPanel::SetUser(const User &user)
     }
 }
 
-void UserEditPanel::SetFontSize(int fontSize)
+void UserEditPanel::SetFontSize(int fontSize) noexcept
 {
     m_editPanelFont.setPointSize(fontSize);
     m_editFieldsLabel->setFont(m_editPanelFont);
@@ -209,7 +203,7 @@ void UserEditPanel::SetFontSize(int fontSize)
 }
 
 
-void UserEditPanel::SetButtonSize(int size)
+void UserEditPanel::SetButtonSize(int size) noexcept
 {
     m_saveUserDataButton->setFixedHeight(size);
     m_FCSLineEdit->setFixedHeight(size);
@@ -230,7 +224,7 @@ void UserEditPanel::GetUserKioskState(const QString &userName)
     m_kioskModeState->setEnabled(true);
 }
 
-void UserEditPanel::InsertUserData(const User &user)
+void UserEditPanel::InsertUserData(const User &user) noexcept
 {
     if (user.RoleIsValid())
     {
@@ -246,7 +240,7 @@ void UserEditPanel::InsertUserData(const User &user)
     }
 }
 
-void UserEditPanel::ShowSaveUserToast(const QString &userName)
+void UserEditPanel::ShowSaveUserToast(const QString &userName) noexcept
 {
     QToast *const pToast = QToast::CreateToast("Данные пользователя " + userName + " сохранены в базе", QToast::LENGTH_LONG, this);
     pToast->show();

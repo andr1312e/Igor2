@@ -117,30 +117,30 @@ void ConclusionWizardPage::CreateUI()
     m_oldDataLabel = new QLabel(QStringLiteral("Данные в системе: "));
     m_oldDataValue = new QLabel();
 
-    m_actionsLabel = new QLabel(QStringLiteral("Выбранные действия:"));
+    m_actionsLabel = new QLabel(QStringLiteral("Выбранные действия над компонентами программы:"));
     m_dataLayout = new QGridLayout();
 
-    m_usersLabel = new QLabel(QStringLiteral("База данных пользователей:"));
+    m_usersLabel = new QLabel(QStringLiteral("База данных пользователей"));
     m_usersActionValue = new QLabel();
     m_usersCommentLabel = new QLabel(QStringLiteral("Колличество пользователей:"));
     m_usersCommentValue = new QLabel();
 
-    m_firstRoleLabel = new QLabel(QStringLiteral("Роль ") + Roles.front());
+    m_firstRoleLabel = new QLabel(QStringLiteral("База роли ") + Roles.front());
     m_firstRoleActionValue = new QLabel();
     m_firstRoleCommentLabel = new QLabel(QStringLiteral("Колличество программ:"));
     m_firstRoleCommentValue = new QLabel();
 
-    m_secondRoleLabel = new QLabel(QStringLiteral("Роль ") + Roles.at(1));
+    m_secondRoleLabel = new QLabel(QStringLiteral("База роли ") + Roles.at(1));
     m_secondRoleActionValue = new QLabel();
     m_secondRoleCommentLabel = new QLabel(QStringLiteral("Колличество программ:"));
     m_secondRoleCommentValue = new QLabel();
 
-    m_thirdRoleLabel = new QLabel(QStringLiteral("Роль ") + Roles.at(2));
+    m_thirdRoleLabel = new QLabel(QStringLiteral("База роли ") + Roles.at(2));
     m_thirdRoleActionValue = new QLabel();
     m_thirdRoleCommentLabel = new QLabel(QStringLiteral("Колличество программ:"));
     m_thirdRoleCommentValue = new QLabel();
 
-    m_fourthRoleLabel = new QLabel(QStringLiteral("Роль ") + Roles.at(3));
+    m_fourthRoleLabel = new QLabel(QStringLiteral("База роли ") + Roles.at(3));
     m_fourthRoleActionValue = new QLabel();
     m_fourthRoleCommentLabel = new QLabel(QStringLiteral("Колличество программ:"));
     m_fourthRoleCommentValue = new QLabel();
@@ -152,7 +152,7 @@ void ConclusionWizardPage::CreateUI()
     m_needInstallPackages = new QCheckBox(QStringLiteral("Установить пакеты (без этого программы могут не запуститься)"));
     m_addIconToDesktopToCurrentUser = new QCheckBox(QStringLiteral("Добавить икону на рабочий стол для текущего пользователя"));
     m_addIconToDesktopToAllUsers = new QCheckBox(QStringLiteral("Добавить иконку на рабочий стол для всех пользователей"));
-    m_addIconToStartMenu = new QCheckBox(QStringLiteral("Добавить иконку в меню пуск"));
+    m_addIconToStartMenu = new QCheckBox(QStringLiteral("Добавить иконку в меню пуск для всех пользователей"));
 
     m_installingPackesLayout = new QHBoxLayout();
     m_currentDoingActionLabel = new QLabel();
@@ -209,8 +209,9 @@ void ConclusionWizardPage::InsertWidgetsIntoLayout()
     MainLayout()->addWidget(m_addIconToDesktopToAllUsers, 0, Qt::AlignHCenter);
     MainLayout()->addWidget(m_addIconToStartMenu, 0, Qt::AlignHCenter);
 
-    m_installingPackesLayout->addWidget(m_currentDoingActionLabel);
+    m_installingPackesLayout->addWidget(m_currentDoingActionLabel, 1);
     m_installingPackesLayout->addWidget(m_currentDoingActionName);
+    m_installingPackesLayout->addSpacing(10);
 
     MainLayout()->addLayout(m_installingPackesLayout);
     MainLayout()->addWidget(m_totalProgressBar);

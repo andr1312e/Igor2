@@ -1,5 +1,5 @@
-#ifndef ADMIN_GUI_VIEWS_WIZARDPAGES_H
-#define ADMIN_GUI_VIEWS_WIZARDPAGES_H
+#ifndef ADMIN_GUI_RESTOREWIZARD_VIEWS_WIZARDPAGES_H
+#define ADMIN_GUI_RESTOREWIZARD_VIEWS_WIZARDPAGES_H
 
 enum class WizardPage
 {
@@ -10,8 +10,9 @@ enum class WizardPage
     Page_ThirdRole = 4,
     Page_FourthRole = 5,
     Page_Enviroment = 6,
-    Page_Conclusion = 7
+    Page_FilesAndFolders = 7,
+    Page_Conclusion = 8
 };
 
 
-#endif // ADMIN_GUI_VIEWS_WIZARDPAGES_H
+#endif // ADMIN_GUI_RESTOREWIZARD_VIEWS_WIZARDPAGES_H

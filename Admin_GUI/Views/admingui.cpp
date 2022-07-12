@@ -74,6 +74,7 @@ void Admin_GUI::InsertWidgetsIntoLayout()
 void Admin_GUI::ConnectObjects()
 {
     connect(m_usersListWidget, &LinuxUsersListWidget::ToUserClick, this, &Admin_GUI::OnUserClick);
+    connect(m_usersListWidget, &LinuxUsersListWidget::ToDeleteUser, this, &Admin_GUI::OnDeleteUser);
     connect(m_userEditPanel, &UserEditPanel::ToRoleToViewChanged, m_roleEditPanel, &RoleEditPanel::OnRoleToViewChanged);
     connect(m_userEditPanel, &UserEditPanel::ToDeleteUser, this, &Admin_GUI::OnDeleteUser);
     connect(m_userEditPanel, &UserEditPanel::ToSaveUser, this, &Admin_GUI::OnSaveUser);
@@ -109,12 +110,19 @@ void Admin_GUI::OnUserClick(const User &user)
 void Admin_GUI::OnDeleteUser(const QString &userId, const QString &userName)
 {
     const int roleId = m_userModel->GetRoleIdByUserId(userId);
-    m_userModel->DeleteUser(userId, userName);
-    if (User::RoleIsValid(roleId))
+    if(userId==m_linuxUserService->GetCurrentUserId() && userName==m_linuxUserService->GetCurrentUserName())
     {
-        m_userDesktopService->DeleteAllIconsToUser(roleId, userName);
+        QMessageBox::warning(this, QStringLiteral("Удаление пользователей"), QStringLiteral("Нельзя удалить текущего пользователя - администратора"));
     }
-    m_userDesktopService->GetAllUserDesktops(userName);
+    else
+    {
+        m_userModel->DeleteUser(userId, userName);
+        if (User::RoleIsValid(roleId))
+        {
+            m_userDesktopService->DeleteAllIconsToUser(roleId, userName);
+        }
+        m_userDesktopService->GetAllUserDesktops(userName);
+    }
 }
 
 void Admin_GUI::OnSaveUser(const QString &userId, const QString &userName, const QString &FCS, int oldRole, int newRole)

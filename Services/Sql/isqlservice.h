@@ -46,7 +46,7 @@ public:
     //users
     virtual void AppendUserIntoTable(const User &user) = 0;
 
-    virtual void RemoveUserIntoTable(int roleIndex, const User &user) = 0;
+    virtual void RemoveUserIntoTable(const User &user) = 0;
 
     virtual QList<User> GetAllUsers() = 0;
 

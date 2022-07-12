@@ -12,7 +12,7 @@ FilesAndFoldersSerivce::~FilesAndFoldersSerivce()
 
 }
 
-void FilesAndFoldersSerivce::SetBackupFolderPath(const QString &backupFolder)
+void FilesAndFoldersSerivce::SetBackupFolderPath(const QString &backupFolder) noexcept
 {
     m_backupFolder = backupFolder;
 }
@@ -45,7 +45,7 @@ void FilesAndFoldersSerivce::GetFoldersFromBackup(const QDomElement &elem)
     }
 }
 
-void FilesAndFoldersSerivce::ClearAll()
+void FilesAndFoldersSerivce::ClearAll() noexcept
 {
     m_filesNames.clear();
     m_foldersNames.clear();
@@ -54,17 +54,17 @@ void FilesAndFoldersSerivce::ClearAll()
 
 void FilesAndFoldersSerivce::CopyFiles()
 {
-    for (const QString &fileName : qAsConst(m_filesNames))
+    for (const QString &fileFullPath : qAsConst(m_filesNames))
     {
-        const QString sourceFile = m_backupFolder + fileName;
+        const QString fileName=GetEntityName(fileFullPath);
         const QString destinationFile = m_rlsTiFolder + fileName;
-        if (m_terminal->IsFileExists(sourceFile, Q_FUNC_INFO, true))
+        if (m_terminal->IsFileExists(fileFullPath, Q_FUNC_INFO, true))
         {
             if (m_terminal->IsFileExists(destinationFile, Q_FUNC_INFO, true))
             {
                 m_terminal->DeleteFileSudo(destinationFile, Q_FUNC_INFO);
             }
-            m_terminal->CopyFileSudo(sourceFile, m_rlsTiFolder, Q_FUNC_INFO);
+            m_terminal->CopyFileSudo(fileFullPath, m_rlsTiFolder, Q_FUNC_INFO);
             m_terminal->SetPermissionToExecuteSudo(destinationFile, Q_FUNC_INFO);
         }
     }
@@ -72,22 +72,63 @@ void FilesAndFoldersSerivce::CopyFiles()
 
 void FilesAndFoldersSerivce::CopyFolders()
 {
-    for (const QString &folderName : qAsConst(m_foldersNames))
+    for (const QString &folderPath : qAsConst(m_foldersNames))
     {
-        const QString sourceFolder = m_backupFolder + folderName;
+        const QString folderName=GetEntityName(folderPath);
         const QString resultFolder = m_rlsTiFolder + folderName;
-        if (m_terminal->IsDirExists(sourceFolder, Q_FUNC_INFO, true))
+        if (m_terminal->IsDirExists(folderPath, Q_FUNC_INFO, true))
         {
             if (m_terminal->IsDirExists(resultFolder, Q_FUNC_INFO, true))
             {
                 m_terminal->DeleteFolderSudo(resultFolder, Q_FUNC_INFO);
             }
-            m_terminal->CopyFolderSudo(sourceFolder, m_rlsTiFolder, Q_FUNC_INFO);
+            m_terminal->CopyFolderSudo(folderPath, m_rlsTiFolder, Q_FUNC_INFO);
         }
     }
 }
 
-QStringList FilesAndFoldersSerivce::ParseDomElement(const QDomElement &elem) const
+const QString &FilesAndFoldersSerivce::GetBackupFolderPath() const noexcept
+{
+    return m_backupFolder;
+}
+
+const QStringList &FilesAndFoldersSerivce::GetAllFilesList() const noexcept
+{
+    return m_filesNames;
+}
+
+const QStringList &FilesAndFoldersSerivce::GetAllFoldersList() const noexcept
+{
+    return m_foldersNames;
+}
+
+bool FilesAndFoldersSerivce::AddFileToList(const QString &newFilePath) noexcept
+{
+    if(m_filesNames.contains(newFilePath))
+    {
+        return false;
+    }
+    else
+    {
+        m_filesNames.append(newFilePath);
+        return true;
+    }
+}
+
+bool FilesAndFoldersSerivce::AddFolderToList(const QString &newFolder) noexcept
+{
+    if(m_foldersNames.contains(newFolder))
+    {
+        return false;
+    }
+    else
+    {
+        m_foldersNames.append(newFolder);
+        return true;
+    }
+}
+
+QStringList FilesAndFoldersSerivce::ParseDomElement(const QDomElement &elem) const noexcept
 {
     QStringList items;
     const QDomNodeList nodesList(elem.childNodes());
@@ -102,29 +143,34 @@ QStringList FilesAndFoldersSerivce::ParseDomElement(const QDomElement &elem) con
 
 QStringList FilesAndFoldersSerivce::ReturnExsistsFullPathFiles(const QStringList &fileNames)
 {
-    QStringList exsistsFiles;
+    QStringList exsistsFullPathsFiles;
     for (const QString &fileName : fileNames)
     {
         const QString fullPathToFile = m_backupFolder + fileName;
         if (m_terminal->IsFileExists(fullPathToFile, Q_FUNC_INFO, true))
         {
-            exsistsFiles.append(fileName);
+            exsistsFullPathsFiles.append(fullPathToFile);
         }
     }
-    return exsistsFiles;
+    return exsistsFullPathsFiles;
+}
+
+QString FilesAndFoldersSerivce::GetEntityName(const QString &fullPath)
+{
+    return fullPath.mid(fullPath.lastIndexOf('/')+1);
 }
 
 QStringList FilesAndFoldersSerivce::ReturnExsistsFullPathsFolders(const QStringList &folderNames)
 {
-    QStringList exsistsFolders;
+    QStringList exsistsFullFolderPaths;
     for (const QString &folderName : folderNames)
     {
         const QString fullPathToFile = m_backupFolder + folderName;
         if (m_terminal->IsDirExists(fullPathToFile, Q_FUNC_INFO, true))
         {
-            exsistsFolders.append(folderName);
+            exsistsFullFolderPaths.append(fullPathToFile);
         }
     }
-    return exsistsFolders;
+    return exsistsFullFolderPaths;
 }
 

@@ -5,7 +5,7 @@ WizardService::WizardService(const QString &rlsTiFolder, LoadingStates states, L
     , m_terminal(Terminal::GetTerminal())
     , m_dependenciesService(new DependenciesService(this))
     , m_filesAndFoldersSerivce(new FilesAndFoldersSerivce(rlsTiFolder))
-    , m_enviromentalVariablesService(new EnviromentalVariablesService())
+    , m_enviromentalVariablesService(new ProfileVariablesService())
     , m_rlsTiFolder(rlsTiFolder)
     , m_currentUserId(service->GetCurrentUserId())
     , m_currentUserName(service->GetCurrentUserName())
@@ -43,9 +43,14 @@ void WizardService::OnChangeInstallState(bool state)
     m_dependenciesService->SetNeedInstallState(state);
 }
 
-EnviromentalVariablesService *WizardService::GetEnviromentalVariablesService() const noexcept
+ProfileVariablesService *WizardService::GetEnviromentalVariablesService() const noexcept
 {
     return m_enviromentalVariablesService;
+}
+
+FilesAndFoldersSerivce *WizardService::GetFilesAndFoldesService() const noexcept
+{
+    return m_filesAndFoldersSerivce;
 }
 
 const QString &WizardService::GetCurrentUserId() const noexcept

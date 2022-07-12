@@ -6,7 +6,7 @@
 
 QT += xml network widgets sql concurrent x11extras
 
-VERSION=1
+VERSION=1.1
 BUILD_DATE = $$system( date "+%d.%m.%Y_%H:%M" )
 
 DEFINES +=APP_VERSION=\\\"$$VERSION\\\"
@@ -188,7 +188,8 @@ SOURCES += \
     Services/ShortCut/globalshortcut.cpp \
     Services/ShortCut/globalshortcut_p.cpp \
     Services/ShortCut/globaldata.cpp \
-    Admin_GUI/RestoreWizard/Views/enviromentwizardpage.cpp
+    Admin_GUI/RestoreWizard/Views/profilewizardpage.cpp \
+    Admin_GUI/RestoreWizard/Views/filesandfolderswizardpage.cpp
 
 HEADERS += \
     Admin_GUI/RestoreWizard/Services/iconmaker.h \
@@ -352,7 +353,8 @@ HEADERS += \
     Services/ShortCut/globalshortcut.h \
     Services/ShortCut/globalshortcut_p.h \
     Services/ShortCut/globaldata.h \
-    Admin_GUI/RestoreWizard/Views/enviromentwizardpage.h
+    Admin_GUI/RestoreWizard/Views/profilewizardpage.h \
+    Admin_GUI/RestoreWizard/Views/filesandfolderswizardpage.h
 
 *-g++* {
   QMAKE_CFLAGS = -pedantic -Wall -Wextra -fno-stack-protector -fno-plt

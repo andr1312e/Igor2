@@ -43,8 +43,8 @@ Q_SIGNALS:
 public Q_SLOTS:
     void OnChangeInstallState(bool state);
 public:
-    EnviromentalVariablesService * GetEnviromentalVariablesService() const noexcept;
-
+    ProfileVariablesService * GetEnviromentalVariablesService() const noexcept;
+    FilesAndFoldersSerivce *GetFilesAndFoldesService() const noexcept;
 public:
     const QString &GetCurrentUserId() const noexcept;
     const QString &GetCurrentUserName() const noexcept;
@@ -96,7 +96,7 @@ private:
     Terminal *const m_terminal;
     DependenciesService *const m_dependenciesService;
     FilesAndFoldersSerivce *const m_filesAndFoldersSerivce;
-    EnviromentalVariablesService *const m_enviromentalVariablesService;
+    ProfileVariablesService *const m_enviromentalVariablesService;
 private:
     const QString m_rlsTiFolder;
     const QString m_currentUserId;

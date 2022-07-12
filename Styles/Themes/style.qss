@@ -16,6 +16,7 @@ QMenuBar
     background-color:qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 rgba(25,25,25,127),stop:1 rgba(53,53,53,75));
     border-bottom:2px solid rgba(25,25,25,75);
 }
+
 QMenuBar::item
 {
     spacing:2px;
@@ -140,17 +141,7 @@ QMainWindow::separator
     padding:2px;
 }
 
-QSplitter::handle:horizontal
-{
-    width:10px;
-}
-
-QSplitter::handle:vertical
-{
-    height:10px;
-}
-
-QMainWindow::separator:hover,QSplitter::handle:hover
+QMainWindow::separator:hover
 {
     background:palette(highlight);
 }
@@ -254,36 +245,6 @@ QRadioButton::indicator
 
     width:18px;
     height:18px;
-}
-
-QRadioButton::indicator:checked
-{
-    image:url(:/images/widges-icons/icon_radiobutton_checked.png);
-}
-
-QRadioButton::indicator:checked:pressed
-{
-    image:url(:/images/widges-icons/icon_radiobutton_checked_pressed.png);
-}
-
-QRadioButton::indicator:checked:disabled
-{
-    image:url(:/images/widges-icons/icon_radiobutton_checked_disabled.png);
-}
-
-QRadioButton::indicator:unchecked
-{
-    image:url(:/images/widges-icons/icon_radiobutton_unchecked.png);
-}
-
-QRadioButton::indicator:unchecked:pressed
-{
-    image:url(:/images/widges-icons/icon_radiobutton_unchecked_pressed.png);
-}
-
-QRadioButton::indicator:unchecked:disabled
-{
-    image:url(:/images/widges-icons/icon_radiobutton_unchecked_disabled.png);
 }
 
 QTreeView, QTableView
@@ -396,7 +357,8 @@ QScrollBar::handle:horizontal:hover
     background-color:palette(highlight);
 }
 
-QScrollBar::add-line:horizontal{
+QScrollBar::add-line:horizontal
+{
     background:none;
     width:0px;
     subcontrol-position:bottom;
@@ -409,6 +371,11 @@ QScrollBar::sub-line:horizontal
     width:0px;
     subcontrol-position:top;
     subcontrol-origin:margin;
+}
+
+QListWidget
+{
+    border:1px solid palette(alternate-base);
 }
 
 QSlider::handle:horizontal
@@ -445,7 +412,6 @@ QToolButton#closeButton
     width:16px;
     height:16px;
     padding:1px;
-    image:url(:/images/widgets-icons/icon_window_close.png);
 }
 
 QToolButton:hover#closeButton
@@ -465,7 +431,6 @@ QToolButton#restoreButton
     width:16px;
     height:16px;
     padding:2px;
-    image:url(:/images/widgets-icons/icon_window_restore.png);
 }
 
 QToolButton:hover#restoreButton
@@ -485,7 +450,6 @@ QToolButton#maximizeButton
     width:16px;
     height:16px;
     padding:1px;
-    image:url(:/images/widgets-icons/icon_window_maximize.png);
 }
 
 QToolButton:hover#maximizeButton
@@ -504,7 +468,6 @@ QToolButton#minimizeButton
    width:16px;
    height:16px;
    padding:1px;
-   image:url(:/images/widgets-icons/icon_window_minimize.png);
 }
 
 QToolButton:hover#minimizeButton

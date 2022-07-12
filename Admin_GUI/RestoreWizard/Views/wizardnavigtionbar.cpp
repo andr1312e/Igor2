@@ -81,7 +81,7 @@ void WizardNavigtionBar::SetButtonDown(int id) noexcept
     }
 }
 
-void WizardNavigtionBar::SetButtonToolTip(QPushButton *button, const int &pageIndex)
+void WizardNavigtionBar::SetButtonToolTip(QPushButton *button, int pageIndex) noexcept
 {
     switch (WizardPage(pageIndex))
     {
@@ -96,6 +96,12 @@ void WizardNavigtionBar::SetButtonToolTip(QPushButton *button, const int &pageIn
     case WizardPage::Page_ThirdRole:
     case WizardPage::Page_FourthRole:
         button->setToolTip(QStringLiteral("Программы для роли: ") + Roles.at(pageIndex - 2));
+        break;
+    case WizardPage::Page_Enviroment:
+        button->setToolTip(QStringLiteral("Переменные окружения"));
+        break;
+    case WizardPage::Page_FilesAndFolders:
+        button->setToolTip(QStringLiteral("Дополнительные папки и файлы комплекта"));
         break;
     case WizardPage::Page_Conclusion:
         button->setToolTip(QStringLiteral("Страница завершения настроек"));

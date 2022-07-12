@@ -12,7 +12,7 @@ LinuxUsersListWidget::LinuxUsersListWidget(UserModel *userModel, QWidget *parent
     InsertWidgetsIntoLayout();
     SetModelToListView();
     CreateConnections();
-    startTimer(2000, Qt::VeryCoarseTimer);
+    startTimer(5000, Qt::VeryCoarseTimer);
 }
 
 LinuxUsersListWidget::~LinuxUsersListWidget()
@@ -278,5 +278,19 @@ void LinuxUsersListWidget::resizeEvent(QResizeEvent *event)
 
 void LinuxUsersListWidget::timerEvent(QTimerEvent *event)
 {
+    Q_UNUSED(event);
     m_userModel->ListUpdate();
+}
+
+void LinuxUsersListWidget::keyPressEvent(QKeyEvent *event)
+{
+    if(Qt::Key_Delete==event->key())
+    {
+        const QModelIndex index=m_allUsersListView->currentIndex();
+        if(index.isValid())
+        {
+            const User user=index.data(Qt::UserRole+1).value<User>();
+            Q_EMIT ToDeleteUser(user.GetUserId(), user.GetUserName());
+        }
+    }
 }

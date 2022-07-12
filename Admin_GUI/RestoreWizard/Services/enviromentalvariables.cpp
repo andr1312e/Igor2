@@ -1,21 +1,21 @@
 #include "Admin_GUI/RestoreWizard/Services/enviromentalvariables.h"
 
-EnviromentalVariablesService::EnviromentalVariablesService()
-    : m_proFilePath(QStringLiteral("/etc/profile"))
+ProfileVariablesService::ProfileVariablesService()
+    : m_proFilePath(QLatin1Literal("/etc/profile"))
     , m_terminal(Terminal::GetTerminal())
 {
 
 }
 
 
-EnviromentalVariablesService::~EnviromentalVariablesService()
+ProfileVariablesService::~ProfileVariablesService()
 {
 
 }
 /**
  * Парсим данные из домэлеметна добавляя их в хэш контейнер
  */
-void EnviromentalVariablesService::GetProfileDataFromBackUp(const QDomElement &profileElem)
+void ProfileVariablesService::GetProfileDataFromBackUp(const QDomElement &profileElem)
 {
     ClearProFiles();
     if (QLatin1Literal("PROFILES") == profileElem.tagName())
@@ -36,14 +36,14 @@ void EnviromentalVariablesService::GetProfileDataFromBackUp(const QDomElement &p
 /**
  * Отчищаем данные профайла из парсера
  */
-void EnviromentalVariablesService::ClearProFiles()
+void ProfileVariablesService::ClearProFiles() noexcept
 {
     m_profileKeyWithData.clear();
 }
 /**
  * Добавляем в профайл данные с заменой ключей уже существующих
  */
-void EnviromentalVariablesService::AppendProfileDataInfo()
+void ProfileVariablesService::AppendProfileDataInfo()
 {
     if (!m_profileKeyWithData.isEmpty())
     {
@@ -80,14 +80,36 @@ void EnviromentalVariablesService::AppendProfileDataInfo()
     ApplyEtc();
 }
 
-const QList<QPair<QString, QString> > EnviromentalVariablesService::GetAllKeys() const noexcept
+bool ProfileVariablesService::SetNewItem(const QString &itemValue, int itemPos, int column) noexcept
+{
+    if(m_profileKeyWithData.count()<=itemPos || itemPos<0)
+    {
+        return false;
+    }
+    else
+    {
+        if(0==column)
+        {
+            const QPair<QString, QString> newPair=QPair<QString, QString>(itemValue, m_profileKeyWithData.at(itemPos).second);
+            m_profileKeyWithData.replace(itemPos, newPair);
+        }
+        else
+        {
+            const QPair<QString, QString> newPair=QPair<QString, QString>(m_profileKeyWithData.at(itemPos).first, itemValue);
+            m_profileKeyWithData.replace(itemPos, newPair);
+        }
+        return true;
+    }
+}
+
+QList<QPair<QString, QString> > ProfileVariablesService::GetAllKeys() const noexcept
 {
     return m_profileKeyWithData;
 }
 /**
  * Получаем из строки ключ значние по индексу оператора =
  */
-QPair<QString, QString> EnviromentalVariablesService::GetKeyAndVal(const QString &line) const noexcept
+QPair<QString, QString> ProfileVariablesService::GetKeyAndVal(const QString &line) const noexcept
 {
     QPair<QString, QString> keyAndValue;
     const int index = line.indexOf('=');
@@ -105,7 +127,7 @@ QPair<QString, QString> EnviromentalVariablesService::GetKeyAndVal(const QString
 /**
  * Преобразуем текст профайла(весь) к новому типу, используя совпадение ключей в хэш таблице
  */
-void EnviromentalVariablesService::RemoveDublicates(const QString &oldFileText)
+void ProfileVariablesService::RemoveDublicates(const QString &oldFileText)
 {
     const QStringList lines = oldFileText.split('\n');
     for (const QString &line : qAsConst(lines))
@@ -121,14 +143,14 @@ void EnviromentalVariablesService::RemoveDublicates(const QString &oldFileText)
 /**
  * создаем файл etc/profile
  */
-void EnviromentalVariablesService::CreateProFile()
+void ProfileVariablesService::CreateProFile()
 {
     m_terminal->CreateFile(m_proFilePath, Q_FUNC_INFO, true);
 }
 /**
  * записываем все имеющиеся данные в ect profile
  */
-void EnviromentalVariablesService::WriteItemsToProFile()
+void ProfileVariablesService::WriteItemsToProFile()
 {
     QString text;
     for (const QPair<QString, QString> &item : qAsConst(m_profileKeyWithData))
@@ -138,7 +160,7 @@ void EnviromentalVariablesService::WriteItemsToProFile()
     m_terminal->AppendTextToFileSudo(text, m_proFilePath, Q_FUNC_INFO);
 }
 
-int EnviromentalVariablesService::HasItem(const QString &key) const noexcept
+int ProfileVariablesService::HasItem(const QString &key) const noexcept
 {
     const QString newKey=key.mid(7); //удаяем export
     for (int i = 0; i < m_profileKeyWithData.count(); ++i)
@@ -152,7 +174,7 @@ int EnviromentalVariablesService::HasItem(const QString &key) const noexcept
     return -1;
 }
 
-void EnviromentalVariablesService::ApplyEtc()
+void ProfileVariablesService::ApplyEtc()
 {
     m_terminal->RunConsoleCommandSync(QLatin1Literal("source ")+m_proFilePath, Q_FUNC_INFO);
 }
